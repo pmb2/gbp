@@ -1,0 +1,1482 @@
+<html><head><base href="." /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GBP Automation Pro - Overview</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+:root {
+  --primary: #4285f4;
+  --secondary: #34a853;
+  --warning: #fbbc05;
+  --danger: #ea4335;
+  --dark: #202124;
+  --light: #ffffff;
+  --gray: #5f6368;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Google Sans', Arial, sans-serif;
+}
+
+body {
+  background: #f8f9fa;
+}
+
+.dashboard {
+  display: grid;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  position: fixed;
+  height: 100vh;
+  width: 250px;
+  background: var(--dark);
+  color: var(--light);
+  padding: 1.5rem 1.5rem 5rem 1.5rem;
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.nav-item {
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active {
+  background: var(--primary);
+}
+
+.nav-item i {
+  font-size: 1.2rem;
+  width: 24px;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 2rem;
+  width: calc(100% - 250px);
+  max-width: 100%;
+  display: grid;
+  gap: 2rem;
+}
+
+.sub-nav {
+  padding-left: 2rem;
+  display: none;
+}
+
+.nav-item.expanded .sub-nav {
+  display: block;
+}
+
+.sub-nav .nav-item {
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+}
+
+.notifications-banner {
+  background: var(--danger);
+  color: var(--light);
+  padding: 0.75rem 2rem;
+  margin: 2rem -2rem 0rem -2em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(234, 67, 53, 0.2);
+  width: calc(100% + 4rem);
+  animation: bounce 0.5s ease infinite alternate;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.notification-close {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.notification-close:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.analytics-section {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.analytics-card {
+  height: 100%;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: white;
+  padding: 1.75rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.analytics-card:hover {
+  transform: translateY(-5px) rotateX(5deg);
+  box-shadow: 0 8px 24px rgba(66,133,244,0.15);
+}
+
+.card-title {
+  font-size: 1.1rem;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+}
+
+.card-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-trend {
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.card-trend.up {
+  background: var(--secondary);
+  color: white;
+}
+
+.card-trend.down {
+  background: var(--danger);
+  color: white;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.analytics-card:hover .card-value {
+  animation: pulse 0.5s ease-in-out;
+}
+
+.drop-zone {
+  width: 100%;
+  border: 2px dashed var(--gray);
+  border-radius: 12px;
+  padding: 3rem;
+  text-align: center;
+  background: rgba(255,255,255,0.8);
+  transition: all 0.3s;
+  margin: 0;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  color: var(--primary);
+}
+
+.knowledge-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.quick-action {
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  background: var(--primary);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.quick-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66,133,244,0.2);
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid rgba(95,99,104,0.1);
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.tab:hover {
+  background: rgba(66,133,244,0.1);
+}
+
+.tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(66,133,244,0.2);
+}
+
+.activity-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.activity-item {
+  width: 100%;
+  height: 100%;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+  position: relative;
+}
+
+.activity-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.activity-meta {
+  font-size: 0.9rem;
+  color: var(--gray);
+}
+
+.filter-controls {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filter-select {
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--gray);
+  min-width: 150px;
+}
+
+.filter-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  background: var(--light);
+  border: 1px solid var(--gray);
+  transition: all 0.2s ease;
+}
+
+.action-btn.primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.activity-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activity-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn-small {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 4px;
+  background: var(--light);
+  border: 1px solid var(--gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.action-btn-small:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.user-profile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 250px;
+  background: var(--dark);
+  padding: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--primary);
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  color: var(--light);
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.user-credits {
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  width: 100%;
+}
+
+.tab-content {
+  display: none;
+  width: 100%;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  top: 50%;
+  right: -20px;
+  background: var(--dark);
+  color: var(--light);
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle:hover {
+  background: var(--primary);
+}
+
+.sidebar-toggle.closed #toggleArrow {
+  transform: rotate(180deg);
+}
+
+/* Media queries for responsive design */
+@media screen and (max-width: 1400px) {
+  .analytics-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .analytics-section {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .quick-action {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.client-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.client-select {
+  min-width: 300px;
+}
+
+.client-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.activity-item {
+  position: relative;
+}
+
+.item-checkbox {
+  position: absolute;
+  left: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.bulk-actions {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--dark);
+  padding: 1rem;
+  border-radius: 8px;
+  color: white;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.bulk-actions.visible {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.login-modal {
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: -115%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  z-index: 200;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.login-modal {
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--gray);
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--danger);
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+}
+
+.login-methods {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.login-method {
+  padding: 1rem;
+  border: 1px solid var(--gray);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.login-method:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">GBP Automation Pro</div>
+    <nav>
+      <a href="{{ url_for('overview') }}" class="nav-item">
+        <i class="fas fa-home"></i>
+        Overview
+      </a>
+      <a href="{{ url_for('content_management') }}" class="nav-item">
+        <i class="fas fa-file-alt"></i>
+        Content Management
+      </a>
+      <a href="{{ url_for('knowledge_base') }}" class="nav-item">
+        <i class="fas fa-book"></i>
+        Knowledge Base
+      </a>
+      <a href="{{ url_for('analytics') }}" class="nav-item">
+        <i class="fas fa-chart-bar"></i>
+        Analytics
+      </a>
+      <a href="{{ url_for('notifications') }}" class="nav-item">
+        <i class="fas fa-bell"></i>
+        Notifications
+      </a>
+    </nav>
+    <div class="user-profile" id="userProfile">
+      <div class="user-avatar">
+        <img id="userAvatar" alt="User avatar">
+      </div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Loading...</div>
+        <div class="user-credits" id="userCredits">Credits: 0</div>
+      </div>
+    </div>
+    <div class="sidebar-toggle" id="sidebarToggle">
+      <i class="fas fa-chevron-left" id="toggleArrow"></i>
+    </div>
+  </aside>
+  
+  <main class="main-content" id="dropTarget">
+    <div class="notifications-banner" id="notificationsBanner">
+      <div>
+        <strong>Welcome back!</strong> You have 3 new reviews pending response.
+      </div>
+      <div class="notification-close">×</div>
+    </div>
+
+    <div class="client-selector">
+      <select class="filter-select client-select" multiple>
+        <option value="all">Select All Accounts</option>
+        <option value="1">Client 1 - Joe's Pizza</option>
+        <option value="2">Client 2 - Main Street Dental</option>
+        <option value="3">Client 3 - Lakeside Hotel</option>
+      </select>
+      <div class="client-actions">
+        <button class="action-btn" onclick="importAccounts()">
+          <i class="fas fa-file-import"></i> Import Accounts
+        </button>
+        <button class="action-btn" onclick="addNewAccount()">
+          <i class="fas fa-plus"></i> Add Account
+        </button>
+      </div>
+    </div>
+
+    <div class="content-wrapper">
+      <div class="analytics-section">
+        <div class="analytics-card">
+          <div class="card-title">Total Reviews</div>
+          <div class="card-value">324</div>
+        </div>
+        <div class="analytics-card">
+          <div class="card-title">Average Rating</div>
+          <div class="card-value">4.8</div>
+        </div>
+        <div class="analytics-card">
+          <div class="card-title">Monthly Views</div>
+          <div class="card-value">12.5k</div>
+        </div>
+        <div class="analytics-card">
+          <div class="card-title">Response Rate</div>
+          <div class="card-value">98%</div>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="dropZone">
+        Drag and drop files here to upload <br>
+        directly into your knowledge base.
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="posts">Posts</div>
+        <div class="tab" data-tab="q-and-a">Q&A</div>
+        <div class="tab" data-tab="reviews">Reviews</div>
+      </div>
+
+      <div class="filter-controls">
+        <div class="filter-row" id="posts-filters">
+          <select class="filter-select">
+            <option>All Posts</option>
+            <option>Published</option>
+            <option>Scheduled</option>
+            <option>Draft</option>
+          </select>
+          <select class="filter-select">
+            <option>Sort by Date</option>
+            <option>Sort by Views</option>
+            <option>Sort by Engagement</option>
+          </select>
+          <div class="filter-actions">
+            <button class="action-btn primary">New Post</button>
+            <button class="action-btn">Schedule Post</button>
+            <button class="action-btn">Generate Content</button>
+          </div>
+        </div>
+
+        <div class="filter-row" id="qa-filters" style="display: none;">
+          <select class="filter-select">
+            <option>All Questions</option>
+            <option>Answered</option>
+            <option>Unanswered</option>
+            <option>Featured</option>
+          </select>
+          <select class="filter-select">
+            <option>Sort by Date</option>
+            <option>Sort by Relevance</option>
+            <option>Sort by Votes</option>
+          </select>
+          <div class="filter-actions">
+            <button class="action-btn primary" onclick="addQuestionAndAnswer()">Add Q&A</button>
+            <button class="action-btn">Generate Answer</button>
+            <button class="action-btn">Import Questions</button>
+          </div>
+        </div>
+
+        <div class="filter-row" id="reviews-filters" style="display: none;">
+          <select class="filter-select">
+            <option>All Reviews</option>
+            <option>Responded</option>
+            <option>Pending</option>
+            <option>Positive</option>
+            <option>Negative</option>
+          </select>
+          <select class="filter-select">
+            <option>Sort by Date</option>
+            <option>Sort by Rating</option>
+            <option>Sort by Response Status</option>
+          </select>
+          <div class="filter-actions">
+            <button class="action-btn">Write Response</button>
+            <button class="action-btn">Generate Response</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content active" id="posts-content">
+        <div class="activity-list">
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e6f4ea; color: var(--secondary)">📝</div>
+              <div class="activity-content">
+                <div class="activity-title">Summer Sale Announcement</div>
+                <div class="activity-meta">Posted 5 hours ago • 1.2k views</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+              <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e6f4ea; color: var(--secondary)">📝</div>
+              <div class="activity-content">
+                <div class="activity-title">New Product Launch</div>
+                <div class="activity-meta">Posted 2 days ago • 3.4k views</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+              <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="qa-content">
+        <div class="activity-list">
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">❓</div>
+              <div class="activity-content">
+                <div class="activity-title">What are your hours?</div>
+                <div class="activity-meta">Answered 1 hour ago</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+              <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">❓</div>
+              <div class="activity-content">
+                <div class="activity-title">Do you offer delivery?</div>
+                <div class="activity-meta">Answered 3 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+              <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">❓</div>
+              <div class="activity-content">
+                <div class="activity-title">Do you have parking available?</div>
+                <div class="activity-meta">Answered 5 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+              <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="reviews-content">
+        <div class="activity-list">
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">⭐</div>
+              <div class="activity-content">
+                <div class="activity-title">Great service and friendly staff!</div>
+                <div class="activity-meta">2 hours ago • John D. • ⭐⭐⭐⭐⭐</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-reply"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">⭐</div>
+              <div class="activity-content">
+                <div class="activity-title">Quick and efficient</div>
+                <div class="activity-meta">1 day ago • Sarah M. • ⭐⭐⭐⭐</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-reply"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="activity-item">
+            <input type="checkbox" class="item-checkbox">
+            <div class="activity-main">
+              <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">⭐</div>
+              <div class="activity-content">
+                <div class="activity-title">Amazing experience overall!</div>
+                <div class="activity-meta">2 days ago • Mike R. • ⭐⭐⭐⭐⭐</div>
+              </div>
+            </div>
+            <div class="activity-actions">
+              <button class="action-btn-small"><i class="fas fa-reply"></i></button>
+              <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bulk-actions" id="bulkActions">
+      <span id="selectedCount">0 selected</span>
+      <button class="action-btn primary">Bulk Edit</button>
+      <button class="action-btn">Bulk Delete</button>
+      <button class="action-btn" id="bulkRequestReviews">Request Reviews (-<span id="creditsRequired">0</span> credits)</button>
+      <button class="action-btn">Generate Response</button>
+    </div>
+
+    <div class="login-modal" id="loginModal">
+      <div class="modal-close">×</div>
+      <h2>Add New Account</h2>
+      <div class="login-methods">
+        <div class="login-method" onclick="handleOAuth('google')">
+          <i class="fab fa-google"></i> Sign in with Google Business Profile
+        </div>
+        <div class="login-method" onclick="handleOAuth('facebook')">
+          <i class="fab fa-facebook"></i> Sign in with Facebook Business
+        </div>
+        <div class="login-method" onclick="handleOAuth('yelp')">
+          <i class="fab fa-yelp"></i> Sign in with Yelp
+        </div>
+        <div class="login-method" onclick="showCredentialsForm()">
+          <i class="fas fa-user"></i> Sign in with Username/Password
+        </div>
+        <div class="login-method" onclick="showCsvUpload()">
+          <i class="fas fa-file-csv"></i> Batch Import via CSV
+        </div>
+      </div>
+    </div>
+    <div class="modal-overlay"></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize SQLite table for uploads
+async function initDB() {
+  const query = `
+    CREATE TABLE IF NOT EXISTS uploads (
+      id INTEGER PRIMARY KEY,
+      filename TEXT,
+      type TEXT,
+      url TEXT,
+      user_id TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `;
+  await fetch('/api/v1/sql/?' + new URLSearchParams({sql: query}));
+}
+
+// Handle file upload and DB insertion
+async function handleFileUpload(file) {
+  try {
+    const url = await window.websim.upload(file);
+    const user = await window.websim.getUser();
+    
+    const query = `
+      INSERT INTO uploads (filename, type, url, user_id)
+      VALUES ('${file.name}', '${file.type}', '${url}', '${user.id}')
+    `;
+    
+    await fetch('/api/v1/sql/?' + new URLSearchParams({sql: query}));
+    
+    // Update UI to show upload success
+    const notification = document.createElement('div');
+    notification.textContent = `${file.name} uploaded successfully`;
+    notification.style.backgroundColor = 'var(--secondary)';
+    notification.style.color = 'white';
+    notification.style.padding = '1rem';
+    notification.style.marginBottom = '1rem';
+    document.querySelector('.knowledge-container').prepend(notification);
+    
+    setTimeout(() => notification.remove(), 3000);
+  } catch (error) {
+    console.error('Upload failed:', error);
+  }
+}
+
+// Initialize drag and drop
+function initDragAndDrop() {
+  const dropZone = document.getElementById('dropZone');
+  const dropTarget = document.getElementById('dropTarget');
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropTarget.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+    
+    dropZone.addEventListener(eventName, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropTarget.addEventListener(eventName, () => {
+      dropZone.classList.add('dragover');
+    });
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropTarget.addEventListener(eventName, () => {
+      dropZone.classList.remove('dragover');
+    });
+  });
+
+  dropTarget.addEventListener('drop', (e) => {
+    const files = e.dataTransfer.files;
+    if (files.length) {
+      [...files].forEach(handleFileUpload);
+    }
+  });
+}
+
+// Handle notifications
+document.querySelector('.notification-close').addEventListener('click', () => {
+  document.getElementById('notificationsBanner').style.display = 'none';
+});
+
+// Client-specific data handling
+const clientData = {
+  'all': {
+    analytics: {
+      totalReviews: 324,
+      averageRating: 4.8,
+      monthlyViews: '12.5k',
+      responseRate: '98%',
+      trends: {
+        reviews: '+15%',
+        rating: '+0.2',
+        views: '+22%',
+        responses: '+5%'
+      }
+    },
+    posts: [
+      {
+        title: 'Summer Sale Announcement',
+        time: '5 hours ago',
+        views: '1.2k'
+      },
+      {
+        title: 'New Product Launch',
+        time: '2 days ago',
+        views: '3.4k'
+      }
+    ],
+    qa: [
+      {
+        question: 'What are your hours?',
+        time: '1 hour ago'
+      },
+      {
+        question: 'Do you offer delivery?',
+        time: '3 hours ago'
+      }
+    ],
+    reviews: [
+      {
+        text: 'Great service and friendly staff!',
+        author: 'John D.',
+        rating: 5,
+        time: '2 hours ago'
+      },
+      {
+        text: 'Quick and efficient',
+        author: 'Sarah M.',  
+        rating: 4,
+        time: '1 day ago'
+      }
+    ]
+  },
+  '1': {
+    analytics: {
+      totalReviews: 156,
+      averageRating: 4.9,
+      monthlyViews: '8.2k',
+      responseRate: '100%',
+      trends: {
+        reviews: '+12%',
+        rating: '+0.3',
+        views: '+18%',
+        responses: '+8%'
+      }
+    },
+    posts: [
+      {
+        title: 'Weekly Pizza Special',
+        time: '1 day ago',
+        views: '850'
+      },
+      {
+        title: 'New Delivery Areas Added',
+        time: '3 days ago',
+        views: '1.2k'
+      }
+    ],
+    qa: [
+      {
+        question: 'Do you offer gluten-free options?',
+        time: '5 hours ago'
+      },
+      {
+        question: 'What are your delivery hours?',
+        time: '1 day ago'
+      }
+    ],
+    reviews: [
+      {
+        text: 'Best pizza in town!',
+        author: 'Mike R.',
+        rating: 5,
+        time: '6 hours ago'
+      },
+      {
+        text: 'Fast delivery, hot and fresh',
+        author: 'Lisa K.',
+        rating: 5,
+        time: '2 days ago'
+      }
+    ]
+  }
+  // Add more client data as needed
+};
+
+// Update the client selector change handler
+document.querySelector('.client-select').addEventListener('change', (e) => {
+  const selectedClient = e.target.value;
+  updateDashboardData(selectedClient);
+});
+
+function updateDashboardData(clientId) {
+  const data = clientData[clientId] || clientData['all'];
+  
+  // Update analytics cards
+  document.querySelectorAll('.analytics-card').forEach((card, index) => {
+    const metrics = ['totalReviews', 'averageRating', 'monthlyViews', 'responseRate'];
+    const trends = ['reviews', 'rating', 'views', 'responses'];
+    const value = data.analytics[metrics[index]];
+    const trend = data.analytics.trends[trends[index]];
+    
+    card.innerHTML = `
+      <div class="card-title">${card.querySelector('.card-title').textContent}</div>
+      <div class="card-value">
+        ${value}
+        <span class="card-trend ${trend.startsWith('+') ? 'up' : 'down'}">
+          ${trend} <i class="fas fa-${trend.startsWith('+') ? 'arrow-up' : 'arrow-down'}"></i>
+        </span>
+      </div>
+    `;
+  });
+
+  // Update posts content
+  const postsContent = document.getElementById('posts-content');
+  postsContent.querySelector('.activity-list').innerHTML = data.posts.map(post => `
+    <div class="activity-item">
+      <input type="checkbox" class="item-checkbox">
+      <div class="activity-main">
+        <div class="activity-icon" style="background: #e6f4ea; color: var(--secondary)">📝</div>
+        <div class="activity-content">
+          <div class="activity-title">${post.title}</div>
+          <div class="activity-meta">Posted ${post.time} • ${post.views} views</div>
+        </div>
+      </div>
+      <div class="activity-actions">
+        <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+        <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+        <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+
+  // Update Q&A content similarly
+  const qaContent = document.getElementById('qa-content');
+  qaContent.querySelector('.activity-list').innerHTML = data.qa.map(qa => `
+    <div class="activity-item">
+      <input type="checkbox" class="item-checkbox">
+      <div class="activity-main">
+        <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">❓</div>
+        <div class="activity-content">
+          <div class="activity-title">${qa.question}</div>
+          <div class="activity-meta">Answered ${qa.time}</div>
+        </div>
+      </div>
+      <div class="activity-actions">
+        <button class="action-btn-small"><i class="fas fa-edit"></i></button>
+        <button class="action-btn-small"><i class="fas fa-calendar"></i></button>
+        <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+
+  // Update reviews content
+  const reviewsContent = document.getElementById('reviews-content');
+  reviewsContent.querySelector('.activity-list').innerHTML = data.reviews.map(review => `
+    <div class="activity-item">
+      <input type="checkbox" class="item-checkbox">
+      <div class="activity-main">
+        <div class="activity-icon" style="background: #e8f0fe; color: var(--primary)">⭐</div>
+        <div class="activity-content">
+          <div class="activity-title">${review.text}</div>
+          <div class="activity-meta">${review.time} • ${review.author} • ${'⭐'.repeat(review.rating)}</div>
+        </div>
+      </div>
+      <div class="activity-actions">
+        <button class="action-btn-small"><i class="fas fa-reply"></i></button>
+        <button class="action-btn-small"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Initialize with all data
+updateDashboardData('all');
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  initDB();
+  initDragAndDrop();
+  initSidebar();
+  initUserProfile();
+  initBulkActions();
+  initAccountManagement();
+
+  // Event listener for user profile elements
+  const userProfile = document.getElementById('userProfile');
+  userProfile.addEventListener('click', () => {
+    // Logic to bring up settings popup/modal
+    console.log('Open settings');
+  });
+
+  // Event listener for sidebar toggle
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  
+  sidebarToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('closed');
+    const toggleArrow = document.getElementById('toggleArrow');
+    toggleArrow.classList.toggle('fa-chevron-left');
+    toggleArrow.classList.toggle('fa-chevron-right');
+  });
+
+  // Add modal close handlers
+  document.querySelector('.modal-close').addEventListener('click', hideLoginModal);
+  document.querySelector('.modal-overlay').addEventListener('click', hideLoginModal);
+});
+
+// Initialize user profile
+async function initUserProfile() {
+  const user = await window.websim.getUser();
+  if (user) {
+    document.getElementById('userAvatar').src = user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.username);
+    document.getElementById('userName').textContent = user.username;
+    // You would typically fetch credits from your backend
+    document.getElementById('userCredits').textContent = 'Credits: 100';
+  }
+}
+
+// Sidebar Interaction
+function initSidebar() {
+  const navItems = document.querySelectorAll('.nav-item');
+  
+  navItems.forEach(item => {
+    const subNav = item.querySelector('.sub-nav');
+    if (subNav) {
+      item.addEventListener('click', (e) => {
+        if (e.target === item) {
+          item.classList.toggle('expanded');
+        }
+      });
+    }
+    
+    item.addEventListener('click', (e) => {
+      if (!e.target.closest('.sub-nav')) {
+        navItems.forEach(navItem => navItem.classList.remove('active'));
+        item.classList.add('active');
+      }
+    });
+  });
+}
+
+// Navigation and Tab Handling
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const tabId = tab.dataset.tab;
+    
+    // Hide all filter rows
+    document.querySelectorAll('.filter-row').forEach(row => {
+      row.style.display = 'none';
+    });
+    
+    // Show the corresponding filter row
+    document.getElementById(`${tabId}-filters`).style.display = 'flex';
+    
+    // Remove active class from all tabs and content
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    // Add active class to clicked tab
+    tab.classList.add('active');
+    
+    // Show corresponding content
+    const contentElement = document.getElementById(`${tabId}-content`);
+    contentElement.classList.add('active');
+
+    // Reset checkboxes when switching tabs
+    document.querySelectorAll('.item-checkbox:checked').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    document.getElementById('bulkActions').classList.remove('visible');
+  });
+});
+
+// Initialize filter functionality
+document.querySelectorAll('.filter-select').forEach(select => {
+  select.addEventListener('change', () => {
+    // Add your filtering logic here
+    console.log('Filter changed:', select.value);
+  });
+});
+
+// Initialize action buttons
+document.querySelectorAll('.action-btn, .action-btn-small').forEach(button => {
+  button.addEventListener('click', () => {
+    // Add your action handling logic here
+    console.log('Action clicked:', button.textContent);
+  });
+});
+
+// Request Reviews functionality
+const requestReviewsBtn = document.getElementById('requestReviews');
+const checkboxes = document.querySelectorAll('.review-checkbox');
+let isRequestMode = true;
+
+requestReviewsBtn.addEventListener('click', () => {
+  if (isRequestMode) {
+    checkboxes.forEach(cb => cb.style.display = 'inline');
+    requestReviewsBtn.innerHTML = 'Use 0 Credits <span style="position: absolute; top: 2px; right: 5px; cursor: pointer;">×</span>';
+    requestReviewsBtn.style.position = 'relative';
+
+    const closeBtn = requestReviewsBtn.querySelector('span');
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetRequestButton();
+    });
+
+    isRequestMode = false;
+  } else {
+    // Handle credits processing
+    const selectedCount = [...checkboxes].filter(cb => cb.checked).length;
+    const creditsRequired = selectedCount * 10;
+    // Here you would add logic to deduct credits
+    console.log(`Processing request for ${creditsRequired} credits`);
+  }
+});
+
+function resetRequestButton() {
+  checkboxes.forEach(cb => {
+    cb.style.display = 'none';
+    cb.checked = false;
+  });
+  requestReviewsBtn.textContent = 'Request Reviews';
+  isRequestMode = true;
+  updateTotal();
+}
+
+function updateTotal() {
+  const selectedCount = [...checkboxes].filter(cb => cb.checked).length;
+  const totalCredits = selectedCount * 10;
+  if (!isRequestMode) {
+    requestReviewsBtn.innerHTML = `Use ${totalCredits} Credits <span style="position: absolute; top: 2px; right: 5px; cursor: pointer;">×</span>`;
+
+    const closeBtn = requestReviewsBtn.querySelector('span');
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      resetRequestButton();
+    });
+  }
+}
+
+document.querySelectorAll('.quick-action').forEach(button => {
+  button.addEventListener('click', () => {
+    if (button.textContent !== 'Request Reviews' && button.textContent !== 'Write Reviews') {
+      const action = button.textContent;
+      switch(action) {
+        case 'Generate Content':
+          // Handle content generation
+          break;
+        case 'Upload Media':
+          // Handle media upload
+          break;
+      }
+    }
+  });
+});
+
+// Initialize bulk actions
+function initBulkActions() {
+  const bulkActionsDiv = document.getElementById('bulkActions');
+
+  // Watch for checkbox changes
+  document.addEventListener('change', e => {
+    if (e.target.matches('.item-checkbox')) {
+      const checkedBoxes = document.querySelectorAll('.item-checkbox:checked');
+      const count = checkedBoxes.length;
+      bulkActionsDiv.classList.toggle('visible', count > 0);
+      document.getElementById('selectedCount').textContent = `${count} selected`;
+      document.getElementById('creditsRequired').textContent = count * 10;
+    }
+  });
+}
+
+// Add OAuth and account management
+function initAccountManagement() {
+  const loginModal = document.getElementById('loginModal');
+
+  // You can add logic to show the modal if needed
+}
+
+// Account Actions
+function importAccounts() {
+  // Trigger file input for CSV upload
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.csv';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    // Handle CSV processing here
+    console.log('Processing CSV:', file);
+  };
+  input.click();
+}
+
+function addNewAccount() {
+  showLoginModal();
+}
+
+function handleOAuth(provider) {
+  // Implement OAuth flow for the selected provider
+  console.log('Authenticating with:', provider);
+}
+
+function showLoginModal() {
+  document.getElementById('loginModal').style.display = 'block';
+  document.querySelector('.modal-overlay').style.display = 'block';
+}
+
+function hideLoginModal() {
+  document.getElementById('loginModal').style.display = 'none';
+  document.querySelector('.modal-overlay').style.display = 'none';
+}
+</script>
+</body></html>
