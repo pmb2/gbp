@@ -194,6 +194,11 @@ function initBulkActions() {
   });
 }
 
+function addQuestionAndAnswer() {
+  // Placeholder function for adding Q&A
+  console.log('Add Q&A button clicked');
+}
+
 // Add OAuth and account management
 function initAccountManagement() {
   const loginModal = document.getElementById('loginModal');
