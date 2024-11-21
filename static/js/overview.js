@@ -39,6 +39,11 @@ async function initUserProfile() {
   }
 }
 
+function addQuestionAndAnswer() {
+  // Placeholder function for adding Q&A
+  console.log('Add Q&A button clicked');
+}
+
 // Sidebar Interaction
 function initSidebar() {
   const navItems = document.querySelectorAll('.nav-item');
