@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+
+function addQuestionAndAnswer() {
+  // Placeholder function for adding Q&A
+  console.log('Add Q&A button clicked');
+}
   initDB();
   initDragAndDrop();
   initSidebar();
