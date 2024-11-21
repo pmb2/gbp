@@ -60,7 +60,8 @@ body {
 }
 
 .nav-item.active {
-  background: var(--primary);
+  background: var(--light);
+  color: var(--primary);
 }
 
 .nav-item i {

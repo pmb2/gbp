@@ -6,41 +6,7 @@
 </head>
 <body>
 <div class="dashboard">
-  <aside class="sidebar" id="sidebar">
-    <div class="logo">GBP Automation Pro</div>
-    <nav>
-      <a href="{{ url_for('overview') }}" class="nav-item">
-        <i class="fas fa-home"></i>
-        Overview
-      </a>
-      <a href="{{ url_for('content_management') }}" class="nav-item">
-        <i class="fas fa-file-alt"></i>
-        Content Management
-      </a>
-      <a href="{{ url_for('knowledge_base') }}" class="nav-item">
-        <i class="fas fa-book"></i>
-        Knowledge Base
-      </a>
-      <a href="{{ url_for('analytics') }}" class="nav-item">
-        <i class="fas fa-chart-bar"></i>
-        Analytics
-      </a>
-      <a href="{{ url_for('notifications') }}" class="nav-item">
-        <i class="fas fa-bell"></i>
-        Notifications
-      </a>
-    </nav>
-    <div class="user-profile">
-      <img src="" alt="User avatar" class="avatar" id="userAvatar">
-      <div class="user-info">
-        <div class="username" id="username"></div>
-        <div class="credits" id="userCredits"></div>
-      </div>
-    </div>
-    <div class="sidebar-toggle" id="sidebarToggle">
-      <i class="fas fa-chevron-left" id="toggleArrow"></i>
-    </div>
-  </aside>
+  {% include 'sidebar.html' %}
   
   <main class="main-content">
     <div class="kb-overview">
