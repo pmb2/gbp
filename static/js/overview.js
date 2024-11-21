@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.modal-overlay').addEventListener('click', hideLoginModal);
 });
 
+function addQuestionAndAnswer() {
+  // Placeholder function for adding Q&A
+  console.log('Add Q&A button clicked');
+}
+
 // Initialize user profile
 async function initUserProfile() {
   const user = await window.websim.getUser();
