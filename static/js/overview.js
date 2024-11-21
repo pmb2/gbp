@@ -9,8 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event listener for user profile elements
   const userProfile = document.getElementById('userProfile');
   userProfile.addEventListener('click', () => {
-    // Logic to bring up settings popup/modal
-    console.log('Open settings');
+    window.location.href = '/settings';
   });
 
   // Event listener for sidebar toggle
