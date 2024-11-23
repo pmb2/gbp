@@ -14,5 +14,5 @@ def setup_google_blueprint():
             "https://www.googleapis.com/auth/userinfo.email",
             "https://www.googleapis.com/auth/userinfo.profile"
         ],
-        redirect_to="auth/callback"
+        redirect_to="login/google/authorized?flowName=GeneralOAuthFlow"
     )
