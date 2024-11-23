@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, render_template
-from .models import Notification, UserPreference, db
-from .email_utils import send_email
+from models import Notification, UserPreference, db
+from email_utils import send_email
 
 bp = Blueprint('main', __name__)
 
