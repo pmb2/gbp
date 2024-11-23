@@ -1,7 +1,7 @@
 from flask import render_template
 from flask_mail import Message
 from app import mail
-from .models import Notification
+from models import Notification
 from datetime import datetime
 
 def send_email(app, notification):

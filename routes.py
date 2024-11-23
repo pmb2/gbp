@@ -7,6 +7,7 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def index():
     return render_template('overview.html')
+@bp.route('/create_notification', methods=['POST'])
 def create_notification():
     data = request.json
     new_notification = Notification(
