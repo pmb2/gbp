@@ -3,7 +3,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from oauth import setup_google_blueprint
 from flask_sqlalchemy import SQLAlchemy
-from database_setup import User, Company, Post, Review, Question, Setting, Notification, UserAction, Analytics
+from models import User, Company, Post, Review, Question, Setting, Notification, UserAction, Analytics
 
 db = SQLAlchemy()
 
