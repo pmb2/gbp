@@ -1,5 +1,5 @@
-from app.models import Notification, UserPreference
-from app.routes import bp
+from models import Notification, UserPreference
+from routes import bp
 from app import create_app, db
 
 app = create_app()
