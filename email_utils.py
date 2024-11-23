@@ -1,6 +1,6 @@
 from flask import render_template
 from flask_mail import Message
-from . import mail
+from app import mail
 from .models import Notification
 from datetime import datetime
 
