@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from .models import Notification, UserPreference, db
 from .email_utils import send_email
 
 bp = Blueprint('main', __name__)
 
-@bp.route('/notifications', methods=['POST'])
+@bp.route('/')
+def index():
+    return render_template('overview.html')
 def create_notification():
     data = request.json
     new_notification = Notification(
