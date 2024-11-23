@@ -9,7 +9,7 @@ db = SQLAlchemy()
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://username:password@localhost/gbp-flask"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://your_username:your_password@localhost/gbp-flask"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize extensions
