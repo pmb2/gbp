@@ -1,0 +1,27 @@
+:root {
+  --primary: #4285f4;
+  --secondary: #34a853;
+  --danger: #ea4335;
+  --dark: #202124;
+  --light: #ffffff;
+}
+
+body {
+  font-family: 'Google Sans', Arial, sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+  padding: 0;
+}
+
+.main-content {
+  margin-left: 250px;
+  padding: 2rem;
+  display: grid;
+  gap: 2rem;
+}
+
+.analytics-card {
+  padding: 1.75rem;
+  background: #fff;
+  border-radius: 12px;
+}
