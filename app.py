@@ -2,7 +2,7 @@ from flask import Flask, redirect, url_for, render_template, session
 from flask_dance.contrib.google import make_google_blueprint, google
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
 from oauth import setup_google_blueprint
-from models import db, User
+from models import db, User, Company, Post, Review, Question, Setting, Notification, UserAction, Analytics
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
@@ -60,6 +60,9 @@ def login_google():
         return redirect(url_for("dashboard"))
     return redirect(url_for("home"))
 
+
+with app.app_context():
+    db.create_all()
 
 if __name__ == "__main__":
     app.run(debug=True)
