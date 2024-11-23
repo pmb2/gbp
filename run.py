@@ -3,7 +3,7 @@ from project.app.routes import bp
 from project.app import create_app, db
 
 app = create_app()
-app.register_blueprint(bp)
+app.register_blueprint(bp, url_prefix='/')
 db.init_app(app)
 
 @app.before_first_request
