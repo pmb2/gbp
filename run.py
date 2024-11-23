@@ -1,6 +1,6 @@
-from project.app.models import Notification, UserPreference
-from project.app.routes import bp
-from project.app import create_app, db
+from models import Notification, UserPreference
+from routes import bp
+from app import create_app, db
 
 app = create_app()
 app.register_blueprint(bp, url_prefix='/')
