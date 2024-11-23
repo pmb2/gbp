@@ -1,174 +1,75 @@
-<html><head><base href="." /><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Knowledge Base - GBP Automation Pro</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/main.min.css">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/knowledge-base.css') }}">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-<div class="dashboard">
-  {% include 'sidebar.html' %}
-  
-  <main class="main-content">
+{% extends 'base.html' %}
+
+{% block content %}
     <div class="kb-overview">
-      <h2>Knowledge Base Overview</h2>
-      <div class="kb-stats">
-        <div class="stat-card">
-          <i class="fas fa-file"></i>
-          <div class="stat-info">
-            <div class="stat-value" id="totalDocuments">0</div>
-            <div class="stat-label">Total Documents</div>
-          </div>
+        <h2>Knowledge Base Overview</h2>
+        <div class="kb-stats">
+            <div class="stat-card">
+                <i class="fas fa-file"></i>
+                <div class="stat-info">
+                    <div class="stat-value" id="totalDocuments">0</div>
+                    <div class="stat-label">Total Documents</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-network-wired"></i>
+                <div class="stat-info">
+                    <div class="stat-value" id="vectorCount">0</div>
+                    <div class="stat-label">Vector Embeddings</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-brain"></i>
+                <div class="stat-info">
+                    <div class="stat-value" id="llmQueries">0</div>
+                    <div class="stat-label">LLM Queries</div>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-          <i class="fas fa-network-wired"></i>
-          <div class="stat-info">
-            <div class="stat-value" id="vectorCount">0</div>
-            <div class="stat-label">Vector Embeddings</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <i class="fas fa-brain"></i>
-          <div class="stat-info">
-            <div class="stat-value" id="llmQueries">0</div>
-            <div class="stat-label">LLM Queries</div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <div class="kb-grid">
-      <div class="vector-graph-container">
-        <h3>Knowledge Graph</h3>
-        <div id="vectorGraph"></div>
-        <div class="graph-legend">
-          <div class="legend-item">
-            <span class="dot document"></span> Documents
-          </div>
-          <div class="legend-item">
-            <span class="dot concept"></span> Concepts
-          </div>
-          <div class="legend-item">
-            <span class="dot relation"></span> Relations
-          </div>
-        </div>
-      </div>
-
-      <div class="file-management">
-        <h3>Document Management</h3>
-        <div class="upload-zone" id="uploadZone">
-          <i class="fas fa-cloud-upload-alt"></i>
-          <p>Drag &amp; drop files here to upload</p>
-          <p>Supported formats: PDF, DOCX, TXT, CSV, JSON, Images</p>
-          <input type="file" id="fileInput" multiple style="display: none;">
-          <button class="upload-btn" onclick="document.getElementById('fileInput').click();">Select Files</button>
-        </div>
-        
-        <div class="file-browser">
-          <div class="file-header">
-            <div class="search-bar">
-              <input type="text" placeholder="Search documents...">
-              <i class="fas fa-search"></i>
+        <div class="vector-graph-container">
+            <h3>Knowledge Graph</h3>
+            <div id="vectorGraph"></div>
+            <div class="graph-legend">
+                <div class="legend-item">
+                    <span class="dot document"></span> Documents
+                </div>
+                <div class="legend-item">
+                    <span class="dot concept"></span> Concepts
+                </div>
+                <div class="legend-item">
+                    <span class="dot relation"></span> Relations
+                </div>
             </div>
-            <div class="view-options">
-              <i class="fas fa-th-large active"></i>
-              <i class="fas fa-list"></i>
+        </div>
+
+        <div class="file-management">
+            <h3>Document Management</h3>
+            <div class="upload-zone" id="uploadZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag &amp; drop files here to upload.</p>
+                <p>Supported formats: PDF, DOCX, TXT, CSV, JSON, Images</p>
+                <input type="file" id="fileInput" multiple/>
+                <button class="upload-btn">Select Files</button>
             </div>
-          </div>
-          <div class="file-grid" id="fileGrid">
-            <!-- Files will be populated here -->
-          </div>
+
+            <div class="file-browser">
+                <div class="file-header">
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search documents...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="view-options">
+                        <i class="fas fa-th-large active"></i>
+                        <i class="fas fa-list"></i>
+                    </div>
+                </div>
+                <div class="file-grid" id="fileGrid">
+                    <!-- Files will be populated here -->
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-
-    <div class="company-info">
-      <div class="info-section">
-        <h3>Company Overview</h3>
-        <div class="info-content" id="companyOverview">
-          <!-- Company overview content -->
-        </div>
-      </div>
-      <div class="info-section">
-        <h3>Operations News</h3>
-        <div class="news-feed" id="operationsNews">
-          <!-- News items -->
-        </div>
-      </div>
-    </div>
-
-    <div class="analytics-overview" id="analyticsContent" style="display: none;">
-      <h2>Analytics Dashboard</h2>
-      <div class="kpi-cards">
-        <div class="kpi-card">
-          <i class="fas fa-users"></i>
-          <div class="kpi-info">
-            <div class="kpi-value">1,247</div>
-            <div class="kpi-label">Active Clients</div>
-            <div class="kpi-trend positive">+12.5% vs last month</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <i class="fas fa-star"></i>
-          <div class="kpi-info">
-            <div class="kpi-value">4.8</div>
-            <div class="kpi-label">Average Rating</div>
-            <div class="kpi-trend positive">+0.3 vs last month</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <i class="fas fa-chart-line"></i>
-          <div class="kpi-info">
-            <div class="kpi-value">89.3%</div>
-            <div class="kpi-label">Profile Optimization</div>
-            <div class="kpi-trend positive">+5.2% vs last month</div>
-          </div>
-        </div>
-        <div class="kpi-card">
-          <i class="fas fa-comments"></i>
-          <div class="kpi-info">
-            <div class="kpi-value">15,892</div>
-            <div class="kpi-label">Reviews Managed</div>
-            <div class="kpi-trend positive">+18.7% vs last month</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="analytics-grid">
-        <div class="chart-container">
-          <h3>Client Growth Trend</h3>
-          <canvas id="clientGrowthChart"></canvas>
-        </div>
-        <div class="chart-container">
-          <h3>Performance Metrics</h3>
-          <canvas id="performanceRadarChart"></canvas>
-        </div>
-      </div>
-
-      <div class="analytics-grid">
-        <div class="chart-container">
-          <h3>Revenue Distribution</h3>
-          <canvas id="revenueChart"></canvas>
-        </div>
-        <div class="chart-container">
-          <h3>Customer Satisfaction</h3>
-          <canvas id="satisfactionChart"></canvas>
-        </div>
-      </div>
-
-      <div class="ai-insights">
-        <h3><i class="fas fa-robot"></i> AI-Powered Insights</h3>
-        <div id="aiInsights" class="insights-container">
-          Loading AI analysis...
-        </div>
-      </div>
-    </div>
-  </main>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.8/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.8/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.8/main.min.js"></script>
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="{{ url_for('static', filename='js/knowledge-base.js') }}"></script>
-</body></html>
+{% endblock %}
