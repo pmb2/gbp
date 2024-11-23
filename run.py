@@ -1,6 +1,6 @@
 from app import create_app, db
-from models import Notification, UserPreference
-from routes import bp
+from app.models import Notification, UserPreference
+from app.routes import bp
 
 app = create_app()
 app.register_blueprint(bp)
