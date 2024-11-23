@@ -104,12 +104,15 @@ def create_database():
     ''')
 
     # Insert a test account for The Backus Agency
-    try:
+    cursor.execute('''
+    SELECT COUNT(*) FROM users WHERE email = 'contact@backusagency.com'
+    ''')
+    if cursor.fetchone()[0] == 0:
         cursor.execute('''
         INSERT INTO users (username, email, password, avatar_url, credits)
         VALUES ('backusagency', 'contact@backusagency.com', 'securepassword', 'https://via.placeholder.com/40', 1000)
         ''')
-    except sqlite3.IntegrityError:
+    else:
         print("User with email 'contact@backusagency.com' already exists.")
 
     cursor.execute('''
