@@ -4,7 +4,6 @@ from app import create_app, db
 
 app = create_app()
 app.register_blueprint(bp)
-db.init_app(app)
 
 @app.before_first_request
 def setup():
