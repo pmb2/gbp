@@ -33,7 +33,7 @@ def home():
 @login_required
 def dashboard():
     user_data = session.get("google_user", {})
-    return render_template("dashboard.html", user=user_data)
+    return render_template("overview.html", user=user_data)
 
 
 @app.route("/logout")
