@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gbp_dashboard',  # Correctly reference the Django app
+    'gbp_django',  # Correctly reference the Django app
 ]
 
 MIDDLEWARE = [
@@ -33,7 +33,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'gbp_dashboard_django.urls'
+ROOT_URLCONF = 'gbp_django.urls'
 
 TEMPLATES = [
     {
