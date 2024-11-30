@@ -3,5 +3,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('gbp_django.urls')),  # Correct the path to avoid recursion
+    # path('', include('gbp_django.urls')),  # Commented out to avoid recursion
 ]
