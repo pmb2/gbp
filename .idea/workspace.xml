@@ -4,22 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f7a95f6-ec12-4a1c-9a83-8551ffd4f0fe" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/gbp_django.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gbp_django/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gbp_django/asgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/gbp_django/wsgi.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/popup.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gbp_django/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gbp_django/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/urls.py" afterDir="false" />
+    <list default="true" id="3f7a95f6-ec12-4a1c-9a83-8551ffd4f0fe" name="Changes" comment="updated paths">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gbp_django/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/wsgi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +17,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "pmb2"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/pmb2/gbp.git",
+    "accountId": "5c7ff7da-ee9f-4fd1-9a39-3fc1e6dbf383"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 0
 }]]></component>
@@ -105,11 +105,35 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733001641926</updated>
-      <workItem from="1733001644316" duration="1711000" />
+      <workItem from="1733001644316" duration="2067000" />
     </task>
+    <task id="LOCAL-00001" summary="updated paths">
+      <option name="closed" value="true" />
+      <created>1733003417153</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1733003417153</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="updated paths" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated paths" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/gbp_django/wsgi.py</url>
+          <line>9</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
