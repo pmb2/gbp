@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gbp_django.app',  # Correctly reference the Django app
+    'gbp_dashboard',  # Correctly reference the Django app
 ]
 
 MIDDLEWARE = [
