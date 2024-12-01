@@ -261,8 +261,12 @@ input:checked + .toggle-slider:before {
       </svg>
       <div class="notification-badge">3</div>
     </div>
-    <div class="user-profile">
+    <div class="user-profile" onclick="toggleUserMenu()">
       <img src="{% if user.is_authenticated %}{{ user.profile_picture_url|default:'https://ui-avatars.com/api/?name='|add:user.email }}{% else %}https://ui-avatars.com/api/?name=Guest{% endif %}" width="32" height="32" style="border-radius: 50%;">
+      <div id="userMenu" class="user-menu" style="display: none;">
+        <button onclick="openSettingsModal()">Settings</button>
+        <button onclick="window.location.href='{% url 'logout' %}'">Log Out</button>
+      </div>
     </div>
   </div>
 </div>
@@ -434,5 +438,36 @@ document.querySelectorAll('.toggle-switch input').forEach(toggle => {
     }
   });
 });
+</script>
+<!-- Settings Modal -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content">
+    <h2>Settings</h2>
+    <p>Settings content goes here...</p>
+    <button class="btn btn-secondary" onclick="closeSettingsModal()">Close</button>
+  </div>
+</div>
+
+<script>
+function toggleUserMenu() {
+  const userMenu = document.getElementById('userMenu');
+  userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
+}
+
+function openSettingsModal() {
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeSettingsModal() {
+  document.getElementById('settingsModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('settingsModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
 </script>
 </body></html>
