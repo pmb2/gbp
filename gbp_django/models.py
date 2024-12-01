@@ -152,6 +152,13 @@ class Notification(models.Model):
     def get_user_notifications(user_id):
         return Notification.objects.filter(user_id=user_id, read=False)
 
+    def mark_as_read(self):
+        self.read = True
+        self.save()
+
+    def delete_notification(self):
+        self.delete()
+
 class BusinessAttribute(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     key = models.CharField(max_length=255)
