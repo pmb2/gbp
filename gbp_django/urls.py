@@ -10,6 +10,5 @@ urlpatterns = [
     path('', login_required(views.index), name='index'),
     path('accounts/', include('allauth.urls')),  # Ensure this line is present
     path('login/', views.login, name='login'),
-    path('accounts/', include('allauth.urls')),  # Add this line
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
