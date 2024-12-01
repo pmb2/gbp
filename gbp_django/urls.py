@@ -7,7 +7,7 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_required(views.index), name='index'),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),  # Include allauth URLs
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
