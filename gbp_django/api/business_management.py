@@ -52,8 +52,7 @@ def get_business_accounts(access_token):
                 user_id = session.get('user_id')
                 if user_id:
                     notification = Notification(user_id=user_id, message="No business accounts found. Using placeholder data.", priority="high")
-                    db.session.add(notification)
-                    db.session.commit()
+                    notification.save()
                 return {"accounts": []}
             return data
         except requests.exceptions.HTTPError as e:
@@ -110,10 +109,10 @@ def store_business_data(business_data, user_id):
                 business_name=account.get('accountName'),
                 business_id=account['name']
             )
-            db.session.add(business)
+            business.save()
         else:
             business.business_name = account.get('accountName')
-    db.session.commit()
+            business.save()
 
 def get_locations(access_token, account_id):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"
