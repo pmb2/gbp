@@ -1,5 +1,5 @@
 """
-WSGI config for gbp_dashboard_django project.
+WSGI config for gbp_django project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
