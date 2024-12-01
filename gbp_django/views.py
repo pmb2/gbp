@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth import login as auth_login
-from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.models import SocialAccount, SocialLogin
+from allauth.socialaccount.helpers import complete_social_login
 from .models import Business, User, Notification
 from .api.business_management import get_business_accounts, store_business_data
 
@@ -25,8 +26,13 @@ def login(request):
 
     if request.method == 'POST':
         # Handle OAuth callback
-        social_account = SocialAccount.objects.get(user=request.user, provider='google')
-        access_token = social_account.socialtoken_set.first().token
+        social_login = SocialLogin.objects.get(user=request.user, provider='google')
+        if not social_login.is_existing:
+            # Link the social account to the existing user
+            social_login.user = request.user
+            complete_social_login(request, social_login)
+
+        access_token = social_login.token.token
 
         # Fetch and store business accounts
         business_data = get_business_accounts(access_token)
