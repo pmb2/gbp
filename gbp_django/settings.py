@@ -12,7 +12,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# Application definition
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -107,6 +110,10 @@ MEDIA_URL = '/media/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 MEDIA_ROOT = BASE_DIR / "media"
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+SITE_ID = 1
+
+LOGIN_REDIRECT_URL = '/'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
