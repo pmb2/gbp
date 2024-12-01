@@ -262,7 +262,7 @@ input:checked + .toggle-slider:before {
       <div class="notification-badge">3</div>
     </div>
     <div class="user-profile">
-      <img src="{% if user.is_authenticated %}{{ user.profile_picture_url|default:'https://ui-avatars.com/api/?name='|add:user.name }}{% else %}https://ui-avatars.com/api/?name=Guest{% endif %}" width="32" height="32" style="border-radius: 50%;">
+      <img src="{% if user.is_authenticated %}{{ user.profile_picture_url|default:'https://ui-avatars.com/api/?name='|add:user.email }}{% else %}https://ui-avatars.com/api/?name=Guest{% endif %}" width="32" height="32" style="border-radius: 50%;">
     </div>
   </div>
 </div>
