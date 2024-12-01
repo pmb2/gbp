@@ -24,9 +24,6 @@ def login(request):
     if request.user.is_authenticated:
         return redirect(reverse('index'))
 
-    if request.user.is_authenticated:
-        return redirect(reverse('index'))
-
     if request.method == 'POST':
         # Handle OAuth callback
         social_login = SocialLogin.objects.get(user=request.user, provider='google')
