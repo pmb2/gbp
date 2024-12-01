@@ -284,6 +284,8 @@ input:checked + .toggle-slider:before {
   <table class="business-table">
     <thead>
       <tr>
+        <th>User Name</th>
+        <th>Email</th>
         <th>Business Name</th>
         <th>Posts</th>
         <th>Photos</th>
@@ -295,7 +297,17 @@ input:checked + .toggle-slider:before {
       </tr>
     </thead>
     <tbody>
-      {% for business in dashboard_data.businesses %}
+      {% for user in dashboard_data.users %}
+      <tr>
+        <td>{{ user.name }}</td>
+        <td>{{ user.email }}</td>
+        <td>
+          {% for business in user.businesses.all %}
+            {{ business.business_name }}<br>
+          {% endfor %}
+        </td>
+      </tr>
+      {% endfor %}
       <tr>
         <td>{{ business.accountName }}</td>
         <td>
