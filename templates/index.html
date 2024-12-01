@@ -260,7 +260,7 @@ input:checked + .toggle-slider:before {
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
       {% if unread_notifications_count|default:0 > 0 %}
-      <div class="notification-badge">{{ unread_notifications_count }}</div>
+      <div class="notification-badge">{{ unread_notifications_count|default:0 }}</div>
       {% endif %}
     </div>
     <div class="user-profile" onclick="toggleUserMenu()">
