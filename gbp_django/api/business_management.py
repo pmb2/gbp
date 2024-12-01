@@ -4,7 +4,7 @@ import requests
 import time
 import random
 from flask import session
-from gbp_dashboard.app.api.authentication import refresh_access_token
+from gbp_django.api.authentication import refresh_access_token
 
 def create_business_location(access_token, account_id, location_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"
