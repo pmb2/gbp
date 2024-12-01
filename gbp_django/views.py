@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import login as auth_login, authenticate
 from allauth.socialaccount.models import SocialAccount, SocialLogin
 from allauth.socialaccount.helpers import complete_social_login
 from .models import Business, User, Notification
@@ -39,21 +39,28 @@ def login(request):
         return redirect(reverse('index'))
 
     if request.method == 'POST':
-        # Handle OAuth callback
-        social_login = SocialLogin.objects.get(user=request.user, provider='google')
-        if not social_login.is_existing:
-            # Link the social account to the existing user
-            social_login.user = request.user
-            complete_social_login(request, social_login)
+        # Authenticate the user
+        user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
+        if user is not None:
+            auth_login(request, user)
+            # Handle OAuth callback
+            social_login = SocialLogin.objects.get(user=user, provider='google')
+            if not social_login.is_existing:
+                # Link the social account to the existing user
+                social_login.user = user
+                complete_social_login(request, social_login)
 
-        access_token = social_login.token.token
+            access_token = social_login.token.token
 
-        # Fetch and store business accounts
-        business_data = get_business_accounts(access_token)
-        store_business_data(business_data, request.user.id)
+            # Fetch and store business accounts
+            business_data = get_business_accounts(access_token)
+            store_business_data(business_data, user.id)
 
-        # Redirect to index after successful login and data collection
-        return redirect(reverse('index'))
+            # Redirect to index after successful login and data collection
+            return redirect(reverse('index'))
+        else:
+            # Return an error message if authentication fails
+            return render(request, 'login.html', {'error': 'Invalid login credentials'})
 
     return render(request, 'login.html')
 
