@@ -9,7 +9,7 @@
 <body>
     <div class="login-container">
         <h1>Login to GBP Dashboard</h1>
-        <a href="{{ url_for('login') }}" class="btn-google">Login with Google</a>
+        <a href="{% url 'socialaccount_login' 'google' %}" class="btn-google">Login with Google</a>
     </div>
 </body>
 </html>
