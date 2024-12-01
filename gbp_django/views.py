@@ -9,6 +9,7 @@ def index(request):
     print(f"Users fetched: {users}")
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     print(f"Users with IDs prepared: {users_with_ids}")
+    print("Rendering index page with dashboard data.")
     return render(request, 'index.html', {'dashboard_data': {'businesses': businesses, 'users': users_with_ids}})
 
 def login(request):
