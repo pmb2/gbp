@@ -62,6 +62,11 @@ TEMPLATES = [
     },
 ]
 
+ACCOUNT_FORMS = {
+    'login': 'gbp_django.forms.CustomLoginForm',
+    'signup': 'gbp_django.forms.CustomSignupForm',
+}
+
 WSGI_APPLICATION = 'gbp_django.wsgi.application'
 
 # Database
