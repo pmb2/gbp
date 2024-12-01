@@ -1,6 +1,6 @@
 import requests
-from gbp_dashboard.app.models.schema import QandA
-from gbp_dashboard.app import db
+from gbp_django.models import QandA
+from gbp_django import db
 
 def store_questions_and_answers(qa_data, account_id):
     for question in qa_data.get('questions', []):

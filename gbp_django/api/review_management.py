@@ -1,6 +1,6 @@
 import requests
-from gbp_dashboard.app.models.schema import Review
-from gbp_dashboard.app import db
+from gbp_django.models import Review
+from gbp_django import db
 
 def store_reviews(reviews_data, account_id):
     reviews = reviews_data.get('reviews', [])

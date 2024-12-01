@@ -1,5 +1,5 @@
 import os
-from gbp_dashboard.app import cache
+from gbp_django import cache
 import requests
 import time
 import random
@@ -44,7 +44,7 @@ def get_business_accounts(access_token):
             if not data.get('accounts'):
                 print("[ERROR] No business accounts found.")
                 # Log the warning as a notification
-                from gbp_dashboard.app.models.schema import Notification
+                from gbp_django.models import Notification
                 from flask import session
                 user_id = session.get('user_id')
                 if user_id:
@@ -95,8 +95,8 @@ def get_business_accounts(access_token):
                 print("[ERROR] Maximum retry attempts reached. Please try again later.")
                 raise e
 
-from gbp_dashboard.app.models.schema import Business
-from gbp_dashboard.app import db
+from gbp_django.models import Business
+from gbp_django import db
 
 def store_business_data(business_data, user_id):
     for account in business_data.get('accounts', []):

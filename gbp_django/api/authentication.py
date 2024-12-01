@@ -27,8 +27,7 @@ def refresh_access_token(refresh_token, client_id, client_secret):
     response.raise_for_status()
     return response.json()
 def get_user_info(access_token):
-    from gbp_dashboard.app.models.schema import Session
-    from gbp_dashboard.app.models.schema import Session
+    from gbp_django.models import Session
     url = "https://openidconnect.googleapis.com/v1/userinfo"
     headers = {"Authorization": f"Bearer {access_token}"}
     try:

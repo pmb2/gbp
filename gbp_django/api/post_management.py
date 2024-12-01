@@ -1,6 +1,6 @@
 import requests
-from gbp_dashboard.app.models.schema import Post
-from gbp_dashboard.app import db
+from gbp_django.models import Post
+from gbp_django import db
 
 def store_posts(posts_data, account_id):
     for post in posts_data.get('localPosts', []):
