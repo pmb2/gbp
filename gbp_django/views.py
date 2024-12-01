@@ -4,7 +4,7 @@ from .models import Business, User, Notification
 
 def index(request):
     if not request.user.is_authenticated or not request.user.socialaccount_set.filter(provider='google').exists():
-        return redirect(reverse('socialaccount_login', args=['google']))
+        return redirect(reverse('socialaccount_login_by_type', args=['google']))
     businesses = Business.objects.all()
     print(f"Businesses fetched: {businesses}")
     users = User.objects.all()
