@@ -3,12 +3,12 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class UserManager(BaseUserManager):
     def create_user(self, email, google_id, password=None, **extra_fields):
-        # Ensure session state is initialized
-        Session.store_session_state(user_id=user.id, state='initialized')
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, google_id=google_id, **extra_fields)
+        # Ensure session state is initialized
+        Session.store_session_state(user_id=user.id, state='initialized')
         user.set_password(password)
         user.save(using=self._db)
         return user
