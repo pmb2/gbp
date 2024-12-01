@@ -11,5 +11,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),  # Ensure this line is present
     path('login/', views.login, name='login'),
     path('accounts/', include('allauth.urls')),  # Add this line
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
 ]
