@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from . import views
 
@@ -10,4 +11,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),  # Ensure this line is present
     path('login/', views.login, name='login'),
     path('accounts/', include('allauth.urls')),  # Add this line
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
