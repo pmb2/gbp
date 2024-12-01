@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Business, User
+from .models import Business, User, Notification
 
 def index(request):
     print("Fetching all businesses and users for the dashboard.")
@@ -9,8 +9,13 @@ def index(request):
     print(f"Users fetched: {users}")
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     print(f"Users with IDs prepared: {users_with_ids}")
+    unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
+    print(f"Unread notifications count: {unread_notifications_count}")
     print("Rendering index page with dashboard data.")
-    return render(request, 'index.html', {'dashboard_data': {'businesses': businesses, 'users': users_with_ids}})
+    return render(request, 'index.html', {
+        'dashboard_data': {'businesses': businesses, 'users': users_with_ids},
+        'unread_notifications_count': unread_notifications_count
+    })
 
 def login(request):
     print("Rendering login page.")
