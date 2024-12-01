@@ -12,6 +12,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',

@@ -8,8 +8,12 @@ from .api.business_management import get_business_accounts, store_business_data
 
 
 def index(request):
-    if not request.user.is_authenticated or not request.user.socialaccount_set.filter(provider='google').exists():
-        return redirect(reverse('google_login'))
+    if not request.user.is_authenticated:
+        return redirect('account_login')
+
+    if not request.user.socialaccount_set.filter(provider='google').exists():
+        return redirect('account_login')  # Redirect to Google login if not linked
+
     businesses = Business.objects.filter(user=request.user)
     users = User.objects.all()
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]

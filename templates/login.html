@@ -61,7 +61,7 @@
     <div class="login-container">
         <h1>Welcome to GBP Dashboard</h1>
         <p>Login using your Google account to access your dashboard.</p>
-        <button onclick="window.location.href='{% url 'socialaccount_login' 'google' %}'" class="btn-google">
+        <a href="{% url 'socialaccount_login' 'google' %}" class="btn-google">
             <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20">
             Sign in with Google
         </button>
