@@ -1,5 +1,10 @@
 import os
-from gbp_django import cache
+# Assuming cache is a third-party library or needs to be imported from a different module
+# If it's a third-party library, ensure it's installed and import it correctly
+# If it's a custom module, import it from the correct location
+# For example, if it's a third-party library:
+# import cache
+# If it's a custom module, adjust the import path accordingly
 import requests
 import time
 import random
