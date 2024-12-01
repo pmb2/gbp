@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib.auth import login as auth_login
@@ -13,6 +14,9 @@ def index(request):
 
     if not request.user.socialaccount_set.filter(provider='google').exists():
         return redirect('account_login')  # Redirect to Google login if not linked
+
+    if not isinstance(request.user, User):
+        return HttpResponse("User is not authenticated or not a valid User instance.", status=400)
 
     businesses = Business.objects.filter(user=request.user)
     users = User.objects.all()
