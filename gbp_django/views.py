@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.contrib.auth import login as auth_login
+from allauth.socialaccount.models import SocialAccount
 from .models import Business, User, Notification
+from .api.business_management import get_business_accounts, store_business_data
 
 
 def index(request):
@@ -17,5 +20,19 @@ def index(request):
 
 
 def login(request):
-    print("Rendering login page.")
+    if request.user.is_authenticated:
+        return redirect(reverse('index'))
+
+    if request.method == 'POST':
+        # Handle OAuth callback
+        social_account = SocialAccount.objects.get(user=request.user, provider='google')
+        access_token = social_account.socialtoken_set.first().token
+
+        # Fetch and store business accounts
+        business_data = get_business_accounts(access_token)
+        store_business_data(business_data, request.user.id)
+
+        # Redirect to index after successful login and data collection
+        return redirect(reverse('index'))
+
     return render(request, 'login.html')
