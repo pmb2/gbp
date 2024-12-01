@@ -299,7 +299,7 @@ input:checked + .toggle-slider:before {
     <tbody>
       {% for user in dashboard_data.users %}
       <tr>
-        <td>{{ user.name }}</td>
+        <td>{{ user.name|default:"No Name" }}</td>
         <td>{{ user.email }}</td>
         <td>
           {% for business in user.businesses.all %}
