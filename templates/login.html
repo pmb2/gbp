@@ -4,12 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .btn-google {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .btn-google:hover {
+            background: #357ae8;
+        }
+    </style>
 </head>
 <body>
     <div class="login-container">
-        <h1>Login to GBP Dashboard</h1>
-        <a href="{% url 'socialaccount_login' 'google' %}" class="btn-google">Login with Google</a>
+        <h1>Welcome to GBP Dashboard</h1>
+        <p>Login using your Google account to access your dashboard.</p>
+        <a href="{% url 'socialaccount_login' 'google' %}" class="btn-google">
+            <img src="https://developers.google.com/identity/images/btn_google_signin_dark_normal_web.png" alt="Google Sign-In">
+        </a>
     </div>
 </body>
 </html>
