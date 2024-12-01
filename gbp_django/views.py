@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from django.contrib.auth import login as auth_login, authenticate
+from django.contrib.auth import login as auth_login, authenticate, logout
 from allauth.socialaccount.models import SocialAccount, SocialLogin
 from allauth.socialaccount.helpers import complete_social_login
 from .models import Business, User, Notification
@@ -13,10 +13,7 @@ from .api.business_management import get_business_accounts, store_business_data
 @login_required
 def index(request):
 
-    if not request.user.socialaccount_set.filter(provider='google').exists():
-        return redirect('account_login')  # Redirect to Google login if not linked
-
-    if not isinstance(request.user, User):
+    if not request.user.is_authenticated or not request.user.socialaccount_set.filter(provider='google').exists():
         # Clear session and state data
         request.session.flush()
         # Log the user out
