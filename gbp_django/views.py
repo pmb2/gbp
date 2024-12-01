@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib.auth import login as auth_login
 from allauth.socialaccount.models import SocialAccount, SocialLogin
@@ -7,9 +8,8 @@ from .models import Business, User, Notification
 from .api.business_management import get_business_accounts, store_business_data
 
 
+@login_required
 def index(request):
-    if not request.user.is_authenticated:
-        return redirect('account_login')
 
     if not request.user.socialaccount_set.filter(provider='google').exists():
         return redirect('account_login')  # Redirect to Google login if not linked
