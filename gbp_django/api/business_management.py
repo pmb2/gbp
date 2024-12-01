@@ -99,7 +99,7 @@ def get_business_accounts(access_token):
                 raise e
 
 from gbp_django.models import Business
-from gbp_django import db
+from django.db import transaction
 
 def store_business_data(business_data, user_id):
     for account in business_data.get('accounts', []):
