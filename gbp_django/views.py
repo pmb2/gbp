@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.urls import reverse
 from .models import Business, User, Notification
 
 def index(request):
-    print("Fetching all businesses and users for the dashboard.")
+    if not request.user.is_authenticated or not request.user.socialaccount_set.filter(provider='google').exists():
+        return redirect(reverse('socialaccount_login', args=['google']))
     businesses = Business.objects.all()
     print(f"Businesses fetched: {businesses}")
     users = User.objects.all()
