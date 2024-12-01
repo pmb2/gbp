@@ -9,8 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', login_required(views.index), name='index'),
     path('accounts/', include('allauth.urls')),  # Include allauth URLs
-    # Register the 'socialaccount' namespace
-    path('accounts/social/', include(('allauth.socialaccount.urls', 'socialaccount'), namespace='socialaccount')),
     path('login/', views.login, name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]
