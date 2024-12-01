@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib.auth import login as auth_login
@@ -16,7 +17,12 @@ def index(request):
         return redirect('account_login')  # Redirect to Google login if not linked
 
     if not isinstance(request.user, User):
-        return HttpResponse("User is not authenticated or not a valid User instance.", status=400)
+        # Clear session and state data
+        request.session.flush()
+        # Log the user out
+        logout(request)
+        # Redirect to login page
+        return HttpResponseRedirect(reverse('login'))
 
     businesses = Business.objects.filter(user=request.user)
     users = User.objects.all()
