@@ -12,7 +12,6 @@ from .api.business_management import get_business_accounts, store_business_data
 
 @login_required
 def index(request):
-
     if not request.user.is_authenticated or not request.user.socialaccount_set.filter(provider='google').exists():
         # Clear session and state data
         request.session.flush()
@@ -25,6 +24,7 @@ def index(request):
     users = User.objects.all()
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
+
     return render(request, 'index.html', {
         'dashboard_data': {'businesses': businesses, 'users': users_with_ids},
         'unread_notifications_count': unread_notifications_count
@@ -60,6 +60,7 @@ def login(request):
             return render(request, 'login.html', {'error': 'Invalid login credentials'})
 
     return render(request, 'login.html')
+
 
 def register(request):
     return render(request, 'register.html')
