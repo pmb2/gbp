@@ -51,9 +51,13 @@ def login(request):
 
             # Fetch and store business accounts
             business_data = get_business_accounts(access_token)
+            print("Business Data Retrieved:", business_data)
             store_business_data(business_data, user.id)
+            print("Business Data Stored Successfully for User ID:", user.id)
 
-            # Redirect to index after successful login and data collection
+            print("User Logged In:", user)
+            print("User ID:", user.id)
+            print("User Email:", user.email)
             return redirect(reverse('index'))
         else:
             # Return an error message if authentication fails
