@@ -1,4 +1,3 @@
-{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,179 +29,61 @@
             margin-bottom: 1rem;
             color: #333;
         }
-        .login-container p {
-            font-size: 1rem;
-            color: #555;
-            margin-bottom: 2rem;
-        }
-        .btn-google {
+        .login-container form {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.5rem;
-            background: #4285f4;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-size: 1.125rem;
-            transition: background 0.3s ease;
-            cursor: pointer;
+            flex-direction: column;
         }
-        .btn-google img {
-            margin-right: 0.5rem;
-        }
-        .btn-google:hover {
-            background: #357ae8;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h1>Welcome to GBP Dashboard</h1>
-        <p>Login using your Google account to access your dashboard.</p>
-        <a href="{% provider_login_url 'google' %}" class="btn-google">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20">
-            Sign in with Google
-        </button>
-    </div>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Roboto', sans-serif;
-        }
-        .login-container {
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            max-width: 380px;
-            width: 100%;
-        }
-        .login-container h1 {
-            font-size: 1.75rem;
+        .login-container input {
             margin-bottom: 1rem;
-            color: #333;
-        }
-        .login-container p {
+            padding: 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
             font-size: 1rem;
-            color: #555;
-            margin-bottom: 2rem;
         }
-        .btn-google {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.5rem;
-            background: #4285f4;
+        .login-container button {
+            padding: 0.75rem;
+            background: #2563eb;
             color: #fff;
             border: none;
             border-radius: 0.5rem;
-            text-decoration: none;
             font-size: 1.125rem;
-            transition: background 0.3s ease;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .login-container button:hover {
+            background: #1d4ed8;
+        }
+        .btn-google {
+            padding: 0.75rem;
+            background: #db4437;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-google:hover {
+            background: #c53727;
         }
         .btn-google img {
             margin-right: 0.5rem;
-        }
-        .btn-google:hover {
-            background: #357ae8;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h1>Welcome to GBP Dashboard</h1>
-        <p>Login using your Google account to access your dashboard.</p>
-        <button onclick="window.location.href='{% url 'socialaccount_login' 'google' %}'" class="btn-google">
-            <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20">
-            Sign in with Google
-        </button>
-    </div>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Roboto', sans-serif;
-        }
-        .login-container {
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            max-width: 380px;
-            width: 100%;
-        }
-        .login-container h1 {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-        .login-container p {
-            font-size: 1rem;
-            color: #555;
-            margin-bottom: 2rem;
-        }
-        .btn-google {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 1.5rem;
-            padding: 0.75rem 1.5rem;
-            background: #4285f4;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            text-decoration: none;
-            font-size: 1.125rem;
-            transition: background 0.3s ease;
-            cursor: pointer;
-        }
-        .btn-google img {
-            margin-right: 0.5rem;
-        }
-        .btn-google:hover {
-            background: #357ae8;
-        }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h1>Welcome to GBP Dashboard</h1>
-        <p>Login using your Google account to access your dashboard.</p>
-        <button onclick="window.location.href='{% url 'socialaccount_login' 'google' %}'" class="btn-google">
+        <h1>Log In</h1>
+        <form method="post" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            <input type="email" name="login" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Log In</button>
+        </form>
+        <button onclick="window.location.href='{% url 'google_login' %}'" class="btn-google">
             <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" width="20">
             Sign in with Google
         </button>
