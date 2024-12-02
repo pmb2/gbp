@@ -40,8 +40,8 @@ def login(request):
         user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
         if user is not None:
             auth_login(request, user)
-            # Redirect to Google OAuth login
-            return redirect(reverse('google_login'))
+            # Automatically redirect to Google OAuth login
+            return redirect('/accounts/google/login/')
         else:
             # Return an error message if authentication fails
             return render(request, 'login.html', {'error': 'Invalid login credentials'})
