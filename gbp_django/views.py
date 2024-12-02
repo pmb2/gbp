@@ -40,25 +40,8 @@ def login(request):
         user = authenticate(request, username=request.POST.get('username'), password=request.POST.get('password'))
         if user is not None:
             auth_login(request, user)
-            # Handle OAuth callback
-            social_login = SocialLogin.objects.get(user=user, provider='google')
-            if not social_login.is_existing:
-                # Link the social account to the existing user
-                social_login.user = user
-                complete_social_login(request, social_login)
-
-            access_token = social_login.token.token
-
-            # Fetch and store business accounts
-            business_data = get_business_accounts(access_token)
-            print("Business Data Retrieved:", business_data)
-            store_business_data(business_data, user.id)
-            print("Business Data Stored Successfully for User ID:", user.id)
-
-            print("User Logged In:", user)
-            print("User ID:", user.id)
-            print("User Email:", user.email)
-            return redirect(reverse('index'))
+            # Redirect to Google OAuth login
+            return redirect(reverse('google_login'))
         else:
             # Return an error message if authentication fails
             return render(request, 'login.html', {'error': 'Invalid login credentials'})
