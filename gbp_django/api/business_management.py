@@ -100,7 +100,7 @@ def get_business_accounts(access_token):
 from gbp_django.models import Business
 from django.db import transaction
 
-def store_business_data(business_data, user_id):
+def store_business_data(business_data, user_id, access_token):
     for account in business_data.get('accounts', []):
         business = Business.query.filter_by(business_id=account['name']).first()
         if not business:

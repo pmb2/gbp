@@ -130,7 +130,7 @@ def google_oauth_callback(request):
     # Fetch and store business data
     access_token = request.user.socialaccount_set.filter(provider='google').first().socialtoken_set.first().token
     business_data = get_business_accounts(access_token)
-    store_business_data(business_data, user.id)
+    store_business_data(business_data, user.id, access_token)
 
     return redirect(reverse('index'))
 
