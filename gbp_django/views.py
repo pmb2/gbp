@@ -195,11 +195,10 @@ def index(request):
 
     # Prioritize businesses associated with the logged-in user's Google account
     google_business = Business.objects.filter(user=request.user, user__socialaccount__provider='google').first()
+    businesses = list(Business.objects.filter(user=request.user))
     if google_business:
-        other_businesses = Business.objects.filter(user=request.user).exclude(id=google_business.id)
-        businesses = [google_business] + list(other_businesses)
-    else:
-        businesses = Business.objects.filter(user=request.user)
+        businesses.remove(google_business)
+        businesses.insert(0, google_business)
     users = User.objects.all()
     for business in businesses:
         business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
