@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'gbp_django',  # Correctly reference the Django app
+    'gbp_django',  # Ensure this is the correct app name
     'django.contrib.sites',  # Add this if not present
     'django_extensions',
     'allauth',
