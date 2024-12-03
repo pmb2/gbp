@@ -111,10 +111,12 @@ def direct_google_oauth(request):
     scope = ' '.join(provider.get_default_scope())
 
     # Get state from session
-    from allauth.socialaccount.helpers import complete_social_login
-    from allauth.socialaccount.providers.oauth2.views import OAuth2View
-    oauth2_view = OAuth2View()
-    state = oauth2_view.get_state(request)
+    import string
+    import random
+
+    # Generate a random state string
+    state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    request.session['oauth_state'] = state
 
     # Construct the authorization URL
     authorize_url = (
