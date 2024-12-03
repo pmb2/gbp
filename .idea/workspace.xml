@@ -4,15 +4,27 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3f7a95f6-ec12-4a1c-9a83-8551ffd4f0fe" name="Changes" comment="updated paths">
+    <list default="true" id="3f7a95f6-ec12-4a1c-9a83-8551ffd4f0fe" name="Changes" comment="bringing over api calls">
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/socialaccount/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gbp_django/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/wsgi.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/manage.py" beforeDir="false" afterPath="$PROJECT_DIR$/manage.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gbp_django/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gbp_django/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/gbp_django/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -40,23 +52,32 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
     "Django Server.gbp_django.executor": "Run",
     "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "django.template.preview.state": "SHOW_EDITOR",
     "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/tba/Documents/gbp_django/templates",
+    "last_opened_file_path": "/home/tba/Documents/gbp_django",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
+    ]
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/templates" />
+      <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/gbp_django" />
+      <recent name="$PROJECT_DIR$/templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -105,7 +126,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733001641926</updated>
-      <workItem from="1733001644316" duration="2067000" />
+      <workItem from="1733001644316" duration="51529000" />
     </task>
     <task id="LOCAL-00001" summary="updated paths">
       <option name="closed" value="true" />
@@ -115,7 +136,23 @@
       <option name="project" value="LOCAL" />
       <updated>1733003417153</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="updated django">
+      <option name="closed" value="true" />
+      <created>1733003734817</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733003734817</updated>
+    </task>
+    <task id="LOCAL-00003" summary="bringing over api calls">
+      <option name="closed" value="true" />
+      <created>1733013498942</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1733013498942</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -123,7 +160,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="updated paths" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated paths" />
+    <MESSAGE value="updated django" />
+    <MESSAGE value="bringing over api calls" />
+    <option name="LAST_COMMIT_MESSAGE" value="bringing over api calls" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

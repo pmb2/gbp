@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
@@ -60,7 +61,7 @@ class Session(models.Model):
             return None
 
 class Business(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='businesses')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
     business_id = models.CharField(max_length=255, unique=True)
     address = models.TextField(blank=True, null=True)

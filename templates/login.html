@@ -1,88 +1,85 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
-            font-family: 'Roboto', sans-serif;
-        }
-        .login-container {
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            text-align: center;
-            max-width: 380px;
-            width: 100%;
-        }
-        .login-container h1 {
-            font-size: 1.75rem;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-        .login-container form {
-            display: flex;
-            flex-direction: column;
-        }
-        .login-container input {
-            margin-bottom: 1rem;
-            padding: 0.75rem;
-            border: 1px solid #ccc;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-        }
-        .login-container button {
-            padding: 0.75rem;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1.125rem;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .login-container button:hover {
-            background: #1d4ed8;
-        }
-        .btn-google {
-            padding: 0.75rem;
-            background: #db4437;
-            color: #fff;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1.125rem;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-google:hover {
-            background: #c53727;
-        }
-        .btn-google img {
-            margin-right: 0.5rem;
-        }
-    </style>
+    <title>GBP Automation Pro - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="login-container">
-        <h1>Log In</h1>
-        <form method="post" action="{% url 'account_login' %}">
+<body class="bg-gray-100">
+<div class="min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">GBP Automation Pro</h1>
+            <p class="text-gray-600 mt-2">Welcome back! Please login to your account.</p>
+        </div>
+
+        <form method="POST" action="{% url 'login' %}" class="space-y-6">
             {% csrf_token %}
-            <input type="email" name="login" placeholder="Email" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Log In</button>
+            {% if error %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" name="email" id="email" required
+                       class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                <input type="password" name="password" id="password" required
+                       class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500">
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember" id="remember"
+                           class="h-4 w-4 rounded border-gray-300 text-blue-600">
+                    <label for="remember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                </div>
+                <a href="#" class="text-sm text-blue-600 hover:text-blue-500">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 text-white rounded-md py-2 px-4 hover:bg-blue-700">
+                Login
+            </button>
+
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="bg-white px-2 text-gray-500">Or continue with</span>
+                </div>
+            </div>
+
+            <a href="{% url 'google_oauth' %}"
+               class="w-full flex justify-center items-center gap-2 bg-white border border-gray-300 rounded-md py-2 px-4 hover:bg-gray-50">
+                <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path fill="#4285F4"
+                          d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853"
+                          d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05"
+                          d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335"
+                          d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Sign in with Google
+            </a>
         </form>
+
+        <p class="mt-8 text-center text-sm text-gray-600">
+            Don't have an account?
+            <a href="{% url 'register' %}" class="font-medium text-blue-600 hover:text-blue-500">
+                Register here
+            </a>
+        </p>
     </div>
+</div>
 </body>
 </html>
