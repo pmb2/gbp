@@ -138,8 +138,11 @@ def index(request):
 
     # Prioritize businesses associated with the logged-in user's Google account
     google_business = Business.objects.filter(user=request.user, user__socialaccount__provider='google').first()
-    other_businesses = Business.objects.filter(user=request.user).exclude(id=google_business.id)
-    businesses = [google_business] + list(other_businesses)
+    if google_business:
+        other_businesses = Business.objects.filter(user=request.user).exclude(id=google_business.id)
+        businesses = [google_business] + list(other_businesses)
+    else:
+        businesses = Business.objects.filter(user=request.user)
     users = User.objects.all()
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
