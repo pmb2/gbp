@@ -265,7 +265,6 @@ input:checked + .toggle-slider:before {
       {% if unread_count > 0 %}
       <div class="notification-badge">{{ unread_notifications_count|default:0 }}</div>
       {% endif %}
-      {% endif %}
       {% endwith %}
     </div>
     <div class="user-profile" onclick="toggleUserMenu()">
