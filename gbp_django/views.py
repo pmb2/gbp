@@ -90,7 +90,7 @@ def direct_google_oauth(request):
     """
     # Initialize provider with request
     provider_class = providers.registry.get_class('google')
-    provider = provider_class(request)
+    provider = provider_class(request, app)
 
     # Get the app configuration directly from allauth
     from allauth.socialaccount.models import SocialApp
