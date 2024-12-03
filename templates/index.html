@@ -303,36 +303,100 @@ input:checked + .toggle-slider:before {
     </thead>
     <tbody>
       {% for business in dashboard_data.businesses %}
-      <tr onclick="toggleDetails(this)">
-        <td>{{ business.business_name }}</td>
-        <td>
-          <div class="status">
-            <div class="status-icon {% if business.is_verified == 'Verified' %}status-green{% else %}status-red{% endif %}"></div>
-            {{ business.is_verified }}
-          </div>
-          <div class="action-buttons">
-            <button class="btn btn-secondary">Edit</button>
-            <button class="btn btn-primary">Analytics</button>
-          </div>
-        </td>
-      </tr>
-      <tr class="details" style="display: none;">
-        <td colspan="2">
-          <div>
-            <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
-            <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
-            <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
-            <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
-            <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
-            <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
-            <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
-            <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
-            <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
-            <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
-            <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
-          </div>
-        </td>
-      </tr>
+        {% if forloop.first %}
+          <tr class="bg-blue-50" onclick="toggleDetails(this)">
+            <td class="flex items-center">
+              <span class="mr-2">
+                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                </svg>
+              </span>
+              {{ business.business_name }}
+              <span class="ml-2 text-blue-600 text-sm">(Connected via Google)</span>
+            </td>
+            <td>
+              <div class="status">
+                <div class="status-icon {% if business.is_verified == 'Verified' %}status-green{% else %}status-red{% endif %}"></div>
+                {{ business.is_verified }}
+              </div>
+              <div class="action-buttons">
+                <button class="btn btn-secondary">Edit</button>
+                <button class="btn btn-primary">Analytics</button>
+              </div>
+            </td>
+          </tr>
+          <tr class="details bg-blue-50" style="display: none;">
+            <td colspan="2">
+              <div class="p-4 space-y-3">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Business Information</h3>
+                    <div class="space-y-2">
+                      <p><span class="font-medium">Address:</span> {{ business.address|default:"No info" }}</p>
+                      <p><span class="font-medium">Phone:</span> {{ business.phone_number|default:"No info" }}</p>
+                      <p><span class="font-medium">Website:</span> 
+                        {% if business.website_url != 'No info' %}
+                          <a href="{{ business.website_url }}" class="text-blue-600 hover:underline" target="_blank">{{ business.website_url }}</a>
+                        {% else %}
+                          No info
+                        {% endif %}
+                      </p>
+                      <p><span class="font-medium">Category:</span> {{ business.category|default:"No info" }}</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Metrics</h3>
+                    <div class="space-y-2">
+                      <p><span class="font-medium">Posts:</span> {{ business.posts_count|default:"No info" }}</p>
+                      <p><span class="font-medium">Photos:</span> {{ business.photos_count|default:"No info" }}</p>
+                      <p><span class="font-medium">Q&amp;A:</span> {{ business.qanda_count|default:"No info" }}</p>
+                      <p><span class="font-medium">Reviews:</span> {{ business.reviews_count|default:"No info" }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <h3 class="font-semibold text-gray-900 mb-2">Settings</h3>
+                  <div class="space-y-2">
+                    <p><span class="font-medium">Email Settings:</span> {{ business.email_settings|default:"No info" }}</p>
+                    <p><span class="font-medium">Automation Status:</span> {{ business.automation_status|default:"No info" }}</p>
+                    <p><span class="font-medium">Verification Status:</span> {{ business.is_verified|default:"No info" }}</p>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr onclick="toggleDetails(this)">
+            <td>{{ business.business_name }}</td>
+            <td>
+              <div class="status">
+                <div class="status-icon {% if business.is_verified == 'Verified' %}status-green{% else %}status-red{% endif %}"></div>
+                {{ business.is_verified }}
+              </div>
+              <div class="action-buttons">
+                <button class="btn btn-secondary">Edit</button>
+                <button class="btn btn-primary">Analytics</button>
+              </div>
+            </td>
+          </tr>
+          <tr class="details" style="display: none;">
+            <td colspan="2">
+              <div class="p-4">
+                <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
+                <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
+                <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
+                <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
+                <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
+                <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
+                <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
+                <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
+                <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
+                <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
+                <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
+              </div>
+            </td>
+          </tr>
+        {% endif %}
       {% endfor %}
     </tbody>
   </table>

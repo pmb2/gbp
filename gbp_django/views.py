@@ -193,12 +193,21 @@ def index(request):
     if not request.user.socialaccount_set.filter(provider='google').exists():
         return redirect('/accounts/google/login/')
 
-    # Prioritize businesses associated with the logged-in user's Google account
-    google_business = Business.objects.filter(user=request.user, user__socialaccount__provider='google').first()
-    businesses = list(Business.objects.filter(user=request.user))
-    if google_business:
-        businesses.remove(google_business)
-        businesses.insert(0, google_business)
+    # Get the OAuth-connected business first
+    oauth_business = Business.objects.filter(
+        user=request.user,
+        user__socialaccount__provider='google'
+    ).select_related('user').first()
+    
+    # Get other businesses
+    other_businesses = list(Business.objects.filter(
+        user=request.user
+    ).exclude(id=oauth_business.id if oauth_business else None))
+    
+    # Combine the lists with OAuth business first
+    businesses = [oauth_business] if oauth_business else []
+    businesses.extend(other_businesses)
+    
     users = User.objects.all()
     for business in businesses:
         business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
