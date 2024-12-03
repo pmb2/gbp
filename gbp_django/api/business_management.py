@@ -109,7 +109,15 @@ def store_business_data(business_data, user_id):
                 business_name=account.get('accountName'),
                 business_id=account['name']
             )
-            business.save()
+            # Fetch additional details for each business location
+            locations = get_locations(access_token, account['name'])
+            for location in locations.get('locations', []):
+                business.address = location.get('address', {}).get('formattedAddress', 'No info')
+                business.phone_number = location.get('primaryPhone', 'No info')
+                business.website_url = location.get('websiteUrl', 'No info')
+                business.category = location.get('primaryCategory', {}).get('displayName', 'No info')
+                business.is_verified = location.get('locationState', {}).get('isVerified', False)
+                business.save()
         else:
             business.business_name = account.get('accountName')
             business.save()

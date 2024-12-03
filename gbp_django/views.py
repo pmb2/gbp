@@ -127,6 +127,11 @@ def google_oauth_callback(request):
         user.google_id = google_account.uid
         user.save()
 
+    # Fetch and store business data
+    access_token = request.user.socialaccount_set.filter(provider='google').first().socialtoken_set.first().token
+    business_data = get_business_accounts(access_token)
+    store_business_data(business_data, user.id)
+
     return redirect(reverse('index'))
 
 
@@ -150,7 +155,11 @@ def index(request):
         business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
         business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
         business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
-        business.automation_status = business.automation_status if hasattr(business, 'automation_status') else 'No info'
+        business.address = business.address if business.address else 'No info'
+        business.phone_number = business.phone_number if business.phone_number else 'No info'
+        business.website_url = business.website_url if business.website_url else 'No info'
+        business.category = business.category if business.category else 'No info'
+        business.is_verified = 'Verified' if business.is_verified else 'Not Verified'
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
 
