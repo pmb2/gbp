@@ -315,12 +315,12 @@ input:checked + .toggle-slider:before {
       <tr class="details" style="display: none;">
         <td colspan="2">
           <div>
-            <strong>Posts:</strong> {{ business.posts_count }}<br>
-            <strong>Photos:</strong> {{ business.photos_count }}<br>
-            <strong>Q&amp;A:</strong> {{ business.qanda_count }}<br>
-            <strong>Reviews:</strong> {{ business.reviews_count }}<br>
-            <strong>Email Settings:</strong> {{ business.email_settings }}<br>
-            <strong>Automation:</strong> {{ business.automation_status }}
+            <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
+            <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
+            <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
+            <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
+            <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
+            <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}
           </div>
         </td>
       </tr>

@@ -143,7 +143,14 @@ def index(request):
         businesses = [google_business] + list(other_businesses)
     else:
         businesses = Business.objects.filter(user=request.user)
-    users = User.objects.all()
+    # Add placeholders for missing business information
+    for business in businesses:
+        business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
+        business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
+        business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
+        business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
+        business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
+        business.automation_status = business.automation_status if hasattr(business, 'automation_status') else 'No info'
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
 
