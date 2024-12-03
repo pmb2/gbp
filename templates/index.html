@@ -307,8 +307,8 @@ input:checked + .toggle-slider:before {
         <td>{{ business.business_name }}</td>
         <td>
           <div class="status">
-            <div class="status-icon status-green"></div>
-            Up to date
+            <div class="status-icon {% if business.is_verified == 'Verified' %}status-green{% else %}status-red{% endif %}"></div>
+            {{ business.is_verified }}
           </div>
           <div class="action-buttons">
             <button class="btn btn-secondary">Edit</button>
