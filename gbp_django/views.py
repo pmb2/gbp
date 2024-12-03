@@ -134,26 +134,38 @@ def google_oauth_callback(request):
         user.google_id = google_account.uid
         user.save()
 
-    # Fetch and store business data
+    print("[INFO] Fetching business accounts...")
     access_token = request.user.socialaccount_set.filter(provider='google').first().socialtoken_set.first().token
     business_data = get_business_accounts(access_token)
+    print("[INFO] Business accounts fetched:", business_data)
     store_business_data(business_data, user.id, access_token)
+    print("[INFO] Business data stored successfully.")
     # Fetch additional data like posts, reviews, Q&A, and photos
     for account in business_data.get('accounts', []):
+        print(f"[INFO] Fetching locations for account {account['name']}...")
         locations = get_locations(access_token, account['name'])
+        print(f"[INFO] Locations fetched for account {account['name']}:", locations)
         for location in locations.get('locations', []):
             # Fetch and store posts
             posts_data = get_posts(access_token, account['name'], location['name'])
+            print(f"[INFO] Posts fetched for location {location['name']}:", posts_data)
             store_posts(posts_data, location['name'])
+            print(f"[INFO] Posts stored for location {location['name']}.")
             # Fetch and store reviews
             reviews_data = get_reviews(access_token, account['name'], location['name'])
+            print(f"[INFO] Reviews fetched for location {location['name']}:", reviews_data)
             store_reviews(reviews_data, location['name'])
+            print(f"[INFO] Reviews stored for location {location['name']}.")
             # Fetch and store Q&A
             qa_data = get_questions_and_answers(access_token, account['name'], location['name'])
+            print(f"[INFO] Q&A fetched for location {location['name']}:", qa_data)
             store_questions_and_answers(qa_data, location['name'])
+            print(f"[INFO] Q&A stored for location {location['name']}.")
             # Fetch and store photos
             photos_data = get_photos(access_token, account['name'], location['name'])
+            print(f"[INFO] Photos fetched for location {location['name']}:", photos_data)
             store_photos(photos_data, location['name'])
+            print(f"[INFO] Photos stored for location {location['name']}.")
 
     return redirect(reverse('index'))
 
