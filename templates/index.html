@@ -293,77 +293,34 @@ input:checked + .toggle-slider:before {
   <table class="business-table">
     <thead>
       <tr>
-        <th>User Email</th>
-        <th>User ID</th>
-        <th>Email</th>
         <th>Business Name</th>
-        <th>Posts</th>
-        <th>Photos</th>
-        <th>Q&amp;A</th>
-        <th>Reviews</th>
-        <th>Email Settings</th>
-        <th>Automation</th>
-        <th>Actions</th>
+        <th>Status/Action</th>
       </tr>
     </thead>
     <tbody>
-      {% for user in dashboard_data.users %}
-      <tr>
-        <td>{{ user.email }}</td>
-        <td>{{ user.id }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-          {% for business in user.businesses.all %}
-            {{ business.business_name }}<br>
-          {% endfor %}
-        </td>
-      </tr>
-      {% endfor %}
       {% for business in dashboard_data.businesses %}
-      <tr>
+      <tr onclick="toggleDetails(this)">
         <td>{{ business.business_name }}</td>
         <td>
           <div class="status">
             <div class="status-icon status-green"></div>
             Up to date
           </div>
-        </td>
-        <td>
-          <div class="status">
-            <div class="status-icon status-yellow"></div>
-            Pending approval
-          </div>
-        </td>
-        <td>
-          <div class="status">
-            <div class="status-icon status-green"></div>
-            Current
-          </div>
-        </td>
-        <td>
-          <div class="status">
-            <div class="status-icon status-red"></div>
-            Action needed
-          </div>
-        </td>
-        <td>
-          <button class="btn btn-secondary" onclick="openEmailModal()">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
-              <path d="M2 4l6 4 6-4"></path>
-              <rect x="2" y="2" width="12" height="12" rx="1"></rect>
-            </svg>
-          </button>
-        </td>
-        <td>
-          <label class="toggle-switch">
-            <input type="checkbox" checked>
-            <span class="toggle-slider"></span>
-          </label>
-        </td>
-        <td>
           <div class="action-buttons">
             <button class="btn btn-secondary">Edit</button>
             <button class="btn btn-primary">Analytics</button>
+          </div>
+        </td>
+      </tr>
+      <tr class="details" style="display: none;">
+        <td colspan="2">
+          <div>
+            <strong>Posts:</strong> {{ business.posts_count }}<br>
+            <strong>Photos:</strong> {{ business.photos_count }}<br>
+            <strong>Q&amp;A:</strong> {{ business.qanda_count }}<br>
+            <strong>Reviews:</strong> {{ business.reviews_count }}<br>
+            <strong>Email Settings:</strong> {{ business.email_settings }}<br>
+            <strong>Automation:</strong> {{ business.automation_status }}
           </div>
         </td>
       </tr>
@@ -443,7 +400,10 @@ document.querySelectorAll('.toggle-switch input').forEach(toggle => {
     }
   });
 });
-</script>
+function toggleDetails(row) {
+  const detailsRow = row.nextElementSibling;
+  detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+}
 <!-- Settings Modal -->
 <div id="settingsModal" class="modal">
   <div class="modal-content">
