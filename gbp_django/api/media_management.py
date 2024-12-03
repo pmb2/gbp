@@ -1,16 +1,17 @@
 import requests
-from gbp_django.models import BusinessAttribute
+from django.db import transaction
+from ..models import BusinessAttribute
 
+@transaction.atomic
 def store_photos(photos_data, account_id):
     for photo in photos_data.get('mediaItems', []):
         existing_photo = BusinessAttribute.objects.filter(business_id=account_id, key='photo', value=photo['name']).first()
         if not existing_photo:
-            new_photo = BusinessAttribute(
+            BusinessAttribute.objects.create(
                 business_id=account_id,
                 key='photo',
                 value=photo['name']
             )
-            new_photo.save()
 
 def upload_photo(access_token, account_id, location_id, photo_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/media"

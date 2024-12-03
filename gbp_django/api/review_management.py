@@ -1,13 +1,15 @@
 import requests
 from gbp_django.models import Review
-from gbp_django import db
+from django.db import transaction
+from ..models import Review
 
+@transaction.atomic
 def store_reviews(reviews_data, account_id):
     reviews = reviews_data.get('reviews', [])
     for review in reviews:
-        existing_review = Review.query.filter_by(review_id=review['name']).first()
+        existing_review = Review.objects.filter(review_id=review['name']).first()
         if not existing_review:
-            new_review = Review(
+            Review.objects.create(
                 business_id=account_id,
                 review_id=review['name'],
                 reviewer_name=review.get('reviewer', {}).get('displayName', 'Anonymous'),
@@ -17,13 +19,12 @@ def store_reviews(reviews_data, account_id):
                 responded=review.get('responded', False),
                 response=review.get('response', {}).get('comment', '')
             )
-            db.session.add(new_review)
         else:
             existing_review.rating = review.get('starRating', 0)
             existing_review.content = review.get('comment', '')
             existing_review.responded = review.get('responded', False)
             existing_review.response = review.get('response', {}).get('comment', '')
-    db.session.commit()
+            existing_review.save()
 
 def respond_to_review(access_token, account_id, location_id, review_id, response_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/reviews/{review_id}/reply"
