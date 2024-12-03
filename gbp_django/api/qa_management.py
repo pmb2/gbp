@@ -1,22 +1,21 @@
-import requests
-from gbp_django.models import QandA
-from gbp_django import db
+from django.db import transaction
+from ..models import QandA
 
+@transaction.atomic
 def store_questions_and_answers(qa_data, account_id):
     for question in qa_data.get('questions', []):
-        existing_qa = QandA.query.filter_by(question=question['name']).first()
+        existing_qa = QandA.objects.filter(question=question['name']).first()
         if not existing_qa:
-            new_qa = QandA(
+            QandA.objects.create(
                 business_id=account_id,
                 question=question.get('text', ''),
                 answer=question.get('answers', [{}])[0].get('text', '') if question.get('answers') else '',
                 answered=bool(question.get('answers'))
             )
-            db.session.add(new_qa)
         else:
             existing_qa.answer = question.get('answers', [{}])[0].get('text', '') if question.get('answers') else ''
             existing_qa.answered = bool(question.get('answers'))
-    db.session.commit()
+            existing_qa.save()
 
 def post_question(access_token, account_id, location_id, question_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/questions"

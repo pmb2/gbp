@@ -1,12 +1,12 @@
-import requests
-from gbp_django.models import Post
 from django.db import transaction
+from ..models import Post
 
+@transaction.atomic
 def store_posts(posts_data, account_id):
     for post in posts_data.get('localPosts', []):
         existing_post = Post.objects.filter(post_id=post['name']).first()
         if not existing_post:
-            new_post = Post(
+            Post.objects.create(
                 business_id=account_id,
                 post_type=post.get('topicType', 'STANDARD'),
                 content=post.get('summary', ''),
@@ -14,12 +14,12 @@ def store_posts(posts_data, account_id):
                 scheduled_at=post.get('scheduledTime', None),
                 status=post.get('state', 'PUBLISHED')
             )
-            new_post.save()
         else:
             existing_post.content = post.get('summary', '')
             existing_post.media_url = post.get('media', [{}])[0].get('sourceUrl', '') if post.get('media') else ''
             existing_post.scheduled_at = post.get('scheduledTime', None)
             existing_post.status = post.get('state', 'PUBLISHED')
+            existing_post.save()
 
 def create_post(access_token, account_id, location_id, post_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/localPosts"
