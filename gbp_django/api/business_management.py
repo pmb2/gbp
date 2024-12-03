@@ -118,6 +118,12 @@ def store_business_data(business_data, user_id, access_token):
                 business.category = location.get('primaryCategory', {}).get('displayName', 'No info')
                 business.is_verified = location.get('locationState', {}).get('isVerified', False)
                 business.save()
+            # Ensure placeholders for missing data
+            business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
+            business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
+            business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
+            business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
+            business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
         else:
             business.business_name = account.get('accountName')
             business.save()

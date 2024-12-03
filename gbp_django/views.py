@@ -131,6 +131,19 @@ def google_oauth_callback(request):
     access_token = request.user.socialaccount_set.filter(provider='google').first().socialtoken_set.first().token
     business_data = get_business_accounts(access_token)
     store_business_data(business_data, user.id, access_token)
+    # Fetch additional data like posts, reviews, and Q&A
+    for account in business_data.get('accounts', []):
+        locations = get_locations(access_token, account['name'])
+        for location in locations.get('locations', []):
+            # Fetch and store posts
+            posts_data = get_posts(access_token, account['name'], location['name'])
+            store_posts(posts_data, location['name'])
+            # Fetch and store reviews
+            reviews_data = get_reviews(access_token, account['name'], location['name'])
+            store_reviews(reviews_data, location['name'])
+            # Fetch and store Q&A
+            qa_data = get_questions_and_answers(access_token, account['name'], location['name'])
+            store_questions_and_answers(qa_data, location['name'])
 
     return redirect(reverse('index'))
 
@@ -155,6 +168,10 @@ def index(request):
         business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
         business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
         business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
+        business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
+        business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
+        business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
+        business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
         business.address = business.address if business.address else 'No info'
         business.phone_number = business.phone_number if business.phone_number else 'No info'
         business.website_url = business.website_url if business.website_url else 'No info'
