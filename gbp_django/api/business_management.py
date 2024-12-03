@@ -124,6 +124,7 @@ def store_business_data(business_data, user_id, access_token):
             business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
             business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
             business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
+            business.automation_status = business.automation_status if hasattr(business, 'automation_status') else 'No info'
         else:
             business.business_name = account.get('accountName')
             business.save()
