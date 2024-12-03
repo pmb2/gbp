@@ -16,6 +16,7 @@ from .api.business_management import get_business_accounts, store_business_data,
 from .api.post_management import get_posts, store_posts
 from .api.review_management import get_reviews, store_reviews
 from .api.qa_management import get_questions_and_answers, store_questions_and_answers
+from .api.media_management import get_photos, store_photos
 
 
 def login(request):
