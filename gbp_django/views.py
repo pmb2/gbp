@@ -213,7 +213,7 @@ def index(request):
         business.category = business.category if business.category else 'No info'
         business.is_verified = 'Verified' if business.is_verified else 'Not Verified'
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
-    unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
+    unread_notifications_count = int(Notification.get_user_notifications(request.user.id).count())
 
     return render(request, 'index.html', {
         'dashboard_data': {'businesses': businesses, 'users': users_with_ids},
