@@ -143,7 +143,7 @@ def index(request):
         businesses = [google_business] + list(other_businesses)
     else:
         businesses = Business.objects.filter(user=request.user)
-    # Add placeholders for missing business information
+    users = User.objects.all()
     for business in businesses:
         business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
         business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
