@@ -322,7 +322,12 @@ input:checked + .toggle-slider:before {
             <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
             <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
             <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
-            <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}
+            <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
+            <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
+            <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
+            <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
+            <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
+            <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
           </div>
         </td>
       </tr>
