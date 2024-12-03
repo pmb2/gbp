@@ -22,6 +22,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     profile_picture_url = models.TextField(blank=True)
