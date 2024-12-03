@@ -1,6 +1,6 @@
 import requests
 from gbp_django.models import Post
-from gbp_django import db
+from django.db import transaction
 
 def store_posts(posts_data, account_id):
     for post in posts_data.get('localPosts', []):
