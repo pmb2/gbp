@@ -12,7 +12,10 @@ from allauth.utils import build_absolute_uri
 from allauth.socialaccount.helpers import complete_social_login
 import allauth.socialaccount.providers.google.provider
 from .models import Business, User, Notification, Session
-from .api.business_management import get_business_accounts, store_business_data
+from .api.business_management import get_business_accounts, store_business_data, get_locations
+from .api.post_management import get_posts, store_posts
+from .api.review_management import get_reviews, store_reviews
+from .api.qa_management import get_questions_and_answers, store_questions_and_answers
 
 
 def login(request):
