@@ -94,7 +94,10 @@ def direct_google_oauth(request):
 
     # Get the app configuration directly from allauth
     from allauth.socialaccount.models import SocialApp
-    app = SocialApp.objects.get_current('google', request)
+    try:
+        app = SocialApp.objects.get(provider='google')
+    except SocialApp.DoesNotExist:
+        raise ValueError("Google SocialApp is not configured. Please add it in the admin interface.")
 
     # Construct OAuth URL
     callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
