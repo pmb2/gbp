@@ -132,6 +132,11 @@ SOCIALACCOUNT_PROVIDERS = {
         ],
         'AUTH_PARAMS': {
             'access_type': 'online',
+        },
+        'APP': {
+            'client_id': 'your-client-id',
+            'secret': 'your-client-secret',
+            'key': ''
         }
     }
 }

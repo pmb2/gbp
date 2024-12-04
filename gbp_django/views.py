@@ -143,10 +143,13 @@ def google_oauth_callback(request):
         return redirect('login')
 
     # Get tokens using the authorization code
+    from allauth.socialaccount.models import SocialApp
+    google_app = SocialApp.objects.get(provider='google')
+    
     tokens = get_access_token(
         code,
-        settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id'],
-        settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['secret'],
+        google_app.client_id,
+        google_app.secret,
         request.build_absolute_uri(reverse('google_oauth_callback'))
     )
 
