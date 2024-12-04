@@ -4,13 +4,8 @@ from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib import messages
-from allauth.socialaccount.models import SocialAccount, SocialApp
-from allauth.socialaccount.providers.google.provider import GoogleProvider
-from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter, OAuth2View
-from allauth.socialaccount import providers
-from allauth.utils import build_absolute_uri
-from allauth.socialaccount.helpers import complete_social_login
-import allauth.socialaccount.providers.google.provider
+from django.conf import settings
+from .api.authentication import get_access_token, get_user_info
 from .models import (
     Business, User, Notification, Session,
     Post, BusinessAttribute, QandA, Review
@@ -141,16 +136,32 @@ def google_oauth_callback(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    user = request.user
-    google_account = user.socialaccount_set.filter(provider='google').first()
+    code = request.GET.get('code')
+    if not code:
+        return redirect('login')
+
+    # Get tokens using the authorization code
+    tokens = get_access_token(
+        code,
+        settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['client_id'],
+        settings.SOCIALACCOUNT_PROVIDERS['google']['APP']['secret'],
+        request.build_absolute_uri(reverse('google_oauth_callback'))
+    )
+
+    access_token = tokens.get('access_token')
+    if not access_token:
+        messages.error(request, 'Failed to get access token')
+        return redirect('login')
+
+    # Get user info from Google
+    user_info = get_user_info(access_token)
     
-    if google_account:
-        # Update user's Google ID
-        user.google_id = google_account.uid
-        user.save()
+    # Update user's Google ID
+    user = request.user
+    user.google_id = user_info.get('sub')
+    user.save()
 
     print("[INFO] Fetching business accounts...")
-    access_token = request.user.socialaccount_set.filter(provider='google').first().socialtoken_set.first().token
     business_data = get_business_accounts(access_token)
     print("[INFO] Business accounts fetched:", business_data)
     store_business_data(business_data, user.id, access_token)
