@@ -4,17 +4,25 @@ from ..models import Post
 
 @transaction.atomic
 def store_posts(posts_data, account_id):
-    for post in posts_data.get('localPosts', []):
-        existing_post = Post.objects.filter(post_id=post['name']).first()
-        if not existing_post:
-            Post.objects.create(
-                business_id=account_id,
-                post_type=post.get('topicType', 'STANDARD'),
-                content=post.get('summary', ''),
-                media_url=post.get('media', [{}])[0].get('sourceUrl', '') if post.get('media') else '',
-                scheduled_at=post.get('scheduledTime', None),
-                status=post.get('state', 'PUBLISHED')
+    stored_posts = []
+    try:
+        for post in posts_data.get('localPosts', []):
+            post_data = {
+                'business_id': account_id,
+                'post_id': post['name'],
+                'post_type': post.get('topicType', 'STANDARD'),
+                'content': post.get('summary', ''),
+                'media_url': post.get('media', [{}])[0].get('sourceUrl', '') if post.get('media') else '',
+                'scheduled_at': post.get('scheduledTime', None),
+                'status': post.get('state', 'PUBLISHED')
+            }
+            
+            post_obj, created = Post.objects.update_or_create(
+                post_id=post['name'],
+                defaults=post_data
             )
+            stored_posts.append(post_obj)
+            print(f"[INFO] Successfully stored/updated post: {post['name']}")
         else:
             existing_post.content = post.get('summary', '')
             existing_post.media_url = post.get('media', [{}])[0].get('sourceUrl', '') if post.get('media') else ''

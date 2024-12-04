@@ -117,25 +117,42 @@ from ..models import Business
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
+    stored_businesses = []
     for account in business_data.get('accounts', []):
-        # Get locations for this account
-        locations = get_locations(access_token, account['name'])
-        if locations.get('locations'):
-            location = locations['locations'][0]  # Use first location
-            
-            # Get or create the business record with full details
-            business, created = Business.objects.get_or_create(
-                business_id=account['name'],
-                defaults={
+        try:
+            # Get locations for this account
+            locations = get_locations(access_token, account['name'])
+            if locations.get('locations'):
+                location = locations['locations'][0]  # Use first location
+                
+                # Extract business details
+                business_details = {
                     'user_id': user_id,
                     'business_name': account.get('accountName', 'Unnamed Business'),
-                    'address': location.get('address', {}).get('formattedAddress', ''),
-                    'phone_number': location.get('primaryPhone', ''),
-                    'website_url': location.get('websiteUrl', ''),
-                    'category': location.get('primaryCategory', {}).get('displayName', ''),
-                    'is_verified': location.get('locationState', {}).get('isVerified', False)
+                    'business_id': account['name'],
+                    'address': location.get('address', {}).get('formattedAddress', 'No info'),
+                    'phone_number': location.get('primaryPhone', 'No info'),
+                    'website_url': location.get('websiteUrl', 'No info'),
+                    'category': location.get('primaryCategory', {}).get('displayName', 'No info'),
+                    'is_verified': location.get('locationState', {}).get('isVerified', False),
+                    'email_settings': 'Enabled',
+                    'automation_status': 'Active'
                 }
-            )
+                
+                # Get or create the business record
+                business, created = Business.objects.update_or_create(
+                    business_id=account['name'],
+                    defaults=business_details
+                )
+                
+                stored_businesses.append(business)
+                print(f"[INFO] Successfully stored/updated business: {business.business_name}")
+                
+        except Exception as e:
+            print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
+            continue
+    
+    return stored_businesses
             
             # Update existing business with latest data
             if not created:
