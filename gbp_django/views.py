@@ -203,12 +203,14 @@ def index(request):
     ).select_related('user').first()
     
     # Get other businesses
-    other_businesses = list(Business.objects.filter(
+    other_businesses = Business.objects.filter(
         user=request.user
-    ).exclude(id=oauth_business.id if oauth_business else None))
+    ).exclude(id=oauth_business.id if oauth_business else None)
     
     # Combine the lists with OAuth business first
-    businesses = [oauth_business] if oauth_business else []
+    businesses = []
+    if oauth_business:
+        businesses.append(oauth_business)
     businesses.extend(other_businesses)
     
     users = User.objects.all()
