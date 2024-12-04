@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from django.contrib import messages
 from django.conf import settings
+from allauth.socialaccount import providers
+from allauth.utils import build_absolute_uri
 from .api.authentication import get_access_token, get_user_info
 from .models import (
     Business, User, Notification, Session,
