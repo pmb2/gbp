@@ -64,13 +64,18 @@ class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
     business_id = models.CharField(max_length=255, unique=True)
-    address = models.TextField(blank=True, null=True)
-    phone_number = models.CharField(max_length=20, blank=True, null=True)
-    website_url = models.TextField(blank=True, null=True)
-    category = models.CharField(max_length=255, blank=True, null=True)
+    address = models.TextField(blank=True, null=True, default='No info')
+    phone_number = models.CharField(max_length=20, blank=True, null=True, default='No info')
+    website_url = models.TextField(blank=True, null=True, default='No info')
+    category = models.CharField(max_length=255, blank=True, null=True, default='No info')
     is_verified = models.BooleanField(default=False)
+    email_settings = models.CharField(max_length=50, default='Enabled')
+    automation_status = models.CharField(max_length=50, default='Active')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.business_name
 
 class Post(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)

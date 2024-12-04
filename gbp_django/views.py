@@ -212,8 +212,10 @@ def index(request):
     if not request.user.socialaccount_set.filter(provider='google').exists():
         return redirect('/accounts/google/login/')
 
-    # Get all businesses for the current user
-    businesses = Business.objects.filter(user=request.user).select_related('user')
+    # Get all businesses for the current user with related counts
+    businesses = Business.objects.filter(user=request.user).prefetch_related(
+        'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
+    )
     
     # Get the OAuth-connected business (should be first)
     oauth_business = businesses.filter(

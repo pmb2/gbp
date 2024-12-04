@@ -118,14 +118,34 @@ from ..models import Business
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
     for account in business_data.get('accounts', []):
-        # Get or create the business record
-        business, created = Business.objects.get_or_create(
-            business_id=account['name'],
-            defaults={
-                'user_id': user_id,
-                'business_name': account.get('accountName', 'Unnamed Business')
-            }
-        )
+        # Get locations for this account
+        locations = get_locations(access_token, account['name'])
+        if locations.get('locations'):
+            location = locations['locations'][0]  # Use first location
+            
+            # Get or create the business record with full details
+            business, created = Business.objects.get_or_create(
+                business_id=account['name'],
+                defaults={
+                    'user_id': user_id,
+                    'business_name': account.get('accountName', 'Unnamed Business'),
+                    'address': location.get('address', {}).get('formattedAddress', ''),
+                    'phone_number': location.get('primaryPhone', ''),
+                    'website_url': location.get('websiteUrl', ''),
+                    'category': location.get('primaryCategory', {}).get('displayName', ''),
+                    'is_verified': location.get('locationState', {}).get('isVerified', False)
+                }
+            )
+            
+            # Update existing business with latest data
+            if not created:
+                business.business_name = account.get('accountName', 'Unnamed Business')
+                business.address = location.get('address', {}).get('formattedAddress', '')
+                business.phone_number = location.get('primaryPhone', '')
+                business.website_url = location.get('websiteUrl', '')
+                business.category = location.get('primaryCategory', {}).get('displayName', '')
+                business.is_verified = location.get('locationState', {}).get('isVerified', False)
+                business.save()
         
         # Fetch locations for this account
         locations = get_locations(access_token, account['name'])
