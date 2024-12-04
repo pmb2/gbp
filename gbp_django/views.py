@@ -196,38 +196,38 @@ def index(request):
     if not request.user.socialaccount_set.filter(provider='google').exists():
         return redirect('/accounts/google/login/')
 
-    # Get the OAuth-connected business first
-    oauth_business = Business.objects.filter(
-        user=request.user,
+    # Get all businesses for the current user
+    businesses = Business.objects.filter(user=request.user).select_related('user')
+    
+    # Get the OAuth-connected business (should be first)
+    oauth_business = businesses.filter(
         user__socialaccount__provider='google'
-    ).select_related('user').first()
+    ).first()
     
-    # Get other businesses
-    other_businesses = Business.objects.filter(
-        user=request.user
-    ).exclude(id=oauth_business.id if oauth_business else None)
-    
-    # Combine the lists with OAuth business first
-    businesses = []
+    # Reorder businesses list to put OAuth business first
     if oauth_business:
-        businesses.append(oauth_business)
-    businesses.extend(other_businesses)
+        businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
     
-    users = User.objects.all()
+    # Process business data
     for business in businesses:
-        business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
-        business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
-        business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
-        business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
-        business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
-        business.automation_status = business.automation_status if hasattr(business, 'automation_status') else 'No info'
-        business.address = business.address if business.address else 'No info'
-        business.phone_number = business.phone_number if business.phone_number else 'No info'
-        business.website_url = business.website_url if business.website_url else 'No info'
-        business.category = business.category if business.category else 'No info'
+        # Get actual counts from related models
+        business.posts_count = Post.objects.filter(business=business).count()
+        business.photos_count = BusinessAttribute.objects.filter(business=business, key='photo').count()
+        business.qanda_count = QandA.objects.filter(business=business).count()
+        business.reviews_count = Review.objects.filter(business=business).count()
+        
+        # Set default values for empty fields
+        business.email_settings = getattr(business, 'email_settings', 'Enabled')
+        business.automation_status = getattr(business, 'automation_status', 'Active')
+        business.address = business.address or 'No info'
+        business.phone_number = business.phone_number or 'No info'
+        business.website_url = business.website_url or 'No info'
+        business.category = business.category or 'No info'
         business.is_verified = 'Verified' if business.is_verified else 'Not Verified'
+
+    users = User.objects.all()
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
-    unread_notifications_count = int(Notification.get_user_notifications(request.user.id).count())
+    unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
 
     return render(request, 'index.html', {
         'dashboard_data': {'businesses': businesses, 'users': users_with_ids},

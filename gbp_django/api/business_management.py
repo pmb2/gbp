@@ -103,30 +103,38 @@ from ..models import Business
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
     for account in business_data.get('accounts', []):
+        # Get or create the business record
         business, created = Business.objects.get_or_create(
             business_id=account['name'],
             defaults={
                 'user_id': user_id,
-                'business_name': account.get('accountName')
+                'business_name': account.get('accountName', 'Unnamed Business')
             }
         )
-        # Fetch additional details for each business location
+        
+        # Fetch locations for this account
         locations = get_locations(access_token, account['name'])
-        for location in locations.get('locations', []):
-            business.address = location.get('address', {}).get('formattedAddress', 'No info')
-            business.phone_number = location.get('primaryPhone', 'No info')
-            business.website_url = location.get('websiteUrl', 'No info')
-            business.category = location.get('primaryCategory', {}).get('displayName', 'No info')
+        if locations.get('locations'):
+            location = locations['locations'][0]  # Use first location
+            
+            # Update business details
+            business.address = location.get('address', {}).get('formattedAddress')
+            business.phone_number = location.get('primaryPhone')
+            business.website_url = location.get('websiteUrl')
+            business.category = location.get('primaryCategory', {}).get('displayName')
             business.is_verified = location.get('locationState', {}).get('isVerified', False)
+            
+            # Count related data
+            business.posts_count = Post.objects.filter(business=business).count()
+            business.photos_count = BusinessAttribute.objects.filter(business=business, key='photo').count()
+            business.qanda_count = QandA.objects.filter(business=business).count()
+            business.reviews_count = Review.objects.filter(business=business).count()
+            
+            # Set default values for settings
+            business.email_settings = 'Enabled'
+            business.automation_status = 'Active'
+            
             business.save()
-        # Ensure placeholders for missing data
-        business.posts_count = business.posts_count if hasattr(business, 'posts_count') else 'No info'
-        business.photos_count = business.photos_count if hasattr(business, 'photos_count') else 'No info'
-        business.qanda_count = business.qanda_count if hasattr(business, 'qanda_count') else 'No info'
-        business.reviews_count = business.reviews_count if hasattr(business, 'reviews_count') else 'No info'
-        business.email_settings = business.email_settings if hasattr(business, 'email_settings') else 'No info'
-        business.automation_status = business.automation_status if hasattr(business, 'automation_status') else 'No info'
-        business.save()
 
 def get_locations(access_token, account_id):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"
