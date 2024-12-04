@@ -153,40 +153,6 @@ def store_business_data(business_data, user_id, access_token):
             continue
     
     return stored_businesses
-            
-            # Update existing business with latest data
-            if not created:
-                business.business_name = account.get('accountName', 'Unnamed Business')
-                business.address = location.get('address', {}).get('formattedAddress', '')
-                business.phone_number = location.get('primaryPhone', '')
-                business.website_url = location.get('websiteUrl', '')
-                business.category = location.get('primaryCategory', {}).get('displayName', '')
-                business.is_verified = location.get('locationState', {}).get('isVerified', False)
-                business.save()
-        
-        # Fetch locations for this account
-        locations = get_locations(access_token, account['name'])
-        if locations.get('locations'):
-            location = locations['locations'][0]  # Use first location
-            
-            # Update business details
-            business.address = location.get('address', {}).get('formattedAddress')
-            business.phone_number = location.get('primaryPhone')
-            business.website_url = location.get('websiteUrl')
-            business.category = location.get('primaryCategory', {}).get('displayName')
-            business.is_verified = location.get('locationState', {}).get('isVerified', False)
-            
-            # Count related data
-            business.posts_count = Post.objects.filter(business=business).count()
-            business.photos_count = BusinessAttribute.objects.filter(business=business, key='photo').count()
-            business.qanda_count = QandA.objects.filter(business=business).count()
-            business.reviews_count = Review.objects.filter(business=business).count()
-            
-            # Set default values for settings
-            business.email_settings = 'Enabled'
-            business.automation_status = 'Active'
-            
-            business.save()
 
 def get_locations(access_token, account_id):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"

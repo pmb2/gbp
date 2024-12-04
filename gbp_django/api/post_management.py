@@ -23,12 +23,9 @@ def store_posts(posts_data, account_id):
             )
             stored_posts.append(post_obj)
             print(f"[INFO] Successfully stored/updated post: {post['name']}")
-        else:
-            existing_post.content = post.get('summary', '')
-            existing_post.media_url = post.get('media', [{}])[0].get('sourceUrl', '') if post.get('media') else ''
-            existing_post.scheduled_at = post.get('scheduledTime', None)
-            existing_post.status = post.get('state', 'PUBLISHED')
-            existing_post.save()
+    except Exception as e:
+        print(f"[ERROR] Failed to store post data: {str(e)}")
+    return stored_posts
 
 def create_post(access_token, account_id, location_id, post_data):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/localPosts"
