@@ -135,11 +135,14 @@ def direct_google_oauth(request):
 
 def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
-    user = request.user
+    if not request.user.is_authenticated:
+        return redirect('login')
 
-    # Update user's Google ID if not set
-    if not user.google_id and user.socialaccount_set.filter(provider='google').exists():
-        google_account = user.socialaccount_set.filter(provider='google').first()
+    user = request.user
+    google_account = user.socialaccount_set.filter(provider='google').first()
+    
+    if google_account:
+        # Update user's Google ID
         user.google_id = google_account.uid
         user.save()
 
