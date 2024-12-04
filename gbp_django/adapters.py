@@ -4,4 +4,5 @@ from allauth.socialaccount.models import SocialApp
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
     def get_app(self, request, provider, client_id=None):
         # Get the most recently created app if multiple exist
-        return SocialApp.objects.filter(provider=provider.id).latest('id')
+        provider_id = provider.id if hasattr(provider, 'id') else provider
+        return SocialApp.objects.filter(provider=provider_id).latest('id')
