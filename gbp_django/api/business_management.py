@@ -2,9 +2,9 @@ import os
 import random
 import requests
 import time
-from django.core.cache import cache
 from django.conf import settings
 from gbp_django.api.authentication import refresh_access_token
+from gbp_django.utils.cache import cache_on_arguments
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
     QandA, Review
@@ -41,7 +41,7 @@ def delete_location(access_token, account_id, location_id):
 
 
 
-@cache.cache_on_arguments(timeout=300)
+@cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     headers = {"Authorization": f"Bearer {access_token}"}
