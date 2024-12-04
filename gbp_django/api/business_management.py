@@ -1,40 +1,47 @@
 import os
-from flask_caching import Cache
-
-# Initialize cache
-cache = Cache(config={'CACHE_TYPE': 'simple'})
+import random
 import requests
 import time
-import random
-from flask import session
+from flask_caching import Cache
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
     QandA, Review
 )
 
+# Initialize cache
+cache = Cache(config={'CACHE_TYPE': 'simple'})
+
 def create_business_location(access_token, account_id, location_data):
-    url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"
+    """Create a new business location."""
+    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
+           f"{account_id}/locations")
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.post(url, headers=headers, json=location_data)
     response.raise_for_status()
     return response.json()
 
+
 def update_business_details(access_token, account_id, location_id, update_data):
-    url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}"
+    """Update details for a business location."""
+    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
+           f"{account_id}/locations/{location_id}")
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.patch(url, headers=headers, json=update_data)
     response.raise_for_status()
     return response.json()
 
+
 def delete_location(access_token, account_id, location_id):
-    url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}"
+    """Delete a business location."""
+    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
+           f"{account_id}/locations/{location_id}")
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.delete(url, headers=headers)
     response.raise_for_status()
     return response.status_code == 204
 
-import time
+
 
 @cache.cached(timeout=300, key_prefix='business_accounts')
 def get_business_accounts(access_token):
