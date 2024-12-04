@@ -79,7 +79,7 @@ class Business(models.Model):
 
 class Post(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
-    post_id = models.CharField(max_length=255, unique=True)
+    post_id = models.CharField(max_length=255, unique=True, default='default-post-id')
     post_type = models.CharField(max_length=50)
     content = models.TextField(blank=True, null=True)
     media_url = models.TextField(blank=True, null=True)
