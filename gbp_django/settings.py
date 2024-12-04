@@ -18,6 +18,9 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+# Custom adapter for handling multiple social apps
+SOCIALACCOUNT_ADAPTER = 'gbp_django.adapters.CustomSocialAccountAdapter'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
