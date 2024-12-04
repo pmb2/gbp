@@ -2,15 +2,12 @@ import os
 import random
 import requests
 import time
-from flask_caching import Cache
+from django.core.cache import cache
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
     QandA, Review
 )
-
-# Initialize cache
-cache = Cache(config={'CACHE_TYPE': 'simple'})
 
 def create_business_location(access_token, account_id, location_data):
     """Create a new business location."""
@@ -43,7 +40,7 @@ def delete_location(access_token, account_id, location_id):
 
 
 
-@cache.cached(timeout=300, key_prefix='business_accounts')
+@cache.cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     headers = {"Authorization": f"Bearer {access_token}"}
@@ -86,13 +83,16 @@ def get_business_accounts(access_token):
                 elif response.status_code == 401:
                     # Token expired, refresh token
                     print("[INFO] Access token expired, attempting to refresh.")
-                    if 'refresh_token' in session:
+                    from django.contrib.sessions.backends.db import SessionStore
+                    session = SessionStore()
+                    if session.get('refresh_token'):
                         new_token = refresh_access_token(
-                            session['refresh_token'],
-                            os.getenv('CLIENT_ID'),
-                            os.getenv('CLIENT_SECRET')
+                            session.get('refresh_token'),
+                            settings.GOOGLE_OAUTH2_CLIENT_ID,
+                            settings.GOOGLE_OAUTH2_CLIENT_SECRET
                         )
                         session['google_token'] = new_token['access_token']
+                        session.save()
                         headers["Authorization"] = f"Bearer {new_token['access_token']}"
                     else:
                         raise Exception("No refresh token available. User needs to re-authenticate.")

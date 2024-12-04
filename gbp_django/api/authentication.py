@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import session, current_app
+from django.conf import settings
 
 def get_access_token(auth_code, client_id, client_secret, redirect_uri):
     url = "https://oauth2.googleapis.com/token"
