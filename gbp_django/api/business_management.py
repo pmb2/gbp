@@ -3,6 +3,7 @@ import random
 import requests
 import time
 from django.core.cache import cache
+from django.conf import settings
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
@@ -56,7 +57,8 @@ def get_business_accounts(access_token):
                 print("[ERROR] No business accounts found.")
                 # Log the warning as a notification
                 from gbp_django.models import Notification
-                from flask import session
+                from django.contrib.sessions.backends.db import SessionStore
+                session = SessionStore()
                 user_id = session.get('user_id')
                 if user_id:
                     notification = Notification(user_id=user_id, message="No business accounts found. Using placeholder data.", priority="high")
@@ -67,12 +69,14 @@ def get_business_accounts(access_token):
             if response.status_code == 401:
                 # Token expired, refresh token
                 print("[INFO] Access token expired, attempting to refresh.")
+                session = SessionStore()
                 new_token = refresh_access_token(
-                    session['refresh_token'],
-                    os.getenv('CLIENT_ID'),
-                    os.getenv('CLIENT_SECRET')
+                    session.get('refresh_token'),
+                    settings.GOOGLE_OAUTH2_CLIENT_ID,
+                    settings.GOOGLE_OAUTH2_CLIENT_SECRET
                 )
                 session['google_token'] = new_token['access_token']
+                session.save()
                 headers["Authorization"] = f"Bearer {new_token['access_token']}"
             elif response.status_code == 429:
                 # Too many requests, apply exponential backoff

@@ -27,7 +27,7 @@ def refresh_access_token(refresh_token, client_id, client_secret):
     response.raise_for_status()
     return response.json()
 def get_user_info(access_token):
-    from gbp_django.models import Session
+    from django.contrib.sessions.backends.db import SessionStore
     url = "https://openidconnect.googleapis.com/v1/userinfo"
     headers = {"Authorization": f"Bearer {access_token}"}
     try:
@@ -38,12 +38,14 @@ def get_user_info(access_token):
         if response.status_code == 401:
             # Token expired, refresh token
             print("[INFO] Access token expired, attempting to refresh.")
+            session = SessionStore()
             new_token = refresh_access_token(
-                session['refresh_token'],
+                session.get('refresh_token'),
                 os.getenv('CLIENT_ID'),
                 os.getenv('CLIENT_SECRET')
             )
             session['google_token'] = new_token['access_token']
+            session.save()
             headers["Authorization"] = f"Bearer {new_token['access_token']}"
             response = requests.get(url, headers=headers)
             response.raise_for_status()
