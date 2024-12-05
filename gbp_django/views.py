@@ -41,7 +41,7 @@ def login(request):
                 request.session.set_expiry(0)
 
             # Check if user needs Google OAuth
-            if not user.socialaccount_set.filter(provider='google').exists():
+            if not user.is_google_linked:
                 return redirect(reverse('google_oauth'))
 
             return redirect(reverse('index'))
@@ -182,8 +182,11 @@ def google_oauth_callback(request):
         user.google_access_token = access_token
         user.google_refresh_token = refresh_token
         user.google_token_expiry = datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        # Update user's Google OAuth status
         user.is_google_linked = True
-        user.save()
+        user.save(update_fields=['google_id', 'name', 'profile_picture_url', 
+                               'google_access_token', 'google_refresh_token', 
+                               'google_token_expiry', 'is_google_linked'])
 
     except Exception as e:
         messages.error(request, f'OAuth error: {str(e)}')
@@ -309,10 +312,10 @@ def index(request):
     print("\n[DEBUG] Loading dashboard index...")
     print(f"[DEBUG] User: {request.user.email}")
     
-    # Ensure user has completed Google OAuth
-    if not request.user.socialaccount_set.filter(provider='google').exists():
+    # Check if user has completed Google OAuth and has valid tokens
+    if not request.user.is_google_linked:
         print("[DEBUG] User has not completed Google OAuth")
-        return redirect('/accounts/google/login/')
+        return redirect(reverse('google_oauth'))
 
     print("[DEBUG] Fetching businesses and related data...")
     # Get all businesses for the current user with related counts
