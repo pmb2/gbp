@@ -22,10 +22,11 @@ from .api.media_management import get_photos, store_photos
 
 def login(request):
     if request.user.is_authenticated:
-        # Check if user needs Google OAuth
-        if not request.user.socialaccount_set.filter(provider='google').exists():
-            return redirect(reverse('google_oauth'))
-        return redirect(reverse('index'))  # This will now go to /dashboard/
+        # If already authenticated and has Google OAuth, go to dashboard
+        if request.user.socialaccount_set.filter(provider='google').exists():
+            return redirect('index')
+        # If authenticated but no Google OAuth, redirect to OAuth
+        return redirect('google_oauth')
 
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -142,6 +143,10 @@ def google_oauth_callback(request):
 
     if not code or not state or state != stored_state:
         messages.error(request, 'Invalid OAuth state or missing code')
+        return redirect('login')
+
+    if not request.user.is_authenticated:
+        messages.error(request, 'Please log in first')
         return redirect('login')
 
     try:
@@ -301,7 +306,8 @@ def google_oauth_callback(request):
             store_photos(photos_data, location['name'])
             print(f"[INFO] Photos stored for location {location['name']}.")
 
-    return redirect('/dashboard/')
+    messages.success(request, 'Successfully connected with Google')
+    return redirect('index')
 
 
 @login_required
