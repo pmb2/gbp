@@ -154,6 +154,7 @@ SITE_ID = 3
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Add this line
 MEDIA_ROOT = BASE_DIR / "media"
 
 LOGIN_REDIRECT_URL = '/'
