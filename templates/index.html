@@ -262,18 +262,6 @@
     <header class="bg-white shadow-sm px-6 py-4">
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
-            <div class="flex items-center space-x-4">
-                <div class="relative">
-
-                    <!-- User Profile Dropdown -->
-                    <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
-                        <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
-                             alt="Profile"
-                             class="h-8 w-8 rounded-full">
-                        <span class="text-gray-700">{{ user.email }}</span>
-                    </div>
-                </div>
-            </div>
         </div>
     </header>
 
@@ -290,21 +278,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                                <i class="fas fa-building text-white"></i>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                                    <i class="fas fa-building text-white"></i>
+                                </div>
+                                <div class="ml-5">
+                                    <dl>
+                                        <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>
+                                        <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>
+                                    </dl>
+                                </div>
                             </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>
-                                    <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>
-                                </dl>
+                            <!-- User Profile -->
+                            <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
+                                <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
+                                     alt="Profile"
+                                     class="h-8 w-8 rounded-full">
+                                <span class="text-sm text-gray-700">{{ user.email }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
             <!-- Business Analytics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 mx-auto max-w-7xl">
                 <!-- Average Rating Card -->
                 <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
