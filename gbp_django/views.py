@@ -136,9 +136,6 @@ def direct_google_oauth(request):
 
 def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
-    if not request.user.is_authenticated:
-        return redirect('login')
-
     code = request.GET.get('code')
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
@@ -304,7 +301,7 @@ def google_oauth_callback(request):
             store_photos(photos_data, location['name'])
             print(f"[INFO] Photos stored for location {location['name']}.")
 
-    return redirect(reverse('index'))
+    return redirect('/dashboard/')
 
 
 @login_required
