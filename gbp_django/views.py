@@ -214,15 +214,61 @@ def google_oauth_callback(request):
                 print(f"  Website: {business.website_url}")
                 print(f"  Category: {business.category}")
                 print(f"  Verified: {business.is_verified}")
+                
+            # Only fetch additional data if we have business data
+            if business_data.get('accounts'):
+                for account in business_data['accounts']:
+                    print(f"[INFO] Fetching locations for account {account['name']}...")
+                    locations = get_locations(access_token, account['name'])
+                    print(f"[INFO] Locations fetched for account {account['name']}:", locations)
+                    
+                    if locations and locations.get('locations'):
+                        for location in locations['locations']:
+                            # Fetch and store posts
+                            try:
+                                print(f"[INFO] Fetching posts for location {location['name']}...")
+                                posts_data = get_posts(access_token, account['name'], location['name'])
+                                if posts_data:
+                                    store_posts(posts_data, location['name'])
+                                    print(f"[INFO] Posts stored for location {location['name']}.")
+                            except Exception as e:
+                                print(f"[ERROR] Failed to fetch/store posts: {str(e)}")
+
+                            # Fetch and store reviews
+                            try:
+                                print(f"[INFO] Fetching reviews for location {location['name']}...")
+                                reviews_data = get_reviews(access_token, account['name'], location['name'])
+                                if reviews_data:
+                                    store_reviews(reviews_data, location['name'])
+                                    print(f"[INFO] Reviews stored for location {location['name']}.")
+                            except Exception as e:
+                                print(f"[ERROR] Failed to fetch/store reviews: {str(e)}")
+
+                            # Fetch and store Q&A
+                            try:
+                                print(f"[INFO] Fetching Q&A for location {location['name']}...")
+                                qa_data = get_questions_and_answers(access_token, account['name'], location['name'])
+                                if qa_data:
+                                    store_questions_and_answers(qa_data, location['name'])
+                                    print(f"[INFO] Q&A stored for location {location['name']}.")
+                            except Exception as e:
+                                print(f"[ERROR] Failed to fetch/store Q&A: {str(e)}")
+
+                            # Fetch and store photos
+                            try:
+                                print(f"[INFO] Fetching photos for location {location['name']}...")
+                                photos_data = get_photos(access_token, account['name'], location['name'])
+                                if photos_data:
+                                    store_photos(photos_data, location['name'])
+                                    print(f"[INFO] Photos stored for location {location['name']}.")
+                            except Exception as e:
+                                print(f"[ERROR] Failed to fetch/store photos: {str(e)}")
         else:
             print("[WARNING] No business data returned from API")
             messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
     except Exception as e:
         print(f"[ERROR] Failed to fetch/store business data: {str(e)}")
         messages.error(request, "There was an error connecting to Google Business Profile. Please try again.")
-
-    # Fetch additional data like posts, reviews, Q&A, and photos
-    for account in business_data.get('accounts', []):
         print(f"[INFO] Fetching locations for account {account['name']}...")
         locations = get_locations(access_token, account['name'])
         print(f"[INFO] Locations fetched for account {account['name']}:", locations)
