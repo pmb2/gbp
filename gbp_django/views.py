@@ -170,13 +170,17 @@ def google_oauth_callback(request):
         if refresh_token:
             request.session['refresh_token'] = refresh_token
 
-    # Get user info from Google
-    user_info = get_user_info(access_token)
-    
-    # Update user's Google ID
-    user = request.user
-    user.google_id = user_info.get('sub')
-    user.save()
+        # Get user info from Google
+        user_info = get_user_info(access_token)
+        
+        # Update user's Google ID
+        user = request.user
+        user.google_id = user_info.get('sub')
+        user.save()
+
+    except Exception as e:
+        messages.error(request, f'OAuth error: {str(e)}')
+        return redirect('login')
 
     print("[INFO] Fetching business accounts...")
     business_data = get_business_accounts(access_token)
