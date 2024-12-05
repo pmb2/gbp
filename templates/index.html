@@ -1,8 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>GBP Automation Pro Dashboard</title>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GBP Automation Pro - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
 /* Reset and base styles */
 * {
   margin: 0;
@@ -252,8 +257,9 @@ input:checked + .toggle-slider:before {
 }
 </style>
 </head>
-<body>
-<div class="header">
+<body class="bg-gray-100">
+<div class="dashboard">
+  <aside class="sidebar" id="sidebar">
   <div class="logo">GBP Automation Pro</div>
   <div class="user-section">
     <div class="notification-icon">
