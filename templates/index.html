@@ -303,41 +303,88 @@
                         </div>
                     </div>
                 </div>
-            <!-- Business Metrics -->
-            <div class="mt-8">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Business Performance</h2>
-                <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-green-100 rounded-md p-3">
-                                    <i class="fas fa-star text-green-600"></i>
-                                </div>
-                                <div class="ml-5">
-                                    <h3 class="text-sm font-medium text-gray-500">Average Rating</h3>
-                                    <p class="mt-1 text-lg font-semibold text-gray-900">4.8</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-blue-100 rounded-md p-3">
-                                    <i class="fas fa-eye text-blue-600"></i>
-                                </div>
-                                <div class="ml-5">
-                                    <h3 class="text-sm font-medium text-gray-500">Total Views</h3>
-                                    <p class="mt-1 text-lg font-semibold text-gray-900">15.2K</p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 bg-purple-100 rounded-md p-3">
-                                    <i class="fas fa-users text-purple-600"></i>
-                                </div>
-                                <div class="ml-5">
-                                    <h3 class="text-sm font-medium text-gray-500">Customer Actions</h3>
-                                    <p class="mt-1 text-lg font-semibold text-gray-900">2.4K</p>
-                                </div>
-                            </div>
+            <!-- Business Analytics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <!-- Average Rating Card -->
+                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                            <i class="fas fa-star text-green-600 text-xl"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Average Rating</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <p class="text-2xl font-bold text-green-600">4.8</p>
+                        <p class="ml-2 text-sm text-gray-500">/ 5.0</p>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center">
+                            <span class="text-green-500 text-sm">↑ 12%</span>
+                            <span class="ml-2 text-sm text-gray-500">from last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Views Card -->
+                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                            <i class="fas fa-eye text-blue-600 text-xl"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Total Views</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <p class="text-2xl font-bold text-blue-600">15.2K</p>
+                        <p class="ml-2 text-sm text-gray-500">views</p>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center">
+                            <span class="text-green-500 text-sm">↑ 8%</span>
+                            <span class="ml-2 text-sm text-gray-500">from last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Actions Card -->
+                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
+                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Customer Actions</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <p class="text-2xl font-bold text-purple-600">2.4K</p>
+                        <p class="ml-2 text-sm text-gray-500">actions</p>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center">
+                            <span class="text-green-500 text-sm">↑ 15%</span>
+                            <span class="ml-2 text-sm text-gray-500">from last month</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversion Rate Card -->
+                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
+                            <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Conversion Rate</h3>
+                    <div class="mt-2 flex items-baseline">
+                        <p class="text-2xl font-bold text-yellow-600">15.8%</p>
+                        <p class="ml-2 text-sm text-gray-500">rate</p>
+                    </div>
+                    <div class="mt-4">
+                        <div class="flex items-center">
+                            <span class="text-green-500 text-sm">↑ 5%</span>
+                            <span class="ml-2 text-sm text-gray-500">from last month</span>
                         </div>
                     </div>
                 </div>
