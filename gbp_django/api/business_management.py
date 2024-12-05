@@ -53,16 +53,11 @@ def get_business_accounts(access_token):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
+            if not data:
+                print("[WARNING] Empty response from Google API")
+                return {"accounts": []}
             if not data.get('accounts'):
-                print("[ERROR] No business accounts found.")
-                # Log the warning as a notification
-                from gbp_django.models import Notification
-                from django.contrib.sessions.backends.db import SessionStore
-                session = SessionStore()
-                user_id = session.get('user_id')
-                if user_id:
-                    notification = Notification(user_id=user_id, message="No business accounts found. Using placeholder data.", priority="high")
-                    notification.save()
+                print("[WARNING] No business accounts found")
                 return {"accounts": []}
             return data
         except requests.exceptions.HTTPError as e:
@@ -117,8 +112,18 @@ from ..models import Business
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
+    if not business_data:
+        print("[WARNING] No business data to store")
+        return []
+    
     stored_businesses = []
-    for account in business_data.get('accounts', []):
+    accounts = business_data.get('accounts', [])
+    
+    if not accounts:
+        print("[WARNING] No accounts found in business data")
+        return []
+        
+    for account in accounts:
         try:
             # Get locations for this account
             locations = get_locations(access_token, account['name'])

@@ -182,11 +182,20 @@ def google_oauth_callback(request):
         messages.error(request, f'OAuth error: {str(e)}')
         return redirect('login')
 
-    print("[INFO] Fetching business accounts...")
-    business_data = get_business_accounts(access_token)
-    print("[INFO] Business accounts fetched:", business_data)
-    store_business_data(business_data, user.id, access_token)
-    print("[INFO] Business data stored successfully.")
+    try:
+        print("[INFO] Fetching business accounts...")
+        business_data = get_business_accounts(access_token)
+        print("[INFO] Business accounts fetched:", business_data)
+        
+        if business_data:
+            store_business_data(business_data, user.id, access_token)
+            print("[INFO] Business data stored successfully.")
+        else:
+            print("[WARNING] No business data returned from API")
+            messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch/store business data: {str(e)}")
+        messages.error(request, "There was an error connecting to Google Business Profile. Please try again.")
 
     # Fetch additional data like posts, reviews, Q&A, and photos
     for account in business_data.get('accounts', []):
