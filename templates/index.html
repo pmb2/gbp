@@ -431,11 +431,9 @@
                     </div>
                 </div>
             </div>
-            {% with unread_notifications_count as unread_count %}
-                {% if unread_count %}
-                    <div class="notification-badge">{{ unread_count }}</div>
-                {% endif %}
-            {% endwith %}
+            {% if unread_notifications_count %}
+                <div class="notification-badge">{{ unread_notifications_count }}</div>
+            {% endif %}
         </div>
         <div class="user-profile" onclick="toggleUserMenu()">
             <img src="
@@ -495,19 +493,21 @@
                     <td class="p-4">
                         <div>
                             <div class="font-medium">{{ business.business_name }}</div>
-                            {% if business.no_data %}
-                                <a href="http://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
-                                   target="_blank"
-                                   class="inline-flex items-center px-3 py-1 mt-2 border border-red-500 text-red-500 rounded-md hover:bg-red-50">
-                                    <span class="mr-2">Verify and Add Business Details</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                    </svg>
-                                </a>
-                            {% else %}
-                                <span class="text-sm text-blue-600">(Connected via Google)</span>
-                            {% endif %}
+                            <span class="text-sm {% if business.no_data %}text-red-600{% else %}text-blue-600{% endif %}">
+                                {% if business.no_data %}
+                                    <a href="http://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
+                                       target="_blank"
+                                       class="inline-flex items-center hover:text-red-700">
+                                        <span class="mr-2">Verify and Add Business Details</span>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                        </svg>
+                                    </a>
+                                {% else %}
+                                    (Connected via Google)
+                                {% endif %}
+                            </span>
                         </div>
                     </td>
                     <td class="p-4">
