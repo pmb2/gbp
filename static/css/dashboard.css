@@ -20,15 +20,18 @@ body {
 }
 
 .dashboard {
-  display: grid;
+  display: flex;
   min-height: 100vh;
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  padding-left: 250px; /* Account for sidebar width */
 }
 
 .sidebar {
   position: fixed;
+  top: 0;
+  left: 0;
   height: 100vh;
   width: 250px;
   background: var(--dark);
@@ -36,12 +39,15 @@ body {
   padding: 1.5rem;
   overflow-y: auto;
   transition: transform 0.3s ease;
+  z-index: 10;
 }
 
 .main-content {
-  margin-left: 250px;
+  flex: 1;
   padding: 2rem;
-  width: calc(100% - 250px);
+  width: 100%;
+  max-width: calc(100vw - 250px);
+  margin-left: auto;
 }
 
 .analytics-section {
