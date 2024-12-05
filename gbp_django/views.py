@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, JsonResponse
 from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
@@ -402,3 +402,40 @@ def root_view(request):
             return redirect('/accounts/google/login/')
         return redirect(reverse('index'))
     return redirect(reverse('login'))
+@login_required
+def get_verification_status(request, business_id):
+    """API endpoint to check business verification status"""
+    try:
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        
+        # Get the latest data from Google API
+        access_token = request.user.google_access_token
+        account_data = get_business_accounts(access_token)
+        
+        # Find matching business in API response
+        business_data = next(
+            (acc for acc in account_data.get('accounts', []) 
+             if acc['name'] == business_id), 
+            None
+        )
+        
+        if not business_data:
+            return JsonResponse({'error': 'Business not found'}, status=404)
+            
+        # Check various verification requirements
+        status = {
+            'business_name': bool(business_data.get('accountName')),
+            'address': bool(business_data.get('address')),
+            'phone': bool(business_data.get('primaryPhone')),
+            'category': bool(business_data.get('primaryCategory')),
+            'website': bool(business_data.get('websiteUrl')),
+            'hours': bool(business_data.get('regularHours')),
+            'photos': bool(business_data.get('photos')),
+        }
+        
+        return JsonResponse(status)
+        
+    except Business.DoesNotExist:
+        return JsonResponse({'error': 'Business not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

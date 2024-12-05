@@ -13,4 +13,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('google/callback/', views.google_oauth_callback, name='google_oauth_callback'),
     path('google/auth/', views.direct_google_oauth, name='google_oauth'),
+    path('api/business/<str:business_id>/verification-status/', 
+         views.get_verification_status, name='verification_status'),
 ]

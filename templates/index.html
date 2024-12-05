@@ -263,9 +263,15 @@
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
             <div class="flex items-center space-x-4">
-                <button class="btn btn-primary" onclick="openAddBusinessModal()">
-                    Add Business
+                {% if not business.is_verified %}
+                <button 
+                    class="bg-red-500 text-white px-4 py-2 rounded-full animate-pulse"
+                    onclick="showVerificationModal('{{ business.business_id }}')"
+                >
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    Verification Required
                 </button>
+                {% endif %}
                 <div class="relative">
 
                     <!-- User Profile Dropdown -->
@@ -644,5 +650,6 @@
     }
 </script>
 </body>
+{% include 'verification_modal.html' %}
 </html>
     </main>

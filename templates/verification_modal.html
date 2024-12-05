@@ -1,0 +1,110 @@
+<div id="verificationModal" class="modal hidden">
+    <div class="modal-content bg-white rounded-lg p-6 max-w-lg w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Business Verification Required</h2>
+            <button onclick="closeVerificationModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="verification-checklist space-y-3">
+            <!-- Checklist items will be dynamically populated -->
+        </div>
+        
+        <div class="mt-6 flex justify-between items-center">
+            <a href="https://www.google.com/business/" 
+               target="_blank"
+               class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Update Business Profile
+            </a>
+            <button onclick="checkVerificationStatus()" 
+                    class="bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200">
+                Check Status
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.verification-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f9fafb;
+    border-radius: 0.375rem;
+}
+
+.verification-item.complete {
+    background: #ecfdf5;
+}
+
+.verification-item.incomplete {
+    background: #fef2f2;
+}
+</style>
+
+<script>
+function showVerificationModal(businessId) {
+    const modal = document.getElementById('verificationModal');
+    modal.classList.remove('hidden');
+    loadVerificationChecklist(businessId);
+}
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    modal.classList.add('hidden');
+}
+
+function loadVerificationChecklist(businessId) {
+    fetch(`/api/business/${businessId}/verification-status/`)
+        .then(response => response.json())
+        .then(data => {
+            const checklist = document.querySelector('.verification-checklist');
+            checklist.innerHTML = '';
+            
+            Object.entries(data).forEach(([key, value]) => {
+                const item = document.createElement('div');
+                item.className = `verification-item ${value ? 'complete' : 'incomplete'}`;
+                item.innerHTML = `
+                    <span class="mr-2">
+                        ${value ? '✓' : '✗'}
+                    </span>
+                    <span>${key.replace('_', ' ').toUpperCase()}</span>
+                `;
+                checklist.appendChild(item);
+            });
+        });
+}
+
+function checkVerificationStatus() {
+    // Implement the verification status check
+    loadVerificationChecklist(currentBusinessId);
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('verificationModal');
+    if (event.target === modal) {
+        closeVerificationModal();
+    }
+}
+</script>
