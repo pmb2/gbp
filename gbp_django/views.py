@@ -41,7 +41,7 @@ def login(request):
                 request.session.set_expiry(0)
 
             # Check if user needs Google OAuth
-            if not user.is_google_linked:
+            if not user.socialaccount_set.filter(provider='google').exists():
                 return redirect(reverse('google_oauth'))
 
             return redirect(reverse('index'))

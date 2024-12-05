@@ -34,7 +34,7 @@ class User(AbstractBaseUser):
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_google_linked = models.BooleanField(default=False)
+    is_google_linked = models.BooleanField(default=False, db_index=True)
 
     objects = UserManager()
 
