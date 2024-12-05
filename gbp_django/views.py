@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect, JsonResponse
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
