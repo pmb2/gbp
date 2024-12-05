@@ -102,6 +102,46 @@
             border-radius: 0.5rem;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .business-table th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #f8fafc;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .business-table td {
+            vertical-align: middle;
+        }
+
+        .business-table tr.expanded {
+            background-color: #f8fafc;
+        }
+
+        .business-table .details {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        .profile-status.complete {
+            background-color: #ecfdf5;
+            color: #059669;
+        }
+
+        .profile-status.incomplete {
+            background-color: #fef2f2;
+            color: #dc2626;
         }
 
         .business-table th,
