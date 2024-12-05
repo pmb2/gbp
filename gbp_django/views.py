@@ -335,7 +335,7 @@ def index(request):
             email_settings="No data available",
             automation_status="No data available"
         )
-        # Don't save it to the database, just use it for display
+        # Set counts directly since this is a dummy object
         dummy_business.posts_count = 0
         dummy_business.photos_count = 0
         dummy_business.qanda_count = 0
@@ -354,11 +354,12 @@ def index(request):
     
     # Process business data
     for business in businesses:
-        # Get actual counts from related models
-        business.posts_count = Post.objects.filter(business=business).count()
-        business.photos_count = BusinessAttribute.objects.filter(business=business, key='photo').count()
-        business.qanda_count = QandA.objects.filter(business=business).count()
-        business.reviews_count = Review.objects.filter(business=business).count()
+        if not hasattr(business, 'no_data'):
+            # Only query counts for real business instances
+            business.posts_count = Post.objects.filter(business=business).count()
+            business.photos_count = BusinessAttribute.objects.filter(business=business, key='photo').count()
+            business.qanda_count = QandA.objects.filter(business=business).count()
+            business.reviews_count = Review.objects.filter(business=business).count()
         
         # Set default values for empty fields
         business.email_settings = getattr(business, 'email_settings', 'Enabled')
