@@ -307,13 +307,30 @@ input:checked + .toggle-slider:before {
           <tr class="bg-blue-50 hover:bg-blue-100 cursor-pointer" onclick="toggleDetails(this)">
             <td class="flex items-center p-4">
               <span class="mr-2">
-                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                </svg>
+                {% if business.no_data %}
+                  <svg class="w-6 h-6 text-red-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                  </svg>
+                {% else %}
+                  <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                  </svg>
+                {% endif %}
               </span>
               <div>
                 <div class="font-medium">{{ business.business_name }}</div>
-                <span class="text-sm text-blue-600">(Connected via Google)</span>
+                {% if business.no_data %}
+                  <a href="http://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb" 
+                     target="_blank" 
+                     class="inline-flex items-center px-3 py-1 mt-2 border border-red-500 text-red-500 rounded-md hover:bg-red-50">
+                    <span class="mr-2">Verify and Add Business Details</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                  </a>
+                {% else %}
+                  <span class="text-sm text-blue-600">(Connected via Google)</span>
+                {% endif %}
               </div>
             </td>
             <td class="p-4">

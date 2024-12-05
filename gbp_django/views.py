@@ -320,15 +320,35 @@ def index(request):
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
     )
     print(f"[DEBUG] Found {businesses.count()} businesses")
-    
-    # Get the OAuth-connected business (should be first)
-    oauth_business = businesses.filter(
-        user__socialaccount__provider='google'
-    ).first()
-    
-    # Reorder businesses list to put OAuth business first
-    if oauth_business:
-        businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
+
+    if not businesses.exists():
+        # Create a dummy business object for the template
+        from types import SimpleNamespace
+        dummy_business = SimpleNamespace(
+            business_name="No Business Data Found",
+            posts_count=0,
+            photos_count=0,
+            qanda_count=0,
+            reviews_count=0,
+            email_settings="No data available",
+            automation_status="No data available",
+            address="No data available",
+            phone_number="No data available",
+            website_url="No data available",
+            category="No data available",
+            is_verified="Not Verified",
+            no_data=True  # Special flag for template
+        )
+        businesses = [dummy_business]
+    else:
+        # Get the OAuth-connected business (should be first)
+        oauth_business = businesses.filter(
+            user__socialaccount__provider='google'
+        ).first()
+        
+        # Reorder businesses list to put OAuth business first
+        if oauth_business:
+            businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
     
     # Process business data
     for business in businesses:
