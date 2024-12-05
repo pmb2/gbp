@@ -122,22 +122,31 @@ def store_business_data(business_data, user_id, access_token):
         try:
             # Get locations for this account
             locations = get_locations(access_token, account['name'])
+            
             if locations.get('locations'):
-                location = locations['locations'][0]  # Use first location
-                
-                # Extract business details
-                business_details = {
-                    'user_id': user_id,
-                    'business_name': account.get('accountName', 'Unnamed Business'),
-                    'business_id': account['name'],
-                    'address': location.get('address', {}).get('formattedAddress', 'No info'),
-                    'phone_number': location.get('primaryPhone', 'No info'),
-                    'website_url': location.get('websiteUrl', 'No info'),
-                    'category': location.get('primaryCategory', {}).get('displayName', 'No info'),
-                    'is_verified': location.get('locationState', {}).get('isVerified', False),
-                    'email_settings': 'Enabled',
-                    'automation_status': 'Active'
-                }
+                for location in locations['locations']:
+                    # Extract business details with enhanced data
+                    business_details = {
+                        'user_id': user_id,
+                        'business_name': account.get('accountName', 'Unnamed Business'),
+                        'business_id': account['name'],
+                        'address': location.get('address', {}).get('formattedAddress', 'No info'),
+                        'phone_number': location.get('primaryPhone', 'No info'),
+                        'website_url': location.get('websiteUrl', 'No info'),
+                        'category': location.get('primaryCategory', {}).get('displayName', 'No info'),
+                        'is_verified': location.get('locationState', {}).get('isVerified', False),
+                        'email_settings': 'Enabled',
+                        'automation_status': 'Active'
+                    }
+
+                    # Store additional attributes
+                    attributes = {
+                        'opening_hours': location.get('regularHours', {}),
+                        'special_hours': location.get('specialHours', {}),
+                        'service_area': location.get('serviceArea', {}),
+                        'labels': location.get('labels', []),
+                        'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                    }
                 
                 # Get or create the business record
                 business, created = Business.objects.update_or_create(
