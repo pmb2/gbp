@@ -283,7 +283,8 @@
 
             <!-- Quick Stats -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
+                <!-- Total Businesses Card -->
+                <div class="bg-white overflow-hidden shadow rounded-lg transform transition-all hover:scale-105">
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
@@ -294,6 +295,12 @@
                                     <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>
                                     <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>
                                 </dl>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <div class="flex items-center text-sm">
+                                <span class="text-green-500">↑ New</span>
+                                <span class="ml-2 text-gray-600">Add more businesses</span>
                             </div>
                         </div>
                     </div>
@@ -423,14 +430,28 @@
     <table class="business-table">
         <thead>
         <tr>
-            <th>Business Name</th>
-            <th>Status/Action</th>
+            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Business Name
+            </th>
+            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Profile Status
+            </th>
+            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Verification
+            </th>
+            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actionables
+            </th>
+            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+            </th>
         </tr>
         </thead>
         <tbody>
         {% for business in dashboard_data.businesses %}
-            {% if forloop.first %}
-                <tr class="bg-blue-50 hover:bg-blue-100 cursor-pointer" onclick="toggleDetails(this)">
+            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150" 
+                onclick="toggleDetails(this)" 
+                data-business-id="{{ business.business_id }}">
                     <td class="flex items-center p-4">
               <span class="mr-2">
                 {% if business.no_data %}
@@ -552,8 +573,51 @@
                     </td>
                 </tr>
                 <tr class="details" style="display: none;">
-                    <td colspan="2">
-                        <div class="p-4">
+                    <td colspan="5">
+                        <div class="p-6 bg-gray-50 space-y-6">
+                            <!-- Business Details Section -->
+                            <div class="grid grid-cols-2 gap-8">
+                                <div class="space-y-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-500">Address</label>
+                                            <input type="text" value="{{ business.address }}" 
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-sm font-medium text-gray-500">Phone</label>
+                                            <input type="text" value="{{ business.phone_number }}"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Metrics Section -->
+                                <div class="space-y-4">
+                                    <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Total Views</div>
+                                            <div class="mt-1 text-2xl font-semibold text-blue-600">15.2K</div>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                            <div class="mt-1 text-2xl font-semibold text-green-600">4.8</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex justify-end space-x-4">
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                    Save Changes
+                                </button>
+                                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                                    View Analytics
+                                </button>
+                            </div>
                             <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
                             <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
                             <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
