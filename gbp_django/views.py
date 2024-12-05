@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from datetime import datetime, timedelta
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -40,7 +41,7 @@ def login(request):
                 request.session.set_expiry(0)
 
             # Check if user needs Google OAuth
-            if not user.socialaccount_set.filter(provider='google').exists():
+            if not user.is_google_linked:
                 return redirect(reverse('google_oauth'))
 
             return redirect(reverse('index'))
@@ -173,9 +174,15 @@ def google_oauth_callback(request):
         # Get user info from Google
         user_info = get_user_info(access_token)
         
-        # Update user's Google ID
+        # Update user's Google information
         user = request.user
         user.google_id = user_info.get('sub')
+        user.name = user_info.get('name')
+        user.profile_picture_url = user_info.get('picture')
+        user.google_access_token = access_token
+        user.google_refresh_token = refresh_token
+        user.google_token_expiry = datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        user.is_google_linked = True
         user.save()
 
     except Exception as e:
