@@ -24,7 +24,7 @@ def login(request):
     if request.user.is_authenticated:
         # Check if user needs Google OAuth
         if not request.user.socialaccount_set.filter(provider='google').exists():
-            return redirect('/accounts/google/login/')
+            return redirect(reverse('google_oauth'))
         return redirect(reverse('index'))  # This will now go to /dashboard/
 
     if request.method == 'POST':
@@ -313,7 +313,7 @@ def index(request):
     print(f"[DEBUG] User: {request.user.email}")
     
     # Check if user has completed Google OAuth and has valid tokens
-    if not request.user.is_google_linked:
+    if not request.user.socialaccount_set.filter(provider='google').exists():
         print("[DEBUG] User has not completed Google OAuth")
         return redirect(reverse('google_oauth'))
 
