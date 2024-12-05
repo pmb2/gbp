@@ -10,11 +10,11 @@
         </div>
         
         <div class="verification-checklist space-y-3">
-            <!-- Checklist items will be dynamically populated -->
+            <!-- Dynamic checklist items -->
         </div>
         
         <div class="mt-6 flex justify-between items-center">
-            <a href="https://www.google.com/business/" 
+            <a href="https://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb" 
                target="_blank"
                class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
                 Update Business Profile
@@ -26,6 +26,74 @@
         </div>
     </div>
 </div>
+
+<script>
+function showVerificationModal(businessId) {
+    const modal = document.getElementById('verificationModal');
+    modal.classList.remove('hidden');
+    loadVerificationChecklist(businessId);
+}
+
+function closeVerificationModal() {
+    const modal = document.getElementById('verificationModal');
+    modal.classList.add('hidden');
+}
+
+function loadVerificationChecklist(businessId) {
+    fetch(`/api/business/${businessId}/verification-status/`)
+        .then(response => response.json())
+        .then(data => {
+            const checklist = document.querySelector('.verification-checklist');
+            checklist.innerHTML = '';
+            
+            Object.entries(data).forEach(([key, value]) => {
+                const item = document.createElement('div');
+                item.className = `flex items-center p-3 rounded ${value ? 'bg-green-50' : 'bg-red-50'}`;
+                item.innerHTML = `
+                    <span class="mr-3">
+                        ${value ? 
+                            '<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>' : 
+                            '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>'
+                        }
+                    </span>
+                    <span class="${value ? 'text-green-700' : 'text-red-700'}">
+                        ${key.replace(/_/g, ' ').toUpperCase()}
+                    </span>
+                `;
+                checklist.appendChild(item);
+            });
+        });
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('verificationModal');
+    if (event.target === modal) {
+        closeVerificationModal();
+    }
+}
+
+// Auto-refresh verification status every 30 seconds when modal is open
+let verificationCheckInterval;
+function startVerificationCheck(businessId) {
+    verificationCheckInterval = setInterval(() => {
+        loadVerificationChecklist(businessId);
+    }, 30000);
+}
+
+function stopVerificationCheck() {
+    clearInterval(verificationCheckInterval);
+}
+
+// Update event listeners
+document.getElementById('verificationModal').addEventListener('show', function(e) {
+    startVerificationCheck(e.detail.businessId);
+});
+
+document.getElementById('verificationModal').addEventListener('hide', function() {
+    stopVerificationCheck();
+});
+</script>
 
 <style>
 .modal {
