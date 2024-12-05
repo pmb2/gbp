@@ -4,9 +4,13 @@ from ..models import Post
 
 @transaction.atomic
 def store_posts(posts_data, account_id):
+    print(f"\n[DEBUG] Starting post storage for account: {account_id}")
+    print(f"[DEBUG] Raw posts data: {posts_data}")
     stored_posts = []
     try:
-        for post in posts_data.get('localPosts', []):
+        local_posts = posts_data.get('localPosts', [])
+        print(f"[DEBUG] Found {len(local_posts)} posts to process")
+        for post in local_posts:
             post_data = {
                 'business_id': account_id,
                 'post_id': post['name'],

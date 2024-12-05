@@ -183,13 +183,30 @@ def google_oauth_callback(request):
         return redirect('login')
 
     try:
-        print("[INFO] Fetching business accounts...")
+        print("\n[DEBUG] Starting OAuth callback process...")
+        print(f"[DEBUG] User ID: {user.id}")
+        print(f"[DEBUG] Access token present: {bool(access_token)}")
+        
+        print("\n[INFO] Fetching business accounts...")
         business_data = get_business_accounts(access_token)
-        print("[INFO] Business accounts fetched:", business_data)
+        print(f"[DEBUG] Raw business data received: {business_data}")
         
         if business_data:
-            store_business_data(business_data, user.id, access_token)
+            print("\n[DEBUG] Processing business data storage...")
+            stored_businesses = store_business_data(business_data, user.id, access_token)
+            print(f"[DEBUG] Stored businesses count: {len(stored_businesses)}")
             print("[INFO] Business data stored successfully.")
+            
+            # Print detailed business information
+            for business in stored_businesses:
+                print(f"\n[DEBUG] Stored Business Details:")
+                print(f"  Name: {business.business_name}")
+                print(f"  ID: {business.business_id}")
+                print(f"  Address: {business.address}")
+                print(f"  Phone: {business.phone_number}")
+                print(f"  Website: {business.website_url}")
+                print(f"  Category: {business.category}")
+                print(f"  Verified: {business.is_verified}")
         else:
             print("[WARNING] No business data returned from API")
             messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
@@ -236,14 +253,20 @@ def google_oauth_callback(request):
 
 @login_required
 def index(request):
+    print("\n[DEBUG] Loading dashboard index...")
+    print(f"[DEBUG] User: {request.user.email}")
+    
     # Ensure user has completed Google OAuth
     if not request.user.socialaccount_set.filter(provider='google').exists():
+        print("[DEBUG] User has not completed Google OAuth")
         return redirect('/accounts/google/login/')
 
+    print("[DEBUG] Fetching businesses and related data...")
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
     )
+    print(f"[DEBUG] Found {businesses.count()} businesses")
     
     # Get the OAuth-connected business (should be first)
     oauth_business = businesses.filter(

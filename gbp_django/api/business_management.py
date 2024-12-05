@@ -44,10 +44,13 @@ def delete_location(access_token, account_id, location_id):
 
 @cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
+    print("\n[DEBUG] Starting business accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     headers = {"Authorization": f"Bearer {access_token}"}
     retries = 3
     backoff_factor = 2
+    print(f"[DEBUG] Request URL: {url}")
+    print(f"[DEBUG] Authorization header present: {'Authorization' in headers}")
 
     for attempt in range(retries):
         try:
@@ -113,12 +116,16 @@ from ..models import Business
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
+    print("\n[DEBUG] Starting business data storage...")
+    print(f"[DEBUG] Raw business data received: {business_data}")
+    
     if not business_data:
         print("[WARNING] No business data to store")
         return []
     
     stored_businesses = []
     accounts = business_data.get('accounts', [])
+    print(f"[DEBUG] Found {len(accounts)} accounts to process")
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
