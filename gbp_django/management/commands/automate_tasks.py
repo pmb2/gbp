@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from gbp_django.models import Business
-from gbp_django.utils import upload_photo, generate_post, update_qa, respond_to_reviews
+from gbp_django.utils.google_oauth import upload_photo, generate_post, update_qa, respond_to_reviews
 
 class Command(BaseCommand):
     help = 'Automate tasks like photo uploads, post creation, and review responses.'
