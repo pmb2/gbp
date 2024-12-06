@@ -214,11 +214,27 @@ def google_oauth_callback(request):
         user.google_access_token = access_token
         user.google_refresh_token = refresh_token
         user.google_token_expiry = datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
-        # Update user's Google OAuth status
-        user.is_google_linked = True
-        user.save(update_fields=['google_id', 'name', 'profile_picture_url', 
-                               'google_access_token', 'google_refresh_token', 
-                               'google_token_expiry', 'is_google_linked'])
+        user.save()
+
+        # Create social account connection
+        from allauth.socialaccount.models import SocialAccount, SocialApp
+        google_app = SocialApp.objects.get(provider='google')
+        
+        # Create or update social account
+        social_account, created = SocialAccount.objects.get_or_create(
+            user=user,
+            provider='google',
+            defaults={
+                'uid': user_info.get('sub'),
+                'extra_data': user_info
+            }
+        )
+        
+        if not created:
+            social_account.extra_data = user_info
+            social_account.save()
+
+        print("[DEBUG] Social account created/updated successfully")
 
     except Exception as e:
         messages.error(request, f'OAuth error: {str(e)}')
