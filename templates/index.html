@@ -4,7 +4,7 @@
 {% block title %}Dashboard - GBP Automation Pro{% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'css/enhanced-dashboard.css' %}">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         /* Reset and base styles */
@@ -345,8 +345,126 @@
                         </div>
                     </div>
                 </div>
-            <!-- Business Analytics -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8 mx-auto max-w-7xl">
+            <!-- Business Table -->
+            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                <table class="business-table">
+                    <thead>
+                        <tr>
+                            <th>Business Name</th>
+                            <th>Profile Completeness</th>
+                            <th>Verified Status</th>
+                            <th>Actionables</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for business in dashboard_data.businesses %}
+                            <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                                <td>
+                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                    <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
+                                </td>
+                                <td>
+                                    <div class="progress-bar">
+                                        <div class="progress-bar-fill" style="width: {{ business.profile_completion }}%"></div>
+                                    </div>
+                                    <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete</div>
+                                </td>
+                                <td>
+                                    <span class="status-badge {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
+                                        {{ business.is_verified }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex space-x-2">
+                                        <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
+                                             title="Posts Status">
+                                            <i class="fas fa-newspaper"></i>
+                                        </div>
+                                        <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
+                                             title="Reviews Status">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
+                                             title="Photos Status">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex space-x-2">
+                                        <button class="action-button primary" onclick="editBusiness('{{ business.business_id }}')">
+                                            Edit
+                                        </button>
+                                        <button class="action-button secondary" onclick="viewAnalytics('{{ business.business_id }}')">
+                                            Analytics
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
+                                <td colspan="5">
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-500">Address:</span>
+                                                    <span class="text-gray-900">{{ business.address }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-500">Phone:</span>
+                                                    <span class="text-gray-900">{{ business.phone_number }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-500">Website:</span>
+                                                    <span class="text-gray-900">{{ business.website_url }}</span>
+                                                </div>
+                                                <div class="flex justify-between">
+                                                    <span class="text-gray-500">Category:</span>
+                                                    <span class="text-gray-900">{{ business.category }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Posts</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.posts_count }}
+                                                    </div>
+                                                </div>
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.reviews_count }}
+                                                    </div>
+                                                </div>
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Photos</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.photos_count }}
+                                                    </div>
+                                                </div>
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Q&A</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.qanda_count }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Analytics Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
                 <!-- Average Rating Card -->
                 <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
                     <div class="flex items-center justify-between mb-4">
@@ -743,6 +861,33 @@
 </div>
 
 <script>
+    function toggleBusinessDetails(businessId) {
+        const detailsRow = document.getElementById(`details-${businessId}`);
+        const allDetails = document.querySelectorAll('.expanded-content');
+        
+        // Close all other expanded rows
+        allDetails.forEach(row => {
+            if (row.id !== `details-${businessId}`) {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Toggle the clicked row
+        detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+    }
+
+    function editBusiness(businessId) {
+        event.stopPropagation();
+        // Implement edit business logic
+        console.log('Edit business:', businessId);
+    }
+
+    function viewAnalytics(businessId) {
+        event.stopPropagation();
+        // Implement analytics view logic
+        console.log('View analytics:', businessId);
+    }
+
     function toggleUserMenu() {
         const userMenu = document.getElementById('userMenu');
         userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
