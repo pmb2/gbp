@@ -22,32 +22,50 @@ from .api.media_management import get_photos, store_photos
 
 
 def login(request):
+    print("\n[DEBUG] Starting login process...")
+    print(f"[DEBUG] Request method: {request.method}")
+    
     if request.user.is_authenticated:
+        print(f"[DEBUG] User already authenticated: {request.user.email}")
         # If already authenticated and has Google OAuth, go to dashboard
         if request.user.socialaccount_set.filter(provider='google').exists():
+            print("[DEBUG] User has Google OAuth, redirecting to dashboard")
             return redirect('index')
         # If authenticated but no Google OAuth, redirect to OAuth
+        print("[DEBUG] User needs Google OAuth, redirecting to OAuth")
         return redirect('google_oauth')
 
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         remember_me = request.POST.get('remember', False)
+        
+        print(f"[DEBUG] Login attempt for email: {email}")
+        print(f"[DEBUG] Remember me: {remember_me}")
 
         user = authenticate(request, username=email, password=password)
         if user is not None:
+            print(f"[DEBUG] User authenticated successfully: {user.email}")
+            print(f"[DEBUG] User ID: {user.id}")
+            print(f"[DEBUG] Is Google linked: {user.is_google_linked}")
+            
             auth_login(request, user)
+            print("[DEBUG] User logged in successfully")
 
             # Set session expiry based on remember me
             if not remember_me:
                 request.session.set_expiry(0)
+                print("[DEBUG] Session expiry set to browser close")
 
             # Check if user needs Google OAuth
             if not user.socialaccount_set.filter(provider='google').exists():
+                print("[DEBUG] User needs Google OAuth, redirecting")
                 return redirect(reverse('google_oauth'))
 
+            print("[DEBUG] Redirecting to dashboard")
             return redirect(reverse('index'))
         else:
+            print("[ERROR] Authentication failed")
             messages.error(request, 'Invalid login credentials')
 
     return render(request, 'login.html')
@@ -138,17 +156,28 @@ def direct_google_oauth(request):
 
 def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
+    print("\n[DEBUG] Starting Google OAuth callback...")
+    
     code = request.GET.get('code')
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
+    
+    print(f"[DEBUG] Code present: {bool(code)}")
+    print(f"[DEBUG] State present: {bool(state)}")
+    print(f"[DEBUG] Stored state present: {bool(stored_state)}")
+    print(f"[DEBUG] State match: {state == stored_state}")
 
     if not code or not state or state != stored_state:
+        print("[ERROR] OAuth validation failed")
         messages.error(request, 'Invalid OAuth state or missing code')
         return redirect('login')
 
     if not request.user.is_authenticated:
+        print("[ERROR] User not authenticated")
         messages.error(request, 'Please log in first')
         return redirect('login')
+        
+    print(f"[DEBUG] Authenticated user: {request.user.email}")
 
     try:
         # Get tokens using the authorization code
