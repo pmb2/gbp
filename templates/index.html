@@ -111,7 +111,7 @@
             top: 0;
             z-index: 10;
             background: #f8fafc;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .business-table td {
@@ -304,7 +304,9 @@
             <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
             <!-- User Profile -->
             <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
-                <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
+                <img src="
+                        
+                        {% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
                      alt="Profile"
                      class="h-8 w-8 rounded-full">
                 <span class="text-sm text-gray-700">{{ user.email }}</span>
@@ -314,355 +316,258 @@
 
     <!-- Main Content -->
     <main class="p-6">
-        <div class="max-w-7xl mx-auto">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
-                <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
+        <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Businesses Card -->
+        <div class="bg-white overflow-hidden shadow rounded-lg transform transition-all hover:scale-105">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
+                        <i class="fas fa-building text-white"></i>
+                    </div>
+                    <div class="ml-5">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>
+                            <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>
+                        </dl>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center text-sm">
+                        <span class="text-green-500">↑ New</span>
+                        <span class="ml-2 text-gray-600">Add more businesses</span>
+                    </div>
+                </div>
             </div>
-
-            <!-- Quick Stats -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Total Businesses Card -->
-                <div class="bg-white overflow-hidden shadow rounded-lg transform transition-all hover:scale-105">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">
-                                <i class="fas fa-building text-white"></i>
-                            </div>
-                            <div class="ml-5">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>
-                                    <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>
-                                </dl>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <div class="flex items-center text-sm">
-                                <span class="text-green-500">↑ New</span>
-                                <span class="ml-2 text-gray-600">Add more businesses</span>
-                            </div>
-                        </div>
+        </div>
+        <!-- Analytics Overview -->
+        <div class="analytics-grid">
+            <!-- Average Rating Card -->
+            <div class="analytics-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
+                        <i class="fas fa-star text-green-600 text-xl"></i>
                     </div>
+                    <span class="text-sm font-medium text-gray-500">Last 30 days</span>
                 </div>
-            <!-- Analytics Overview -->
-            <div class="analytics-grid">
-                <!-- Average Rating Card -->
-                <div class="analytics-card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
-                            <i class="fas fa-star text-green-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Average Rating</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-green-600">4.8</p>
-                        <p class="ml-2 text-sm text-gray-500">/ 5.0</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 12%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
+                <h3 class="text-lg font-semibold text-gray-900">Average Rating</h3>
+                <div class="mt-2 flex items-baseline">
+                    <p class="text-2xl font-bold text-green-600">4.8</p>
+                    <p class="ml-2 text-sm text-gray-500">/ 5.0</p>
                 </div>
-
-                <!-- Total Views Card -->
-                <div class="analytics-card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
-                            <i class="fas fa-eye text-blue-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Total Views</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-blue-600">15.2K</p>
-                        <p class="ml-2 text-sm text-gray-500">views</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 8%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Customer Actions Card -->
-                <div class="analytics-card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
-                            <i class="fas fa-users text-purple-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Customer Actions</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-purple-600">2.4K</p>
-                        <p class="ml-2 text-sm text-gray-500">actions</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 15%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Conversion Rate Card -->
-                <div class="analytics-card">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
-                            <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Conversion Rate</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-yellow-600">15.8%</p>
-                        <p class="ml-2 text-sm text-gray-500">rate</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 5%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <span class="text-green-500 text-sm">↑ 12%</span>
+                        <span class="ml-2 text-sm text-gray-500">from last month</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Business Table -->
-            <div class="table-container">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
-                    <div class="flex space-x-4">
-                        <input type="text" 
-                               placeholder="Search businesses..." 
-                               class="px-4 py-2 border rounded-md">
-                        <button class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                            Add Business
-                        </button>
+            <!-- Total Views Card -->
+            <div class="analytics-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
+                        <i class="fas fa-eye text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Total Views</h3>
+                <div class="mt-2 flex items-baseline">
+                    <p class="text-2xl font-bold text-blue-600">15.2K</p>
+                    <p class="ml-2 text-sm text-gray-500">views</p>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <span class="text-green-500 text-sm">↑ 8%</span>
+                        <span class="ml-2 text-sm text-gray-500">from last month</span>
                     </div>
                 </div>
-                <table class="business-table">
-                    <thead>
-                        <tr>
-                            <th>Business Name</th>
-                            <th>Profile Completeness</th>
-                            <th>Verified Status</th>
-                            <th>Actionables</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for business in dashboard_data.businesses %}
-                            <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
-                                <td>
-                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
-                                </td>
-                                <td>
-                                    <div class="progress-bar">
-                                        <div class="progress-bar-fill" style="width: {{ business.profile_completion }}%"></div>
-                                    </div>
-                                    <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete</div>
-                                </td>
-                                <td>
+            </div>
+
+            <!-- Customer Actions Card -->
+            <div class="analytics-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
+                        <i class="fas fa-users text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Customer Actions</h3>
+                <div class="mt-2 flex items-baseline">
+                    <p class="text-2xl font-bold text-purple-600">2.4K</p>
+                    <p class="ml-2 text-sm text-gray-500">actions</p>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <span class="text-green-500 text-sm">↑ 15%</span>
+                        <span class="ml-2 text-sm text-gray-500">from last month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversion Rate Card -->
+            <div class="analytics-card">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
+                        <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-500">Last 30 days</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Conversion Rate</h3>
+                <div class="mt-2 flex items-baseline">
+                    <p class="text-2xl font-bold text-yellow-600">15.8%</p>
+                    <p class="ml-2 text-sm text-gray-500">rate</p>
+                </div>
+                <div class="mt-4">
+                    <div class="flex items-center">
+                        <span class="text-green-500 text-sm">↑ 5%</span>
+                        <span class="ml-2 text-sm text-gray-500">from last month</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Business Table -->
+        <div class="table-container">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
+                <div class="flex space-x-4">
+                    <input type="text"
+                           placeholder="Search businesses..."
+                           class="px-4 py-2 border rounded-md">
+                    <button class="bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Add Business
+                    </button>
+                </div>
+            </div>
+            <table class="business-table">
+                <thead>
+                <tr>
+                    <th>Business Name</th>
+                    <th>Profile Completeness</th>
+                    <th>Verified Status</th>
+                    <th>Actionables</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for business in dashboard_data.businesses %}
+                    <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                        <td>
+                            <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                            <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
+                        </td>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill"
+                                     style="width: {{ business.profile_completion }}%"></div>
+                            </div>
+                            <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete
+                            </div>
+                        </td>
+                        <td>
                                     <span class="status-badge {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
                                         {{ business.is_verified }}
                                     </span>
-                                </td>
-                                <td>
-                                    <div class="flex space-x-2">
-                                        <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
-                                             title="Posts Status">
-                                            <i class="fas fa-newspaper"></i>
+                        </td>
+                        <td>
+                            <div class="flex space-x-2">
+                                <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
+                                     title="Posts Status">
+                                    <i class="fas fa-newspaper"></i>
+                                </div>
+                                <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
+                                     title="Reviews Status">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
+                                     title="Photos Status">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="flex space-x-2">
+                                <button class="action-button primary"
+                                        onclick="editBusiness('{{ business.business_id }}')">
+                                    Edit
+                                </button>
+                                <button class="action-button secondary"
+                                        onclick="viewAnalytics('{{ business.business_id }}')">
+                                    Analytics
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
+                        <td colspan="5">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Address:</span>
+                                            <span class="text-gray-900">{{ business.address }}</span>
                                         </div>
-                                        <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
-                                             title="Reviews Status">
-                                            <i class="fas fa-star"></i>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Phone:</span>
+                                            <span class="text-gray-900">{{ business.phone_number }}</span>
                                         </div>
-                                        <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
-                                             title="Photos Status">
-                                            <i class="fas fa-image"></i>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Website:</span>
+                                            <span class="text-gray-900">{{ business.website_url }}</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-500">Category:</span>
+                                            <span class="text-gray-900">{{ business.category }}</span>
                                         </div>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="flex space-x-2">
-                                        <button class="action-button primary" onclick="editBusiness('{{ business.business_id }}')">
-                                            Edit
-                                        </button>
-                                        <button class="action-button secondary" onclick="viewAnalytics('{{ business.business_id }}')">
-                                            Analytics
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
-                                <td colspan="5">
-                                    <div class="grid grid-cols-2 gap-6">
-                                        <div>
-                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
-                                            <div class="space-y-3">
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Address:</span>
-                                                    <span class="text-gray-900">{{ business.address }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Phone:</span>
-                                                    <span class="text-gray-900">{{ business.phone_number }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Website:</span>
-                                                    <span class="text-gray-900">{{ business.website_url }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Category:</span>
-                                                    <span class="text-gray-900">{{ business.category }}</span>
-                                                </div>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Posts</div>
+                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                {{ business.posts_count }}
                                             </div>
                                         </div>
-                                        <div>
-                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Posts</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.posts_count }}
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.reviews_count }}
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Photos</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.photos_count }}
-                                                    </div>
-                                                </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.qanda_count }}
-                                                    </div>
-                                                </div>
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                {{ business.reviews_count }}
+                                            </div>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Photos</div>
+                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                {{ business.photos_count }}
+                                            </div>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-lg shadow-sm">
+                                            <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
+                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                {{ business.qanda_count }}
                                             </div>
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Analytics Overview -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-                <!-- Average Rating Card -->
-                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-green-100 rounded-full p-3">
-                            <i class="fas fa-star text-green-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Average Rating</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-green-600">4.8</p>
-                        <p class="ml-2 text-sm text-gray-500">/ 5.0</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 12%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Total Views Card -->
-                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-blue-100 rounded-full p-3">
-                            <i class="fas fa-eye text-blue-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Total Views</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-blue-600">15.2K</p>
-                        <p class="ml-2 text-sm text-gray-500">views</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 8%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Customer Actions Card -->
-                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-purple-100 rounded-full p-3">
-                            <i class="fas fa-users text-purple-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Customer Actions</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-purple-600">2.4K</p>
-                        <p class="ml-2 text-sm text-gray-500">actions</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 15%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Conversion Rate Card -->
-                <div class="bg-white rounded-lg shadow p-6 transform transition-all hover:scale-105">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="flex-shrink-0 bg-yellow-100 rounded-full p-3">
-                            <i class="fas fa-chart-line text-yellow-600 text-xl"></i>
-                        </div>
-                        <span class="text-sm font-medium text-gray-500">Last 30 days</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-900">Conversion Rate</h3>
-                    <div class="mt-2 flex items-baseline">
-                        <p class="text-2xl font-bold text-yellow-600">15.8%</p>
-                        <p class="ml-2 text-sm text-gray-500">rate</p>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex items-center">
-                            <span class="text-green-500 text-sm">↑ 5%</span>
-                            <span class="ml-2 text-sm text-gray-500">from last month</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% if unread_notifications_count %}
-                <div class="notification-badge">{{ unread_notifications_count }}</div>
-            {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <div class="user-profile" onclick="toggleUserMenu()">
-            <img src="
-                    {% if user.is_authenticated %}{{ user.profile_picture_url|default:'https://ui-avatars.com/api/?name='|add:user.email }}{% else %}https://ui-avatars.com/api/?name=Guest{% endif %}"
-                 width="32" height="32" style="border-radius: 50%;">
-            <div id="userMenu" class="user-menu" style="display: none;">
-                <button onclick="openSettingsModal()">Settings</button>
-                <form method="post" action="{% url 'logout' %}">
-                    {% csrf_token %}
-                    <button type="submit">Log Out</button>
-                </form>
-            </div>
-        </div>
+        {% if unread_notifications_count %}
+            <div class="notification-badge">{{ unread_notifications_count }}</div>
+        {% endif %}
     </div>
 {% endblock %}
 
@@ -680,7 +585,7 @@
         </div>
         <button class="btn btn-primary">Add Business</button>
     </div>
-
+.
     <table class="business-table">
         <thead>
         <tr>
@@ -703,13 +608,13 @@
         </thead>
         <tbody>
         {% for business in dashboard_data.businesses %}
-            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150" 
-                onclick="toggleDetails(this)" 
+            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150"
+                onclick="toggleDetails(this)"
                 data-business-id="{{ business.business_id }}">
-                    <td class="p-4">
-                        <div>
-                            <div class="font-medium">{{ business.business_name }}</div>
-                            <span class="text-sm {% if business.no_data %}text-red-600{% else %}text-blue-600{% endif %}">
+                <td class="p-4">
+                    <div>
+                        <div class="font-medium">{{ business.business_name }}</div>
+                        <span class="text-sm {% if business.no_data %}text-red-600{% else %}text-blue-600{% endif %}">
                                 {% if business.no_data %}
                                     <a href="http://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
                                        target="_blank"
@@ -724,150 +629,152 @@
                                     (Connected via Google)
                                 {% endif %}
                             </span>
+                    </div>
+                </td>
+                <td class="p-4">
+                    <div class="flex flex-col space-y-2">
+                        <div class="status flex items-center">
+                            <div class="status-icon w-3 h-3 rounded-full mr-2 {% if business.is_verified == 'Verified' %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
+                            <span class="text-sm font-medium">{{ business.is_verified }}</span>
                         </div>
-                    </td>
-                    <td class="p-4">
-                        <div class="flex flex-col space-y-2">
-                            <div class="status flex items-center">
-                                <div class="status-icon w-3 h-3 rounded-full mr-2 {% if business.is_verified == 'Verified' %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
-                                <span class="text-sm font-medium">{{ business.is_verified }}</span>
-                            </div>
-                            <div class="action-buttons flex space-x-2">
-                                <button class="btn btn-secondary text-sm px-3 py-1">Edit</button>
-                                <button class="btn btn-primary text-sm px-3 py-1">Analytics</button>
-                            </div>
+                        <div class="action-buttons flex space-x-2">
+                            <button class="btn btn-secondary text-sm px-3 py-1">Edit</button>
+                            <button class="btn btn-primary text-sm px-3 py-1">Analytics</button>
                         </div>
-                    </td>
-                </tr>
-                <tr class="details bg-blue-50" style="display: none;">
-                    <td colspan="2">
-                        <div class="p-6 space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <h3 class="font-semibold text-gray-900 mb-2">Business Information</h3>
-                                    <div class="space-y-2">
-                                        <p><span
-                                                class="font-medium">Address:</span> {{ business.address|default:"No info" }}
-                                        </p>
-                                        <p><span
-                                                class="font-medium">Phone:</span> {{ business.phone_number|default:"No info" }}
-                                        </p>
-                                        <p><span class="font-medium">Website:</span>
-                                            {% if business.website_url != 'No info' %}
-                                                <a href="{{ business.website_url }}"
-                                                   class="text-blue-600 hover:underline"
-                                                   target="_blank">{{ business.website_url }}</a>
-                                            {% else %}
-                                                No info
-                                            {% endif %}
-                                        </p>
-                                        <p><span
-                                                class="font-medium">Category:</span> {{ business.category|default:"No info" }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-900 mb-2">Metrics</h3>
-                                    <div class="space-y-2">
-                                        <p><span
-                                                class="font-medium">Posts:</span> {{ business.posts_count|default:"No info" }}
-                                        </p>
-                                        <p><span
-                                                class="font-medium">Photos:</span> {{ business.photos_count|default:"No info" }}
-                                        </p>
-                                        <p><span
-                                                class="font-medium">Q&amp;A:</span> {{ business.qanda_count|default:"No info" }}
-                                        </p>
-                                        <p><span
-                                                class="font-medium">Reviews:</span> {{ business.reviews_count|default:"No info" }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-4">
-                                <h3 class="font-semibold text-gray-900 mb-2">Settings</h3>
+                    </div>
+                </td>
+            </tr>
+            <tr class="details bg-blue-50" style="display: none;">
+                <td colspan="2">
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="font-semibold text-gray-900 mb-2">Business Information</h3>
                                 <div class="space-y-2">
                                     <p><span
-                                            class="font-medium">Email Settings:</span> {{ business.email_settings|default:"No info" }}
+                                            class="font-medium">Address:</span> {{ business.address|default:"No info" }}
                                     </p>
                                     <p><span
-                                            class="font-medium">Automation Status:</span> {{ business.automation_status|default:"No info" }}
+                                            class="font-medium">Phone:</span> {{ business.phone_number|default:"No info" }}
+                                    </p>
+                                    <p><span class="font-medium">Website:</span>
+                                        {% if business.website_url != 'No info' %}
+                                            <a href="{{ business.website_url }}"
+                                               class="text-blue-600 hover:underline"
+                                               target="_blank">{{ business.website_url }}</a>
+                                        {% else %}
+                                            No info
+                                        {% endif %}
                                     </p>
                                     <p><span
-                                            class="font-medium">Verification Status:</span> {{ business.is_verified|default:"No info" }}
+                                            class="font-medium">Category:</span> {{ business.category|default:"No info" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 mb-2">Metrics</h3>
+                                <div class="space-y-2">
+                                    <p><span
+                                            class="font-medium">Posts:</span> {{ business.posts_count|default:"No info" }}
+                                    </p>
+                                    <p><span
+                                            class="font-medium">Photos:</span> {{ business.photos_count|default:"No info" }}
+                                    </p>
+                                    <p><span
+                                            class="font-medium">Q&amp;A:</span> {{ business.qanda_count|default:"No info" }}
+                                    </p>
+                                    <p><span
+                                            class="font-medium">Reviews:</span> {{ business.reviews_count|default:"No info" }}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center py-4">
-                        <p class="text-gray-500">No businesses found. <a href="https://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb" class="text-blue-600 hover:underline">Create a Business Profile</a></p>
-                    </td>
-                </tr>
-                <tr class="details" style="display: none;">
-                    <td colspan="5">
-                        <div class="p-6 bg-gray-50 space-y-6">
-                            <!-- Business Details Section -->
-                            <div class="grid grid-cols-2 gap-8">
-                                <div class="space-y-4">
-                                    <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-500">Address</label>
-                                            <input type="text" value="{{ business.address }}" 
-                                                   class="w-full px-3 py-2 border rounded-md">
-                                        </div>
-                                        <div class="space-y-2">
-                                            <label class="text-sm font-medium text-gray-500">Phone</label>
-                                            <input type="text" value="{{ business.phone_number }}"
-                                                   class="w-full px-3 py-2 border rounded-md">
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Metrics Section -->
-                                <div class="space-y-4">
-                                    <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Total Views</div>
-                                            <div class="mt-1 text-2xl font-semibold text-blue-600">15.2K</div>
-                                        </div>
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                            <div class="mt-1 text-2xl font-semibold text-green-600">4.8</div>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="mt-4">
+                            <h3 class="font-semibold text-gray-900 mb-2">Settings</h3>
+                            <div class="space-y-2">
+                                <p><span
+                                        class="font-medium">Email Settings:</span> {{ business.email_settings|default:"No info" }}
+                                </p>
+                                <p><span
+                                        class="font-medium">Automation Status:</span> {{ business.automation_status|default:"No info" }}
+                                </p>
+                                <p><span
+                                        class="font-medium">Verification Status:</span> {{ business.is_verified|default:"No info" }}
+                                </p>
                             </div>
-                            
-                            <!-- Action Buttons -->
-                            <div class="flex justify-end space-x-4">
-                                <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                    Save Changes
-                                </button>
-                                <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                                    View Analytics
-                                </button>
-                            </div>
-                            <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
-                            <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
-                            <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
-                            <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
-                            <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
-                            <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
-                            <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
-                            <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
-                            <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
-                            <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
-                            <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
                         </div>
-                    </td>
-                </tr>
-            {% endfor %}
+                    </div>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="5" class="text-center py-4">
+                    <p class="text-gray-500">No businesses found. <a
+                            href="https://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
+                            class="text-blue-600 hover:underline">Create a Business Profile</a></p>
+                </td>
+            </tr>
+            <tr class="details" style="display: none;">
+                <td colspan="5">
+                    <div class="p-6 bg-gray-50 space-y-6">
+                        <!-- Business Details Section -->
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-500">Address</label>
+                                        <input type="text" value="{{ business.address }}"
+                                               class="w-full px-3 py-2 border rounded-md">
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label class="text-sm font-medium text-gray-500">Phone</label>
+                                        <input type="text" value="{{ business.phone_number }}"
+                                               class="w-full px-3 py-2 border rounded-md">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Metrics Section -->
+                            <div class="space-y-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                                        <div class="text-sm font-medium text-gray-500">Total Views</div>
+                                        <div class="mt-1 text-2xl font-semibold text-blue-600">15.2K</div>
+                                    </div>
+                                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                                        <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                        <div class="mt-1 text-2xl font-semibold text-green-600">4.8</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-end space-x-4">
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                Save Changes
+                            </button>
+                            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                                View Analytics
+                            </button>
+                        </div>
+                        <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
+                        <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
+                        <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
+                        <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
+                        <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
+                        <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
+                        <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
+                        <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
+                        <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
+                        <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
+                        <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
         </tbody>
     </table>
 </div>
@@ -962,14 +869,14 @@
     function toggleBusinessDetails(businessId) {
         const detailsRow = document.getElementById(`details-${businessId}`);
         const allDetails = document.querySelectorAll('.expanded-content');
-        
+
         // Close all other expanded rows
         allDetails.forEach(row => {
             if (row.id !== `details-${businessId}`) {
                 row.style.display = 'none';
             }
         });
-        
+
         // Toggle the clicked row
         detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
     }
@@ -1010,4 +917,4 @@
 </body>
 {% include 'verification_modal.html' %}
 </html>
-    </main>
+</main>
