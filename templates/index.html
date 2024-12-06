@@ -645,8 +645,58 @@
             <div class="notification-badge">{{ unread_notifications_count }}</div>
         {% endif %}
     </div>
-{% endblock %}
 
+    <!-- JavaScript for Business Table Interactions -->
+    <script>
+        function toggleBusinessDetails(businessId) {
+            const detailsRow = document.getElementById(`details-${businessId}`);
+            if (!detailsRow) return;
+            
+            // Close all other expanded rows
+            document.querySelectorAll('.expanded-content').forEach(row => {
+                if (row.id !== `details-${businessId}`) {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Toggle the clicked row
+            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+            
+            // Prevent event bubbling
+            event.stopPropagation();
+        }
+
+        function editBusiness(businessId) {
+            // Prevent row expansion when clicking edit
+            event.stopPropagation();
+            console.log('Editing business:', businessId);
+            // Add your edit business logic here
+        }
+
+        function viewAnalytics(businessId) {
+            // Prevent row expansion when clicking analytics
+            event.stopPropagation();
+            console.log('Viewing analytics:', businessId);
+            // Add your analytics view logic here
+        }
+
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) {
+                userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Close expanded rows when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.business-table')) {
+                document.querySelectorAll('.expanded-content').forEach(row => {
+                    row.style.display = 'none';
+                });
+            }
+        });
+    </script>
+{% endblock %}
 
 <div class="dashboard">
     <div class="controls">
