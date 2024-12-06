@@ -47,7 +47,7 @@ def login(request):
         if user is not None:
             print(f"[DEBUG] User authenticated successfully: {user.email}")
             print(f"[DEBUG] User ID: {user.id}")
-            print(f"[DEBUG] Is Google linked: {user.is_google_linked}")
+            print(f"[DEBUG] Has Google OAuth: {user.socialaccount_set.filter(provider='google').exists()}")
             
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
