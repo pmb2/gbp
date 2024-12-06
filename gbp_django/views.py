@@ -328,26 +328,23 @@ def index(request):
     )
     print(f"[DEBUG] Found {businesses.count()} businesses")
 
-    if not businesses.exists():
-        # Create a dummy business object that mimics the Business model
-        dummy_business = Business(
-            business_name="No Business Data Found",
-            business_id="dummy-no-data",
-            user=request.user,
-            address="No data available",
-            phone_number="No data available", 
-            website_url="No data available",
-            category="No data available",
-            is_verified=False,
-            email_settings="No data available",
-            automation_status="No data available"
-        )
-        # Set counts directly since this is a dummy object
-        dummy_business.posts_count = 0
-        dummy_business.photos_count = 0
-        dummy_business.qanda_count = 0
-        dummy_business.reviews_count = 0
-        dummy_business.no_data = True  # Special flag for template
+    if not businesses:
+        dummy_business = type('Business', (), {
+            'business_name': "No Business Data Found",
+            'business_id': "dummy-no-data",
+            'address': "No data available",
+            'phone_number': "No data available",
+            'website_url': "No data available",
+            'category': "No data available",
+            'is_verified': False,
+            'email_settings': "No data available",
+            'automation_status': "No data available",
+            'posts_count': 0,
+            'photos_count': 0,
+            'qanda_count': 0,
+            'reviews_count': 0,
+            'no_data': True
+        })()
         businesses = [dummy_business]
     else:
         # Get the OAuth-connected business (should be first)
