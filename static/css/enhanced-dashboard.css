@@ -19,9 +19,16 @@
 
 /* Layout & Spacing */
 .dashboard-container {
-  padding: var(--spacing-xl);
-  max-width: 1600px;
+  padding: var(--spacing-md);
+  max-width: 2000px;
   margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .dashboard-container {
+    padding: var(--spacing-xl);
+  }
 }
 
 .analytics-grid {

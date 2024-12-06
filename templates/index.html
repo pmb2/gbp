@@ -315,9 +315,9 @@
     </header>
 
     <!-- Main Content -->
-    <main class="p-6">
+    <main class="p-6 max-w-[2000px] mx-auto">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
             <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
@@ -345,7 +345,7 @@
             </div>
         </div>
         <!-- Analytics Overview -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 w-full">
             <!-- Average Rating Card -->
             <div class="bg-white p-4 rounded-lg shadow-sm">
                 <div class="flex items-center justify-between mb-4">
@@ -436,7 +436,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold text-gray-900">Quick Actions</h2>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
                 <button onclick="showBulkPostModal()" class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
                     <i class="fas fa-newspaper text-blue-600 mr-2"></i>
                     <span>Create Bulk Posts</span>
@@ -453,28 +453,29 @@
         </div>
 
         <!-- Business Table -->
-        <div class="bg-white rounded-lg shadow-sm">
+        <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
             <div class="p-6">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
-                    <div class="flex space-x-4">
-                        <div class="relative">
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        <div class="relative flex-grow sm:flex-grow-0">
                             <input type="text"
                                    placeholder="Search businesses..."
-                                   class="pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   class="w-full sm:w-[300px] pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
-                        <div class="flex space-x-2">
-                            <button class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
+                        <div class="flex gap-2 flex-wrap">
+                            <button class="flex-grow sm:flex-grow-0 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
                                 <i class="fas fa-filter mr-2"></i>Filter
                             </button>
-                            <button class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <button class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
                                 <i class="fas fa-plus mr-2"></i>Add Business
                             </button>
                         </div>
                     </div>
                 </div>
-            <table class="min-w-full divide-y divide-gray-200">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                 <tr>
                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -601,7 +602,8 @@
                     </tr>
                 {% endfor %}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
         {% if unread_notifications_count %}
             <div class="notification-badge">{{ unread_notifications_count }}</div>
