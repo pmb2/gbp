@@ -15,4 +15,7 @@ urlpatterns = [
     path('google/auth/', views.direct_google_oauth, name='google_oauth'),
     path('api/business/<str:business_id>/verification-status/', 
          views.get_verification_status, name='verification_status'),
+    path('api/notifications/', views.get_notifications, name='get_notifications'),
+    path('api/notifications/<int:notification_id>/dismiss/', 
+         views.dismiss_notification, name='dismiss_notification'),
 ]

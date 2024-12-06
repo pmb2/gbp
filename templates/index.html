@@ -303,14 +303,28 @@
         <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold text-gray-800">Dashboard</h1>
             <!-- User Profile -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
-                <img src="
-                        
-                        
-                        {% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
-                     alt="Profile"
-                     class="h-8 w-8 rounded-full">
-                <span class="text-sm text-gray-700">{{ user.email }}</span>
+            <div class="flex items-center space-x-4">
+                <!-- Notification Bell -->
+                <div class="relative">
+                    <button onclick="toggleNotificationsModal()" class="text-gray-600 hover:text-gray-800">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                        {% if unread_notifications_count > 0 %}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {{ unread_notifications_count }}
+                        </span>
+                        {% endif %}
+                    </button>
+                </div>
+                
+                <!-- User Profile -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
+                    <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
+                         alt="Profile"
+                         class="h-8 w-8 rounded-full">
+                    <span class="text-sm text-gray-700">{{ user.email }}</span>
+                </div>
             </div>
         </div>
     </header>
@@ -647,7 +661,108 @@
     </div>
 
     <!-- JavaScript for Business Table Interactions -->
+    {% include 'components/alert_banner.html' %}
+    {% include 'components/notifications_modal.html' %}
+    
     <script>
+        // Check business verification status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkBusinessVerification();
+        });
+
+        function checkBusinessVerification() {
+            {% for business in dashboard_data.businesses %}
+                if (!{{ business.is_verified|yesno:"true,false" }}) {
+                    showAlertBanner('Your business profile requires verification. Click here to complete the process.', 'red');
+                    createNotification('Business Verification Required', 'Please verify your business profile to unlock all features.');
+                } else if (hasIncompleteInformation('{{ business.business_id }}')) {
+                    showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
+                    createNotification('Missing Information', 'Complete your business profile to improve visibility.');
+                }
+            {% endfor %}
+        }
+
+        function showAlertBanner(message, type) {
+            const banner = document.getElementById('alertBanner');
+            const messageEl = document.getElementById('alertMessage');
+            banner.classList.remove('hidden');
+            messageEl.textContent = message;
+            
+            if (type === 'red') {
+                banner.classList.remove('bg-orange-100', 'border-orange-400', 'text-orange-700');
+                banner.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+            } else {
+                banner.classList.remove('bg-red-100', 'border-red-400', 'text-red-700');
+                banner.classList.add('bg-orange-100', 'border-orange-400', 'text-orange-700');
+            }
+        }
+
+        function closeAlertBanner() {
+            document.getElementById('alertBanner').classList.add('hidden');
+        }
+
+        function toggleNotificationsModal() {
+            const modal = document.getElementById('notificationsModal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                loadNotifications();
+            }
+        }
+
+        function closeNotificationsModal() {
+            document.getElementById('notificationsModal').classList.add('hidden');
+        }
+
+        function loadNotifications() {
+            fetch('/api/notifications/')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationsList = document.getElementById('notificationsList');
+                    notificationsList.innerHTML = '';
+                    
+                    data.notifications.forEach(notification => {
+                        const notificationEl = createNotificationElement(notification);
+                        notificationsList.appendChild(notificationEl);
+                    });
+                });
+        }
+
+        function createNotificationElement(notification) {
+            const div = document.createElement('div');
+            div.className = 'p-4 bg-white border rounded-lg shadow-sm';
+            div.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${notification.title}</h4>
+                        <p class="text-sm text-gray-500">${notification.message}</p>
+                    </div>
+                    <button onclick="dismissNotification(${notification.id})" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        function dismissNotification(notificationId) {
+            fetch(`/api/notifications/${notificationId}/dismiss/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            }).then(() => {
+                loadNotifications();
+                updateNotificationCount();
+            });
+        }
+
+        function hasIncompleteInformation(businessId) {
+            // Add logic to check for incomplete business information
+            return false; // Placeholder
+        }
+
         function toggleBusinessDetails(businessId) {
             const detailsRow = document.getElementById(`details-${businessId}`);
             if (!detailsRow) return;

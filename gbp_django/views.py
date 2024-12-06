@@ -312,6 +312,26 @@ def google_oauth_callback(request):
 
 
 @login_required
+from django.http import JsonResponse
+from .models import Notification
+
+def get_notifications(request):
+    notifications = Notification.objects.filter(
+        user=request.user,
+        read=False
+    ).values('id', 'message', 'created_at')
+    return JsonResponse({'notifications': list(notifications)})
+
+def dismiss_notification(request, notification_id):
+    if request.method == 'POST':
+        notification = Notification.objects.get(
+            id=notification_id,
+            user=request.user
+        )
+        notification.mark_as_read()
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=405)
+
 def index(request):
     print("\n[DEBUG] Loading dashboard index...")
     print(f"[DEBUG] User: {request.user.email}")
