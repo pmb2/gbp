@@ -311,10 +311,10 @@ def google_oauth_callback(request):
     return redirect('index')
 
 
-@login_required
 from django.http import JsonResponse
 from .models import Notification
 
+@login_required
 def get_notifications(request):
     notifications = Notification.objects.filter(
         user=request.user,
@@ -397,6 +397,14 @@ def index(request):
     users = User.objects.all()
     users_with_ids = [{'email': user.email, 'id': user.id} for user in users]
     unread_notifications_count = Notification.get_user_notifications(request.user.id).count()
+
+    try:
+        unread_notifications_count = Notification.objects.filter(
+            user=request.user,
+            read=False
+        ).count()
+    except:
+        unread_notifications_count = 0
 
     return render(request, 'index.html', {
         'dashboard_data': {'businesses': businesses, 'users': users_with_ids},
