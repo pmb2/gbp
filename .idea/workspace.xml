@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3f7a95f6-ec12-4a1c-9a83-8551ffd4f0fe" name="Changes" comment="pulling in oauth account data and working on dashboard">
-      <change afterPath="$PROJECT_DIR$/gbp_django/api/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jsLibraryMappings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gbp_django.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gbp_django.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,52 +23,58 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="5a1024143e14875d5e955f5d669c29cb8a91e88e" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "pmb2"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;pmb2&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/pmb2/gbp.git",
-    "accountId": "5c7ff7da-ee9f-4fd1-9a39-3fc1e6dbf383"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/pmb2/gbp.git&quot;,
+    &quot;accountId&quot;: &quot;5c7ff7da-ee9f-4fd1-9a39-3fc1e6dbf383&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2paQKMzdTf6MyXNciMAYKbu0h3d" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Django Server.gbp_django.executor": "Run",
-    "RunOnceActivity.OpenDjangoStructureViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "django.template.preview.state": "SHOW_EDITOR",
-    "git-widget-placeholder": "main",
-    "last_opened_file_path": "/home/tba/Documents/gbp_django",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Django Server.gbp_django.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenDjangoStructureViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;django.template.preview.state&quot;: &quot;SHOW_EDITOR&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/tba/Documents/gbp_django&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />

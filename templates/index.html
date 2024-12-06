@@ -306,6 +306,7 @@
             <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
                 <img src="
                         
+                        
                         {% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
                      alt="Profile"
                      class="h-8 w-8 rounded-full">
@@ -437,171 +438,206 @@
                 <h2 class="text-xl font-bold text-gray-900">Quick Actions</h2>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
-                <button onclick="showBulkPostModal()" class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                <button onclick="showBulkPostModal()"
+                        class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
                     <i class="fas fa-newspaper text-blue-600 mr-2"></i>
                     <span>Create Bulk Posts</span>
                 </button>
-                <button onclick="showPhotoUploadModal()" class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                <button onclick="showPhotoUploadModal()"
+                        class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
                     <i class="fas fa-images text-green-600 mr-2"></i>
                     <span>Upload Photos</span>
                 </button>
-                <button onclick="showAutomationSettingsModal()" class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+                <button onclick="showAutomationSettingsModal()"
+                        class="flex items-center justify-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
                     <i class="fas fa-robot text-purple-600 mr-2"></i>
                     <span>Automation Settings</span>
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Business Table -->
-        <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
-            <div class="p-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
-                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <div class="relative flex-grow sm:flex-grow-0">
-                            <input type="text"
-                                   placeholder="Search businesses..."
-                                   class="w-full sm:w-[300px] pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
-                        <div class="flex gap-2 flex-wrap">
-                            <button class="flex-grow sm:flex-grow-0 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
-                                <i class="fas fa-filter mr-2"></i>Filter
-                            </button>
-                            <button class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-                                <i class="fas fa-plus mr-2"></i>Add Business
-                            </button>
-                        </div>
+    <!-- Email Settings Modal -->
+    <div id="emailModal" class="modal">
+        <div class="modal-content">
+            <h2>Email Settings - Business A</h2>
+            <div style="margin-top: 1rem;">
+                <h3>Notification Preferences</h3>
+                <div style="margin: 1rem 0;">
+                    <label>
+                        <input type="checkbox" checked> Enable Email Notifications
+                    </label>
+                </div>
+                <h3>Frequency</h3>
+                <div style="margin: 1rem 0;">
+                    <select style="width: 100%; padding: 0.5rem;">
+                        <option>Immediate</option>
+                        <option>Daily Digest</option>
+                        <option>Weekly Summary</option>
+                    </select>
+                </div>
+                <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
+                    <button class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Business Table -->
+    <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
+        <div class="p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
+                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                    <div class="relative flex-grow sm:flex-grow-0">
+                        <input type="text"
+                               placeholder="Search businesses..."
+                               class="w-full sm:w-[300px] pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <button class="flex-grow sm:flex-grow-0 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
+                            <i class="fas fa-filter mr-2"></i>Filter
+                        </button>
+                        <button class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>Add Business
+                        </button>
                     </div>
                 </div>
+            </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                <tr>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Business Name
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Profile Status
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Performance
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Automation
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for business in dashboard_data.businesses %}
-                    <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
-                        <td>
-                            <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                            <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
-                        </td>
-                        <td>
-                            <div class="progress-bar">
-                                <div class="progress-bar-fill"
-                                     style="width: {{ business.profile_completion }}%"></div>
-                            </div>
-                            <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete
-                            </div>
-                        </td>
-                        <td>
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Business Name
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Profile Status
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Performance
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Automation
+                        </th>
+                        <th scope="col"
+                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for business in dashboard_data.businesses %}
+                        <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                            <td>
+                                <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
+                            </td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-bar-fill"
+                                         style="width: {{ business.profile_completion }}%"></div>
+                                </div>
+                                <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete
+                                </div>
+                            </td>
+                            <td>
                                     <span class="status-badge {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
                                         {{ business.is_verified }}
                                     </span>
-                        </td>
-                        <td>
-                            <div class="flex space-x-2">
-                                <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
-                                     title="Posts Status">
-                                    <i class="fas fa-newspaper"></i>
-                                </div>
-                                <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
-                                     title="Reviews Status">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
-                                     title="Photos Status">
-                                    <i class="fas fa-image"></i>
-                                </div>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="flex space-x-2">
-                                <button class="action-button primary"
-                                        onclick="editBusiness('{{ business.business_id }}')">
-                                    Edit
-                                </button>
-                                <button class="action-button secondary"
-                                        onclick="viewAnalytics('{{ business.business_id }}')">
-                                    Analytics
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
-                        <td colspan="5">
-                            <div class="grid grid-cols-2 gap-6">
-                                <div>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-500">Address:</span>
-                                            <span class="text-gray-900">{{ business.address }}</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-500">Phone:</span>
-                                            <span class="text-gray-900">{{ business.phone_number }}</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-500">Website:</span>
-                                            <span class="text-gray-900">{{ business.website_url }}</span>
-                                        </div>
-                                        <div class="flex justify-between">
-                                            <span class="text-gray-500">Category:</span>
-                                            <span class="text-gray-900">{{ business.category }}</span>
-                                        </div>
+                            </td>
+                            <td>
+                                <div class="flex space-x-2">
+                                    <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
+                                         title="Posts Status">
+                                        <i class="fas fa-newspaper"></i>
+                                    </div>
+                                    <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
+                                         title="Reviews Status">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
+                                         title="Photos Status">
+                                        <i class="fas fa-image"></i>
                                     </div>
                                 </div>
-                                <div>
-                                    <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Posts</div>
-                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                {{ business.posts_count }}
+                            </td>
+                            <td>
+                                <div class="flex space-x-2">
+                                    <button class="action-button primary"
+                                            onclick="editBusiness('{{ business.business_id }}')">
+                                        Edit
+                                    </button>
+                                    <button class="action-button secondary"
+                                            onclick="viewAnalytics('{{ business.business_id }}')">
+                                        Analytics
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
+                            <td colspan="5">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
+                                        <div class="space-y-3">
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Address:</span>
+                                                <span class="text-gray-900">{{ business.address }}</span>
                                             </div>
-                                        </div>
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                {{ business.reviews_count }}
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Phone:</span>
+                                                <span class="text-gray-900">{{ business.phone_number }}</span>
                                             </div>
-                                        </div>
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Photos</div>
-                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                {{ business.photos_count }}
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Website:</span>
+                                                <span class="text-gray-900">{{ business.website_url }}</span>
                                             </div>
-                                        </div>
-                                        <div class="bg-white p-4 rounded-lg shadow-sm">
-                                            <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
-                                            <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                {{ business.qanda_count }}
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500">Category:</span>
+                                                <span class="text-gray-900">{{ business.category }}</span>
                                             </div>
                                         </div>
                                     </div>
+                                    <div>
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <div class="text-sm font-medium text-gray-500">Posts</div>
+                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                    {{ business.posts_count }}
+                                                </div>
+                                            </div>
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                    {{ business.reviews_count }}
+                                                </div>
+                                            </div>
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <div class="text-sm font-medium text-gray-500">Photos</div>
+                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                    {{ business.photos_count }}
+                                                </div>
+                                            </div>
+                                            <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
+                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                    {{ business.qanda_count }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -625,7 +661,7 @@
         </div>
         <button class="btn btn-primary">Add Business</button>
     </div>
-.
+    .
     <table class="business-table">
         <thead>
         <tr>
@@ -817,144 +853,115 @@
         {% endfor %}
         </tbody>
     </table>
-</div>
+    <script>
+        function openEmailModal() {
+            document.getElementById('emailModal').style.display = 'flex';
+        }
 
-<!-- Email Settings Modal -->
-<div id="emailModal" class="modal">
-    <div class="modal-content">
-        <h2>Email Settings - Business A</h2>
-        <div style="margin-top: 1rem;">
-            <h3>Notification Preferences</h3>
-            <div style="margin: 1rem 0;">
-                <label>
-                    <input type="checkbox" checked> Enable Email Notifications
-                </label>
-            </div>
-            <h3>Frequency</h3>
-            <div style="margin: 1rem 0;">
-                <select style="width: 100%; padding: 0.5rem;">
-                    <option>Immediate</option>
-                    <option>Daily Digest</option>
-                    <option>Weekly Summary</option>
-                </select>
-            </div>
-            <div style="margin-top: 2rem; display: flex; justify-content: flex-end; gap: 1rem;">
-                <button class="btn btn-secondary" onclick="closeEmailModal()">Cancel</button>
-                <button class="btn btn-primary">Save Changes</button>
-            </div>
+        function closeEmailModal() {
+            document.getElementById('emailModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('emailModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Example data handling
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            // Here you would typically filter the table rows based on the search term
+            console.log('Searching for:', searchTerm);
+        });
+
+        // Example notification handling
+        document.querySelector('.notification-icon').addEventListener('click', () => {
+            alert('Notifications panel would open here');
+        });
+
+        // Example automation toggle handling
+        document.querySelectorAll('.toggle-switch input').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const isEnabled = e.target.checked;
+                if (!isEnabled) {
+                    if (confirm('Are you sure you want to disable automation for this business?')) {
+                        console.log('Automation disabled');
+                    } else {
+                        e.target.checked = true;
+                    }
+                } else {
+                    console.log('Automation enabled');
+                }
+            });
+        });
+
+        function toggleDetails(row) {
+            const detailsRow = row.nextElementSibling;
+            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+        }
+    </script>
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <h2>Settings</h2>
+            <p>Settings content goes here...</p>
+            <button class="btn btn-secondary" onclick="closeSettingsModal()">Close</button>
         </div>
     </div>
-</div>
 
-<script>
-    function openEmailModal() {
-        document.getElementById('emailModal').style.display = 'flex';
-    }
+    <script>
+        function toggleBusinessDetails(businessId) {
+            const detailsRow = document.getElementById(`details-${businessId}`);
+            const allDetails = document.querySelectorAll('.expanded-content');
 
-    function closeEmailModal() {
-        document.getElementById('emailModal').style.display = 'none';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-        const modal = document.getElementById('emailModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
-    }
-
-    // Example data handling
-    document.querySelector('.search-input').addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        // Here you would typically filter the table rows based on the search term
-        console.log('Searching for:', searchTerm);
-    });
-
-    // Example notification handling
-    document.querySelector('.notification-icon').addEventListener('click', () => {
-        alert('Notifications panel would open here');
-    });
-
-    // Example automation toggle handling
-    document.querySelectorAll('.toggle-switch input').forEach(toggle => {
-        toggle.addEventListener('change', (e) => {
-            const isEnabled = e.target.checked;
-            if (!isEnabled) {
-                if (confirm('Are you sure you want to disable automation for this business?')) {
-                    console.log('Automation disabled');
-                } else {
-                    e.target.checked = true;
+            // Close all other expanded rows
+            allDetails.forEach(row => {
+                if (row.id !== `details-${businessId}`) {
+                    row.style.display = 'none';
                 }
-            } else {
-                console.log('Automation enabled');
-            }
-        });
-    });
+            });
 
-    function toggleDetails(row) {
-        const detailsRow = row.nextElementSibling;
-        detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-    }
-</script>
-<!-- Settings Modal -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <h2>Settings</h2>
-        <p>Settings content goes here...</p>
-        <button class="btn btn-secondary" onclick="closeSettingsModal()">Close</button>
-    </div>
-</div>
-
-<script>
-    function toggleBusinessDetails(businessId) {
-        const detailsRow = document.getElementById(`details-${businessId}`);
-        const allDetails = document.querySelectorAll('.expanded-content');
-
-        // Close all other expanded rows
-        allDetails.forEach(row => {
-            if (row.id !== `details-${businessId}`) {
-                row.style.display = 'none';
-            }
-        });
-
-        // Toggle the clicked row
-        detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-    }
-
-    function editBusiness(businessId) {
-        event.stopPropagation();
-        // Implement edit business logic
-        console.log('Edit business:', businessId);
-    }
-
-    function viewAnalytics(businessId) {
-        event.stopPropagation();
-        // Implement analytics view logic
-        console.log('View analytics:', businessId);
-    }
-
-    function toggleUserMenu() {
-        const userMenu = document.getElementById('userMenu');
-        userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function openSettingsModal() {
-        document.getElementById('settingsModal').style.display = 'flex';
-    }
-
-    function closeSettingsModal() {
-        document.getElementById('settingsModal').style.display = 'none';
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function (event) {
-        const modal = document.getElementById('settingsModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
+            // Toggle the clicked row
+            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
         }
-    }
-</script>
-</body>
+
+        function editBusiness(businessId) {
+            event.stopPropagation();
+            // Implement edit business logic
+            console.log('Edit business:', businessId);
+        }
+
+        function viewAnalytics(businessId) {
+            event.stopPropagation();
+            // Implement analytics view logic
+            console.log('View analytics:', businessId);
+        }
+
+        function toggleUserMenu() {
+            const userMenu = document.getElementById('userMenu');
+            userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function openSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('settingsModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</div>
 {% include 'verification_modal.html' %}
 </html>
 </main>
