@@ -375,6 +375,11 @@ def get_notifications(request):
 @login_required
 @require_http_methods(["POST"])
 def update_business(request, business_id):
+    if business_id == 'dummy-no-data':
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Cannot update dummy business. Please add a real business first.'
+        }, status=400)
     try:
         data = json.loads(request.body)
         business = Business.objects.get(id=business_id, user=request.user)

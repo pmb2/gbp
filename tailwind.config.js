@@ -5,7 +5,18 @@ module.exports = {
     "./static/**/*.js",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontSmoothing: {
+        'antialiased': {
+          '-webkit-font-smoothing': 'antialiased',
+          '-moz-osx-font-smoothing': 'grayscale',
+        },
+      },
+    },
   },
   plugins: [],
+  future: {
+    removeDeprecatedGapUtilities: true,
+    purgeLayersByDefault: true,
+  },
 }

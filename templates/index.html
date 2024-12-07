@@ -1253,7 +1253,7 @@
                 detailsRow.style.display = isHidden ? 'table-row' : 'none';
                 
                 if (arrow && arrowSvg) {
-                    arrow.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+                    arrow.style.transform = isHidden ? 'rotate(90deg) translateZ(0)' : 'rotate(0deg) translateZ(0)';
                     if (isHidden) {
                         arrowSvg.classList.remove('text-gray-500');
                         arrowSvg.classList.add('text-blue-500');
