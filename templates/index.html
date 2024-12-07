@@ -331,8 +331,8 @@
 
     <!-- Main Content -->
     <main class="p-6 max-w-[2000px] mx-auto">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <!-- Header - Hidden until profile is complete -->
+    <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
             <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
@@ -553,12 +553,14 @@
                                 <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
                             </td>
                             <td>
+                                {% with completion=0 %}
                                 <div class="progress-bar">
                                     <div class="progress-bar-fill"
-                                         style="width: {{ business.profile_completion }}%"></div>
+                                         style="width: {{ completion }}%"></div>
                                 </div>
-                                <div class="text-sm text-gray-500 mt-1">{{ business.profile_completion }}% Complete
+                                <div class="text-sm text-gray-500 mt-1">{{ completion }}% Complete
                                 </div>
+                                {% endwith %}
                             </td>
                             <td>
                                     <span class="status-badge {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
@@ -665,10 +667,31 @@
     {% include 'components/notifications_modal.html' %}
     
     <script>
-        // Check business verification status on page load
+        // Check business verification status and profile completion on page load
         document.addEventListener('DOMContentLoaded', function() {
             checkBusinessVerification();
+            checkProfileCompletion();
         });
+
+        function checkProfileCompletion() {
+            const businesses = document.querySelectorAll('.business-table tbody tr:not(.expanded-content)');
+            let totalCompletion = 0;
+            
+            businesses.forEach(business => {
+                const progressBar = business.querySelector('.progress-bar-fill');
+                if (progressBar) {
+                    const completion = parseInt(progressBar.style.width) || 0;
+                    totalCompletion = Math.max(totalCompletion, completion);
+                }
+            });
+
+            const dashboardHeader = document.getElementById('dashboardHeader');
+            if (totalCompletion === 100) {
+                dashboardHeader.classList.remove('hidden');
+            } else {
+                dashboardHeader.classList.add('hidden');
+            }
+        }
 
         function checkBusinessVerification() {
             {% for business in dashboard_data.businesses %}
