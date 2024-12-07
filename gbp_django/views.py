@@ -357,7 +357,11 @@ def google_oauth_callback(request):
 
 
 from django.http import JsonResponse
-from .models import Notification
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+import json
+from .models import Notification, Business
+from .api.business_management import update_business_details
 
 @login_required
 def get_notifications(request):
@@ -366,6 +370,39 @@ def get_notifications(request):
         read=False
     ).values('id', 'message', 'created_at')
     return JsonResponse({'notifications': list(notifications)})
+
+@login_required
+@require_http_methods(["POST"])
+def update_business(request, business_id):
+    try:
+        data = json.loads(request.body)
+        business = Business.objects.get(id=business_id, user=request.user)
+        
+        # Update Google Business Profile via API
+        update_result = update_business_details(
+            access_token=request.user.google_access_token,
+            account_id=business.business_id,
+            location_id=business.business_id,
+            update_data=data
+        )
+        
+        # If API update successful, update local database
+        if update_result:
+            business.business_name = data.get('business_name', business.business_name)
+            business.address = data.get('address', business.address)
+            business.phone_number = data.get('phone', business.phone_number)
+            business.website_url = data.get('website', business.website_url)
+            business.category = data.get('category', business.category)
+            business.save()
+            
+            return JsonResponse({'status': 'success'})
+        
+        return JsonResponse({'status': 'error', 'message': 'Failed to update Google Business Profile'}, status=400)
+        
+    except Business.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Business not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 def dismiss_notification(request, notification_id):
     if request.method == 'POST':
