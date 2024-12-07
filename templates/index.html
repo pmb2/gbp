@@ -547,7 +547,7 @@
                             <td>
                                 <div class="flex items-center">
                                     <div class="transform transition-transform duration-200 mr-2" id="arrow-{{ business.business_id }}">
-                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5 text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </div>
@@ -1213,16 +1213,24 @@
         function toggleBusinessDetails(businessId) {
             const detailsRow = document.getElementById(`details-${businessId}`);
             const arrow = document.getElementById(`arrow-${businessId}`);
+            const arrowSvg = arrow.querySelector('svg');
             
             if (detailsRow.style.display === 'none') {
                 // Open this row
                 detailsRow.style.display = 'table-row';
                 arrow.style.transform = 'rotate(90deg)';
+                arrowSvg.classList.remove('text-gray-500');
+                arrowSvg.classList.add('text-blue-500');
             } else {
                 // Close this row
                 detailsRow.style.display = 'none';
                 arrow.style.transform = 'rotate(0deg)';
+                arrowSvg.classList.remove('text-blue-500');
+                arrowSvg.classList.add('text-gray-500');
             }
+            
+            // Prevent event bubbling
+            event.stopPropagation();
         }
 
         function editBusiness(businessId) {
