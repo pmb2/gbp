@@ -378,16 +378,25 @@ def update_business(request, business_id):
         data = json.loads(request.body)
         business = Business.objects.get(id=business_id, user=request.user)
         
-        # Update Google Business Profile via API
-        update_result = update_business_details(
-            access_token=request.user.google_access_token,
-            account_id=business.business_id,
-            location_id=business.business_id,
-            update_data=data
-        )
-        
-        # If API update successful, update local database
-        if update_result:
+        # Validate required fields
+        required_fields = ['business_name', 'address', 'phone', 'website', 'category']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        if missing_fields:
+            return JsonResponse({
+                'status': 'error',
+                'message': f'Missing required fields: {", ".join(missing_fields)}'
+            }, status=400)
+
+        try:
+            # Update Google Business Profile via API
+            update_result = update_business_details(
+                access_token=request.user.google_access_token,
+                account_id=business.business_id,
+                location_id=business.business_id,
+                update_data=data
+            )
+            
+            # Update local database
             business.business_name = data.get('business_name', business.business_name)
             business.address = data.get('address', business.address)
             business.phone_number = data.get('phone', business.phone_number)
@@ -395,14 +404,45 @@ def update_business(request, business_id):
             business.category = data.get('category', business.category)
             business.save()
             
-            return JsonResponse({'status': 'success'})
-        
-        return JsonResponse({'status': 'error', 'message': 'Failed to update Google Business Profile'}, status=400)
-        
+            return JsonResponse({
+                'status': 'success',
+                'data': {
+                    'business_name': business.business_name,
+                    'address': business.address,
+                    'phone': business.phone_number,
+                    'website': business.website_url,
+                    'category': business.category
+                }
+            })
+            
+        except requests.exceptions.RequestException as e:
+            # Log the error details
+            print(f"API Error: {str(e)}")
+            if hasattr(e.response, 'json'):
+                error_details = e.response.json()
+                print(f"Error details: {error_details}")
+            
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Failed to update Google Business Profile. Please check the API logs for details.'
+            }, status=400)
+            
     except Business.DoesNotExist:
-        return JsonResponse({'status': 'error', 'message': 'Business not found'}, status=404)
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        print(f"Unexpected error: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': 'An unexpected error occurred'
+        }, status=500)
 
 def dismiss_notification(request, notification_id):
     if request.method == 'POST':

@@ -743,12 +743,22 @@
 
         async function saveBusinessDetails(businessId) {
             const data = {
-                business_name: document.getElementById(`business-name-${businessId}`).value,
-                address: document.getElementById(`address-${businessId}`).value,
-                phone: document.getElementById(`phone-${businessId}`).value,
-                website: document.getElementById(`website-${businessId}`).value,
-                category: document.getElementById(`category-${businessId}`).value
+                business_name: document.getElementById(`business-name-${businessId}`).value.trim(),
+                address: document.getElementById(`address-${businessId}`).value.trim(),
+                phone: document.getElementById(`phone-${businessId}`).value.trim(),
+                website: document.getElementById(`website-${businessId}`).value.trim(),
+                category: document.getElementById(`category-${businessId}`).value.trim()
             };
+
+            // Validate required fields
+            const missingFields = Object.entries(data)
+                .filter(([_, value]) => !value)
+                .map(([key]) => key.replace('_', ' '));
+
+            if (missingFields.length > 0) {
+                alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+                return;
+            }
 
             try {
                 const response = await fetch(`/api/business/${businessId}/update/`, {
@@ -760,8 +770,10 @@
                     body: JSON.stringify(data)
                 });
 
+                const result = await response.json();
+
                 if (!response.ok) {
-                    throw new Error('Failed to update business details');
+                    throw new Error(result.message || 'Failed to update business details');
                 }
 
                 // Update the view mode with new values
@@ -772,9 +784,12 @@
                 viewMode.querySelector(':nth-child(4) span:last-child').textContent = data.website;
                 viewMode.querySelector(':nth-child(5) span:last-child').textContent = data.category;
 
+                // Show success message
+                alert('Business details updated successfully!');
+
             } catch (error) {
                 console.error('Error updating business details:', error);
-                alert('Failed to update business details. Please try again.');
+                alert(error.message || 'Failed to update business details. Please try again.');
             }
         }
 

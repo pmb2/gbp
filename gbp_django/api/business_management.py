@@ -23,12 +23,42 @@ def create_business_location(access_token, account_id, location_data):
 
 def update_business_details(access_token, account_id, location_id, update_data):
     """Update details for a business location."""
-    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
-           f"{account_id}/locations/{location_id}")
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.patch(url, headers=headers, json=update_data)
-    response.raise_for_status()
-    return response.json()
+    try:
+        # Format the data according to Google's API requirements
+        formatted_data = {
+            "locationName": update_data.get('business_name', ''),
+            "primaryPhone": update_data.get('phone', ''),
+            "websiteUrl": update_data.get('website', ''),
+            "primaryCategory": {"displayName": update_data.get('category', '')},
+            "address": {
+                "regionCode": "US",  # Default to US
+                "addressLines": [update_data.get('address', '')]
+            }
+        }
+
+        url = (f"https://mybusinessaccountmanagement.googleapis.com/v1/"
+               f"{account_id}/locations/{location_id}")
+        
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        # Use PATCH with updateMask to specify which fields to update
+        params = {
+            "updateMask": "locationName,primaryPhone,websiteUrl,primaryCategory,address"
+        }
+        
+        response = requests.patch(url, headers=headers, json=formatted_data, params=params)
+        response.raise_for_status()
+        return response.json()
+        
+    except requests.exceptions.RequestException as e:
+        print(f"API Error: {str(e)}")
+        if hasattr(e.response, 'json'):
+            error_details = e.response.json()
+            print(f"Error details: {error_details}")
+        raise
 
 
 def delete_location(access_token, account_id, location_id):
