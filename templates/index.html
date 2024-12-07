@@ -936,14 +936,6 @@
             }
         }
 
-        // Close expanded rows when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('.business-table')) {
-                document.querySelectorAll('.expanded-content').forEach(row => {
-                    row.style.display = 'none';
-                });
-            }
-        });
     </script>
 {% endblock %}
 
@@ -1217,36 +1209,43 @@
             const arrowSvg = arrow.querySelector('svg');
             const detailsRow = document.getElementById(`details-${businessId}`);
             
-            // If clicking the arrow, close the row
+            // If clicking the arrow, toggle the row
             if (event.target === arrow || arrow.contains(event.target)) {
-                // Close this row
-                detailsRow.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-                arrowSvg.classList.remove('text-blue-500');
-                arrowSvg.classList.add('text-gray-500');
+                if (detailsRow.style.display !== 'none') {
+                    // Close this row
+                    detailsRow.style.display = 'none';
+                    arrow.style.transform = 'rotate(0deg)';
+                    arrowSvg.classList.remove('text-blue-500');
+                    arrowSvg.classList.add('text-gray-500');
+                } else {
+                    // Open this row
+                    detailsRow.style.display = 'table-row';
+                    arrow.style.transform = 'rotate(90deg)';
+                    arrowSvg.classList.remove('text-gray-500');
+                    arrowSvg.classList.add('text-blue-500');
+                }
                 
                 // Prevent event bubbling when clicking arrow
                 event.stopPropagation();
                 return;
             }
             
-            // For any click on the row (except arrow), toggle open/closed
-            // Close all other rows first
-            document.querySelectorAll('[id^="details-"]').forEach(row => {
-                if (row.id !== `details-${businessId}`) {
-                    row.style.display = 'none';
-                    const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
-                    if (otherArrow) {
-                        const otherSvg = otherArrow.querySelector('svg');
-                        otherArrow.style.transform = 'rotate(0deg)';
-                        otherSvg.classList.remove('text-blue-500');
-                        otherSvg.classList.add('text-gray-500');
-                    }
-                }
-            });
-            
-            // Toggle current row
+            // For any other click on the row, only open if closed
             if (detailsRow.style.display === 'none') {
+                // Close all other rows first
+                document.querySelectorAll('[id^="details-"]').forEach(row => {
+                    if (row.id !== `details-${businessId}`) {
+                        row.style.display = 'none';
+                        const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
+                        if (otherArrow) {
+                            const otherSvg = otherArrow.querySelector('svg');
+                            otherArrow.style.transform = 'rotate(0deg)';
+                            otherSvg.classList.remove('text-blue-500');
+                            otherSvg.classList.add('text-gray-500');
+                        }
+                    }
+                });
+                
                 detailsRow.style.display = 'table-row';
                 arrow.style.transform = 'rotate(90deg)';
                 arrowSvg.classList.remove('text-gray-500');
