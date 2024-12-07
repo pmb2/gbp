@@ -557,18 +557,32 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 {% with completion=0 %}
-                                <div class="progress-bar">
-                                    <div class="progress-bar-fill"
-                                         style="width: {{ completion }}%"></div>
-                                </div>
-                                <div class="text-sm text-gray-500 mt-1">{{ completion }}% Complete
+                                <div class="flex flex-col items-center">
+                                    <div class="progress-bar w-32">
+                                        <div class="progress-bar-fill 
+                                            {% if completion <= 20 %}bg-red-500
+                                            {% elif completion <= 40 %}bg-yellow-500
+                                            {% elif completion <= 60 %}bg-orange-500
+                                            {% elif completion <= 80 %}bg-green-400
+                                            {% else %}bg-green-600{% endif %}"
+                                            style="width: {{ completion }}%">
+                                        </div>
+                                    </div>
+                                    <div class="text-sm mt-1 
+                                        {% if completion <= 20 %}text-red-500
+                                        {% elif completion <= 40 %}text-yellow-500
+                                        {% elif completion <= 60 %}text-orange-500
+                                        {% elif completion <= 80 %}text-green-400
+                                        {% else %}text-green-600{% endif %}">
+                                        {{ completion }}% Complete
+                                    </div>
                                 </div>
                                 {% endwith %}
                             </td>
-                            <td>
-                                <div class="flex space-x-2">
+                            <td class="text-center">
+                                <div class="flex justify-center space-x-2">
                                     <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
                                          title="Posts Status">
                                         <i class="fas fa-newspaper"></i>
@@ -583,8 +597,8 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="status-badge {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
+                            <td class="text-center">
+                                <span class="status-badge inline-flex justify-center {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
                                     {{ business.is_verified }}
                                 </span>
                             </td>
