@@ -1210,23 +1210,33 @@
     </div>
 
     <script>
-        function toggleBusinessDetails(businessId) {
-            const detailsRow = document.getElementById(`details-${businessId}`);
+        function toggleBusinessDetails(businessId, event) {
+            // Only proceed if the click was on the arrow
             const arrow = document.getElementById(`arrow-${businessId}`);
             const arrowSvg = arrow.querySelector('svg');
+            const detailsRow = document.getElementById(`details-${businessId}`);
             
-            if (detailsRow.style.display === 'none') {
-                // Open this row
+            // Check if the click was on or within the arrow element
+            if (event.target === arrow || arrow.contains(event.target)) {
+                if (detailsRow.style.display === 'none') {
+                    // Open this row
+                    detailsRow.style.display = 'table-row';
+                    arrow.style.transform = 'rotate(90deg)';
+                    arrowSvg.classList.remove('text-gray-500');
+                    arrowSvg.classList.add('text-blue-500');
+                } else {
+                    // Close this row
+                    detailsRow.style.display = 'none';
+                    arrow.style.transform = 'rotate(0deg)';
+                    arrowSvg.classList.remove('text-blue-500');
+                    arrowSvg.classList.add('text-gray-500');
+                }
+            } else if (detailsRow.style.display === 'none') {
+                // If clicking anywhere else in the row, only open (don't close)
                 detailsRow.style.display = 'table-row';
                 arrow.style.transform = 'rotate(90deg)';
                 arrowSvg.classList.remove('text-gray-500');
                 arrowSvg.classList.add('text-blue-500');
-            } else {
-                // Close this row
-                detailsRow.style.display = 'none';
-                arrow.style.transform = 'rotate(0deg)';
-                arrowSvg.classList.remove('text-blue-500');
-                arrowSvg.classList.add('text-gray-500');
             }
             
             // Prevent event bubbling
