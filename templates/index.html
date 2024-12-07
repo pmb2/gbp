@@ -1224,56 +1224,40 @@
     </div>
 
     <script>
-        function toggleBusinessDetails(businessId, event) {
-            const arrow = document.getElementById(`arrow-${businessId}`);
-            const arrowSvg = arrow.querySelector('svg');
+        function toggleBusinessDetails(businessId) {
             const detailsRow = document.getElementById(`details-${businessId}`);
+            const arrow = document.getElementById(`arrow-${businessId}`);
+            const arrowSvg = arrow?.querySelector('svg');
             
-            // If clicking the arrow, toggle the row
-            if (event.target === arrow || arrow.contains(event.target)) {
-                if (detailsRow.style.display !== 'none') {
-                    // Close this row
-                    detailsRow.style.display = 'none';
-                    arrow.style.transform = 'rotate(0deg)';
-                    arrowSvg.classList.remove('text-blue-500');
-                    arrowSvg.classList.add('text-gray-500');
-                } else {
-                    // Open this row
-                    detailsRow.style.display = 'table-row';
-                    arrow.style.transform = 'rotate(90deg)';
-                    arrowSvg.classList.remove('text-gray-500');
-                    arrowSvg.classList.add('text-blue-500');
-                }
-                
-                // Prevent event bubbling when clicking arrow
-                event.stopPropagation();
-                return;
-            }
-            
-            // For any other click on the row, only open if closed
-            if (detailsRow.style.display === 'none') {
-                // Close all other rows first
-                document.querySelectorAll('[id^="details-"]').forEach(row => {
-                    if (row.id !== `details-${businessId}`) {
-                        row.style.display = 'none';
-                        const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
-                        if (otherArrow) {
-                            const otherSvg = otherArrow.querySelector('svg');
-                            otherArrow.style.transform = 'rotate(0deg)';
-                            otherSvg.classList.remove('text-blue-500');
-                            otherSvg.classList.add('text-gray-500');
-                        }
+            // Close all other rows first
+            document.querySelectorAll('[id^="details-"]').forEach(row => {
+                if (row.id !== `details-${businessId}`) {
+                    row.style.display = 'none';
+                    const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
+                    if (otherArrow) {
+                        const otherSvg = otherArrow.querySelector('svg');
+                        otherArrow.style.transform = 'rotate(0deg)';
+                        otherSvg.classList.remove('text-blue-500');
+                        otherSvg.classList.add('text-gray-500');
                     }
-                });
+                }
+            });
+
+            if (detailsRow) {
+                const isHidden = detailsRow.style.display === 'none';
+                detailsRow.style.display = isHidden ? 'table-row' : 'none';
                 
-                detailsRow.style.display = 'table-row';
-                arrow.style.transform = 'rotate(90deg)';
-                arrowSvg.classList.remove('text-gray-500');
-                arrowSvg.classList.add('text-blue-500');
+                if (arrow && arrowSvg) {
+                    arrow.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+                    if (isHidden) {
+                        arrowSvg.classList.remove('text-gray-500');
+                        arrowSvg.classList.add('text-blue-500');
+                    } else {
+                        arrowSvg.classList.remove('text-blue-500');
+                        arrowSvg.classList.add('text-gray-500');
+                    }
+                }
             }
-            
-            // Prevent event bubbling
-            event.stopPropagation();
         }
 
         function editBusiness(businessId) {
