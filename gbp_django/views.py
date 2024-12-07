@@ -381,7 +381,7 @@ def update_business(request, business_id):
             'message': 'Cannot update dummy business. Please add a real business first.'
         }, status=400)
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         business = Business.objects.get(id=business_id, user=request.user)
         
         # Validate required fields
