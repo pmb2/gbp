@@ -780,6 +780,11 @@
                 if (!response.ok) {
                     throw new Error(result.message || 'Failed to update business details');
                 }
+            } catch (error) {
+                console.error('Error updating business details:', error);
+                alert(error.message || 'Failed to update business details. Please try again.');
+                return;
+            }
 
                 // Update the view mode with new values
                 const viewMode = document.getElementById(`view-mode-${businessId}`);
