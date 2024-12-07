@@ -545,8 +545,17 @@
                     {% for business in dashboard_data.businesses %}
                         <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
                             <td>
-                                <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
+                                <div class="flex items-center">
+                                    <div class="transform transition-transform duration-200 mr-2" id="arrow-{{ business.business_id }}">
+                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                        <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 {% with completion=0 %}
@@ -1189,17 +1198,17 @@
     <script>
         function toggleBusinessDetails(businessId) {
             const detailsRow = document.getElementById(`details-${businessId}`);
-            const allDetails = document.querySelectorAll('.expanded-content');
-
-            // Close all other expanded rows
-            allDetails.forEach(row => {
-                if (row.id !== `details-${businessId}`) {
-                    row.style.display = 'none';
-                }
-            });
-
-            // Toggle the clicked row
-            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
+            const arrow = document.getElementById(`arrow-${businessId}`);
+            
+            if (detailsRow.style.display === 'none') {
+                // Open this row
+                detailsRow.style.display = 'table-row';
+                arrow.style.transform = 'rotate(90deg)';
+            } else {
+                // Close this row
+                detailsRow.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
         }
 
         function editBusiness(businessId) {
