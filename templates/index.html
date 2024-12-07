@@ -717,6 +717,9 @@
         {% endif %}
     </div>
 
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    
     <!-- JavaScript for Business Table Interactions -->
     {% include 'components/alert_banner.html' %}
     {% include 'components/notifications_modal.html' %}
@@ -742,13 +745,15 @@
         }
 
         async function saveBusinessDetails(businessId) {
-            const data = {
-                business_name: document.getElementById(`business-name-${businessId}`).value.trim(),
-                address: document.getElementById(`address-${businessId}`).value.trim(),
-                phone: document.getElementById(`phone-${businessId}`).value.trim(),
-                website: document.getElementById(`website-${businessId}`).value.trim(),
-                category: document.getElementById(`category-${businessId}`).value.trim()
-            };
+            try {
+                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+                const data = {
+                    business_name: document.getElementById(`business-name-${businessId}`).value.trim(),
+                    address: document.getElementById(`address-${businessId}`).value.trim(),
+                    phone: document.getElementById(`phone-${businessId}`).value.trim(),
+                    website: document.getElementById(`website-${businessId}`).value.trim(),
+                    category: document.getElementById(`category-${businessId}`).value.trim()
+                };
 
             // Validate required fields
             const missingFields = Object.entries(data)
@@ -899,7 +904,7 @@
             fetch(`/api/notifications/${notificationId}/dismiss/`, {
                 method: 'POST',
                 headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    'X-CSRFToken': csrfToken
                 }
             }).then(() => {
                 loadNotifications();
