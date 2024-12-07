@@ -543,7 +543,7 @@
                     </thead>
                     <tbody>
                     {% for business in dashboard_data.businesses %}
-                        <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                        <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}', event)">
                             <td>
                                 <div class="flex items-center">
                                     <div class="transform transition-transform duration-200 mr-2" id="arrow-{{ business.business_id }}">
