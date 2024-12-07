@@ -19,4 +19,10 @@ module.exports = {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
   },
+  corePlugins: {
+    preflight: true,
+  },
+  experimental: {
+    optimizeUniversalDefaults: true
+  }
 }
