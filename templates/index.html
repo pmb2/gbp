@@ -746,8 +746,8 @@
 
         async function saveBusinessDetails(businessId) {
             try {
-                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
                 const data = {
+                    csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value,
                     business_name: document.getElementById(`business-name-${businessId}`).value.trim(),
                     address: document.getElementById(`address-${businessId}`).value.trim(),
                     phone: document.getElementById(`phone-${businessId}`).value.trim(),
@@ -767,10 +767,10 @@
 
             try {
                 const response = await fetch(`/api/business/${businessId}/update/`, {
-                    method: 'POST',
+                    method: 'POST', 
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        'X-CSRFToken': data.csrfmiddlewaretoken
                     },
                     body: JSON.stringify(data)
                 });
