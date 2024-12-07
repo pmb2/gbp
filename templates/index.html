@@ -543,10 +543,12 @@
                     </thead>
                     <tbody>
                     {% for business in dashboard_data.businesses %}
-                        <tr class="expandable-row" onclick="toggleBusinessDetails('{{ business.business_id }}', event)">
+                        <tr class="expandable-row">
                             <td>
                                 <div class="flex items-center">
-                                    <div class="transform transition-transform duration-200 mr-2" id="arrow-{{ business.business_id }}">
+                                    <div class="transform transition-transform duration-200 mr-2 cursor-pointer" 
+                                         id="arrow-{{ business.business_id }}"
+                                         onclick="toggleBusinessDetails('{{ business.business_id }}', event)">
                                         <svg class="w-5 h-5 text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
@@ -1211,28 +1213,29 @@
 
     <script>
         function toggleBusinessDetails(businessId, event) {
-            // Only proceed if the click was on the arrow
             const arrow = document.getElementById(`arrow-${businessId}`);
             const arrowSvg = arrow.querySelector('svg');
             const detailsRow = document.getElementById(`details-${businessId}`);
             
-            // Check if the click was on or within the arrow element
+            // Only toggle if clicking the arrow
             if (event.target === arrow || arrow.contains(event.target)) {
-                if (detailsRow.style.display === 'none') {
-                    // Open this row
-                    detailsRow.style.display = 'table-row';
-                    arrow.style.transform = 'rotate(90deg)';
-                    arrowSvg.classList.remove('text-gray-500');
-                    arrowSvg.classList.add('text-blue-500');
-                } else {
+                const isExpanded = detailsRow.style.display !== 'none';
+                
+                if (isExpanded) {
                     // Close this row
                     detailsRow.style.display = 'none';
                     arrow.style.transform = 'rotate(0deg)';
                     arrowSvg.classList.remove('text-blue-500');
                     arrowSvg.classList.add('text-gray-500');
+                } else {
+                    // Open this row
+                    detailsRow.style.display = 'table-row';
+                    arrow.style.transform = 'rotate(90deg)';
+                    arrowSvg.classList.remove('text-gray-500');
+                    arrowSvg.classList.add('text-blue-500');
                 }
             } else if (detailsRow.style.display === 'none') {
-                // If clicking anywhere else in the row, only open (don't close)
+                // If clicking anywhere else in the row, only open
                 detailsRow.style.display = 'table-row';
                 arrow.style.transform = 'rotate(90deg)';
                 arrowSvg.classList.remove('text-gray-500');
