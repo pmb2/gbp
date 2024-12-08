@@ -191,7 +191,9 @@ function updateProgress() {
 function handleCurrentStep() {
     switch(currentStep) {
         case 1:
-            showVerificationPromptModal();
+            window.open('https://www.google.com/business/', '_blank');
+            // Start periodic status check
+            startProfileStatusCheck();
             break;
         case 2:
             // Enable editing of business details
@@ -212,6 +214,54 @@ function handleCurrentStep() {
     }
 }
 
-// Initialize progress
-document.addEventListener('DOMContentLoaded', updateProgress);
+// Initialize progress and start status check
+document.addEventListener('DOMContentLoaded', () => {
+    updateProgress();
+    startProfileStatusCheck();
+});
+
+function startProfileStatusCheck() {
+    // Check status immediately
+    checkProfileStatus();
+    
+    // Then check every 30 seconds
+    const statusInterval = setInterval(checkProfileStatus, 30000);
+    
+    // Store interval ID in case we need to clear it later
+    window.profileStatusInterval = statusInterval;
+}
+
+function checkProfileStatus() {
+    const businessId = document.querySelector('[data-business-id]')?.dataset.businessId;
+    if (!businessId) return;
+
+    fetch(`/api/business/${businessId}/verification-status/`)
+        .then(response => response.json())
+        .then(data => {
+            // Calculate completion percentage based on verified fields
+            const totalFields = Object.keys(data).length;
+            const completedFields = Object.values(data).filter(Boolean).length;
+            const percentage = Math.round((completedFields / totalFields) * 100);
+            
+            // Update progress
+            document.getElementById('completionPercentage').textContent = `${percentage}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            
+            // Update current step based on completion
+            if (percentage === 100 && currentStep !== 5) {
+                currentStep = 5;
+                updateProgress();
+            } else if (percentage >= 75 && currentStep < 4) {
+                currentStep = 4;
+                updateProgress();
+            } else if (percentage >= 50 && currentStep < 3) {
+                currentStep = 3;
+                updateProgress();
+            } else if (percentage >= 25 && currentStep < 2) {
+                currentStep = 2;
+                updateProgress();
+            }
+        })
+        .catch(error => console.error('Error checking profile status:', error));
+}
 </script>
