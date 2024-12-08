@@ -382,7 +382,7 @@ def update_business(request, business_id):
         }, status=400)
     try:
         data = json.loads(request.body.decode('utf-8'))
-        business = Business.objects.get(id=business_id, user=request.user)
+        business = Business.objects.get(business_id=business_id, user=request.user)
         
         # Validate required fields
         required_fields = ['business_name', 'address', 'phone', 'website', 'category']

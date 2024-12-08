@@ -18,6 +18,6 @@ urlpatterns = [
     path('api/notifications/', views.get_notifications, name='get_notifications'),
     path('api/notifications/<int:notification_id>/dismiss/', 
          views.dismiss_notification, name='dismiss_notification'),
-    path('api/business/<int:business_id>/update/',
+    path('api/business/<str:business_id>/update/',
          views.update_business, name='update_business'),
 ]
