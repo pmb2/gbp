@@ -782,7 +782,23 @@
                 }
             } catch (error) {
                 console.error('Error updating business details:', error);
-                alert(error.message || 'Failed to update business details. Please try again.');
+                const response = await error.response?.json();
+                
+                if (response?.status === 'verification_required') {
+                    // Show verification modal
+                    const modal = document.getElementById('verificationPromptModal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                    }
+                } else {
+                    // Show error in a more user-friendly way
+                    const alertBanner = document.getElementById('alertBanner');
+                    const alertMessage = document.getElementById('alertMessage');
+                    if (alertBanner && alertMessage) {
+                        alertMessage.textContent = response?.message || 'Failed to update business details. Please try again.';
+                        alertBanner.classList.remove('hidden');
+                    }
+                }
                 return;
             }
 
@@ -961,6 +977,20 @@
             }
         }
 
+    function closeVerificationPromptModal() {
+        const modal = document.getElementById('verificationPromptModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('verificationPromptModal');
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    }
     </script>
 {% endblock %}
 
@@ -1301,5 +1331,6 @@
     </script>
 </div>
 {% include 'verification_modal.html' %}
+{% include 'components/verification_prompt_modal.html' %}
 </html>
 </main>

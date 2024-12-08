@@ -377,9 +377,10 @@ def get_notifications(request):
 def update_business(request, business_id):
     if business_id == 'dummy-no-data':
         return JsonResponse({
-            'status': 'error',
-            'message': 'Cannot update dummy business. Please add a real business first.'
-        }, status=400)
+            'status': 'verification_required',
+            'message': 'This business needs to be verified before making updates.',
+            'action': 'verify'
+        }, status=403)
     try:
         data = json.loads(request.body.decode('utf-8'))
         business = Business.objects.get(business_id=business_id, user=request.user)
