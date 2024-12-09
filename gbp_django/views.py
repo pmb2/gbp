@@ -603,7 +603,7 @@ def index(request):
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
-    ).order_by('is_verified', 'profile_completion')  # Show unverified first, then by completion
+    ).order_by('is_verified')  # Show unverified first
     print(f"[DEBUG] Found {businesses.count()} businesses")
 
     # Calculate profile completion for each business
@@ -622,6 +622,9 @@ def index(request):
         business.photos_count = business.businessattribute_set.filter(key='photo').count()
         business.qanda_count = business.qanda_set.count()
         business.reviews_count = business.review_set.count()
+    
+    # Sort businesses by completion score (after calculating all scores)
+    businesses = sorted(businesses, key=lambda x: (x.is_verified, x.profile_completion))
     else:
         # Get the OAuth-connected business (should be first)
         oauth_business = businesses.filter(
