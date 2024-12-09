@@ -2,6 +2,11 @@ import requests
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from datetime import datetime, timedelta
+import secrets
+from django.utils import timezone
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -460,6 +465,89 @@ def dismiss_notification(request, notification_id):
         notification.mark_as_read()
         return JsonResponse({'status': 'success'})
     return JsonResponse({'status': 'error'}, status=405)
+
+@login_required
+def bulk_upload_businesses(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+        
+    if 'file' not in request.FILES:
+        return JsonResponse({'error': 'No file uploaded'}, status=400)
+        
+    file = request.FILES['file']
+    
+    # Validate file type
+    if not file.name.endswith(('.csv', '.xlsx')):
+        return JsonResponse({'error': 'Invalid file type. Please upload CSV or Excel file'}, status=400)
+        
+    # Validate file size (5MB limit)
+    if file.size > 5 * 1024 * 1024:
+        return JsonResponse({'error': 'File size exceeds 5MB limit'}, status=400)
+    
+    try:
+        # Process CSV/Excel file
+        if file.name.endswith('.csv'):
+            import csv
+            decoded_file = file.read().decode('utf-8').splitlines()
+            reader = csv.DictReader(decoded_file)
+        else:
+            import pandas as pd
+            reader = pd.read_excel(file).to_dict('records')
+            
+        processed = 0
+        for row in reader:
+            # Validate required fields
+            required_fields = ['Business Name', 'Email', 'Address', 'Phone', 'Website', 'Category']
+            if not all(field in row for field in required_fields):
+                continue
+                
+            # Create business record
+            business = Business.objects.create(
+                user=request.user,
+                business_name=row['Business Name'],
+                business_email=row['Email'],
+                address=row['Address'],
+                phone_number=row['Phone'],
+                website_url=row['Website'],
+                category=row['Category'],
+                email_verification_pending=True,
+                email_verification_token=secrets.token_urlsafe(32)
+            )
+            
+            # Send verification email
+            send_verification_email(business)
+            processed += 1
+            
+        return JsonResponse({
+            'status': 'success',
+            'processed': processed,
+            'message': f'Successfully processed {processed} businesses'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'error': str(e)
+        }, status=500)
+
+@login_required
+def verify_business_email(request, token):
+    try:
+        business = Business.objects.get(
+            email_verification_token=token,
+            email_verification_pending=True
+        )
+        
+        business.email_verification_pending = False
+        business.email_verified_at = timezone.now()
+        business.save()
+        
+        messages.success(request, 'Email verified successfully!')
+        return redirect('index')
+        
+    except Business.DoesNotExist:
+        messages.error(request, 'Invalid or expired verification token')
+        return redirect('index')
 
 def index(request):
     print("\n[DEBUG] Loading dashboard index...")
