@@ -20,4 +20,8 @@ urlpatterns = [
          views.dismiss_notification, name='dismiss_notification'),
     path('api/business/<str:business_id>/update/',
          views.update_business, name='update_business'),
+    path('api/business/bulk-upload/',
+         views.bulk_upload_businesses, name='bulk_upload_businesses'),
+    path('api/business/verify-email/<str:token>/',
+         views.verify_business_email, name='verify_business_email'),
 ]
