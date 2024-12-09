@@ -1038,9 +1038,25 @@
         </thead>
         <tbody>
         {% for business in dashboard_data.businesses %}
-            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150"
+            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative"
                 onclick="toggleDetails(this)"
                 data-business-id="{{ business.business_id }}">
+                {% if business.is_verified != 'Verified' %}
+                <td colspan="5" class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-10">
+                    <div class="text-center">
+                        <div class="text-red-600 font-medium mb-2">Business Not Verified</div>
+                        <a href="https://www.google.com/business/" 
+                           target="_blank"
+                           class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                            <span class="mr-2">Verify Now</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                            </svg>
+                        </a>
+                    </div>
+                </td>
+                {% endif %}
                 <td class="p-4">
                     <div>
                         <div class="font-medium">{{ business.business_name }}</div>
