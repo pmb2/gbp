@@ -627,13 +627,14 @@ def index(request):
     businesses = sorted(businesses, key=lambda x: (x.is_verified, x.profile_completion))
 
     # Get the OAuth-connected business (should be first)
-    oauth_business = businesses.filter(
-        user__socialaccount__provider='google'
-    ).first()
+    oauth_business = next(
+        (b for b in businesses if b.user.socialaccount_set.filter(provider='google').exists()),
+        None
+    )
     
     # Reorder businesses list to put OAuth business first
     if oauth_business:
-        businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
+        businesses = [oauth_business] + [b for b in businesses if b != oauth_business]
     
     # Process business data
     for business in businesses:
