@@ -625,15 +625,15 @@ def index(request):
     
     # Sort businesses by completion score (after calculating all scores)
     businesses = sorted(businesses, key=lambda x: (x.is_verified, x.profile_completion))
-    else:
-        # Get the OAuth-connected business (should be first)
-        oauth_business = businesses.filter(
-            user__socialaccount__provider='google'
-        ).first()
-        
-        # Reorder businesses list to put OAuth business first
-        if oauth_business:
-            businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
+
+    # Get the OAuth-connected business (should be first)
+    oauth_business = businesses.filter(
+        user__socialaccount__provider='google'
+    ).first()
+    
+    # Reorder businesses list to put OAuth business first
+    if oauth_business:
+        businesses = [oauth_business] + list(businesses.exclude(id=oauth_business.id))
     
     # Process business data
     for business in businesses:
