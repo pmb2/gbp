@@ -272,16 +272,22 @@ def google_oauth_callback(request):
         print("\n[DEBUG] Starting OAuth callback process...")
         print(f"[DEBUG] User ID: {user.id}")
         print(f"[DEBUG] Access token present: {bool(access_token)}")
-        
+            
         print("\n[INFO] Fetching business accounts...")
         business_data = get_business_accounts(access_token)
         print(f"[DEBUG] Raw business data received: {business_data}")
-        
+            
         if business_data:
             print("\n[DEBUG] Processing business data storage...")
             stored_businesses = store_business_data(business_data, user.id, access_token)
             print(f"[DEBUG] Stored businesses count: {len(stored_businesses)}")
             print("[INFO] Business data stored successfully.")
+                
+            # Create success notification
+            Notification.objects.create(
+                user=user,
+                message=f"Successfully added {len(stored_businesses)} business(es) to your account."
+            )
             
             # Print detailed business information
             for business in stored_businesses:
