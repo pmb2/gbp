@@ -590,27 +590,25 @@ def index(request):
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
-    )
+    ).order_by('-is_verified', '-created_at')  # Show verified businesses first
     print(f"[DEBUG] Found {businesses.count()} businesses")
 
-    if not businesses:
-        dummy_business = type('Business', (), {
-            'business_name': "No Business Data Found",
-            'business_id': "dummy-no-data",
-            'address': "No data available",
-            'phone_number': "No data available",
-            'website_url': "No data available",
-            'category': "No data available",
-            'is_verified': False,
-            'email_settings': "No data available",
-            'automation_status': "No data available",
-            'posts_count': 0,
-            'photos_count': 0,
-            'qanda_count': 0,
-            'reviews_count': 0,
-            'no_data': True
-        })()
-        businesses = [dummy_business]
+    # Calculate profile completion for each business
+    for business in businesses:
+        completion_score = 0
+        required_fields = ['business_name', 'address', 'phone_number', 'website_url', 'category']
+        
+        for field in required_fields:
+            if getattr(business, field) and getattr(business, field) not in ['No info', 'Pending verification']:
+                completion_score += 20  # Each field contributes 20% to completion
+        
+        business.profile_completion = completion_score
+        
+        # Set counts
+        business.posts_count = business.post_set.count()
+        business.photos_count = business.businessattribute_set.filter(key='photo').count()
+        business.qanda_count = business.qanda_set.count()
+        business.reviews_count = business.review_set.count()
     else:
         # Get the OAuth-connected business (should be first)
         oauth_business = businesses.filter(

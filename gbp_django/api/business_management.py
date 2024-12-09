@@ -149,16 +149,25 @@ def store_business_data(business_data, user_id, access_token):
     print("\n[DEBUG] Starting business data storage...")
     print(f"[DEBUG] Raw business data received: {business_data}")
     
-    if not business_data:
-        print("[WARNING] No business data to store")
-        return []
-    
     stored_businesses = []
-    accounts = business_data.get('accounts', [])
+    accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # Delete existing businesses for this user to prevent duplicates
-    Business.objects.filter(user_id=user_id).delete()
+    if not accounts:
+        # Create unverified business placeholder
+        unverified_business = Business.objects.create(
+            user_id=user_id,
+            business_name="Unverified Business",
+            business_id=f"unverified-{user_id}-{int(time.time())}",
+            is_verified=False,
+            address="Pending verification",
+            phone_number="Pending verification",
+            website_url="Pending verification",
+            category="Pending verification"
+        )
+        stored_businesses.append(unverified_business)
+        print("[INFO] Created unverified business placeholder")
+        return stored_businesses
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
