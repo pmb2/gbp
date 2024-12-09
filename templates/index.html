@@ -965,6 +965,11 @@
         }
 
         function toggleBusinessDetails(businessId) {
+            const row = document.querySelector(`[data-business-id="${businessId}"]`);
+            if (row.dataset.verified !== 'Verified') {
+                return; // Don't allow expansion for unverified businesses
+            }
+            
             const detailsRow = document.getElementById(`details-${businessId}`);
             if (!detailsRow) return;
             
