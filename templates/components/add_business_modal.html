@@ -1,5 +1,5 @@
-<div id="addBusinessModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-    <div class="relative top-20 mx-auto p-6 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+<div id="addBusinessModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center transition-all duration-300 ease-in-out">
+    <div class="relative mx-auto p-8 border w-11/12 max-w-md shadow-xl rounded-lg bg-white/95 backdrop-blur transform transition-all duration-300 ease-in-out hover:shadow-2xl">
         <div class="mt-3">
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-medium text-gray-900">Add Business</h3>
@@ -10,10 +10,10 @@
                 </button>
             </div>
             
-            <div class="mt-4">
-                <div class="flex flex-col space-y-4">
+            <div class="mt-6">
+                <div class="flex flex-col space-y-6">
                     <button onclick="window.location.href='/google/auth/'" 
-                            class="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-50">
+                            class="flex items-center justify-center px-6 py-3 border-2 border-blue-100 rounded-lg shadow-sm bg-gradient-to-r from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 group">
                         <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -32,8 +32,8 @@
                         </div>
                     </div>
                     
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                        <form id="bulkUploadForm" class="space-y-4">
+                    <div class="border-2 border-dashed border-blue-200 rounded-lg p-8 bg-gradient-to-br from-blue-50/50 to-white transition-all duration-300 hover:border-blue-300 hover:shadow-md">
+                        <form id="bulkUploadForm" class="space-y-6">
                             <div class="text-center">
                                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                     <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -68,12 +68,31 @@
 
 <script>
 function openAddBusinessModal() {
-    document.getElementById('addBusinessModal').classList.remove('hidden');
+    const modal = document.getElementById('addBusinessModal');
+    modal.classList.remove('hidden');
+    // Trigger fade in
+    setTimeout(() => {
+        modal.classList.add('opacity-100');
+        modal.classList.remove('opacity-0');
+    }, 10);
 }
 
 function closeAddBusinessModal() {
-    document.getElementById('addBusinessModal').classList.add('hidden');
+    const modal = document.getElementById('addBusinessModal');
+    // Trigger fade out
+    modal.classList.add('opacity-0');
+    modal.classList.remove('opacity-100');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
 }
+
+// Close modal when clicking outside
+document.getElementById('addBusinessModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAddBusinessModal();
+    }
+});
 
 document.getElementById('file-upload').addEventListener('change', async function(e) {
     const file = e.target.files[0];
