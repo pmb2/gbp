@@ -545,7 +545,7 @@
                     </thead>
                     <tbody>
                     {% for business in dashboard_data.businesses %}
-                        <tr class="expandable-row relative">
+                        <tr class="expandable-row relative" data-business-id="{{ business.business_id }}" data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="absolute inset-0">
                                 <div class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20">
@@ -566,7 +566,7 @@
                             {% endif %}
                             <td>
                                 <div class="flex items-center">
-                                    <div class="transform transition-transform duration-200 mr-2 cursor-pointer" 
+                                    <div class="transform transition-transform duration-200 mr-2 {% if business.is_verified != 'Verified' %}opacity-50 cursor-not-allowed{% else %}cursor-pointer{% endif %}" 
                                          id="arrow-{{ business.business_id }}"
                                          onclick="toggleBusinessDetails('{{ business.business_id }}')">
                                         <svg class="w-5 h-5 text-gray-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1302,6 +1302,11 @@
 
     <script>
         function toggleBusinessDetails(businessId) {
+            const row = document.querySelector(`[data-business-id="${businessId}"]`);
+            if (row.dataset.verified !== 'Verified') {
+                return; // Don't allow expansion for unverified businesses
+            }
+            
             const detailsRow = document.getElementById(`details-${businessId}`);
             const arrow = document.getElementById(`arrow-${businessId}`);
             const arrowSvg = arrow?.querySelector('svg');
