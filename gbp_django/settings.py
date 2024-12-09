@@ -157,6 +157,9 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"  # Add this line
 MEDIA_ROOT = BASE_DIR / "media"
 
+# Site URL for email verification links
+SITE_URL = 'http://localhost:8000'  # Change this in production
+
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'

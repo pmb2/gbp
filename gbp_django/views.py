@@ -7,6 +7,28 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib import messages
+from django.conf import settings
+
+def send_verification_email(business):
+    """Send verification email to business email address"""
+    verification_url = f"{settings.SITE_URL}/api/business/verify-email/{business.email_verification_token}/"
+    
+    context = {
+        'business_name': business.business_name,
+        'verification_url': verification_url
+    }
+    
+    html_message = render_to_string('emails/verify_business_email.html', context)
+    plain_message = f"Please verify your business email by clicking: {verification_url}"
+    
+    send_mail(
+        subject='Verify Your Business Email',
+        message=plain_message,
+        html_message=html_message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[business.business_email],
+        fail_silently=False,
+    )
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.decorators import login_required
