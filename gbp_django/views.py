@@ -587,10 +587,23 @@ def index(request):
         return redirect(reverse('google_oauth'))
 
     print("[DEBUG] Fetching businesses and related data...")
+    # Create a dummy unverified business if none exist
+    if not Business.objects.filter(user=request.user).exists():
+        Business.objects.create(
+            user=request.user,
+            business_name="My Business",
+            business_id="dummy-no-data",
+            is_verified=False,
+            address="Pending verification",
+            phone_number="Pending verification",
+            website_url="Pending verification",
+            category="Pending verification"
+        )
+
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
-    ).order_by('-is_verified', '-created_at')  # Show verified businesses first
+    ).order_by('is_verified', 'profile_completion')  # Show unverified first, then by completion
     print(f"[DEBUG] Found {businesses.count()} businesses")
 
     # Calculate profile completion for each business
