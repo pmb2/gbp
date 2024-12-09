@@ -112,30 +112,27 @@
   position: relative;
 }
 
-.business-table tr.unverified {
+.business-table tr {
   position: relative;
 }
 
-.business-table tr.unverified::before {
-  content: '';
+.business-table tr td[colspan] {
   position: absolute;
-  inset: 0;
-  background: rgba(254, 226, 226, 0.9);
-  z-index: 5;
-}
-
-.business-table tr.unverified td > * {
-  opacity: 0.5;
-}
-
-.business-table .verification-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 10;
-  background: rgba(254, 226, 226, 0.9);
+  pointer-events: none;
+}
+
+.business-table tr td[colspan] > div {
+  pointer-events: auto;
+}
+
+.business-table tr td[colspan] a {
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* Expandable Row Styles */
