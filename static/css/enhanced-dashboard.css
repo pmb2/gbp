@@ -160,20 +160,12 @@
     background-color: #fee2e2;
 }
 
-.unverified-row::before {
-    content: "Business Not Verified - Click to Verify";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(254, 226, 226, 0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    color: #991b1b;
-    z-index: 10;
+.unverified-row td:not(.relative) {
+    opacity: 0.5;
+}
+
+.unverified-row .relative {
+    background-color: transparent;
 }
 
 /* Status Indicators */

@@ -545,19 +545,18 @@
                             data-business-id="{{ business.business_id }}" 
                             data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
-                            <td colspan="4" class="absolute inset-0 w-full overflow-hidden">
-                                <a href="https://www.google.com/business/" 
-                                   target="_blank" 
-                                   class="absolute inset-0 w-full bg-red-50 bg-opacity-90 flex items-center justify-center z-20 hover:bg-red-100 transition-colors duration-200 overflow-hidden"
-                                   onclick="event.stopPropagation()">
-                                    <span class="flex items-center space-x-2 text-red-600 font-semibold text-lg">
+                            <td colspan="4" class="relative">
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20">
+                                    <a href="https://www.google.com/business/" 
+                                       target="_blank" 
+                                       class="flex items-center space-x-2 text-red-600 font-semibold text-lg hover:bg-red-100 px-4 py-2 rounded transition-colors duration-200"
+                                       onclick="event.stopPropagation()">
                                         <span>⚠️</span>
                                         <span>Account Not Verified</span>
                                         <span class="font-medium">Verify Now</span>
                                         <span>⚠️</span>
-                                    </span>
-                                </a>
-                            </td>
+                                    </a>
+                                </div>
                             {% endif %}
                             <td>
                                 <div class="flex items-center">

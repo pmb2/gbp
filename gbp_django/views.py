@@ -191,6 +191,13 @@ def google_oauth_callback(request):
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
     
+    # Clear any existing businesses for this user that start with 'dummy-'
+    if request.user.is_authenticated:
+        Business.objects.filter(
+            user=request.user,
+            business_id__startswith='dummy-'
+        ).delete()
+    
     print(f"[DEBUG] Code present: {bool(code)}")
     print(f"[DEBUG] State present: {bool(state)}")
     print(f"[DEBUG] Stored state present: {bool(stored_state)}")
