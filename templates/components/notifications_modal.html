@@ -1,15 +1,15 @@
-<div id="notificationsModal" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center hidden z-50">
-    <div class="bg-white rounded-lg shadow-xl w-96 max-w-md transform transition-all">
-        <div class="p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-semibold text-gray-900">Notifications</h3>
-                <button onclick="closeNotificationsModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+<div id="notificationsModal" class="fixed right-0 top-16 mt-2 mr-4 hidden z-50">
+    <div class="bg-white rounded-lg shadow-xl w-96 max-w-md transform transition-all border border-gray-200">
+        <div class="p-4">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-lg font-semibold text-gray-900">Notifications</h3>
+                <button onclick="closeNotificationsModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none p-1">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
-            <div id="notificationsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+            <div id="notificationsList" class="space-y-3 max-h-[70vh] overflow-y-auto pr-2">
                 <!-- Notifications will be dynamically inserted here -->
             </div>
             <div class="mt-6 flex justify-end">
