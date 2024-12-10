@@ -236,20 +236,39 @@ function startProfileStatusCheck() {
 }
 
 function checkProfileStatus() {
-    const businessId = document.querySelector('[data-business-id]')?.dataset.businessId;
-    if (!businessId) return;
-
-    fetch(`/api/business/${businessId}/verification-status/`)
-        .then(response => response.json())
+    // Get all business rows
+    const businessRows = document.querySelectorAll('[data-business-id]');
+    
+    businessRows.forEach(row => {
+        const businessId = row.dataset.businessId;
+        // Skip dummy/unverified businesses
+        if (businessId.startsWith('dummy-')) return;
+        
+        // Only check verification for real businesses
+        fetch(`/api/business/${businessId}/verification-status/`)
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 400) {
+                    console.log('Skipping verification check for non-OAuth business');
+                    return;
+                }
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
         .then(data => {
+            if (!data) return;
+            
             // Calculate completion percentage based on verified fields
             const totalFields = Object.keys(data).length;
             const completedFields = Object.values(data).filter(Boolean).length;
             const percentage = Math.round((completedFields / totalFields) * 100);
             
-            // Update progress
-            document.getElementById('completionPercentage').textContent = `${percentage}%`;
-            document.getElementById('progressBar').style.width = `${percentage}%`;
+            // Update progress for this specific business
+            const progressElement = row.querySelector('.completion-percentage');
+            const progressBar = row.querySelector('.progress-bar-fill');
+            if (progressElement) progressElement.textContent = `${percentage}%`;
+            if (progressBar) progressBar.style.width = `${percentage}%`;
             
             // Update current step based on completion
             if (percentage === 100 && currentStep !== 5) {

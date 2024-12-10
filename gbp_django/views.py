@@ -774,18 +774,11 @@ def get_verification_status(request, business_id):
     try:
         business = Business.objects.get(business_id=business_id, user=request.user)
         
-        # For dummy businesses, return mock verification status
-        if business_id.startswith('dummy-'):
-            # Default status for unrecognized dummy business
-            status = {
-                'business_name': True,
-                'address': False,
-                'phone': False,
-                'category': False,
-                'website': False,
-                'hours': False,
-                'photos': False
-            }
+        # Only check verification for OAuth-connected businesses
+        if not business.user.socialaccount_set.filter(provider='google').exists():
+            return JsonResponse({
+                'error': 'Business not connected to Google OAuth'
+            }, status=400)
             
             # Specific dummy business profiles
             if business_id == 'dummy-business-a':
