@@ -295,20 +295,15 @@ def google_oauth_callback(request):
             for b in existing_businesses:
                 print(f"- {b.business_name} (ID: {b.business_id}, Verified: {b.is_verified})")
 
-            # Create a new business record if none were stored
+            # Create or update business records
             if not stored_businesses:
                 print("\n[DEBUG] No existing businesses found, creating new business record")
                 timestamp = int(time.time())
-                business_id = f"gbp-business-{user.id}-{timestamp}"
-                print(f"[DEBUG] Generated business ID: {business_id}")
+                business_id = f"gbp-oauth-{user.id}-{timestamp}"
+                print(f"[DEBUG] Generated OAuth business ID: {business_id}")
                 
                 business_name = user_info.get('name', 'New Business')
                 print(f"[DEBUG] Using business name: {business_name}")
-                
-                # Generate unique business ID
-                timestamp = int(time.time())
-                business_id = f"gbp-oauth-{user.id}-{timestamp}"
-                print(f"[DEBUG] Generated OAuth business ID: {business_id}")
                 
                 new_business = Business.objects.create(
                     business_id=business_id,

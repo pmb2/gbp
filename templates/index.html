@@ -546,16 +546,18 @@
                             data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative">
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20">
-                                    <a href="https://www.google.com/business/" 
-                                       target="_blank" 
-                                       class="flex items-center space-x-2 text-red-600 font-semibold text-lg hover:bg-red-100 px-4 py-2 rounded transition-colors duration-200"
-                                       onclick="event.stopPropagation()">
-                                        <span>⚠️</span>
-                                        <span>Account Not Verified</span>
-                                        <span class="font-medium">Verify Now</span>
-                                        <span>⚠️</span>
-                                    </a>
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center z-20 pointer-events-none">
+                                    <div class="pointer-events-auto">
+                                        <a href="https://www.google.com/business/" 
+                                           target="_blank" 
+                                           class="flex items-center space-x-2 text-red-600 font-semibold text-lg hover:bg-red-100 px-4 py-2 rounded transition-colors duration-200"
+                                           onclick="event.stopPropagation()">
+                                            <span>⚠️</span>
+                                            <span>Account Not Verified</span>
+                                            <span class="font-medium">Verify Now</span>
+                                            <span>⚠️</span>
+                                        </a>
+                                    </div>
                                 </div>
                             {% endif %}
                             <td>
