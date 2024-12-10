@@ -444,12 +444,52 @@ from .models import Notification, Business
 from .api.business_management import update_business_details
 
 @login_required
+@login_required
 def get_notifications(request):
     notifications = Notification.objects.filter(
         user=request.user,
         read=False
-    ).values('id', 'message', 'created_at')
-    return JsonResponse({'notifications': list(notifications)})
+    ).order_by('-created_at').values(
+        'id', 
+        'message', 
+        'created_at'
+    )
+    
+    formatted_notifications = []
+    for notification in notifications:
+        formatted_notifications.append({
+            'id': notification['id'],
+            'message': notification['message'],
+            'created_at': notification['created_at'].strftime('%b %d, %Y %H:%M'),
+            'timeAgo': get_time_ago(notification['created_at'])
+        })
+    
+    return JsonResponse({'notifications': formatted_notifications})
+
+@login_required
+@require_http_methods(["POST"])
+def mark_all_notifications_read(request):
+    Notification.objects.filter(
+        user=request.user,
+        read=False
+    ).update(read=True)
+    return JsonResponse({'status': 'success'})
+
+def get_time_ago(timestamp):
+    """Helper function to format time ago string"""
+    now = timezone.now()
+    diff = now - timestamp
+    
+    if diff.days > 7:
+        return timestamp.strftime('%b %d, %Y')
+    elif diff.days > 0:
+        return f"{diff.days}d ago"
+    elif diff.seconds > 3600:
+        return f"{diff.seconds // 3600}h ago"
+    elif diff.seconds > 60:
+        return f"{diff.seconds // 60}m ago"
+    else:
+        return "Just now"
 
 @login_required
 @require_http_methods(["POST"])
