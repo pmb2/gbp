@@ -525,21 +525,17 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
-                    <tr>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <tr class="w-full">
+                        <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Business Name
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Profile Status
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Automation
                         </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Actions/Status
                         </th>
                     </tr>
@@ -548,10 +544,10 @@
                     {% for business in dashboard_data.businesses %}
                         <tr class="expandable-row relative" data-business-id="{{ business.business_id }}" data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
-                            <td colspan="4" class="absolute inset-0">
+                            <td colspan="4" class="absolute inset-0 w-full">
                                 <a href="https://www.google.com/business/" 
                                    target="_blank" 
-                                   class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20 hover:bg-red-100 transition-colors duration-200">
+                                   class="absolute inset-0 w-full bg-red-50 bg-opacity-90 flex items-center justify-center z-20 hover:bg-red-100 transition-colors duration-200">
                                     <span class="flex items-center space-x-2 text-red-600 font-semibold text-lg">
                                         <span>⚠️</span>
                                         <span>Account Not Verified</span>
