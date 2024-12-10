@@ -7,10 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontSmoothing: {
-        'antialiased': {
-          '-webkit-font-smoothing': 'antialiased',
-          '-moz-osx-font-smoothing': 'grayscale',
-        },
+        'antialiased': ['antialiased'],
       },
     },
   },
