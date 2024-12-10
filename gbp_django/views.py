@@ -284,10 +284,17 @@ def google_oauth_callback(request):
             
             # Create a new business record if none were stored
             if not stored_businesses:
-                business_id = f"business-{user.id}-{int(time.time())}"
+                print("\n[DEBUG] No existing businesses found, creating new business record")
+                timestamp = int(time.time())
+                business_id = f"business-{user.id}-{timestamp}"
+                print(f"[DEBUG] Generated business ID: {business_id}")
+                
+                business_name = user_info.get('name', 'New Business')
+                print(f"[DEBUG] Using business name: {business_name}")
+                
                 new_business = Business.objects.create(
                     user=user,
-                    business_name=user_info.get('name', 'New Business'),
+                    business_name=business_name,
                     business_id=business_id,
                     business_email=user.email,
                     is_verified=False,
@@ -298,6 +305,7 @@ def google_oauth_callback(request):
                     website_url='Pending verification',
                     category='Pending verification'
                 )
+                print(f"[DEBUG] Created new business record: {new_business.business_id}")
                 
                 # Create notification for new business
                 Notification.objects.create(

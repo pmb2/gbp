@@ -7,7 +7,11 @@
         <div class="flex items-center">
             <div class="text-3xl font-bold text-blue-600" id="completionPercentage">
                 {% with completion=business.calculate_profile_completion %}
-                    {{ completion }}%
+                    {% if not business.is_verified %}
+                        0%
+                    {% else %}
+                        {{ completion }}%
+                    {% endif %}
                 {% endwith %}
             </div>
             <div class="ml-2 text-gray-500">Complete</div>

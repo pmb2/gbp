@@ -83,7 +83,11 @@ class Business(models.Model):
 
     def calculate_profile_completion(self):
         """Calculate profile completion percentage"""
+        print(f"\n[DEBUG] Calculating profile completion for business: {self.business_name}")
+        print(f"[DEBUG] Verification status: {self.is_verified}")
+        
         if not self.is_verified:
+            print("[DEBUG] Business not verified, returning 0%")
             return 0
             
         completion_score = 0
@@ -97,10 +101,14 @@ class Business(models.Model):
         
         for field, score in required_fields:
             value = getattr(self, field)
+            print(f"[DEBUG] Checking {field}: {value}")
             if value and value not in ['No info', 'Pending verification', None, '']:
                 completion_score += score
+                print(f"[DEBUG] Added {score} points for {field}")
                 
-        return min(completion_score, 100)  # Ensure we don't exceed 100%
+        final_score = min(completion_score, 100)
+        print(f"[DEBUG] Final completion score: {final_score}%")
+        return final_score
 
     def __str__(self):
         return self.business_name
