@@ -44,6 +44,39 @@
     {% block extra_body %}{% endblock %}
 
     <script>
+        // Sort businesses by completion percentage and urgency
+        function sortBusinessRows() {
+            const tbody = document.querySelector('.business-table tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
+            
+            rows.sort((a, b) => {
+                const aVerified = a.dataset.verified === 'Verified';
+                const bVerified = b.dataset.verified === 'Verified';
+                const aCompletion = parseInt(a.dataset.completion) || 0;
+                const bCompletion = parseInt(b.dataset.completion) || 0;
+                
+                // Unverified businesses come first
+                if (aVerified !== bVerified) {
+                    return aVerified ? 1 : -1;
+                }
+                
+                // Then sort by completion percentage (ascending)
+                return aCompletion - bCompletion;
+            });
+            
+            // Reorder the rows
+            rows.forEach(row => {
+                tbody.appendChild(row);
+                const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+                if (detailsRow) {
+                    tbody.appendChild(detailsRow);
+                }
+            });
+        }
+
+        // Call sort on page load
+        document.addEventListener('DOMContentLoaded', sortBusinessRows);
+
         // Mobile menu functionality
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileSidebar = document.getElementById('mobile-sidebar');
