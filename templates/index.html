@@ -542,7 +542,9 @@
                     </thead>
                     <tbody>
                     {% for business in dashboard_data.businesses %}
-                        <tr class="expandable-row relative" data-business-id="{{ business.business_id }}" data-verified="{{ business.is_verified }}">
+                        <tr class="expandable-row relative {% if not business.is_verified %}unverified-row{% endif %}" 
+                            data-business-id="{{ business.business_id }}" 
+                            data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="absolute inset-0 w-full overflow-hidden">
                                 <a href="https://www.google.com/business/" 

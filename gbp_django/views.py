@@ -284,15 +284,27 @@ def google_oauth_callback(request):
             
             # Create a new business record if none were stored
             if not stored_businesses:
+                business_id = f"business-{user.id}-{int(time.time())}"
                 new_business = Business.objects.create(
                     user=user,
-                    business_name="New Business",
-                    business_id=f"business-{user.id}-{int(time.time())}",
+                    business_name=user_info.get('name', 'New Business'),
+                    business_id=business_id,
                     business_email=user.email,
                     is_verified=False,
                     email_verification_pending=True,
-                    email_verification_token=secrets.token_urlsafe(32)
+                    email_verification_token=secrets.token_urlsafe(32),
+                    address='Pending verification',
+                    phone_number='Pending verification',
+                    website_url='Pending verification',
+                    category='Pending verification'
                 )
+                
+                # Create notification for new business
+                Notification.objects.create(
+                    user=user,
+                    message=f"Please verify your business profile to unlock all features."
+                )
+                
                 stored_businesses = [new_business]
                 
             print(f"[DEBUG] Stored businesses count: {len(stored_businesses)}")

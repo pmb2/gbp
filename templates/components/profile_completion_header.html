@@ -5,7 +5,11 @@
             <p class="text-gray-600">Follow these steps to unlock all features</p>
         </div>
         <div class="flex items-center">
-            <div class="text-3xl font-bold text-blue-600" id="completionPercentage">{{ business.profile_completion }}%</div>
+            <div class="text-3xl font-bold text-blue-600" id="completionPercentage">
+                {% with completion=business.calculate_profile_completion %}
+                    {{ completion }}%
+                {% endwith %}
+            </div>
             <div class="ml-2 text-gray-500">Complete</div>
         </div>
     </div>

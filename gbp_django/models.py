@@ -97,10 +97,10 @@ class Business(models.Model):
         
         for field, score in required_fields:
             value = getattr(self, field)
-            if value and value not in ['No info', 'Pending verification']:
+            if value and value not in ['No info', 'Pending verification', None, '']:
                 completion_score += score
                 
-        return completion_score
+        return min(completion_score, 100)  # Ensure we don't exceed 100%
 
     def __str__(self):
         return self.business_name
