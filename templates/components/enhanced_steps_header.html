@@ -1,0 +1,298 @@
+<div class="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg rounded-xl p-6 mb-8">
+    <!-- Header -->
+    <div class="text-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-900">Your Business Journey</h2>
+        <p class="text-sm text-gray-600">Complete these milestones to maximize your business presence</p>
+    </div>
+
+    <!-- Progress Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-gray-900">Progress</span>
+                <span id="overallProgress" class="text-2xl font-bold text-blue-600">0%</span>
+            </div>
+            <div class="mt-2 h-2 bg-gray-200 rounded-full">
+                <div id="progressBar" class="h-2 bg-blue-600 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-gray-900">Achievements</span>
+                <span id="achievementCount" class="text-2xl font-bold text-green-600">0/6</span>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">Unlock rewards as you progress</p>
+        </div>
+        
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+                <span class="text-lg font-semibold text-gray-900">Next Step</span>
+                <span id="nextStepBadge" class="px-2 py-1 text-sm bg-yellow-100 text-yellow-800 rounded-full">Verification</span>
+            </div>
+            <p id="nextStepDescription" class="text-sm text-gray-600 mt-2">Verify your business to unlock features</p>
+        </div>
+    </div>
+
+    <!-- Milestone Timeline -->
+    <div class="relative">
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 transform -translate-y-1/2"></div>
+        <div class="absolute top-1/2 left-0 h-1 bg-blue-600 transform -translate-y-1/2 transition-all duration-500" 
+             id="timelineProgress" style="width: 0%"></div>
+
+        <div class="relative flex justify-between">
+            <!-- Milestone Steps -->
+            <div class="milestone-step" data-step="1">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10 transition-all duration-300">
+                    <i class="fas fa-check text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Verification</h3>
+                    <p class="text-xs text-gray-500">Get verified</p>
+                </div>
+            </div>
+
+            <div class="milestone-step" data-step="2">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-building text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Profile</h3>
+                    <p class="text-xs text-gray-500">Add details</p>
+                </div>
+            </div>
+
+            <div class="milestone-step" data-step="3">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-images text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Media</h3>
+                    <p class="text-xs text-gray-500">Add photos</p>
+                </div>
+            </div>
+
+            <div class="milestone-step" data-step="4">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-clock text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Hours</h3>
+                    <p class="text-xs text-gray-500">Set schedule</p>
+                </div>
+            </div>
+
+            <div class="milestone-step" data-step="5">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-brain text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Knowledge</h3>
+                    <p class="text-xs text-gray-500">Add content</p>
+                </div>
+            </div>
+
+            <div class="milestone-step" data-step="6">
+                <div class="w-12 h-12 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-flag-checkered text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Complete</h3>
+                    <p class="text-xs text-gray-500">All set!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Card -->
+    <div class="mt-8 bg-white rounded-lg p-6 shadow-sm">
+        <div class="flex items-start space-x-4">
+            <div class="flex-shrink-0">
+                <div id="currentStepIcon" class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-star text-blue-600 text-xl"></i>
+                </div>
+            </div>
+            <div class="flex-grow">
+                <h3 id="currentStepTitle" class="text-lg font-semibold text-gray-900">Get Verified</h3>
+                <p id="currentStepDescription" class="text-gray-600 mt-1">
+                    Verify your business to build trust with customers and unlock all features.
+                </p>
+                <div class="mt-4">
+                    <button onclick="handleCurrentStep()" 
+                            class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                            id="currentStepButton">
+                        Start Verification
+                    </button>
+                </div>
+            </div>
+            <div class="flex-shrink-0">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    Step <span id="currentStepNumber">1</span> of 6
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStep = 1;
+const totalSteps = 6;
+const stepData = {
+    1: {
+        title: "Get Verified",
+        description: "Verify your business to build trust with customers and unlock all features.",
+        buttonText: "Start Verification",
+        icon: "star"
+    },
+    2: {
+        title: "Complete Your Profile",
+        description: "Add essential business details to help customers find you.",
+        buttonText: "Update Details",
+        icon: "building"
+    },
+    3: {
+        title: "Add Photos",
+        description: "Upload high-quality photos to showcase your business.",
+        buttonText: "Upload Photos",
+        icon: "images"
+    },
+    4: {
+        title: "Set Business Hours",
+        description: "Let customers know when you're open for business.",
+        buttonText: "Set Hours",
+        icon: "clock"
+    },
+    5: {
+        title: "Build Knowledge Base",
+        description: "Upload business documents to enhance our AI responses.",
+        buttonText: "Upload Files",
+        icon: "brain"
+    },
+    6: {
+        title: "All Complete!",
+        description: "Congratulations! Your business profile is fully optimized.",
+        buttonText: "View Profile",
+        icon: "flag-checkered"
+    }
+};
+
+function updateProgress() {
+    const percentage = ((currentStep - 1) / totalSteps) * 100;
+    
+    // Update progress indicators
+    document.getElementById('overallProgress').textContent = `${Math.round(percentage)}%`;
+    document.getElementById('progressBar').style.width = `${percentage}%`;
+    document.getElementById('timelineProgress').style.width = `${percentage}%`;
+    document.getElementById('achievementCount').textContent = `${currentStep - 1}/6`;
+    
+    // Update milestone steps
+    document.querySelectorAll('.milestone-step').forEach((step, index) => {
+        const stepNum = index + 1;
+        const stepIcon = step.querySelector('.w-12');
+        const stepIconContent = step.querySelector('i');
+        
+        if (stepNum < currentStep) {
+            stepIcon.classList.remove('border-gray-300');
+            stepIcon.classList.add('border-green-500', 'bg-green-500');
+            stepIconContent.classList.remove('text-gray-400');
+            stepIconContent.classList.add('text-white');
+        } else if (stepNum === currentStep) {
+            stepIcon.classList.remove('border-gray-300');
+            stepIcon.classList.add('border-blue-500');
+            stepIconContent.classList.remove('text-gray-400');
+            stepIconContent.classList.add('text-blue-500');
+        }
+    });
+
+    // Update current step details
+    const stepInfo = stepData[currentStep];
+    document.getElementById('currentStepTitle').textContent = stepInfo.title;
+    document.getElementById('currentStepDescription').textContent = stepInfo.description;
+    document.getElementById('currentStepButton').textContent = stepInfo.buttonText;
+    document.getElementById('currentStepNumber').textContent = currentStep;
+    document.getElementById('currentStepIcon').innerHTML = `<i class="fas fa-${stepInfo.icon} text-blue-600 text-xl"></i>`;
+    
+    // Update next step badge
+    if (currentStep < totalSteps) {
+        const nextStepInfo = stepData[currentStep + 1];
+        document.getElementById('nextStepBadge').textContent = nextStepInfo.title.split(' ')[0];
+        document.getElementById('nextStepDescription').textContent = nextStepInfo.description;
+    }
+}
+
+function handleCurrentStep() {
+    switch(currentStep) {
+        case 1:
+            window.open('https://www.google.com/business/', '_blank');
+            break;
+        case 2:
+            toggleEditMode(document.querySelector('[data-business-id]').dataset.businessId);
+            break;
+        case 3:
+            // Show photo upload modal
+            break;
+        case 4:
+            // Show hours setting modal
+            break;
+        case 5:
+            // Show file upload interface
+            break;
+        case 6:
+            // Show completion celebration
+            break;
+    }
+}
+
+// Initialize progress
+document.addEventListener('DOMContentLoaded', () => {
+    updateProgress();
+    startProfileStatusCheck();
+});
+
+function checkProfileStatus(businessId = null) {
+    const businesses = businessId ? 
+        [document.querySelector(`[data-business-id="${businessId}"]`)] :
+        document.querySelectorAll('[data-business-id]');
+    
+    businesses.forEach(row => {
+        if (!row) return;
+        const businessId = row.dataset.businessId;
+        if (businessId.startsWith('dummy-')) return;
+        
+        fetch(`/api/business/${businessId}/verification-status/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data) return;
+                
+                const totalFields = Object.keys(data).length;
+                const completedFields = Object.values(data).filter(Boolean).length;
+                const percentage = Math.round((completedFields / totalFields) * 100);
+                
+                // Update progress for this specific business
+                const progressElement = row.querySelector('.completion-percentage');
+                const progressBar = row.querySelector('.progress-bar-fill');
+                if (progressElement) progressElement.textContent = `${percentage}%`;
+                if (progressBar) progressBar.style.width = `${percentage}%`;
+                
+                // Update current step based on completion
+                if (percentage === 100 && currentStep !== 6) {
+                    currentStep = 6;
+                    updateProgress();
+                } else if (percentage >= 80 && currentStep < 5) {
+                    currentStep = 5;
+                    updateProgress();
+                } else if (percentage >= 60 && currentStep < 4) {
+                    currentStep = 4;
+                    updateProgress();
+                } else if (percentage >= 40 && currentStep < 3) {
+                    currentStep = 3;
+                    updateProgress();
+                } else if (percentage >= 20 && currentStep < 2) {
+                    currentStep = 2;
+                    updateProgress();
+                }
+            })
+            .catch(error => console.error('Error checking profile status:', error));
+    });
+}
+</script>
