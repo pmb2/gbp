@@ -549,20 +549,16 @@
                         <tr class="expandable-row relative" data-business-id="{{ business.business_id }}" data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="absolute inset-0">
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20">
-                                    <div class="text-center">
-                                        <div class="text-red-600 font-medium mb-2">Business Not Verified</div>
-                                        <a href="https://www.google.com/business/" 
-                                           target="_blank"
-                                           class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
-                                            <span class="mr-2">Verify Now</span>
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                            </svg>
-                                        </a>
-                                    </div>
-                                </div>
+                                <a href="https://www.google.com/business/" 
+                                   target="_blank" 
+                                   class="absolute inset-0 bg-red-50 bg-opacity-90 flex items-center justify-center z-20 hover:bg-red-100 transition-colors duration-200">
+                                    <span class="flex items-center space-x-2 text-red-600 font-semibold text-lg">
+                                        <span>⚠️</span>
+                                        <span>Account Not Verified</span>
+                                        <span class="font-medium">Verify Now</span>
+                                        <span>⚠️</span>
+                                    </span>
+                                </a>
                             </td>
                             {% endif %}
                             <td>
