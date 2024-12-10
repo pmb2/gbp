@@ -546,10 +546,8 @@
                             data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative">
-                                <div class="flex items-center absolute left-0 top-0 bottom-0 px-6 py-3 z-10">
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-between px-6 z-20">
                                     <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                </div>
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center z-20">
                                     <a href="https://www.google.com/business/" 
                                        target="_blank" 
                                        class="flex items-center space-x-2 text-red-600 font-semibold text-lg hover:bg-red-100 px-4 py-2 rounded transition-colors duration-200"
