@@ -597,8 +597,9 @@ def index(request):
                 'is_verified': False,
                 'address': '123 Test St, Suite A',
                 'phone_number': '(555) 000-0001',
-                'website_url': 'https://dummy-a.example.com',
-                'category': 'Test Business A'
+                'website_url': '',  # Incomplete
+                'category': '',  # Incomplete
+                'profile_completion': 60  # Partially complete
             },
             {
                 'business_name': 'Dummy Business B',
@@ -607,16 +608,18 @@ def index(request):
                 'address': '456 Test Ave, Suite B',
                 'phone_number': '(555) 000-0002',
                 'website_url': 'https://dummy-b.example.com',
-                'category': 'Test Business B'
+                'category': 'Test Business B',
+                'profile_completion': 100  # Fully complete
             },
             {
                 'business_name': 'Dummy Business C',
                 'business_id': 'dummy-business-c',
                 'is_verified': False,
-                'address': '789 Test Blvd, Suite C',
-                'phone_number': '(555) 000-0003',
-                'website_url': 'https://dummy-c.example.com',
-                'category': 'Test Business C'
+                'address': '',  # Incomplete
+                'phone_number': '',  # Incomplete
+                'website_url': '',  # Incomplete
+                'category': '',  # Incomplete
+                'profile_completion': 20  # Mostly incomplete
             }
         ]
         
@@ -720,7 +723,42 @@ def get_verification_status(request, business_id):
     try:
         business = Business.objects.get(business_id=business_id, user=request.user)
         
-        # Get the latest data from Google API
+        # For dummy businesses, return mock verification status
+        if business_id.startswith('dummy-business-'):
+            # Different completion levels for different dummy businesses
+            if business_id == 'dummy-business-a':
+                status = {
+                    'business_name': True,
+                    'address': True,
+                    'phone': True,
+                    'category': False,
+                    'website': False,
+                    'hours': False,
+                    'photos': False,
+                }
+            elif business_id == 'dummy-business-b':
+                status = {
+                    'business_name': True,
+                    'address': True,
+                    'phone': True,
+                    'category': True,
+                    'website': True,
+                    'hours': True,
+                    'photos': True,
+                }
+            else:  # dummy-business-c
+                status = {
+                    'business_name': True,
+                    'address': False,
+                    'phone': False,
+                    'category': False,
+                    'website': False,
+                    'hours': False,
+                    'photos': False,
+                }
+            return JsonResponse(status)
+
+        # For real businesses, get the latest data from Google API
         access_token = request.user.google_access_token
         account_data = get_business_accounts(access_token)
         
