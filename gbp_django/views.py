@@ -280,6 +280,20 @@ def google_oauth_callback(request):
         if business_data:
             print("\n[DEBUG] Processing business data storage...")
             stored_businesses = store_business_data(business_data, user.id, access_token)
+            
+            # Create a new business record if none were stored
+            if not stored_businesses:
+                new_business = Business.objects.create(
+                    user=user,
+                    business_name="New Business",
+                    business_id=f"business-{user.id}-{int(time.time())}",
+                    business_email=user.email,
+                    is_verified=False,
+                    email_verification_pending=True,
+                    email_verification_token=secrets.token_urlsafe(32)
+                )
+                stored_businesses = [new_business]
+                
             print(f"[DEBUG] Stored businesses count: {len(stored_businesses)}")
             print("[INFO] Business data stored successfully.")
                 
@@ -637,14 +651,7 @@ def index(request):
 
     # Calculate profile completion for each business
     for business in businesses:
-        completion_score = 0
-        required_fields = ['business_name', 'address', 'phone_number', 'website_url', 'category']
-        
-        for field in required_fields:
-            if getattr(business, field) and getattr(business, field) not in ['No info', 'Pending verification']:
-                completion_score += 20  # Each field contributes 20% to completion
-        
-        business.profile_completion = completion_score
+        business.profile_completion = business.calculate_profile_completion()
         
         # Set counts
         business.posts_count = business.post_set.count()

@@ -81,6 +81,27 @@ class Business(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def calculate_profile_completion(self):
+        """Calculate profile completion percentage"""
+        if not self.is_verified:
+            return 0
+            
+        completion_score = 0
+        required_fields = [
+            ('business_name', 20),
+            ('address', 20),
+            ('phone_number', 20),
+            ('website_url', 20),
+            ('category', 20)
+        ]
+        
+        for field, score in required_fields:
+            value = getattr(self, field)
+            if value and value not in ['No info', 'Pending verification']:
+                completion_score += score
+                
+        return completion_score
+
     def __str__(self):
         return self.business_name
 
