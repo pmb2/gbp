@@ -522,10 +522,10 @@
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed w-full">
                     <thead class="bg-gray-50">
                     <tr class="w-full">
-                        <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col" class="w-full px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Business Name
                         </th>
                         <th scope="col" class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -545,14 +545,10 @@
                             data-business-id="{{ business.business_id }}" 
                             data-verified="{{ business.is_verified }}">
                             {% if business.is_verified != 'Verified' %}
-                            <td class="w-1/4">
-                                <div class="flex items-center">
-                                    <div>
-                                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    </div>
+                            <td colspan="4" class="relative">
+                                <div class="flex items-center absolute left-0 top-0 bottom-0 px-6 py-3 z-10">
+                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
                                 </div>
-                            </td>
-                            <td colspan="3" class="relative">
                                 <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center z-20">
                                     <a href="https://www.google.com/business/" 
                                        target="_blank" 
