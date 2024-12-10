@@ -66,7 +66,7 @@ class Session(models.Model):
 class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
-    business_id = models.CharField(max_length=255, unique=True)
+    business_id = models.CharField(max_length=255, unique=True, default='dummy-business-a')  # For test data
     business_email = models.EmailField(max_length=255)
     email_verification_token = models.CharField(max_length=100, null=True, blank=True)
     email_verification_pending = models.BooleanField(default=True)

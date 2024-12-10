@@ -408,7 +408,7 @@ def get_notifications(request):
 @login_required
 @require_http_methods(["POST"])
 def update_business(request, business_id):
-    if business_id == 'dummy-no-data':
+    if business_id.startswith('dummy-business-'):
         return JsonResponse({
             'status': 'verification_required',
             'message': 'This business needs to be verified before making updates.',
@@ -589,16 +589,42 @@ def index(request):
     print("[DEBUG] Fetching businesses and related data...")
     # Create a dummy unverified business if none exist
     if not Business.objects.filter(user=request.user).exists():
-        Business.objects.create(
-            user=request.user,
-            business_name="My Business",
-            business_id="dummy-no-data",
-            is_verified=False,
-            address="Pending verification",
-            phone_number="Pending verification",
-            website_url="Pending verification",
-            category="Pending verification"
-        )
+        # Create multiple dummy businesses for testing
+        dummy_businesses = [
+            {
+                'business_name': 'Dummy Business A',
+                'business_id': 'dummy-business-a',
+                'is_verified': False,
+                'address': '123 Test St, Suite A',
+                'phone_number': '(555) 000-0001',
+                'website_url': 'https://dummy-a.example.com',
+                'category': 'Test Business A'
+            },
+            {
+                'business_name': 'Dummy Business B',
+                'business_id': 'dummy-business-b',
+                'is_verified': True,
+                'address': '456 Test Ave, Suite B',
+                'phone_number': '(555) 000-0002',
+                'website_url': 'https://dummy-b.example.com',
+                'category': 'Test Business B'
+            },
+            {
+                'business_name': 'Dummy Business C',
+                'business_id': 'dummy-business-c',
+                'is_verified': False,
+                'address': '789 Test Blvd, Suite C',
+                'phone_number': '(555) 000-0003',
+                'website_url': 'https://dummy-c.example.com',
+                'category': 'Test Business C'
+            }
+        ]
+        
+        for business_data in dummy_businesses:
+            Business.objects.create(
+                user=request.user,
+                **business_data
+            )
 
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
