@@ -587,9 +587,8 @@ def index(request):
         return redirect(reverse('google_oauth'))
 
     print("[DEBUG] Fetching businesses and related data...")
-    # Create a dummy unverified business if none exist
+    # Create dummy businesses if none exist
     if not Business.objects.filter(user=request.user).exists():
-        # Create multiple dummy businesses for testing
         dummy_businesses = [
             {
                 'business_name': 'Dummy Business A',
@@ -597,9 +596,9 @@ def index(request):
                 'is_verified': False,
                 'address': '123 Test St, Suite A',
                 'phone_number': '(555) 000-0001',
-                'website_url': '',  # Incomplete
-                'category': '',  # Incomplete
-                'profile_completion': 60  # Partially complete
+                'website_url': 'No info',
+                'category': 'No info',
+                'profile_completion': 60
             },
             {
                 'business_name': 'Dummy Business B',
@@ -609,23 +608,24 @@ def index(request):
                 'phone_number': '(555) 000-0002',
                 'website_url': 'https://dummy-b.example.com',
                 'category': 'Test Business B',
-                'profile_completion': 100  # Fully complete
+                'profile_completion': 100
             },
             {
                 'business_name': 'Dummy Business C',
                 'business_id': 'dummy-business-c',
                 'is_verified': False,
-                'address': '',  # Incomplete
-                'phone_number': '',  # Incomplete
-                'website_url': '',  # Incomplete
-                'category': '',  # Incomplete
-                'profile_completion': 20  # Mostly incomplete
+                'address': 'No info',
+                'phone_number': 'No info',
+                'website_url': 'No info',
+                'category': 'No info',
+                'profile_completion': 20
             }
         ]
         
         for business_data in dummy_businesses:
             Business.objects.create(
                 user=request.user,
+                business_email='dummy@example.com',  # Add required field
                 **business_data
             )
 
@@ -724,38 +724,40 @@ def get_verification_status(request, business_id):
         business = Business.objects.get(business_id=business_id, user=request.user)
         
         # For dummy businesses, return mock verification status
-        if business_id.startswith('dummy-business-'):
-            # Different completion levels for different dummy businesses
+        if business_id.startswith('dummy-'):
+            # Default status for unrecognized dummy business
+            status = {
+                'business_name': True,
+                'address': False,
+                'phone': False,
+                'category': False,
+                'website': False,
+                'hours': False,
+                'photos': False
+            }
+            
+            # Specific dummy business profiles
             if business_id == 'dummy-business-a':
-                status = {
-                    'business_name': True,
+                status.update({
                     'address': True,
                     'phone': True,
                     'category': False,
-                    'website': False,
-                    'hours': False,
-                    'photos': False,
-                }
+                    'website': False
+                })
             elif business_id == 'dummy-business-b':
-                status = {
-                    'business_name': True,
+                status.update({
                     'address': True,
                     'phone': True,
                     'category': True,
                     'website': True,
                     'hours': True,
-                    'photos': True,
-                }
-            else:  # dummy-business-c
-                status = {
-                    'business_name': True,
-                    'address': False,
-                    'phone': False,
-                    'category': False,
-                    'website': False,
-                    'hours': False,
-                    'photos': False,
-                }
+                    'photos': True
+                })
+            elif business_id == 'dummy-business-c':
+                status.update({
+                    'business_name': True
+                })
+                
             return JsonResponse(status)
 
         # For real businesses, get the latest data from Google API
