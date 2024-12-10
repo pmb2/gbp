@@ -67,8 +67,19 @@
                 </div>
             </div>
 
-            <!-- Step 5: Complete -->
+            <!-- Step 5: Knowledge Base -->
             <div class="step-item" data-step="5">
+                <div class="w-10 h-10 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
+                    <i class="fas fa-brain text-gray-400"></i>
+                </div>
+                <div class="mt-3 text-center">
+                    <h3 class="font-medium text-gray-900">Knowledge Base</h3>
+                    <p class="text-sm text-gray-500">Upload business data</p>
+                </div>
+            </div>
+
+            <!-- Step 6: Complete -->
+            <div class="step-item" data-step="6">
                 <div class="w-10 h-10 bg-white border-2 border-gray-300 rounded-full flex items-center justify-center relative z-10">
                     <i class="fas fa-flag-checkered text-gray-400"></i>
                 </div>
@@ -131,7 +142,7 @@
 
 <script>
 let currentStep = 1;
-const totalSteps = 5;
+const totalSteps = 6;
 const stepData = {
     1: {
         title: "Get Verified",
@@ -158,6 +169,12 @@ const stepData = {
         icon: "clock"
     },
     5: {
+        title: "Build Your Knowledge Base",
+        description: "Knowledge is power! Upload your business documents (PDFs, text files, directories) to help us provide more personalized and accurate responses. Simply drag and drop your files here.",
+        buttonText: "Upload Files",
+        icon: "brain"
+    },
+    6: {
         title: "Profile Complete!",
         description: "Congratulations! Your profile is now complete.",
         buttonText: "View Profile",
