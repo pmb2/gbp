@@ -76,8 +76,15 @@ window.onclick = function(event) {
 // Auto-refresh verification status every 30 seconds when modal is open
 let verificationCheckInterval;
 function startVerificationCheck(businessId) {
+    // Clear any existing interval
+    if (verificationCheckInterval) {
+        clearInterval(verificationCheckInterval);
+    }
+    
+    // Start new interval for specific business
     verificationCheckInterval = setInterval(() => {
         loadVerificationChecklist(businessId);
+        checkProfileStatus(businessId);
     }, 30000);
 }
 

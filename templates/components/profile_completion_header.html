@@ -1,7 +1,7 @@
 <div id="profileCompletionHeader" class="bg-white shadow-sm rounded-lg p-6 mb-8">
     <div class="flex justify-between items-center mb-6">
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">Complete Your Business Profile</h2>
+            <h2 class="text-2xl font-bold text-gray-900">Complete <span id="businessNameHeader"></span> Profile</h2>
             <p class="text-gray-600">Follow these steps to unlock all features</p>
         </div>
         <div class="flex items-center">
@@ -235,11 +235,14 @@ function startProfileStatusCheck() {
     window.profileStatusInterval = statusInterval;
 }
 
-function checkProfileStatus() {
-    // Get all business rows
-    const businessRows = document.querySelectorAll('[data-business-id]');
+function checkProfileStatus(specificBusinessId = null) {
+    // If specificBusinessId is provided, only check that business
+    const businessRows = specificBusinessId ? 
+        [document.querySelector(`[data-business-id="${specificBusinessId}"]`)] :
+        document.querySelectorAll('[data-business-id]');
     
     businessRows.forEach(row => {
+        if (!row) return;
         const businessId = row.dataset.businessId;
         // Skip dummy/unverified businesses
         if (businessId.startsWith('dummy-')) return;

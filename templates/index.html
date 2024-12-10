@@ -1308,6 +1308,13 @@
             if (row.dataset.verified !== 'Verified') {
                 return; // Don't allow expansion for unverified businesses
             }
+    
+            // Update the profile completion header with business name
+            const businessName = row.querySelector('.font-medium').textContent.trim();
+            document.getElementById('businessNameHeader').textContent = businessName + "'s";
+    
+            // Update completion status for this specific business
+            checkProfileStatus(businessId);
             
             const detailsRow = document.getElementById(`details-${businessId}`);
             const arrow = document.getElementById(`arrow-${businessId}`);
