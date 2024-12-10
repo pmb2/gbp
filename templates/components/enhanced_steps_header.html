@@ -1,58 +1,81 @@
-<div class="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg rounded-xl p-4 mb-6">
-    <div class="flex items-center justify-between">
+<div class="bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg rounded-xl p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
         <div>
-            <h2 class="text-xl font-bold text-gray-900">Business Profile Steps</h2>
-            <p class="text-sm text-gray-600">Complete these steps to optimize your presence</p>
+            <h2 class="text-2xl font-bold text-gray-900">Business Profile Steps</h2>
+            <p class="text-sm text-gray-600">Track your progress across all businesses</p>
         </div>
     </div>
 
-    <!-- Steps Timeline -->
-    <div class="flex justify-between items-center mt-4">
-        <div class="milestone-step" data-step="1">
-            <div class="flex flex-col items-center">
-                <div class="w-8 h-8 bg-white border-2 border-red-500 rounded-full flex items-center justify-center mb-1">
-                    <i class="fas fa-check text-red-500"></i>
+    <!-- Steps Timeline with Progress Bar -->
+    <div class="relative mb-8">
+        <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2"></div>
+        <div class="relative flex justify-between">
+            <div class="milestone-step group" data-step="1" onmouseover="highlightStep(1)" onmouseout="unhighlightSteps()">
+                <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-white border-2 border-red-500 rounded-full flex items-center justify-center mb-2 shadow-md transform transition-transform group-hover:scale-110 relative z-10">
+                        <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-800">Not Verified</span>
+                    <div class="mt-1 px-3 py-1 bg-red-100 rounded-full">
+                        <span id="step1-count" class="text-xs font-bold text-red-600">0</span>
+                    </div>
                 </div>
-                <span class="text-sm font-medium">Verification</span>
-                <span id="step1-count" class="mt-1 text-xs font-semibold text-red-500">0</span>
+            </div>
+
+            <div class="milestone-step group" data-step="2" onmouseover="highlightStep(2)" onmouseout="unhighlightSteps()">
+                <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-white border-2 border-yellow-500 rounded-full flex items-center justify-center mb-2 shadow-md transform transition-transform group-hover:scale-110 relative z-10">
+                        <i class="fas fa-building text-yellow-500 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-800">Getting Started</span>
+                    <div class="mt-1 px-3 py-1 bg-yellow-100 rounded-full">
+                        <span id="step2-count" class="text-xs font-bold text-yellow-600">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="milestone-step group" data-step="3" onmouseover="highlightStep(3)" onmouseout="unhighlightSteps()">
+                <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-white border-2 border-green-500 rounded-full flex items-center justify-center mb-2 shadow-md transform transition-transform group-hover:scale-110 relative z-10">
+                        <i class="fas fa-tasks text-green-500 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-800">In Progress</span>
+                    <div class="mt-1 px-3 py-1 bg-green-100 rounded-full">
+                        <span id="step3-count" class="text-xs font-bold text-green-600">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="milestone-step group" data-step="4" onmouseover="highlightStep(4)" onmouseout="unhighlightSteps()">
+                <div class="flex flex-col items-center">
+                    <div class="w-12 h-12 bg-white border-2 border-blue-500 rounded-full flex items-center justify-center mb-2 shadow-md transform transition-transform group-hover:scale-110 relative z-10">
+                        <i class="fas fa-check-circle text-blue-500 text-xl"></i>
+                    </div>
+                    <span class="text-sm font-medium text-gray-800">Complete</span>
+                    <div class="mt-1 px-3 py-1 bg-blue-100 rounded-full">
+                        <span id="step4-count" class="text-xs font-bold text-blue-600">0</span>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        <div class="milestone-step" data-step="2">
-            <div class="flex flex-col items-center">
-                <div class="w-8 h-8 bg-white border-2 border-yellow-500 rounded-full flex items-center justify-center mb-1">
-                    <i class="fas fa-building text-yellow-500"></i>
-                </div>
-                <span class="text-sm font-medium">Business Info</span>
-                <span id="step2-count" class="mt-1 text-xs font-semibold text-yellow-500">0</span>
-            </div>
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="text-sm text-gray-600">Total Businesses</div>
+            <div class="text-2xl font-bold text-gray-900" id="totalBusinessCount">0</div>
         </div>
-
-        <div class="milestone-step" data-step="3">
-            <div class="flex flex-col items-center">
-                <div class="w-8 h-8 bg-white border-2 border-green-500 rounded-full flex items-center justify-center mb-1">
-                    <i class="fas fa-images text-green-500"></i>
-                </div>
-                <span class="text-sm font-medium">Media &amp; Hours</span>
-                <span id="step3-count" class="mt-1 text-xs font-semibold text-green-500">0</span>
-            </div>
-        </div>
-
-        <div class="milestone-step" data-step="4">
-            <div class="flex flex-col items-center">
-                <div class="w-8 h-8 bg-white border-2 border-blue-500 rounded-full flex items-center justify-center mb-1">
-                    <i class="fas fa-flag-checkered text-blue-500"></i>
-                </div>
-                <span class="text-sm font-medium">Complete</span>
-                <span id="step4-count" class="mt-1 text-xs font-semibold text-blue-500">0</span>
-            </div>
+        <div class="bg-white rounded-lg p-4 shadow-sm">
+            <div class="text-sm text-gray-600">Completion Rate</div>
+            <div class="text-2xl font-bold text-gray-900" id="averageCompletion">0%</div>
         </div>
     </div>
 
     <!-- Action Button -->
-    <div class="mt-4 text-center">
+    <div class="text-center">
         <button onclick="handleCurrentStep()" 
-                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+                class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105 shadow-md text-sm font-medium"
                 id="currentStepButton">
             Start Verification
         </button>
