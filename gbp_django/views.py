@@ -685,8 +685,7 @@ def index(request):
                 'address': '123 Test St, Suite A',
                 'phone_number': '(555) 000-0001',
                 'website_url': 'No info',
-                'category': 'No info',
-                'profile_completion': 60
+                'category': 'No info'
             },
             {
                 'business_name': 'Dummy Business B',
@@ -695,8 +694,7 @@ def index(request):
                 'address': '456 Test Ave, Suite B',
                 'phone_number': '(555) 000-0002',
                 'website_url': 'https://dummy-b.example.com',
-                'category': 'Test Business B',
-                'profile_completion': 100
+                'category': 'Test Business B'
             },
             {
                 'business_name': 'Dummy Business C',
@@ -705,8 +703,7 @@ def index(request):
                 'address': 'No info',
                 'phone_number': 'No info',
                 'website_url': 'No info',
-                'category': 'No info',
-                'profile_completion': 20
+                'category': 'No info'
             }
         ]
         
