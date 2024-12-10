@@ -85,6 +85,7 @@ class Business(models.Model):
         """Calculate profile completion percentage"""
         print(f"\n[DEBUG] Calculating profile completion for business: {self.business_name}")
         print(f"[DEBUG] Verification status: {self.is_verified}")
+        print(f"[DEBUG] Business ID: {self.business_id}")
         
         if not self.is_verified:
             print("[DEBUG] Business not verified, returning 0%")

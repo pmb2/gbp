@@ -282,17 +282,29 @@ def google_oauth_callback(request):
             print("\n[DEBUG] Processing business data storage...")
             stored_businesses = store_business_data(business_data, user.id, access_token)
             
+            # Print existing businesses for debugging
+            print("\n[DEBUG] Current businesses for user:")
+            existing_businesses = Business.objects.filter(user=user)
+            for b in existing_businesses:
+                print(f"- {b.business_name} (ID: {b.business_id}, Verified: {b.is_verified})")
+
             # Create a new business record if none were stored
             if not stored_businesses:
                 print("\n[DEBUG] No existing businesses found, creating new business record")
                 timestamp = int(time.time())
-                business_id = f"business-{user.id}-{timestamp}"
+                business_id = f"gbp-business-{user.id}-{timestamp}"
                 print(f"[DEBUG] Generated business ID: {business_id}")
                 
                 business_name = user_info.get('name', 'New Business')
                 print(f"[DEBUG] Using business name: {business_name}")
                 
+                # Generate unique business ID
+                timestamp = int(time.time())
+                business_id = f"gbp-oauth-{user.id}-{timestamp}"
+                print(f"[DEBUG] Generated OAuth business ID: {business_id}")
+                
                 new_business = Business.objects.create(
+                    business_id=business_id,
                     user=user,
                     business_name=business_name,
                     business_id=business_id,
@@ -668,7 +680,19 @@ def index(request):
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
     ).order_by('is_verified')  # Show unverified first
-    print(f"[DEBUG] Found {businesses.count()} businesses")
+    
+    print(f"\n[DEBUG] Found {businesses.count()} businesses")
+    print("[DEBUG] Business details:")
+    for business in businesses:
+        print(f"\nBusiness: {business.business_name}")
+        print(f"ID: {business.business_id}")
+        print(f"Verified: {business.is_verified}")
+        print(f"Completion: {business.calculate_profile_completion()}%")
+        print(f"Email: {business.business_email}")
+        print(f"Address: {business.address}")
+        print(f"Phone: {business.phone_number}")
+        print(f"Website: {business.website_url}")
+        print(f"Category: {business.category}")
 
     # Calculate profile completion for each business
     for business in businesses:
