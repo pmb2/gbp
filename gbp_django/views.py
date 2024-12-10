@@ -307,7 +307,6 @@ def google_oauth_callback(request):
                     business_id=business_id,
                     user=user,
                     business_name=business_name,
-                    business_id=business_id,
                     business_email=user.email,
                     is_verified=False,
                     email_verification_pending=True,
