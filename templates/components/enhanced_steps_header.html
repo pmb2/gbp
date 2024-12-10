@@ -222,6 +222,51 @@ function unhighlightSteps() {
     });
 }
 
+function updateStepCounts() {
+    const businesses = document.querySelectorAll('[data-business-id]');
+    let stepCounts = [0, 0, 0, 0];
+            
+    businesses.forEach(business => {
+        const completion = parseInt(business.dataset.completion) || 0;
+        if (completion === 0) stepCounts[0]++;
+        else if (completion <= 40) stepCounts[1]++;
+        else if (completion <= 80) stepCounts[2]++;
+        else stepCounts[3]++;
+    });
+            
+    // Update count badges
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`step${i}-count`).textContent = stepCounts[i-1];
+    }
+}
+
+function highlightStep(step) {
+    const businesses = document.querySelectorAll('[data-business-id]');
+    businesses.forEach(business => {
+        const completion = parseInt(business.dataset.completion) || 0;
+        let isInStep = false;
+                
+        switch(step) {
+            case 1: isInStep = completion === 0; break;
+            case 2: isInStep = completion > 0 && completion <= 40; break;
+            case 3: isInStep = completion > 40 && completion <= 80; break;
+            case 4: isInStep = completion > 80; break;
+        }
+                
+        if (isInStep) {
+            business.classList.add('transform', 'translate-y-[-4px]', 'shadow-lg');
+            business.style.transition = 'all 0.3s ease';
+        }
+    });
+}
+
+function unhighlightSteps() {
+    const businesses = document.querySelectorAll('[data-business-id]');
+    businesses.forEach(business => {
+        business.classList.remove('transform', 'translate-y-[-4px]', 'shadow-lg');
+    });
+}
+
 function checkProfileStatus(businessId = null) {
     const businesses = businessId ? 
         [document.querySelector(`[data-business-id="${businessId}"]`)] :
