@@ -46,22 +46,30 @@
     <script>
         // Automation settings functionality
         function setAutomation(feature, level, businessId) {
-            const slider = document.getElementById(`${feature}-slider-${businessId}`);
-            let transform = '0';
+            const track = document.querySelector(`[data-feature="${feature}"] .automation-progress`);
+            const dots = document.querySelectorAll(`[data-feature="${feature}"] .automation-dot`);
             
+            // Remove active state from all dots
+            dots.forEach(dot => dot.classList.remove('active'));
+            
+            // Set progress width and active dot
+            let progress = 0;
             switch(level) {
                 case 'off':
-                    transform = 'translateX(0)';
+                    progress = 0;
+                    dots[0].classList.add('active');
                     break;
                 case 'approval':
-                    transform = 'translateX(100%)';
+                    progress = 50;
+                    dots[1].classList.add('active');
                     break;
                 case 'auto':
-                    transform = 'translateX(200%)';
+                    progress = 100;
+                    dots[2].classList.add('active');
                     break;
             }
             
-            slider.style.transform = transform;
+            track.style.width = `${progress}%`;
             
             // Here you would typically make an API call to update the automation settings
             console.log(`Setting ${feature} automation to ${level} for business ${businessId}`);

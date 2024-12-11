@@ -220,50 +220,51 @@
             display: none;
         }
 
-        /* Switch Toggle Styles */
-        .switch {
+        /* Automation Controls */
+        .automation-track {
             position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
+            margin: 1rem 0;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+        .automation-progress {
+            transition: width 0.3s ease;
         }
 
-        .slider {
-            position: absolute;
+        .automation-dots {
+            margin-top: -8px;
+        }
+
+        .automation-dot {
+            position: relative;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
+            transition: all 0.2s ease;
         }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
+        .automation-dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
         }
 
-        input:checked + .slider {
+        .automation-dot.active {
             background-color: #2563eb;
+            border-color: #2563eb;
         }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
+        .automation-label {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 0.5rem;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            color: #6b7280;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .automation-dot:hover .automation-label {
+            opacity: 1;
         }
 
         /* Action buttons */
@@ -882,11 +883,25 @@
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Q&A Responses</span>
                                                         </div>
                                                         <div class="relative">
-                                                            <div class="flex bg-white border-2 border-blue-200 rounded-full h-10 w-52 p-1">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('qa', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="qa-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
+                                                            <div class="automation-track bg-gray-200 w-52 h-2 rounded-full mx-4">
+                                                                <div class="automation-progress bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                                                            </div>
+                                                            <div class="automation-dots flex justify-between absolute -top-2 w-52">
+                                                                <button onclick="setAutomation('qa', 'off', '{{ business.business_id }}')" 
+                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
+                                                                        data-position="off">
+                                                                    <span class="automation-label">Off</span>
+                                                                </button>
+                                                                <button onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')"
+                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
+                                                                        data-position="approval">
+                                                                    <span class="automation-label">Approval</span>
+                                                                </button>
+                                                                <button onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')"
+                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
+                                                                        data-position="auto">
+                                                                    <span class="automation-label">Auto</span>
+                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
