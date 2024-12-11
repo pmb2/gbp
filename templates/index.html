@@ -1120,29 +1120,39 @@
                                 <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
                                     <div class="p-4">
                                         <h3 class="text-lg font-medium text-gray-900 mb-4">Knowledge Base</h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <!-- Left Panel - File List -->
-                                            <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="flex gap-4">
+                                            <!-- Left Panel - File List (25%) -->
+                                            <div class="w-1/4 bg-gray-50 p-4 rounded-lg">
                                                 <div class="flex justify-between items-center mb-4">
-                                                    <h4 class="font-medium text-gray-700">Uploaded Files & Memories</h4>
+                                                    <h4 class="font-medium text-gray-700">Knowledge Base</h4>
                                                     <button class="text-sm text-blue-600 hover:text-blue-800" onclick="deleteSelectedFiles('{{ business.business_id }}')">
                                                         Delete Selected
+                                                    </button>
+                                                </div>
+                                                <!-- Memories Section -->
+                                                <div class="mb-4">
+                                                    <button onclick="openMemoriesModal('{{ business.business_id }}')" 
+                                                            class="w-full text-left p-2 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center">
+                                                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                                        </svg>
+                                                        <span>Chat Memories</span>
                                                     </button>
                                                 </div>
                                                 <div id="file-list-{{ business.business_id }}" class="space-y-2 mb-4 max-h-[400px] overflow-y-auto">
                                                     <!-- Files will be listed here dynamically -->
                                                 </div>
-                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center"
+                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center"
                                                      ondrop="handleFileDrop(event, '{{ business.business_id }}')"
                                                      ondragover="handleDragOver(event)"
                                                      ondragenter="handleDragEnter(event)"
                                                      ondragleave="handleDragLeave(event)">
-                                                    <p class="text-sm text-gray-500">Drag and drop documents here</p>
-                                                    <p class="text-xs text-gray-400 mt-1">Supported formats: PDF, TXT, DOC</p>
+                                                    <p class="text-sm text-gray-500">Drag and drop files here</p>
+                                                    <p class="text-xs text-gray-400 mt-1">PDF, TXT, DOC, DOCX</p>
                                                 </div>
                                             </div>
 
-                                            <!-- Right Panel - Chat Interface -->
+                                            <!-- Right Panel - Chat Interface (75%) -->
                                             <div class="bg-white border border-gray-200 rounded-lg flex flex-col">
                                                 <div id="chat-messages-{{ business.business_id }}" class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[400px]">
                                                     <!-- Initial welcome message -->
@@ -1920,6 +1930,7 @@
             event.currentTarget.classList.remove('bg-blue-50');
         }
 
+        // Handle file drops anywhere on the business row
         function handleFileDrop(event, businessId) {
             event.preventDefault();
             event.currentTarget.classList.remove('bg-blue-50');
@@ -1933,7 +1944,9 @@
                 if (file.type === 'application/pdf' ||
                     file.type.startsWith('text/') ||
                     file.name.endsWith('.pdf') ||
-                    file.name.endsWith('.txt')) {
+                    file.name.endsWith('.txt') ||
+                    file.name.endsWith('.doc') ||
+                    file.name.endsWith('.docx')) {
                     formData.append('files[]', file);
                 }
             });
@@ -1949,23 +1962,136 @@
                 },
                 body: formData
             })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    updateFileList(businessId, data.files);
+                    showSuccessMessage('Files uploaded successfully!');
+                } else {
+                    showErrorMessage('Error uploading files: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorMessage('Error uploading files. Please try again.');
+            });
+        }
+
+        // Make business rows droppable
+        document.querySelectorAll('.expandable-row').forEach(row => {
+            row.addEventListener('dragover', (e) => handleDragOver(e));
+            row.addEventListener('dragenter', (e) => handleDragEnter(e));
+            row.addEventListener('dragleave', (e) => handleDragLeave(e));
+            row.addEventListener('drop', (e) => {
+                const businessId = row.dataset.businessId;
+                handleFileDrop(e, businessId);
+            });
+        });
+
+        // Memories Modal Functions
+        function openMemoriesModal(businessId) {
+            const modal = document.getElementById('memoriesModal');
+            modal.classList.remove('hidden');
+            loadMemories(businessId);
+        }
+
+        function closeMemoriesModal() {
+            document.getElementById('memoriesModal').classList.add('hidden');
+        }
+
+        function loadMemories(businessId) {
+            fetch(`/api/business/${businessId}/memories/`)
+            .then(response => response.json())
+            .then(data => {
+                const memoriesList = document.getElementById('memoriesList');
+                memoriesList.innerHTML = '';
+                
+                data.memories.forEach(memory => {
+                    const memoryItem = document.createElement('div');
+                    memoryItem.className = 'p-3 bg-gray-50 rounded-lg flex justify-between items-start';
+                    memoryItem.innerHTML = `
+                        <div class="flex-1">
+                            <div class="text-sm text-gray-600">${memory.timestamp}</div>
+                            <div class="mt-1">${memory.content}</div>
+                        </div>
+                        <button onclick="deleteMemory('${businessId}', '${memory.id}')" 
+                                class="ml-2 text-red-600 hover:text-red-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    `;
+                    memoriesList.appendChild(memoryItem);
+                });
+            });
+        }
+
+        function deleteMemory(businessId, memoryId) {
+            if (confirm('Are you sure you want to delete this memory?')) {
+                fetch(`/api/business/${businessId}/memories/${memoryId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        alert('Files uploaded successfully! Your knowledge base is being processed.');
-                        // Update progress if needed
-                        checkProfileStatus(businessId);
-                    } else {
-                        alert('Error uploading files: ' + data.message);
+                        loadMemories(businessId);
+                    }
+                });
+            }
+        }
+
+        function clearAllMemories() {
+            if (confirm('Are you sure you want to clear all memories? This cannot be undone.')) {
+                const businessId = document.getElementById('memoriesModal').dataset.businessId;
+                fetch(`/api/business/${businessId}/memories/clear/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     }
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error uploading files. Please try again.');
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadMemories(businessId);
+                        showSuccessMessage('All memories cleared successfully');
+                    }
                 });
+            }
         }
     </script>
 </div>
+    
+<!-- Memories Modal -->
+<div id="memoriesModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+    <div class="absolute inset-0 bg-gray-600 bg-opacity-50"></div>
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Chat Memories</h3>
+                <button onclick="closeMemoriesModal()" class="text-gray-400 hover:text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div id="memoriesList" class="space-y-2 max-h-[60vh] overflow-y-auto">
+                <!-- Memories will be listed here -->
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="clearAllMemories()" class="text-red-600 hover:text-red-700 px-4 py-2">
+                    Clear All Memories
+                </button>
+                <button onclick="closeMemoriesModal()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+    
 {% include 'verification_modal.html' %}
 {% include 'components/verification_prompt_modal.html' %}
 </html>
