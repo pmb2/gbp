@@ -331,7 +331,6 @@
 
     <!-- Main Content -->
     <main class="p-6 max-w-[2000px] mx-auto">
-        {% include 'components/enhanced_steps_header.html' %}
     <!-- Header - Hidden until profile is complete -->
     <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -502,8 +501,47 @@
     <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
         <div class="p-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
-                <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <div class="flex flex-col w-full">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
+                        <div class="flex items-center space-x-8">
+                            <!-- Step Counters -->
+                            <div class="flex items-center space-x-4">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
+                                    <span class="text-sm font-medium" id="step1-count">0</span>
+                                    <span class="text-sm text-gray-500 ml-1">Not Verified</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
+                                    <span class="text-sm font-medium" id="step2-count">0</span>
+                                    <span class="text-sm text-gray-500 ml-1">Getting Started</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                                    <span class="text-sm font-medium" id="step3-count">0</span>
+                                    <span class="text-sm text-gray-500 ml-1">In Progress</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                                    <span class="text-sm font-medium" id="step4-count">0</span>
+                                    <span class="text-sm text-gray-500 ml-1">Complete</span>
+                                </div>
+                            </div>
+                            <!-- Total Stats -->
+                            <div class="flex items-center space-x-4 border-l pl-4">
+                                <div>
+                                    <span class="text-sm text-gray-500">Total Businesses:</span>
+                                    <span class="text-sm font-medium ml-1" id="totalBusinessCount">0</span>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">Completion Rate:</span>
+                                    <span class="text-sm font-medium ml-1" id="averageCompletion">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                     <div class="relative flex-grow sm:flex-grow-0">
                         <input type="text"
                                id="businessSearch"
