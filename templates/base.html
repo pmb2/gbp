@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200">
+<body class="bg-gray-900 text-gray-100 transition-colors duration-200">
     <div class="h-screen">
 
         <!-- Main Content -->
@@ -51,8 +51,11 @@
             const sunIcon = themeToggle?.querySelector('.sun');
             const moonIcon = themeToggle?.querySelector('.moon');
 
-            // Check for saved theme preference or default to system preference
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Always default to dark theme
+            if (!localStorage.theme) {
+                localStorage.theme = 'dark';
+            }
+            if (localStorage.theme === 'dark') {
                 html.classList.add('dark');
                 if (sunIcon && moonIcon) {
                     sunIcon.classList.remove('hidden');
