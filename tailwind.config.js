@@ -4,7 +4,7 @@ module.exports = {
     "./templates/**/*.html",
     "./static/**/*.js",
   ],
-  darkMode: 'media',
+  darkMode: false,
   theme: {
     extend: {
       fontSmoothing: {

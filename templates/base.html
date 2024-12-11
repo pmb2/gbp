@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
+<body class="bg-gray-100">
     <div class="h-screen">
 
         <!-- Main Content -->
@@ -114,57 +114,6 @@
             }
         }
 
-        // Theme toggle functionality
-        function initTheme() {
-            const themeToggle = document.getElementById('themeToggle');
-            const html = document.documentElement;
-            const sunIcon = themeToggle?.querySelector('.sun');
-            const moonIcon = themeToggle?.querySelector('.moon');
-            
-            // Get stored theme or system preference
-            const storedTheme = localStorage.getItem('theme');
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const defaultDark = storedTheme === 'dark' || (!storedTheme && systemPrefersDark);
-            
-            function setTheme(isDark) {
-                if (isDark) {
-                    html.classList.add('dark');
-                    document.body.style.backgroundColor = '#000000';
-                    if (sunIcon && moonIcon) {
-                        sunIcon.classList.remove('hidden');
-                        moonIcon.classList.add('hidden');
-                    }
-                } else {
-                    html.classList.remove('dark');
-                    document.body.style.backgroundColor = '#ffffff';
-                    if (sunIcon && moonIcon) {
-                        moonIcon.classList.remove('hidden');
-                        sunIcon.classList.add('hidden');
-                    }
-                }
-                localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            }
-            
-            // Set initial theme
-            setTheme(defaultDark);
-            
-            // Theme toggle click handler
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    const isDark = html.classList.contains('dark');
-                    setTheme(!isDark);
-                });
-            }
-            
-            // Listen for system theme changes
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                if (!localStorage.getItem('theme')) {
-                    setTheme(e.matches);
-                }
-            });
-        }
-        
-        document.addEventListener('DOMContentLoaded', initTheme);
 
         // Automation settings functionality
         function setAutomation(feature, level, businessId) {
