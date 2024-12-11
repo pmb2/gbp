@@ -44,6 +44,69 @@
     {% block extra_body %}{% endblock %}
     
     <script>
+        // Automation settings functionality
+        function setAutomation(feature, level, businessId) {
+            // Get all buttons for this feature
+            const buttons = document.querySelectorAll(`[data-feature="${feature}"]`);
+            
+            // Remove active class and background from all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                btn.classList.add('bg-white');
+            });
+            
+            // Add active class and background to clicked button
+            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"]`);
+            clickedButton.classList.add('active');
+            
+            // Add color based on feature
+            switch(feature) {
+                case 'qa':
+                    clickedButton.classList.add('bg-blue-500');
+                    break;
+                case 'posts':
+                    clickedButton.classList.add('bg-purple-500');
+                    break;
+                case 'reviews':
+                    clickedButton.classList.add('bg-green-500');
+                    break;
+            }
+            
+            // Save to database via API
+            fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log(`Successfully updated ${feature} automation to ${level}`);
+                } else {
+                    console.error('Failed to update automation settings');
+                    // Revert UI changes on error
+                    buttons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                        btn.classList.add('bg-white');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert UI changes on error
+                buttons.forEach(btn => {
+                    btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                    btn.classList.add('bg-white');
+                });
+            });
+        }
+
         // Theme toggle functionality with system preference detection
         function initTheme() {
             const themeToggle = document.getElementById('themeToggle');
