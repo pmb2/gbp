@@ -181,14 +181,35 @@
             background: #ef4444;
         }
 
-        /* Tab Styles */
+        /* Modern Tab Styles */
         .tab-button {
             position: relative;
-            transition: all 0.3s;
+            transition: all 0.2s ease-in-out;
+            background: transparent;
+        }
+
+        .tab-button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
         .tab-button:focus {
             outline: none;
+            ring: 2px;
+            ring-offset: 2px;
+            ring-blue-500;
+        }
+
+        .tab-button.active {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-button svg {
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .tab-button:hover svg {
+            transform: scale(1.1);
         }
 
         .tab-content {
@@ -768,25 +789,33 @@
                         </tr>
                         <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
                             <td colspan="5">
-                                <!-- Tabs Navigation -->
-                                <div class="border-b border-gray-200">
-                                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                                        <button onclick="switchTab('{{ business.business_id }}', 'details')"
-                                                class="tab-button active border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600"
-                                                id="details-tab-{{ business.business_id }}">
-                                            Business Details
-                                        </button>
-                                        <button onclick="switchTab('{{ business.business_id }}', 'knowledge')"
-                                                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                                id="knowledge-tab-{{ business.business_id }}">
-                                            Knowledge Base
-                                        </button>
-                                        <button onclick="switchTab('{{ business.business_id }}', 'settings')"
-                                                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                                                id="settings-tab-{{ business.business_id }}">
-                                            Settings
-                                        </button>
-                                    </nav>
+                                <!-- Modern Browser-like Tabs -->
+                                <div class="bg-gray-100 rounded-t-lg p-2 flex space-x-1">
+                                    <button onclick="switchTab('{{ business.business_id }}', 'details')"
+                                            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
+                                            id="details-tab-{{ business.business_id }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                        </svg>
+                                        <span>Business Details</span>
+                                    </button>
+                                    <button onclick="switchTab('{{ business.business_id }}', 'knowledge')"
+                                            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
+                                            id="knowledge-tab-{{ business.business_id }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                        </svg>
+                                        <span>Knowledge Base</span>
+                                    </button>
+                                    <button onclick="switchTab('{{ business.business_id }}', 'settings')"
+                                            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
+                                            id="settings-tab-{{ business.business_id }}">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span>Settings</span>
+                                    </button>
                                 </div>
 
                                 <!-- Tab Contents -->
@@ -952,12 +981,12 @@
         function switchTab(businessId, tabName) {
             // Update tab buttons
             document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
-                tab.classList.remove('border-blue-500', 'text-blue-600');
-                tab.classList.add('border-transparent', 'text-gray-500');
+                tab.classList.remove('bg-white', 'text-blue-600');
+                tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
             });
             const activeTab = document.getElementById(`${tabName}-tab-${businessId}`);
-            activeTab.classList.remove('border-transparent', 'text-gray-500');
-            activeTab.classList.add('border-blue-500', 'text-blue-600');
+            activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+            activeTab.classList.add('bg-white', 'text-blue-600');
 
             // Update tab contents
             document.querySelectorAll(`[id$="-content-${businessId}"]`).forEach(content => {
