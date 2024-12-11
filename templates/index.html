@@ -726,10 +726,10 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center">
                                     {% if business.is_verified == 'Verified' %}
-                                        <div class="transform transition-transform duration-200 mr-2 cursor-pointer"
+                                        <div class="mr-2 cursor-pointer"
                                              id="arrow-{{ business.business_id }}"
                                              onclick="toggleBusinessDetails('{{ business.business_id }}')">
-                                            <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-colors duration-200"
+                                            <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-all duration-200 transform"
                                                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                       d="M9 5l7 7-7 7"/>
@@ -1630,12 +1630,12 @@
                 detailsRow.style.display = isHidden ? 'table-row' : 'none';
 
                 if (arrow && arrowSvg) {
-                    arrow.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
-                    arrow.style.webkitTransform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
                     if (isHidden) {
+                        arrowSvg.style.transform = 'rotate(90deg)';
                         arrowSvg.classList.remove('text-gray-500');
                         arrowSvg.classList.add('text-blue-500');
                     } else {
+                        arrowSvg.style.transform = 'rotate(0deg)';
                         arrowSvg.classList.remove('text-blue-500');
                         arrowSvg.classList.add('text-gray-500');
                     }
