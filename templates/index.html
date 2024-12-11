@@ -769,31 +769,40 @@
                                 </div>
                                 {% endwith %}
                             </td>
-                            <td class="text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
-                                         title="Posts Status">
-                                        <i class="fas fa-newspaper"></i>
+                            <td class="px-6 py-4 w-1/3 text-center">
+                                {% if business.is_verified != 'Verified' %}
+                                    <div class="flex flex-col items-center">
+                                        <div class="progress-bar w-32 mb-2">
+                                            <div class="progress-bar-fill bg-red-600" style="width: 0%"></div>
+                                        </div>
+                                        <div class="text-sm text-red-500 mb-2">0% Complete</div>
+                                        <div class="flex justify-center space-x-2">
+                                            <div class="status-icon attention" title="Posts Status">
+                                                <i class="fas fa-newspaper"></i>
+                                            </div>
+                                            <div class="status-icon attention" title="Reviews Status">
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                            <div class="status-icon attention" title="Photos Status">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
-                                         title="Reviews Status">
-                                        <i class="fas fa-star"></i>
-                                    </div>
-                                    <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
-                                         title="Photos Status">
-                                        <i class="fas fa-image"></i>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">
-                                {% if business.email_verification_pending %}
-                                    <span class="status-badge inline-flex justify-center bg-yellow-100 text-yellow-800">
-                                        Pending Email Verification
-                                    </span>
                                 {% else %}
-                                    <span class="status-badge inline-flex justify-center {% if business.is_verified == 'Verified' %}verified{% else %}unverified{% endif %}">
-                                        {{ business.is_verified }}
-                                    </span>
+                                    <div class="flex justify-center space-x-2">
+                                        <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
+                                             title="Posts Status">
+                                            <i class="fas fa-newspaper"></i>
+                                        </div>
+                                        <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
+                                             title="Reviews Status">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
+                                             title="Photos Status">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    </div>
                                 {% endif %}
                             </td>
 {#                        hide all td's above if not verified#}
