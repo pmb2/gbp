@@ -873,7 +873,7 @@
                                                 <h3 class="text-lg font-medium text-gray-900 mb-6">Automation Settings</h3>
                                                 <div class="space-y-6">
                                                     <!-- Q&A Automation -->
-                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg hover:shadow-md transition-all duration-200">
                                                         <div class="flex items-center space-x-3">
                                                             <div class="p-2 bg-blue-200 rounded-full">
                                                                 <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -882,32 +882,29 @@
                                                             </div>
                                                             <span class="text-gray-700 dark:text-white font-medium">Q&A Responses</span>
                                                         </div>
-                                                        <div class="relative">
-                                                            <div class="automation-track bg-gray-200 dark:bg-gray-700 w-52 h-2 rounded-full mx-4" data-feature="qa">
-                                                                <div class="automation-progress bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
-                                                            </div>
-                                                            <div class="automation-dots flex justify-between absolute -top-2 w-52">
-                                                                <button onclick="setAutomation('qa', 'off', '{{ business.business_id }}')" 
-                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
-                                                                        data-position="off">
-                                                                    <span class="automation-label">Off</span>
-                                                                </button>
-                                                                <button onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')"
-                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
-                                                                        data-position="approval">
-                                                                    <span class="automation-label">Approval</span>
-                                                                </button>
-                                                                <button onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')"
-                                                                        class="automation-dot w-6 h-6 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110"
-                                                                        data-position="auto">
-                                                                    <span class="automation-label">Auto</span>
-                                                                </button>
-                                                            </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="setAutomation('qa', 'off', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                                                                    data-position="off">
+                                                                <span class="automation-label">Off</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-blue-300"></div>
+                                                            <button onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                                                                    data-position="approval">
+                                                                <span class="automation-label">Approval</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-blue-300"></div>
+                                                            <button onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                                                                    data-position="auto">
+                                                                <span class="automation-label">Auto</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Posts Automation -->
-                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg hover:shadow-md transition-all duration-200">
                                                         <div class="flex items-center space-x-3">
                                                             <div class="p-2 bg-purple-200 rounded-full">
                                                                 <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -916,18 +913,29 @@
                                                             </div>
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Posts Creation</span>
                                                         </div>
-                                                        <div class="relative">
-                                                            <div class="flex bg-white border-2 border-purple-200 rounded-full h-10 w-52 p-1">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('posts', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="posts-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
-                                                            </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="setAutomation('posts', 'off', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                                                                    data-position="off">
+                                                                <span class="automation-label">Off</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-purple-300"></div>
+                                                            <button onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                                                                    data-position="approval">
+                                                                <span class="automation-label">Approval</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-purple-300"></div>
+                                                            <button onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                                                                    data-position="auto">
+                                                                <span class="automation-label">Auto</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Reviews Automation -->
-                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center space-x-4 p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg hover:shadow-md transition-all duration-200">
                                                         <div class="flex items-center space-x-3">
                                                             <div class="p-2 bg-green-200 rounded-full">
                                                                 <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -936,13 +944,24 @@
                                                             </div>
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Review Responses</span>
                                                         </div>
-                                                        <div class="relative">
-                                                            <div class="flex bg-white border-2 border-green-200 rounded-full h-10 w-52 p-1">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="reviews-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
-                                                            </div>
+                                                        <div class="flex items-center space-x-2">
+                                                            <button onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                                                                    data-position="off">
+                                                                <span class="automation-label">Off</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-green-300"></div>
+                                                            <button onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                                                                    data-position="approval">
+                                                                <span class="automation-label">Approval</span>
+                                                            </button>
+                                                            <div class="w-6 h-0.5 bg-green-300"></div>
+                                                            <button onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                                                                    data-position="auto">
+                                                                <span class="automation-label">Auto</span>
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
