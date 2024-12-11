@@ -425,7 +425,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="p-6 max-w-[2000px] mx-auto flex flex-col">
+    <main class="p-6 max-w-[2000px] mx-auto flex flex-col overflow-hidden">
     <!-- Header - Hidden until profile is complete -->
     <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -593,8 +593,8 @@
         </div>
     </div>
     <!-- Business Table -->
-    <div class="bg-white dark:bg-dark-card dark:border-gray-700 rounded-lg shadow-sm mt-8 w-full overflow-hidden">
-        <div class="p-6">
+    <div class="bg-white dark:bg-dark-card dark:border-gray-700 rounded-lg shadow-sm mt-8 w-full">
+        <div class="p-6 overflow-hidden">
             <div class="flex flex-col w-full mb-6">
                     <div class="flex flex-col items-center justify-center mb-4">
                         <h2 class="text-xl font-bold text-gray-900 mb-4">Business Profiles</h2>
@@ -681,8 +681,8 @@
                     </div>
                 </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed w-full">
+            <div class="overflow-x-auto overflow-y-hidden">
+                <table class="divide-y divide-gray-200 w-full">
                     <thead class="bg-gray-50">
                     <tr class="w-full">
                         <th scope="col" class="w-1/2 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
