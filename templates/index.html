@@ -701,7 +701,7 @@
                     </thead>
                     <tbody>
                     {% for business in dashboard_data.businesses %}
-                        <tr class="expandable-row relative {% if not business.is_verified %}unverified-row{% endif %} 
+                        <tr class="expandable-row relative {% if not business.is_verified %}unverified-row opacity-70{% endif %} 
                                transition-all duration-300 hover:shadow-md h-16"
                             style="background: linear-gradient(to right, 
                                    {% if business.calculate_profile_completion <= 30 %}rgba(239, 68, 68, 0.1){% elif business.calculate_profile_completion <= 70 %}rgba(245, 158, 11, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %} 
@@ -750,11 +750,11 @@
                                 <div class="flex flex-col items-center">
                                     <div class="progress-bar w-32">
                                         <div class="progress-bar-fill 
-                                            {% if completion <= 20 %}bg-red-500
-                                            {% elif completion <= 40 %}bg-yellow-500
-                                            {% elif completion <= 60 %}bg-orange-500
-                                            {% elif completion <= 80 %}bg-green-400
-                                            {% else %}bg-green-600{% endif %}"
+                                            {% if completion <= 20 %}bg-red-600
+                                            {% elif completion <= 40 %}bg-yellow-600
+                                            {% elif completion <= 60 %}bg-orange-600
+                                            {% elif completion <= 80 %}bg-green-600
+                                            {% else %}bg-green-700{% endif %}"
                                             style="width: {{ completion }}%">
                                         </div>
                                     </div>
