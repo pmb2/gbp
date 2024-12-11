@@ -746,7 +746,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center w-1/4">
+                            <td class="text-center w-1/4 {% if not business.is_verified %}hidden{% endif %}">
                                 {% with completion=business.calculate_profile_completion %}
                                 <div class="flex flex-col items-center">
                                     <div class="progress-bar w-32">
@@ -770,7 +770,7 @@
                                 </div>
                                 {% endwith %}
                             </td>
-                            <td class="text-center">
+                            <td class="text-center {% if not business.is_verified %}hidden{% endif %}">
                                 <div class="flex justify-center space-x-2">
                                     <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
                                          title="Posts Status">
@@ -786,7 +786,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center">
+                            <td class="text-center {% if not business.is_verified %}hidden{% endif %}">
                                 {% if business.email_verification_pending %}
                                     <span class="status-badge inline-flex justify-center bg-yellow-100 text-yellow-800">
                                         Pending Email Verification
