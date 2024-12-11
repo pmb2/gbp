@@ -44,6 +44,53 @@
     {% block extra_body %}{% endblock %}
     
     <script>
+        // Theme toggle functionality with system preference detection
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const sunIcon = themeToggle?.querySelector('.sun');
+            const moonIcon = themeToggle?.querySelector('.moon');
+
+            // Check for saved theme preference or default to system preference
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                if (sunIcon && moonIcon) {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            } else {
+                html.classList.remove('dark');
+                if (sunIcon && moonIcon) {
+                    moonIcon.classList.remove('hidden');
+                    sunIcon.classList.add('hidden');
+                }
+            }
+
+            // Add click handler for theme toggle
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    if (html.classList.contains('dark')) {
+                        html.classList.remove('dark');
+                        localStorage.theme = 'light';
+                        if (moonIcon && sunIcon) {
+                            moonIcon.classList.remove('hidden');
+                            sunIcon.classList.add('hidden');
+                        }
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.theme = 'dark';
+                        if (sunIcon && moonIcon) {
+                            sunIcon.classList.remove('hidden');
+                            moonIcon.classList.add('hidden');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
+
         // Automation settings functionality
         function setAutomation(feature, level, businessId) {
             // Get all buttons for this feature
