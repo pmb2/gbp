@@ -1018,28 +1018,91 @@
                                         <div>
                                             <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
                                             <div class="grid grid-cols-2 gap-4">
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Posts</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.posts_count }}
+                                                <!-- Posts Card -->
+                                                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <div class="text-sm font-medium text-blue-600">Posts</div>
+                                                            <div class="mt-1 text-2xl font-bold text-blue-700">
+                                                                {{ business.posts_count }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-newspaper text-blue-600"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-blue-600">
+                                                        {% if business.posts_count > 0 %}
+                                                            Level {{ business.posts_count|divisibleby:5|add:1 }} Publisher
+                                                        {% else %}
+                                                            Start posting to level up!
+                                                        {% endif %}
                                                     </div>
                                                 </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.reviews_count }}
+
+                                                <!-- Reviews Card -->
+                                                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <div class="text-sm font-medium text-purple-600">Reviews</div>
+                                                            <div class="mt-1 text-2xl font-bold text-purple-700">
+                                                                {{ business.reviews_count }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="w-10 h-10 bg-purple-200 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-star text-purple-600"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-purple-600">
+                                                        {% if business.reviews_count > 0 %}
+                                                            Level {{ business.reviews_count|divisibleby:10|add:1 }} Responder
+                                                        {% else %}
+                                                            Respond to reviews to level up!
+                                                        {% endif %}
                                                     </div>
                                                 </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Photos</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.photos_count }}
+
+                                                <!-- Photos Card -->
+                                                <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <div class="text-sm font-medium text-green-600">Photos</div>
+                                                            <div class="mt-1 text-2xl font-bold text-green-700">
+                                                                {{ business.photos_count }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="w-10 h-10 bg-green-200 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-camera text-green-600"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-green-600">
+                                                        {% if business.photos_count > 0 %}
+                                                            Level {{ business.photos_count|divisibleby:3|add:1 }} Photographer
+                                                        {% else %}
+                                                            Upload photos to level up!
+                                                        {% endif %}
                                                     </div>
                                                 </div>
-                                                <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                    <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
-                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                        {{ business.qanda_count }}
+
+                                                <!-- Q&A Card -->
+                                                <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
+                                                    <div class="flex items-center justify-between">
+                                                        <div>
+                                                            <div class="text-sm font-medium text-yellow-600">Q&amp;A</div>
+                                                            <div class="mt-1 text-2xl font-bold text-yellow-700">
+                                                                {{ business.qanda_count }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center">
+                                                            <i class="fas fa-question-circle text-yellow-600"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-2 text-xs text-yellow-600">
+                                                        {% if business.qanda_count > 0 %}
+                                                            Level {{ business.qanda_count|divisibleby:5|add:1 }} Expert
+                                                        {% else %}
+                                                            Answer questions to level up!
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             </div>
@@ -1548,7 +1611,14 @@
                                         {% elif completion <= 60 %}text-orange-500
                                         {% elif completion <= 80 %}text-green-400
                                         {% else %}text-green-600{% endif %}">
-                                            {{ completion }}% Complete
+                                            <span class="font-medium
+                                            {% if completion <= 20 %}text-red-600
+                                            {% elif completion <= 40 %}text-yellow-600 
+                                            {% elif completion <= 60 %}text-orange-600
+                                            {% elif completion <= 80 %}text-green-600
+                                            {% else %}text-green-700{% endif %}">
+                                                {{ completion }}% Complete
+                                            </span>
                                         </div>
                                     </div>
 
