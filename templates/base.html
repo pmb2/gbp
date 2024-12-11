@@ -46,29 +46,32 @@
     <script>
         // Automation settings functionality
         function setAutomation(feature, level, businessId) {
-            // Remove active state from all dots in this feature group
-            const dots = document.querySelectorAll(`[data-feature="${feature}"] .automation-dot`);
-            dots.forEach(dot => dot.classList.remove('active'));
+            // Get all buttons for this feature
+            const buttons = document.querySelectorAll(`button[onclick*="setAutomation('${feature}',"][onclick*="${businessId}"]`);
             
-            // Add active state to clicked dot
-            const selectedDot = document.querySelector(`[data-feature="${feature}"] [data-position="${level}"]`);
-            selectedDot.classList.add('active');
+            // Remove active class from all buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                btn.classList.add('bg-white');
+            });
             
-            // Set progress width based on level
-            const track = document.querySelector(`[data-feature="${feature}"] .automation-progress`);
-            let progress = 0;
-            switch(level) {
-                case 'manual':
-                    progress = 0;
+            // Add active class to clicked button
+            const clickedButton = document.querySelector(`button[onclick="setAutomation('${feature}', '${level}', '${businessId}')"]`);
+            clickedButton.classList.add('active');
+            
+            // Add color based on feature
+            switch(feature) {
+                case 'qa':
+                    clickedButton.classList.add('bg-blue-500');
                     break;
-                case 'approval':
-                    progress = 50;
+                case 'posts':
+                    clickedButton.classList.add('bg-purple-500');
                     break;
-                case 'auto':
-                    progress = 100;
+                case 'reviews':
+                    clickedButton.classList.add('bg-green-500');
                     break;
             }
-            track.style.width = `${progress}%`;
             
             // Save to database via API
             fetch(`/api/business/${businessId}/automation/`, {
@@ -89,13 +92,21 @@
                 } else {
                     console.error('Failed to update automation settings');
                     // Revert UI changes on error
-                    dots.forEach(dot => dot.classList.remove('active'));
+                    buttons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                        btn.classList.add('bg-white');
+                    });
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
                 // Revert UI changes on error
-                dots.forEach(dot => dot.classList.remove('active'));
+                buttons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                    btn.classList.add('bg-white');
+                });
             });
         }
 
