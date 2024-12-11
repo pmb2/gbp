@@ -1299,35 +1299,6 @@
     </script>
 {% endblock %}
 
-<div class="dashboard">
-    <div class="controls">
-        <div class="search-filter">
-            <input type="text" class="search-input" placeholder="Search businesses...">
-            <button class="filter-button">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
-                    <path d="M14 2H2l4.8 5.6v4.8L9.2 14V7.6L14 2z"></path>
-                </svg>
-                Filter
-            </button>
-        </div>
-        <button class="btn btn-primary">Add Business</button>
-    </div>
-    .
-    <table class="business-table">
-        <thead class="bg-gray-50">
-        <tr>
-            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Business Name
-            </th>
-            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status & Actions
-            </th>
-            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-            </th>
-        </tr>
-        </thead>
-        <tbody>
         {% for business in dashboard_data.businesses %}
             <tr>
                 <!-- Business Name -->
