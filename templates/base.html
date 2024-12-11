@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-900 text-gray-100 transition-colors duration-200">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-200">
     <div class="h-screen">
 
         <!-- Main Content -->
@@ -124,46 +124,41 @@
             // Check system preference first, then localStorage
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const storedTheme = localStorage.getItem('theme');
-        
-            if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
-                html.classList.add('dark');
-                document.body.classList.add('dark');
-                if (sunIcon && moonIcon) {
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                }
-            } else {
-                html.classList.remove('dark');
-                document.body.classList.remove('dark');
-                if (sunIcon && moonIcon) {
-                    moonIcon.classList.remove('hidden');
-                    sunIcon.classList.add('hidden');
+            
+            function setDarkMode(isDark) {
+                if (isDark) {
+                    html.classList.add('dark');
+                    if (sunIcon && moonIcon) {
+                        sunIcon.classList.remove('hidden');
+                        moonIcon.classList.add('hidden');
+                    }
+                } else {
+                    html.classList.remove('dark');
+                    if (sunIcon && moonIcon) {
+                        moonIcon.classList.remove('hidden');
+                        sunIcon.classList.add('hidden');
+                    }
                 }
             }
+
+            // Set initial theme
+            setDarkMode(storedTheme === 'dark' || (!storedTheme && systemPrefersDark));
 
             // Add click handler for theme toggle
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
                     const isDark = html.classList.contains('dark');
-                    if (isDark) {
-                        html.classList.remove('dark');
-                        document.body.classList.remove('dark');
-                        localStorage.theme = 'light';
-                        if (moonIcon && sunIcon) {
-                            moonIcon.classList.remove('hidden');
-                            sunIcon.classList.add('hidden');
-                        }
-                    } else {
-                        html.classList.add('dark');
-                        document.body.classList.add('dark');
-                        localStorage.theme = 'dark';
-                        if (sunIcon && moonIcon) {
-                            sunIcon.classList.remove('hidden');
-                            moonIcon.classList.add('hidden');
-                        }
-                    }
+                    setDarkMode(!isDark);
+                    localStorage.theme = isDark ? 'light' : 'dark';
                 });
             }
+
+            // Listen for system theme changes
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.theme) {  // Only react if user hasn't set a preference
+                    setDarkMode(e.matches);
+                }
+            });
         }
 
         // Initialize theme on page load
