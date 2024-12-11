@@ -872,40 +872,61 @@
                                                 <h3 class="text-lg font-medium text-gray-900 mb-6">Automation Settings</h3>
                                                 <div class="space-y-6">
                                                     <!-- Q&A Automation -->
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700 dark:text-gray-300">Q&A Responses</span>
+                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="p-2 bg-blue-200 rounded-full">
+                                                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-gray-700 dark:text-gray-300 font-medium">Q&A Responses</span>
+                                                        </div>
                                                         <div class="relative">
-                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('qa', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="qa-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
+                                                            <div class="flex bg-white border-2 border-blue-200 rounded-full h-10 w-52 p-1">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('qa', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="qa-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Posts Automation -->
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700 dark:text-gray-300">Posts Creation</span>
+                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="p-2 bg-purple-200 rounded-full">
+                                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-gray-700 dark:text-gray-300 font-medium">Posts Creation</span>
+                                                        </div>
                                                         <div class="relative">
-                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('posts', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="posts-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
+                                                            <div class="flex bg-white border-2 border-purple-200 rounded-full h-10 w-52 p-1">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('posts', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="posts-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Reviews Automation -->
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700 dark:text-gray-300">Review Responses</span>
+                                                    <div class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg hover:shadow-md transition-all duration-200">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="p-2 bg-green-200 rounded-full">
+                                                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                                                </svg>
+                                                            </div>
+                                                            <span class="text-gray-700 dark:text-gray-300 font-medium">Review Responses</span>
+                                                        </div>
                                                         <div class="relative">
-                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
-                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')">Off</div>
-                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')">Approval</div>
-                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')">Auto</div>
-                                                                <div id="reviews-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
+                                                            <div class="flex bg-white border-2 border-green-200 rounded-full h-10 w-52 p-1">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-red-50 rounded-l-full transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-yellow-50 transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-green-50 rounded-r-full transition-colors text-sm font-medium" onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="reviews-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-gradient-to-r from-green-500 to-green-600 rounded-full shadow-lg transition-transform duration-200 ease-in-out"></div>
                                                             </div>
                                                         </div>
                                                     </div>
