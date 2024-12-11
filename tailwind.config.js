@@ -14,12 +14,21 @@ module.exports = {
         dark: {
           primary: '#1a1a1a',
           secondary: '#2d2d2d',
+          card: '#2d2d2d',
+          hover: '#3d3d3d'
         }
       },
       textColor: {
         dark: {
           primary: '#ffffff',
           secondary: '#a0aec0',
+          muted: '#6b7280'
+        }
+      },
+      borderColor: {
+        dark: {
+          default: '#404040',
+          hover: '#525252'
         }
       }
     },

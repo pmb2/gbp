@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-dark-primary dark:text-dark-primary transition-colors duration-200">
     <div class="h-screen">
 
         <!-- Main Content -->
@@ -45,35 +45,50 @@
     
     <script>
         // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        const sunIcon = themeToggle.querySelector('.sun');
-        const moonIcon = themeToggle.querySelector('.moon');
+        function initTheme() {
+            const themeToggle = document.getElementById('themeToggle');
+            const html = document.documentElement;
+            const sunIcon = themeToggle?.querySelector('.sun');
+            const moonIcon = themeToggle?.querySelector('.moon');
 
-        // Check for saved theme preference or default to light
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        } else {
-            html.classList.remove('dark');
-            moonIcon.classList.remove('hidden');
-            sunIcon.classList.add('hidden');
+            // Check for saved theme preference or default to light
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                if (sunIcon && moonIcon) {
+                    sunIcon.classList.remove('hidden');
+                    moonIcon.classList.add('hidden');
+                }
+            } else {
+                html.classList.remove('dark');
+                if (sunIcon && moonIcon) {
+                    moonIcon.classList.remove('hidden');
+                    sunIcon.classList.add('hidden');
+                }
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    if (html.classList.contains('dark')) {
+                        html.classList.remove('dark');
+                        localStorage.theme = 'light';
+                        if (moonIcon && sunIcon) {
+                            moonIcon.classList.remove('hidden');
+                            sunIcon.classList.add('hidden');
+                        }
+                    } else {
+                        html.classList.add('dark');
+                        localStorage.theme = 'dark';
+                        if (sunIcon && moonIcon) {
+                            sunIcon.classList.remove('hidden');
+                            moonIcon.classList.add('hidden');
+                        }
+                    }
+                });
+            }
         }
 
-        themeToggle.addEventListener('click', () => {
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.theme = 'light';
-                moonIcon.classList.remove('hidden');
-                sunIcon.classList.add('hidden');
-            } else {
-                html.classList.add('dark');
-                localStorage.theme = 'dark';
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            }
-        });
+        // Initialize theme on page load
+        document.addEventListener('DOMContentLoaded', initTheme);
 
     <script>
         // Sort businesses by completion percentage and urgency

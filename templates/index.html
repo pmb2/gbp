@@ -593,7 +593,7 @@
         </div>
     </div>
     <!-- Business Table -->
-    <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
+    <div class="bg-white dark:bg-dark-card rounded-lg shadow-sm mt-8 w-full overflow-hidden">
         <div class="p-6">
             <div class="flex flex-col w-full mb-6">
                     <div class="flex flex-col items-center justify-center mb-4">
@@ -1325,7 +1325,7 @@
         </thead>
         <tbody>
         {% for business in dashboard_data.businesses %}
-            <tr class="{% cycle 'bg-white' 'bg-gray-50' %} hover:bg-blue-50 cursor-pointer transition-colors duration-150 relative"
+            <tr class="{% cycle 'bg-white dark:bg-dark-card' 'bg-gray-50 dark:bg-dark-secondary' %} hover:bg-blue-50 dark:hover:bg-dark-hover cursor-pointer transition-colors duration-150 relative"
                 onclick="toggleDetails(this)"
                 data-business-id="{{ business.business_id }}">
                 {% if business.is_verified != 'Verified' %}
