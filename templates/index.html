@@ -330,7 +330,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="p-6 max-w-[2000px] mx-auto">
+    <main class="p-6 max-w-[2000px] mx-auto flex flex-col">
     <!-- Header - Hidden until profile is complete -->
     <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -500,8 +500,7 @@
     <!-- Business Table -->
     <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
         <div class="p-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div class="flex flex-col w-full">
+            <div class="flex flex-col w-full mb-6">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
                         <div class="flex items-center space-x-8">
@@ -541,15 +540,15 @@
                             </div>
                         </div>
                     </div>
-                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                    <div class="relative flex-grow sm:flex-grow-0">
+                    <div class="flex flex-col md:flex-row gap-4 w-full">
+                    <div class="relative flex-grow md:w-80">
                         <input type="text"
                                id="businessSearch"
                                placeholder="Search businesses..."
                                class="w-full sm:w-[300px] pl-10 pr-4 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     </div>
-                    <div class="flex gap-2 flex-wrap">
+                    <div class="flex gap-2 flex-wrap justify-end">
                         <button class="flex-grow sm:flex-grow-0 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
