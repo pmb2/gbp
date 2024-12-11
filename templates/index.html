@@ -685,8 +685,8 @@
                             ondragleave="handleDragLeave(event)">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative h-[52px]">
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center px-6 z-20 h-16">
-                                    <div class="font-medium text-gray-900 mr-4">{{ business.business_name }}</div>
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center px-6 z-20 h-16">
+                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
                                     <a href="https://www.google.com/business/" 
                                        target="_blank" 
                                        class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
