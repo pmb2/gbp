@@ -121,18 +121,20 @@
             const sunIcon = themeToggle?.querySelector('.sun');
             const moonIcon = themeToggle?.querySelector('.moon');
 
-            // Always default to dark theme
-            if (!localStorage.theme) {
-                localStorage.theme = 'dark';
-            }
-            if (localStorage.theme === 'dark') {
+            // Check system preference first, then localStorage
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const storedTheme = localStorage.getItem('theme');
+        
+            if (storedTheme === 'dark' || (!storedTheme && systemPrefersDark)) {
                 html.classList.add('dark');
+                document.body.classList.add('dark');
                 if (sunIcon && moonIcon) {
                     sunIcon.classList.remove('hidden');
                     moonIcon.classList.add('hidden');
                 }
             } else {
                 html.classList.remove('dark');
+                document.body.classList.remove('dark');
                 if (sunIcon && moonIcon) {
                     moonIcon.classList.remove('hidden');
                     sunIcon.classList.add('hidden');
@@ -142,8 +144,10 @@
             // Add click handler for theme toggle
             if (themeToggle) {
                 themeToggle.addEventListener('click', () => {
-                    if (html.classList.contains('dark')) {
+                    const isDark = html.classList.contains('dark');
+                    if (isDark) {
                         html.classList.remove('dark');
+                        document.body.classList.remove('dark');
                         localStorage.theme = 'light';
                         if (moonIcon && sunIcon) {
                             moonIcon.classList.remove('hidden');
@@ -151,6 +155,7 @@
                         }
                     } else {
                         html.classList.add('dark');
+                        document.body.classList.add('dark');
                         localStorage.theme = 'dark';
                         if (sunIcon && moonIcon) {
                             sunIcon.classList.remove('hidden');
