@@ -565,11 +565,11 @@
     <div class="bg-white rounded-lg shadow-sm mt-8 w-full overflow-hidden">
         <div class="p-6">
             <div class="flex flex-col w-full mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
+                    <div class="flex flex-col items-center justify-center mb-4">
+                        <h2 class="text-xl font-bold text-gray-900 mb-4">Business Profiles</h2>
                         <div class="flex items-center justify-center space-x-8">
                             <!-- Step Counters -->
-                            <div class="flex items-center justify-center space-x-6">
+                            <div class="flex items-center justify-center space-x-8">
                                 <div class="group relative">
                                     <div class="flex items-center bg-red-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
                                         <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-pulse"></div>
@@ -685,8 +685,8 @@
                             ondragleave="handleDragLeave(event)">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative h-[52px]">
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-between px-6 z-20 h-16">
-                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center px-6 z-20 h-16">
+                                    <div class="font-medium text-gray-900 mr-4">{{ business.business_name }}</div>
                                     <a href="https://www.google.com/business/" 
                                        target="_blank" 
                                        class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
