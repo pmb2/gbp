@@ -1108,7 +1108,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="mt-2 text-xs text-yellow-600">
-                                                        {{ business.qanda_count|default:0 }} Total Q&As
+                                                        {{ business.qanda_count|default_if_none:0 }} Total Q&As
                                                     </div>
                                                 </div>
                                             </div>
