@@ -505,26 +505,54 @@
                         <h2 class="text-xl font-bold text-gray-900">Business Profiles</h2>
                         <div class="flex items-center space-x-8">
                             <!-- Step Counters -->
-                            <div class="flex items-center space-x-4">
-                                <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded-full bg-red-500 mr-2"></div>
-                                    <span class="text-sm font-medium" id="step1-count">0</span>
-                                    <span class="text-sm text-gray-500 ml-1">Not Verified</span>
+                            <div class="flex items-center space-x-6">
+                                <div class="group relative">
+                                    <div class="flex items-center bg-red-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                        <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-pulse"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-red-700" id="step1-count">0</span>
+                                            <span class="text-xs text-red-600">Not Verified</span>
+                                        </div>
+                                    </div>
+                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-red-700 text-white text-xs rounded whitespace-nowrap">
+                                        Businesses requiring verification
+                                    </div>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded-full bg-yellow-500 mr-2"></div>
-                                    <span class="text-sm font-medium" id="step2-count">0</span>
-                                    <span class="text-sm text-gray-500 ml-1">Getting Started</span>
+                                <div class="group relative">
+                                    <div class="flex items-center bg-yellow-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                        <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-yellow-700" id="step2-count">0</span>
+                                            <span class="text-xs text-yellow-600">Getting Started</span>
+                                        </div>
+                                    </div>
+                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-yellow-700 text-white text-xs rounded whitespace-nowrap">
+                                        Newly added businesses
+                                    </div>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-                                    <span class="text-sm font-medium" id="step3-count">0</span>
-                                    <span class="text-sm text-gray-500 ml-1">In Progress</span>
+                                <div class="group relative">
+                                    <div class="flex items-center bg-blue-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                        <div class="w-4 h-4 rounded-full bg-blue-500 mr-3"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-blue-700" id="step3-count">0</span>
+                                            <span class="text-xs text-blue-600">In Progress</span>
+                                        </div>
+                                    </div>
+                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-blue-700 text-white text-xs rounded whitespace-nowrap">
+                                        Actively being updated
+                                    </div>
                                 </div>
-                                <div class="flex items-center">
-                                    <div class="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                                    <span class="text-sm font-medium" id="step4-count">0</span>
-                                    <span class="text-sm text-gray-500 ml-1">Complete</span>
+                                <div class="group relative">
+                                    <div class="flex items-center bg-green-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                        <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
+                                        <div class="flex flex-col">
+                                            <span class="text-lg font-bold text-green-700" id="step4-count">0</span>
+                                            <span class="text-xs text-green-600">Complete</span>
+                                        </div>
+                                    </div>
+                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-green-700 text-white text-xs rounded whitespace-nowrap">
+                                        Fully optimized profiles
+                                    </div>
                                 </div>
                             </div>
                             <!-- Total Stats -->
