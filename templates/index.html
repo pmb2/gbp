@@ -742,19 +742,7 @@
                                             </svg>
                                         </div>
                                     {% endif %}
-                                    <div class="flex items-center justify-between flex-grow">
-                                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                        {% if business.is_verified != 'Verified' %}
-                                            <a href="https://www.google.com/business/"
-                                               target="_blank"
-                                               class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
-                                               onclick="event.stopPropagation()">
-                                                <span>⚠️</span>
-                                                <span class="text-sm">Verify Now</span>
-                                                <span>⚠️</span>
-                                            </a>
-                                        {% endif %}
-                                    </div>
+                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
                                 </div>
                             </td>
                             <td class="w-1/2">
