@@ -1032,11 +1032,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="mt-2 text-xs text-blue-600">
-                                                        {% if business.posts_count > 0 %}
-                                                            Level {{ business.posts_count|divisibleby:5|add:1 }} Publisher
-                                                        {% else %}
-                                                            Start posting to level up!
-                                                        {% endif %}
+                                                        {{ business.posts_count }} Total Posts
                                                     </div>
                                                 </div>
 
@@ -1053,12 +1049,8 @@
                                                             <i class="fas fa-star text-purple-600"></i>
                                                         </div>
                                                     </div>
-                                                    <div class="mt-2 text-xs text-purple-600">
-                                                        {% if business.reviews_count > 0 %}
-                                                            Level {{ business.reviews_count|divisibleby:10|add:1 }} Responder
-                                                        {% else %}
-                                                            Respond to reviews to level up!
-                                                        {% endif %}
+                                                    <div class="mt-2 text-xs text-blue-600">
+                                                        {{ business.reviews_count }} Total Reviews
                                                     </div>
                                                 </div>
 
@@ -1075,12 +1067,8 @@
                                                             <i class="fas fa-camera text-green-600"></i>
                                                         </div>
                                                     </div>
-                                                    <div class="mt-2 text-xs text-green-600">
-                                                        {% if business.photos_count > 0 %}
-                                                            Level {{ business.photos_count|divisibleby:3|add:1 }} Photographer
-                                                        {% else %}
-                                                            Upload photos to level up!
-                                                        {% endif %}
+                                                    <div class="mt-2 text-xs text-blue-600">
+                                                        {{ business.photos_count }} Total Photos
                                                     </div>
                                                 </div>
 
@@ -1097,12 +1085,8 @@
                                                             <i class="fas fa-question-circle text-yellow-600"></i>
                                                         </div>
                                                     </div>
-                                                    <div class="mt-2 text-xs text-yellow-600">
-                                                        {% if business.qanda_count > 0 %}
-                                                            Level {{ business.qanda_count|divisibleby:5|add:1 }} Expert
-                                                        {% else %}
-                                                            Answer questions to level up!
-                                                        {% endif %}
+                                                    <div class="mt-2 text-xs text-blue-600">
+                                                        {{ business.qanda_count }} Total Q&As
                                                     </div>
                                                 </div>
                                             </div>
