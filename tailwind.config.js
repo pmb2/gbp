@@ -4,7 +4,7 @@ module.exports = {
     "./templates/**/*.html",
     "./static/**/*.js",
   ],
-  darkMode: false,
+  darkMode: 'media',
   theme: {
     extend: {
       fontSmoothing: {
@@ -58,7 +58,4 @@ module.exports = {
   corePlugins: {
     preflight: true,
   },
-  experimental: {
-    optimizeUniversalDefaults: true
-  }
 }

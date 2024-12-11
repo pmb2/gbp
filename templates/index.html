@@ -194,9 +194,9 @@
 
         .tab-button:focus {
             outline: none;
-            ring: 2px;
-            ring-offset: 2px;
-            ring-blue-500;
+            outline-width: 2px;
+            outline-offset: 2px;
+            outline-color: #3B82F6;
         }
 
         .tab-button.active {
@@ -1853,6 +1853,12 @@
     </script>
 
     <script>
+        function showMemoriesModal(businessId) {
+            const modal = document.getElementById('memoriesModal');
+            modal.classList.remove('hidden');
+            loadMemories(businessId);
+        }
+        
         function switchTab(businessId, tabName) {
             // Update tab buttons
             document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
