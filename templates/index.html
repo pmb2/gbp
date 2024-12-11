@@ -724,23 +724,8 @@
                             ondragenter="handleDragEnter(event)"
                             ondragleave="handleDragLeave(event)">
                             <td class="px-6 py-4">
-                                <div class="flex items-center justify-between">
-                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    {% if business.is_verified != 'Verified' %}
-                                        <a href="https://www.google.com/business/"
-                                           target="_blank"
-                                           class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
-                                           onclick="event.stopPropagation()">
-                                            <span>⚠️</span>
-                                            <span class="text-sm">Verify Now</span>
-                                            <span>⚠️</span>
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td class="w-1/2">
-                                {% if business.is_verified == 'Verified' %}
-                                    <div class="flex items-center">
+                                <div class="flex items-center">
+                                    {% if business.is_verified == 'Verified' %}
                                         <div class="transform transition-transform duration-200 mr-2 cursor-pointer"
                                              id="arrow-{{ business.business_id }}"
                                              onclick="toggleBusinessDetails('{{ business.business_id }}')">
@@ -750,11 +735,23 @@
                                                       d="M9 5l7 7-7 7"/>
                                             </svg>
                                         </div>
-                                        <div>
-                                            <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                        </div>
+                                    {% endif %}
+                                    <div class="flex items-center justify-between flex-grow">
+                                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                        {% if business.is_verified != 'Verified' %}
+                                            <a href="https://www.google.com/business/"
+                                               target="_blank"
+                                               class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
+                                               onclick="event.stopPropagation()">
+                                                <span>⚠️</span>
+                                                <span class="text-sm">Verify Now</span>
+                                                <span>⚠️</span>
+                                            </a>
+                                        {% endif %}
                                     </div>
-                                {% endif %}
+                                </div>
+                            </td>
+                            <td class="w-1/2">
                                     <div class="flex space-x-2">
                                         <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
                                             <i class="fas fa-cog"></i>
