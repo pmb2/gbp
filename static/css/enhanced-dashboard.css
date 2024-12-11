@@ -159,16 +159,23 @@
 /* Unverified Business Row */
 .unverified-row {
     position: relative;
-    background-color: #fee2e2;
 }
 
-.unverified-row td:not(.relative) {
-    opacity: 0.5;
+.unverified-row td:not(:first-child) {
+    display: none;
 }
 
-.unverified-row .relative {
-    background-color: transparent;
+.unverified-row td:first-child {
+    background: rgba(239, 68, 68, 0.2);
 }
+
+/* Progress bar background colors */
+.expandable-row[data-completion="0"] { background-color: rgba(239, 68, 68, 0.2); }
+.expandable-row[data-completion="20"] { background-color: rgba(245, 158, 11, 0.2); }
+.expandable-row[data-completion="40"] { background-color: rgba(245, 158, 11, 0.2); }
+.expandable-row[data-completion="60"] { background-color: rgba(16, 185, 129, 0.2); }
+.expandable-row[data-completion="80"] { background-color: rgba(16, 185, 129, 0.2); }
+.expandable-row[data-completion="100"] { background-color: rgba(16, 185, 129, 0.2); }
 
 /* Status Indicators */
 .status-badge {
