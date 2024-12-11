@@ -704,10 +704,34 @@
                         </tr>
                         <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
                             <td colspan="5">
-                                <div class="grid grid-cols-2 gap-6">
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Details</h3>
-                                        <div class="space-y-3" id="business-details-{{ business.business_id }}">
+                                <!-- Tabs Navigation -->
+                                <div class="border-b border-gray-200">
+                                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                                        <button onclick="switchTab('{{ business.business_id }}', 'details')"
+                                                class="tab-button active border-b-2 border-blue-500 py-4 px-1 text-sm font-medium text-blue-600"
+                                                id="details-tab-{{ business.business_id }}">
+                                            Business Details
+                                        </button>
+                                        <button onclick="switchTab('{{ business.business_id }}', 'knowledge')"
+                                                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                id="knowledge-tab-{{ business.business_id }}">
+                                            Knowledge Base
+                                        </button>
+                                        <button onclick="switchTab('{{ business.business_id }}', 'settings')"
+                                                class="tab-button border-b-2 border-transparent py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                                                id="settings-tab-{{ business.business_id }}">
+                                            Settings
+                                        </button>
+                                    </nav>
+                                </div>
+
+                                <!-- Tab Contents -->
+                                <div class="p-4">
+                                    <!-- Business Details Tab -->
+                                    <div class="tab-content active" id="details-content-{{ business.business_id }}">
+                                        <div class="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <div class="space-y-3" id="business-details-{{ business.business_id }}">
                                             <div class="flex justify-between items-center mb-4">
                                                 <h3 class="text-lg font-medium text-gray-900">Business Details</h3>
                                                 <button onclick="toggleEditMode('{{ business.business_id }}')" class="text-gray-600 hover:text-gray-900">
@@ -771,10 +795,11 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
-                                        <div class="grid grid-cols-2 gap-4">
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
+                                                <div class="grid grid-cols-2 gap-4">
                                             <div class="bg-white p-4 rounded-lg shadow-sm">
                                                 <div class="text-sm font-medium text-gray-500">Posts</div>
                                                 <div class="mt-1 text-2xl font-semibold text-gray-900">
@@ -797,6 +822,44 @@
                                                 <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
                                                 <div class="mt-1 text-2xl font-semibold text-gray-900">
                                                     {{ business.qanda_count }}
+                                                </div>
+                                            </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Knowledge Base Tab -->
+                                    <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
+                                        <div class="p-4">
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Knowledge Base</h3>
+                                            <div class="bg-gray-50 p-4 rounded-lg">
+                                                <p class="text-gray-600 mb-4">Drag and drop documents here to build your business knowledge base.</p>
+                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                    <p class="text-sm text-gray-500">Supported formats: PDF, TXT, DOC</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Settings Tab -->
+                                    <div class="tab-content hidden" id="settings-content-{{ business.business_id }}">
+                                        <div class="p-4">
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Business Settings</h3>
+                                            <div class="space-y-4">
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-700">Email Notifications</span>
+                                                    <label class="switch">
+                                                        <input type="checkbox" checked>
+                                                        <span class="slider round"></span>
+                                                    </label>
+                                                </div>
+                                                <div class="flex items-center justify-between">
+                                                    <span class="text-gray-700">Automation Status</span>
+                                                    <label class="switch">
+                                                        <input type="checkbox" checked>
+                                                        <span class="slider round"></span>
+                                                    </label>
                                                 </div>
                                             </div>
                                         </div>
@@ -1461,6 +1524,22 @@
     </script>
     
     <script>
+        function switchTab(businessId, tabName) {
+            // Update tab buttons
+            document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
+                tab.classList.remove('border-blue-500', 'text-blue-600');
+                tab.classList.add('border-transparent', 'text-gray-500');
+            });
+            const activeTab = document.getElementById(`${tabName}-tab-${businessId}`);
+            activeTab.classList.remove('border-transparent', 'text-gray-500');
+            activeTab.classList.add('border-blue-500', 'text-blue-600');
+
+            // Update tab contents
+            document.querySelectorAll(`[id$="-content-${businessId}"]`).forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
+        }
         // Search functionality
         document.getElementById('businessSearch').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
