@@ -717,17 +717,14 @@
 {#                        if business is not verified hide all td#}
                             {% if business.is_verified != 'Verified' %}
                             <td class="px-6 py-4">
-                                <div class="flex items-center">
-                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    <a href="https://www.google.com/business/" 
-                                       target="_blank" 
-                                       class="ml-4 flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
-                                       onclick="event.stopPropagation()">
-                                        <span>⚠️</span>
-                                        <span class="text-sm">Account Not Verified - Verify Now</span>
-                                        <span>⚠️</span>
-                                    </a>
-                                </div>
+                                <a href="https://www.google.com/business/" 
+                                   target="_blank" 
+                                   class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
+                                   onclick="event.stopPropagation()">
+                                    <span>⚠️</span>
+                                    <span class="text-sm">Account Not Verified - Verify Now</span>
+                                    <span>⚠️</span>
+                                </a>
                             {% endif %}
                             <td class="w-1/4">
                                 <div class="flex items-center">
