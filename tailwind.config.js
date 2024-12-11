@@ -12,11 +12,11 @@ module.exports = {
       },
       backgroundColor: {
         dark: {
-          primary: '#1a1a1a',
-          secondary: '#2d2d2d',
-          card: '#2d2d2d',
-          hover: '#3d3d3d',
-          accent: '#3b82f6'
+          primary: '#111827',
+          secondary: '#1F2937',
+          card: '#1F2937',
+          hover: '#374151',
+          accent: '#3B82F6'
         }
       },
       textColor: {
