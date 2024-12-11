@@ -703,7 +703,7 @@
                         </th>
                         <th scope="col"
                             class="w-2/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Status & Profile
+                            Profile Status & Completion
                         </th>
                         <th scope="col"
                             class="w-1/4 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -770,7 +770,7 @@
                             {#                        hide all td's above if not verified#}
                         </tr>
                         <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
-                            <td colspan="5">
+                            <td colspan="3">
                                 <!-- Modern Browser-like Tabs -->
                                 <div class="bg-gray-100 rounded-t-lg p-2 flex space-x-1">
                                     <button onclick="switchTab('{{ business.business_id }}', 'details')"
@@ -873,7 +873,7 @@
                                                 <div class="space-y-6">
                                                     <!-- Q&A Automation -->
                                                     <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700">Q&A Responses</span>
+                                                        <span class="text-gray-700 dark:text-gray-300">Q&A Responses</span>
                                                         <div class="relative">
                                                             <div class="flex bg-gray-200 rounded-full h-8 w-48">
                                                                 <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('qa', 'off', '{{ business.business_id }}')">Off</div>
@@ -886,7 +886,7 @@
                                                     
                                                     <!-- Posts Automation -->
                                                     <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700">Posts Creation</span>
+                                                        <span class="text-gray-700 dark:text-gray-300">Posts Creation</span>
                                                         <div class="relative">
                                                             <div class="flex bg-gray-200 rounded-full h-8 w-48">
                                                                 <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('posts', 'off', '{{ business.business_id }}')">Off</div>
@@ -899,7 +899,7 @@
                                                     
                                                     <!-- Reviews Automation -->
                                                     <div class="flex items-center justify-between">
-                                                        <span class="text-gray-700">Review Responses</span>
+                                                        <span class="text-gray-700 dark:text-gray-300">Review Responses</span>
                                                         <div class="relative">
                                                             <div class="flex bg-gray-200 rounded-full h-8 w-48">
                                                                 <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')">Off</div>
