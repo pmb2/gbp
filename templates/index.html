@@ -717,14 +717,17 @@
 {#                        if business is not verified hide all td#}
                             {% if business.is_verified != 'Verified' %}
                             <td class="px-6 py-4">
-                                <a href="https://www.google.com/business/" 
-                                   target="_blank" 
-                                   class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
-                                   onclick="event.stopPropagation()">
-                                    <span>⚠️</span>
-                                    <span class="text-sm">Account Not Verified - Verify Now</span>
-                                    <span>⚠️</span>
-                                </a>
+                                <div class="flex items-center justify-between">
+                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                    <a href="https://www.google.com/business/" 
+                                       target="_blank" 
+                                       class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
+                                       onclick="event.stopPropagation()">
+                                        <span>⚠️</span>
+                                        <span class="text-sm">Verify Now</span>
+                                        <span>⚠️</span>
+                                    </a>
+                                </div>
                             {% endif %}
                             <td class="w-1/4">
                                 {% if business.is_verified == 'Verified' %}
@@ -742,7 +745,7 @@
                                 </div>
                                 {% endif %}
                             </td>
-                            <td class="text-center w-1/4" {% if not business.is_verified %}style="display: none;"{% endif %}>
+                            <td class="text-center w-1/4">
                                 {% with completion=business.calculate_profile_completion %}
                                 <div class="flex flex-col items-center">
                                     <div class="progress-bar w-32">
@@ -766,7 +769,7 @@
                                 </div>
                                 {% endwith %}
                             </td>
-                            <td class="text-center" {% if not business.is_verified %}style="display: none;"{% endif %}>
+                            <td class="text-center">
                                 <div class="flex justify-center space-x-2">
                                     <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
                                          title="Posts Status">
@@ -782,7 +785,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center" {% if not business.is_verified %}style="display: none;"{% endif %}>
+                            <td class="text-center">
                                 {% if business.email_verification_pending %}
                                     <span class="status-badge inline-flex justify-center bg-yellow-100 text-yellow-800">
                                         Pending Email Verification
