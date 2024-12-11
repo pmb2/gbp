@@ -33,6 +33,14 @@
 <script>
 let isEditMode = false;
 let originalMemories = [];
+let currentBusinessId = null;
+
+function showMemoriesModal(businessId) {
+    currentBusinessId = businessId;
+    const modal = document.getElementById('memoriesModal');
+    modal.classList.remove('hidden');
+    loadMemories(businessId);
+}
 
 function toggleEditMode() {
     isEditMode = !isEditMode;
@@ -139,9 +147,11 @@ function closeMemoriesModal() {
         if (confirm('You have unsaved changes. Are you sure you want to close?')) {
             isEditMode = false;
             document.getElementById('memoriesModal').classList.add('hidden');
+            currentBusinessId = null;
         }
     } else {
         document.getElementById('memoriesModal').classList.add('hidden');
+        currentBusinessId = null;
     }
 }
 
