@@ -727,8 +727,8 @@
                                 </a>
                             {% endif %}
                             <td class="w-1/4">
+                                {% if business.is_verified == 'Verified' %}
                                 <div class="flex items-center">
-                                    {% if business.is_verified == 'Verified' %}
                                     <div class="transform transition-transform duration-200 mr-2 cursor-pointer" 
                                          id="arrow-{{ business.business_id }}"
                                          onclick="toggleBusinessDetails('{{ business.business_id }}')">
@@ -736,12 +736,11 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                                         </svg>
                                     </div>
-                                    {% endif %}
                                     <div>
                                         <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-{#                                        <div class="text-sm text-gray-500">ID: {{ business.business_id }}</div>#}
                                     </div>
                                 </div>
+                                {% endif %}
                             </td>
                             <td class="text-center w-1/4" {% if not business.is_verified %}style="display: none;"{% endif %}>
                                 {% with completion=business.calculate_profile_completion %}
