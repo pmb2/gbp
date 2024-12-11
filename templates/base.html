@@ -46,33 +46,57 @@
     <script>
         // Automation settings functionality
         function setAutomation(feature, level, businessId) {
-            const track = document.querySelector(`[data-feature="${feature}"] .automation-progress`);
+            // Remove active state from all dots in this feature group
             const dots = document.querySelectorAll(`[data-feature="${feature}"] .automation-dot`);
-            
-            // Remove active state from all dots
             dots.forEach(dot => dot.classList.remove('active'));
             
-            // Set progress width and active dot
+            // Add active state to clicked dot
+            const selectedDot = document.querySelector(`[data-feature="${feature}"] [data-position="${level}"]`);
+            selectedDot.classList.add('active');
+            
+            // Set progress width based on level
+            const track = document.querySelector(`[data-feature="${feature}"] .automation-progress`);
             let progress = 0;
             switch(level) {
-                case 'off':
+                case 'manual':
                     progress = 0;
-                    dots[0].classList.add('active');
                     break;
                 case 'approval':
                     progress = 50;
-                    dots[1].classList.add('active');
                     break;
                 case 'auto':
                     progress = 100;
-                    dots[2].classList.add('active');
                     break;
             }
-            
             track.style.width = `${progress}%`;
             
-            // Here you would typically make an API call to update the automation settings
-            console.log(`Setting ${feature} automation to ${level} for business ${businessId}`);
+            // Save to database via API
+            fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log(`Successfully updated ${feature} automation to ${level}`);
+                } else {
+                    console.error('Failed to update automation settings');
+                    // Revert UI changes on error
+                    dots.forEach(dot => dot.classList.remove('active'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert UI changes on error
+                dots.forEach(dot => dot.classList.remove('active'));
+            });
         }
 
         // Theme toggle functionality with system preference detection

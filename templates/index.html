@@ -246,8 +246,23 @@
         }
 
         .automation-dot.active {
-            background-color: #2563eb;
-            border-color: #2563eb;
+            background-color: currentColor;
+            border-color: currentColor;
+        }
+
+        .automation-dot[data-position="manual"].active {
+            background-color: #6b7280;
+            border-color: #6b7280;
+        }
+
+        .automation-dot[data-position="approval"].active {
+            background-color: #eab308;
+            border-color: #eab308;
+        }
+
+        .automation-dot[data-position="auto"].active {
+            background-color: #22c55e;
+            border-color: #22c55e;
         }
 
         .automation-label {
@@ -938,10 +953,10 @@
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Q&amp;A Responses</span>
                                                         </div>
                                                         <div class="flex items-center space-x-2">
-                                                            <button onclick="setAutomation('qa', 'off', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
-                                                                    data-position="off">
-                                                                <span class="automation-label">Off</span>
+                                                            <button onclick="setAutomation('qa', 'manual', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600 {% if business.qa_automation == 'manual' %}active{% endif %}"
+                                                                    data-position="manual">
+                                                                <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-blue-300"></div>
                                                             <button onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')"
@@ -969,10 +984,10 @@
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Posts Creation</span>
                                                         </div>
                                                         <div class="flex items-center space-x-2">
-                                                            <button onclick="setAutomation('posts', 'off', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
-                                                                    data-position="off">
-                                                                <span class="automation-label">Off</span>
+                                                            <button onclick="setAutomation('posts', 'manual', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600 {% if business.posts_automation == 'manual' %}active{% endif %}"
+                                                                    data-position="manual">
+                                                                <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-purple-300"></div>
                                                             <button onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')"
@@ -1000,10 +1015,10 @@
                                                             <span class="text-gray-700 dark:text-gray-300 font-medium">Review Responses</span>
                                                         </div>
                                                         <div class="flex items-center space-x-2">
-                                                            <button onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
-                                                                    data-position="off">
-                                                                <span class="automation-label">Off</span>
+                                                            <button onclick="setAutomation('reviews', 'manual', '{{ business.business_id }}')"
+                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600 {% if business.reviews_automation == 'manual' %}active{% endif %}"
+                                                                    data-position="manual">
+                                                                <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-green-300"></div>
                                                             <button onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')"
