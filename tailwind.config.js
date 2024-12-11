@@ -15,7 +15,8 @@ module.exports = {
           primary: '#1a1a1a',
           secondary: '#2d2d2d',
           card: '#2d2d2d',
-          hover: '#3d3d3d'
+          hover: '#3d3d3d',
+          accent: '#3b82f6'
         }
       },
       textColor: {

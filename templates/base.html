@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 dark:bg-dark-primary dark:text-dark-primary transition-colors duration-200">
+<body class="bg-gray-100 dark:bg-dark-primary dark:text-gray-100 transition-colors duration-200">
     <div class="h-screen">
 
         <!-- Main Content -->
@@ -44,7 +44,7 @@
     {% block extra_body %}{% endblock %}
     
     <script>
-        // Theme toggle functionality
+        // Theme toggle functionality with system preference detection
         function initTheme() {
             const themeToggle = document.getElementById('themeToggle');
             const html = document.documentElement;
