@@ -42,6 +42,38 @@
     </div>
 
     {% block extra_body %}{% endblock %}
+    
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const sunIcon = themeToggle.querySelector('.sun');
+        const moonIcon = themeToggle.querySelector('.moon');
+
+        // Check for saved theme preference or default to light
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            moonIcon.classList.remove('hidden');
+            sunIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
 
     <script>
         // Sort businesses by completion percentage and urgency
