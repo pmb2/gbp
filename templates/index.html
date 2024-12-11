@@ -954,8 +954,9 @@
                                                         </div>
                                                         <div class="flex items-center space-x-2">
                                                             <button onclick="setAutomation('qa', 'manual', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600 {% if business.qa_automation == 'manual' %}active{% endif %}"
-                                                                    data-position="manual">
+                                                                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'manual' %}bg-blue-500{% else %}bg-white{% endif %} border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                                                                    data-position="manual"
+                                                                    data-feature="qa">
                                                                 <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-blue-300"></div>
@@ -985,8 +986,9 @@
                                                         </div>
                                                         <div class="flex items-center space-x-2">
                                                             <button onclick="setAutomation('posts', 'manual', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600 {% if business.posts_automation == 'manual' %}active{% endif %}"
-                                                                    data-position="manual">
+                                                                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'manual' %}bg-purple-500{% else %}bg-white{% endif %} border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                                                                    data-position="manual"
+                                                                    data-feature="posts">
                                                                 <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-purple-300"></div>
@@ -1016,8 +1018,9 @@
                                                         </div>
                                                         <div class="flex items-center space-x-2">
                                                             <button onclick="setAutomation('reviews', 'manual', '{{ business.business_id }}')"
-                                                                    class="automation-dot w-4 h-4 rounded-full bg-white border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600 {% if business.reviews_automation == 'manual' %}active{% endif %}"
-                                                                    data-position="manual">
+                                                                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'manual' %}bg-green-500{% else %}bg-white{% endif %} border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                                                                    data-position="manual"
+                                                                    data-feature="reviews">
                                                                 <span class="automation-label">Manual</span>
                                                             </button>
                                                             <div class="w-6 h-0.5 bg-green-300"></div>

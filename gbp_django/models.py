@@ -78,6 +78,9 @@ class Business(models.Model):
     is_verified = models.BooleanField(default=False)
     email_settings = models.CharField(max_length=50, default='Enabled')
     automation_status = models.CharField(max_length=50, default='Active')
+    qa_automation = models.CharField(max_length=20, default='manual')  # manual, approval, auto
+    posts_automation = models.CharField(max_length=20, default='manual')
+    reviews_automation = models.CharField(max_length=20, default='manual')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

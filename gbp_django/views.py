@@ -583,6 +583,56 @@ def dismiss_notification(request, notification_id):
     return JsonResponse({'status': 'error'}, status=405)
 
 @login_required
+@login_required
+@require_http_methods(["POST"])
+def update_automation_settings(request, business_id):
+    try:
+        data = json.loads(request.body)
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        
+        feature = data.get('feature')
+        level = data.get('level')
+        
+        if feature not in ['qa', 'posts', 'reviews'] or level not in ['manual', 'approval', 'auto']:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid feature or automation level'
+            }, status=400)
+            
+        # Update the appropriate field
+        if feature == 'qa':
+            business.qa_automation = level
+        elif feature == 'posts':
+            business.posts_automation = level
+        elif feature == 'reviews':
+            business.reviews_automation = level
+            
+        business.save()
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'feature': feature,
+                'level': level
+            }
+        })
+        
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
 def bulk_upload_businesses(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST method is allowed'}, status=405)

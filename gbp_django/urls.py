@@ -22,6 +22,8 @@ urlpatterns = [
          views.mark_all_notifications_read, name='mark_all_notifications_read'),
     path('api/business/<str:business_id>/update/',
          views.update_business, name='update_business'),
+    path('api/business/<str:business_id>/automation/',
+         views.update_automation_settings, name='update_automation'),
     path('api/business/bulk-upload/',
          views.bulk_upload_businesses, name='bulk_upload_businesses'),
     path('api/business/verify-email/<str:token>/',
