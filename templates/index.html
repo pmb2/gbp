@@ -393,27 +393,31 @@
                 <div class="relative">
                     <button onclick="toggleNotificationsModal()" class="text-gray-600 hover:text-gray-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
                         {% if unread_notifications_count %}
-                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {{ unread_notifications_count }}
                         </span>
                         {% endif %}
                     </button>
                 </div>
-                
+
                 <!-- Theme Toggle -->
                 <button id="themeToggle" class="text-gray-600 hover:text-gray-800 px-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path class="sun hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-                        <path class="moon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        <path class="sun hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        <path class="moon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
                     </svg>
                 </button>
-                
+
                 <!-- User Profile -->
                 <div class="relative group cursor-pointer" onclick="toggleUserMenu()">
-                    <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
+                    <img src="
+                            {% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
                          alt="Profile"
                          class="h-8 w-8 rounded-full">
                     <span class="absolute right-full mr-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm text-gray-700">
@@ -427,33 +431,34 @@
     <!-- Main Content -->
     <main class="p-6 max-w-[2000px] mx-auto flex flex-col overflow-hidden">
     <!-- Header - Hidden until profile is complete -->
-    <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+    <div id="dashboardHeader"
+         class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
             <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
         </div>
-{#        <!-- Total Businesses Card -->#}
-{#        <div class="bg-white overflow-hidden shadow rounded-lg transform transition-all hover:scale-105 w-64">#}
-{#            <div class="p-5">#}
-{#                <div class="flex items-center">#}
-{#                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">#}
-{#                        <i class="fas fa-building text-white"></i>#}
-{#                    </div>#}
-{#                    <div class="ml-5">#}
-{#                        <dl>#}
-{#                            <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>#}
-{#                            <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>#}
-{#                        </dl>#}
-{#                    </div>#}
-{#                </div>#}
-{#                <div class="mt-4">#}
-{#                    <div class="flex items-center text-sm">#}
-{#                        <span class="text-green-500">↑ New</span>#}
-{#                        <span class="ml-2 text-gray-600">Add more businesses</span>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
+        {#        <!-- Total Businesses Card -->#}
+        {#        <div class="bg-white overflow-hidden shadow rounded-lg transform transition-all hover:scale-105 w-64">#}
+        {#            <div class="p-5">#}
+        {#                <div class="flex items-center">#}
+        {#                    <div class="flex-shrink-0 bg-blue-500 rounded-md p-3">#}
+        {#                        <i class="fas fa-building text-white"></i>#}
+        {#                    </div>#}
+        {#                    <div class="ml-5">#}
+        {#                        <dl>#}
+        {#                            <dt class="text-sm font-medium text-gray-500 truncate">Total Businesses</dt>#}
+        {#                            <dd class="text-lg font-semibold text-gray-900">{{ dashboard_data.businesses|length }}</dd>#}
+        {#                        </dl>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#                <div class="mt-4">#}
+        {#                    <div class="flex items-center text-sm">#}
+        {#                        <span class="text-green-500">↑ New</span>#}
+        {#                        <span class="ml-2 text-gray-600">Add more businesses</span>#}
+        {#                    </div>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </div>#}
         <!-- Analytics Overview -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 w-full">
             <!-- Average Rating Card -->
@@ -596,74 +601,80 @@
     <div class="bg-white dark:bg-dark-card dark:border-gray-700 rounded-lg shadow-sm mt-8 w-full">
         <div class="p-6 overflow-hidden">
             <div class="flex flex-col w-full mb-6">
-                    <div class="flex flex-col items-center justify-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-900 mb-4">Business Profiles</h2>
+                <div class="flex flex-col items-center justify-center mb-4">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">Business Profiles</h2>
+                    <div class="flex items-center justify-center space-x-8">
+                        <!-- Step Counters -->
                         <div class="flex items-center justify-center space-x-8">
-                            <!-- Step Counters -->
-                            <div class="flex items-center justify-center space-x-8">
-                                <div class="group relative">
-                                    <div class="flex items-center bg-red-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
-                                        <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-pulse"></div>
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-red-700" id="step1-count">{{ dashboard_data.stats.step1_count }}</span>
-                                            <span class="text-xs text-red-600">Not Verified</span>
-                                        </div>
-                                    </div>
-                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-red-700 text-white text-xs rounded whitespace-nowrap">
-                                        Businesses requiring verification
+                            <div class="group relative">
+                                <div class="flex items-center bg-red-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                    <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-pulse"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-bold text-red-700"
+                                              id="step1-count">{{ dashboard_data.stats.step1_count }}</span>
+                                        <span class="text-xs text-red-600">Not Verified</span>
                                     </div>
                                 </div>
-                                <div class="group relative">
-                                    <div class="flex items-center bg-yellow-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
-                                        <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-yellow-700" id="step2-count">{{ dashboard_data.stats.step2_count }}</span>
-                                            <span class="text-xs text-yellow-600">Getting Started</span>
-                                        </div>
-                                    </div>
-                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-yellow-700 text-white text-xs rounded whitespace-nowrap">
-                                        Newly added businesses
-                                    </div>
-                                </div>
-                                <div class="group relative">
-                                    <div class="flex items-center bg-blue-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
-                                        <div class="w-4 h-4 rounded-full bg-blue-500 mr-3"></div>
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-blue-700" id="step3-count">{{ dashboard_data.stats.step3_count }}</span>
-                                            <span class="text-xs text-blue-600">In Progress</span>
-                                        </div>
-                                    </div>
-                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-blue-700 text-white text-xs rounded whitespace-nowrap">
-                                        Actively being updated
-                                    </div>
-                                </div>
-                                <div class="group relative">
-                                    <div class="flex items-center bg-green-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
-                                        <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
-                                        <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-green-700" id="step4-count">{{ dashboard_data.stats.step4_count }}</span>
-                                            <span class="text-xs text-green-600">Complete</span>
-                                        </div>
-                                    </div>
-                                    <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-green-700 text-white text-xs rounded whitespace-nowrap">
-                                        Fully optimized profiles
-                                    </div>
+                                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-red-700 text-white text-xs rounded whitespace-nowrap">
+                                    Businesses requiring verification
                                 </div>
                             </div>
-                            <!-- Total Stats -->
-                            <div class="flex items-center space-x-4 border-l pl-4">
-                                <div>
-                                    <span class="text-sm text-gray-500">Total Businesses:</span>
-                                    <span class="text-sm font-medium ml-1" id="totalBusinessCount">{{ dashboard_data.stats.total_businesses }}</span>
+                            <div class="group relative">
+                                <div class="flex items-center bg-yellow-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                    <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-bold text-yellow-700"
+                                              id="step2-count">{{ dashboard_data.stats.step2_count }}</span>
+                                        <span class="text-xs text-yellow-600">Getting Started</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span class="text-sm text-gray-500">Completion Rate:</span>
-                                    <span class="text-sm font-medium ml-1" id="averageCompletion">{{ dashboard_data.stats.average_completion }}%</span>
+                                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-yellow-700 text-white text-xs rounded whitespace-nowrap">
+                                    Newly added businesses
+                                </div>
+                            </div>
+                            <div class="group relative">
+                                <div class="flex items-center bg-blue-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                    <div class="w-4 h-4 rounded-full bg-blue-500 mr-3"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-bold text-blue-700"
+                                              id="step3-count">{{ dashboard_data.stats.step3_count }}</span>
+                                        <span class="text-xs text-blue-600">In Progress</span>
+                                    </div>
+                                </div>
+                                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-blue-700 text-white text-xs rounded whitespace-nowrap">
+                                    Actively being updated
+                                </div>
+                            </div>
+                            <div class="group relative">
+                                <div class="flex items-center bg-green-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
+                                    <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-lg font-bold text-green-700"
+                                              id="step4-count">{{ dashboard_data.stats.step4_count }}</span>
+                                        <span class="text-xs text-green-600">Complete</span>
+                                    </div>
+                                </div>
+                                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-green-700 text-white text-xs rounded whitespace-nowrap">
+                                    Fully optimized profiles
                                 </div>
                             </div>
                         </div>
+                        <!-- Total Stats -->
+                        <div class="flex items-center space-x-4 border-l pl-4">
+                            <div>
+                                <span class="text-sm text-gray-500">Total Businesses:</span>
+                                <span class="text-sm font-medium ml-1"
+                                      id="totalBusinessCount">{{ dashboard_data.stats.total_businesses }}</span>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Completion Rate:</span>
+                                <span class="text-sm font-medium ml-1"
+                                      id="averageCompletion">{{ dashboard_data.stats.average_completion }}%</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex flex-col md:flex-row gap-4 w-full">
+                </div>
+                <div class="flex flex-col md:flex-row gap-4 w-full">
                     <div class="relative flex-grow md:w-80">
                         <input type="text"
                                id="businessSearch"
@@ -675,7 +686,8 @@
                         <button class="flex-grow sm:flex-grow-0 bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
-                        <a href="{% url 'google_oauth' %}" class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 inline-flex items-center justify-center">
+                        <a href="{% url 'google_oauth' %}"
+                           class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 inline-flex items-center justify-center">
                             <i class="fas fa-plus mr-2"></i>Add Business
                         </a>
                     </div>
@@ -685,10 +697,12 @@
                 <table class="divide-y divide-gray-200 w-full table-fixed">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="w-2/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Business Name
                         </th>
-                        <th scope="col" class="w-3/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th scope="col"
+                            class="w-3/5 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Status & Actions
                         </th>
                     </tr>
@@ -697,24 +711,23 @@
                     {% for business in dashboard_data.businesses %}
                         <tr class="expandable-row relative {% if not business.is_verified %}unverified-row opacity-70{% endif %} 
                                transition-all duration-300 hover:shadow-md h-16"
-                            style="background: linear-gradient(to right, 
-                                   {% if business.calculate_profile_completion <= 30 %}rgba(239, 68, 68, 0.1){% elif business.calculate_profile_completion <= 70 %}rgba(245, 158, 11, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %} 
-                                   {{ business.calculate_profile_completion }}%, 
-                                   transparent {{ business.calculate_profile_completion }}%)"
-                            data-business-id="{{ business.business_id }}" 
+                            style="background: linear-gradient(to right,
+                                    {% if business.calculate_profile_completion <= 30 %}rgba(239, 68, 68, 0.1){% elif business.calculate_profile_completion <= 70 %}rgba(245, 158, 11, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %}
+                                    {{ business.calculate_profile_completion }}%,
+                                    transparent {{ business.calculate_profile_completion }}%)"
+                            data-business-id="{{ business.business_id }}"
                             data-verified="{{ business.is_verified }}"
                             data-completion="{{ business.calculate_profile_completion }}"
                             ondrop="handleFileDrop(event, '{{ business.business_id }}')"
                             ondragover="handleDragOver(event)"
                             ondragenter="handleDragEnter(event)"
                             ondragleave="handleDragLeave(event)">
-{#                        if business is not verified hide all td#}
                             {% if business.is_verified != 'Verified' %}
-                            <td class="px-6 py-4">
+                                <td class="px-6 py-4">
                                 <div class="flex items-center justify-between">
                                     <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    <a href="https://www.google.com/business/" 
-                                       target="_blank" 
+                                    <a href="https://www.google.com/business/"
+                                       target="_blank"
                                        class="flex items-center space-x-2 text-red-600 font-semibold hover:bg-red-100 px-4 py-1 rounded transition-colors duration-200"
                                        onclick="event.stopPropagation()">
                                         <span>⚠️</span>
@@ -725,74 +738,75 @@
                             {% endif %}
                             <td class="w-1/4">
                                 {% if business.is_verified == 'Verified' %}
-                                <div class="flex items-center">
-                                    <div class="transform transition-transform duration-200 mr-2 cursor-pointer" 
-                                         id="arrow-{{ business.business_id }}"
-                                         onclick="toggleBusinessDetails('{{ business.business_id }}')">
-                                        <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                        </svg>
+                                    <div class="flex items-center">
+                                        <div class="transform transition-transform duration-200 mr-2 cursor-pointer"
+                                             id="arrow-{{ business.business_id }}"
+                                             onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                                            <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-colors duration-200"
+                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M9 5l7 7-7 7"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                    </div>
-                                </div>
                                 {% endif %}
-                            </td>
-                            <td class="px-6 py-4">
+
                                 <div class="flex items-center justify-between">
                                     {% with completion=business.calculate_profile_completion %}
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex flex-col">
-                                            <div class="progress-bar w-32">
-                                                <div class="progress-bar-fill 
+                                        <div class="flex items-center space-x-4">
+                                            <div class="flex flex-col">
+                                                <div class="progress-bar w-32">
+                                                    <div class="progress-bar-fill 
                                                     {% if completion <= 20 %}bg-red-600
                                                     {% elif completion <= 40 %}bg-yellow-600
                                                     {% elif completion <= 60 %}bg-orange-600
                                                     {% elif completion <= 80 %}bg-green-600
                                                     {% else %}bg-green-700{% endif %}"
-                                                    style="width: {{ completion }}%">
+                                                         style="width: {{ completion }}%">
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="text-sm mt-1 
+                                                <div class="text-sm mt-1 
                                                 {% if completion <= 20 %}text-red-500
                                                 {% elif completion <= 40 %}text-yellow-500
                                                 {% elif completion <= 60 %}text-orange-500
                                                 {% elif completion <= 80 %}text-green-400
                                                 {% else %}text-green-600{% endif %}">
-                                                {{ completion }}% Complete
+                                                    {{ completion }}% Complete
+                                                </div>
+                                            </div>
+
+                                            <div class="flex space-x-2">
+                                                {% if business.is_verified != 'Verified' %}
+                                                    <div class="status-icon attention" title="Posts Status">
+                                                        <i class="fas fa-newspaper"></i>
+                                                    </div>
+                                                    <div class="status-icon attention" title="Reviews Status">
+                                                        <i class="fas fa-star"></i>
+                                                    </div>
+                                                    <div class="status-icon attention" title="Photos Status">
+                                                        <i class="fas fa-image"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
+                                                         title="Posts Status">
+                                                        <i class="fas fa-newspaper"></i>
+                                                    </div>
+                                                    <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
+                                                         title="Reviews Status">
+                                                        <i class="fas fa-star"></i>
+                                                    </div>
+                                                    <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
+                                                         title="Photos Status">
+                                                        <i class="fas fa-image"></i>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
-                                        
-                                        <div class="flex space-x-2">
-                                            {% if business.is_verified != 'Verified' %}
-                                                <div class="status-icon attention" title="Posts Status">
-                                                    <i class="fas fa-newspaper"></i>
-                                                </div>
-                                                <div class="status-icon attention" title="Reviews Status">
-                                                    <i class="fas fa-star"></i>
-                                                </div>
-                                                <div class="status-icon attention" title="Photos Status">
-                                                    <i class="fas fa-image"></i>
-                                                </div>
-                                            {% else %}
-                                                <div class="status-icon {% if business.posts_needed %}attention{% elif business.posts_pending %}pending{% else %}complete{% endif %}"
-                                                     title="Posts Status">
-                                                    <i class="fas fa-newspaper"></i>
-                                                </div>
-                                                <div class="status-icon {% if business.reviews_needed %}attention{% elif business.reviews_pending %}pending{% else %}complete{% endif %}"
-                                                     title="Reviews Status">
-                                                    <i class="fas fa-star"></i>
-                                                </div>
-                                                <div class="status-icon {% if business.photos_needed %}attention{% elif business.photos_pending %}pending{% else %}complete{% endif %}"
-                                                     title="Photos Status">
-                                                    <i class="fas fa-image"></i>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
                                     {% endwith %}
-                                    
+
                                     <div class="flex space-x-2">
                                         <button class="px-3 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200">
                                             <i class="fas fa-cog"></i>
@@ -803,7 +817,7 @@
                                     </div>
                                 </div>
                             </td>
-{#                        hide all td's above if not verified#}
+                            {#                        hide all td's above if not verified#}
                         </tr>
                         <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
                             <td colspan="5">
@@ -813,7 +827,8 @@
                                             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
                                             id="details-tab-{{ business.business_id }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                         <span>Business Details</span>
                                     </button>
@@ -821,7 +836,8 @@
                                             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
                                             id="knowledge-tab-{{ business.business_id }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                                         </svg>
                                         <span>Knowledge Base</span>
                                     </button>
@@ -829,8 +845,10 @@
                                             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
                                             id="settings-tab-{{ business.business_id }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                         </svg>
                                         <span>Settings</span>
                                     </button>
@@ -843,158 +861,162 @@
                                         <div class="grid grid-cols-2 gap-6">
                                             <div>
                                                 <div class="space-y-3" id="business-details-{{ business.business_id }}">
-                                            <div class="flex justify-between items-center mb-4">
-                                                <h3 class="text-lg font-medium text-gray-900">Business Details</h3>
-                                                <button onclick="toggleEditMode('{{ business.business_id }}')" class="text-gray-600 hover:text-gray-900">
-                                                    <span id="edit-icon-{{ business.business_id }}">✏️</span>
-                                                </button>
-                                            </div>
-                                            <div class="view-mode" id="view-mode-{{ business.business_id }}">
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Business Name:</span>
-                                                    <span class="text-gray-900">{{ business.business_name }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Address:</span>
-                                                    <span class="text-gray-900">{{ business.address }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Phone:</span>
-                                                    <span class="text-gray-900">{{ business.phone_number }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Website:</span>
-                                                    <span class="text-gray-900">{{ business.website_url }}</span>
-                                                </div>
-                                                <div class="flex justify-between">
-                                                    <span class="text-gray-500">Category:</span>
-                                                    <span class="text-gray-900">{{ business.category }}</span>
-                                                </div>
-                                            </div>
-                                            <div class="edit-mode hidden" id="edit-mode-{{ business.business_id }}">
-                                                <div class="space-y-3">
-                                                    <div class="flex justify-between items-center">
-                                                        <label class="text-gray-500">Business Name:</label>
-                                                        <input type="text" value="{{ business.business_name }}" 
-                                                               class="border rounded px-2 py-1 w-2/3"
-                                                               id="business-name-{{ business.business_id }}">
+                                                    <div class="flex justify-between items-center mb-4">
+                                                        <h3 class="text-lg font-medium text-gray-900">Business
+                                                            Details</h3>
+                                                        <button onclick="toggleEditMode('{{ business.business_id }}')"
+                                                                class="text-gray-600 hover:text-gray-900">
+                                                            <span id="edit-icon-{{ business.business_id }}">✏️</span>
+                                                        </button>
                                                     </div>
-                                                    <div class="flex justify-between items-center">
-                                                        <label class="text-gray-500">Address:</label>
-                                                        <input type="text" value="{{ business.address }}" 
-                                                               class="border rounded px-2 py-1 w-2/3"
-                                                               id="address-{{ business.business_id }}">
+                                                    <div class="view-mode" id="view-mode-{{ business.business_id }}">
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-500">Business Name:</span>
+                                                            <span class="text-gray-900">{{ business.business_name }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-500">Address:</span>
+                                                            <span class="text-gray-900">{{ business.address }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-500">Phone:</span>
+                                                            <span class="text-gray-900">{{ business.phone_number }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-500">Website:</span>
+                                                            <span class="text-gray-900">{{ business.website_url }}</span>
+                                                        </div>
+                                                        <div class="flex justify-between">
+                                                            <span class="text-gray-500">Category:</span>
+                                                            <span class="text-gray-900">{{ business.category }}</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="flex justify-between items-center">
-                                                        <label class="text-gray-500">Phone:</label>
-                                                        <input type="text" value="{{ business.phone_number }}" 
-                                                               class="border rounded px-2 py-1 w-2/3"
-                                                               id="phone-{{ business.business_id }}">
-                                                    </div>
-                                                    <div class="flex justify-between items-center">
-                                                        <label class="text-gray-500">Website:</label>
-                                                        <input type="text" value="{{ business.website_url }}" 
-                                                               class="border rounded px-2 py-1 w-2/3"
-                                                               id="website-{{ business.business_id }}">
-                                                    </div>
-                                                    <div class="flex justify-between items-center">
-                                                        <label class="text-gray-500">Category:</label>
-                                                        <input type="text" value="{{ business.category }}" 
-                                                               class="border rounded px-2 py-1 w-2/3"
-                                                               id="category-{{ business.business_id }}">
+                                                    <div class="edit-mode hidden"
+                                                         id="edit-mode-{{ business.business_id }}">
+                                                        <div class="space-y-3">
+                                                            <div class="flex justify-between items-center">
+                                                                <label class="text-gray-500">Business Name:</label>
+                                                                <input type="text" value="{{ business.business_name }}"
+                                                                       class="border rounded px-2 py-1 w-2/3"
+                                                                       id="business-name-{{ business.business_id }}">
+                                                            </div>
+                                                            <div class="flex justify-between items-center">
+                                                                <label class="text-gray-500">Address:</label>
+                                                                <input type="text" value="{{ business.address }}"
+                                                                       class="border rounded px-2 py-1 w-2/3"
+                                                                       id="address-{{ business.business_id }}">
+                                                            </div>
+                                                            <div class="flex justify-between items-center">
+                                                                <label class="text-gray-500">Phone:</label>
+                                                                <input type="text" value="{{ business.phone_number }}"
+                                                                       class="border rounded px-2 py-1 w-2/3"
+                                                                       id="phone-{{ business.business_id }}">
+                                                            </div>
+                                                            <div class="flex justify-between items-center">
+                                                                <label class="text-gray-500">Website:</label>
+                                                                <input type="text" value="{{ business.website_url }}"
+                                                                       class="border rounded px-2 py-1 w-2/3"
+                                                                       id="website-{{ business.business_id }}">
+                                                            </div>
+                                                            <div class="flex justify-between items-center">
+                                                                <label class="text-gray-500">Category:</label>
+                                                                <input type="text" value="{{ business.category }}"
+                                                                       class="border rounded px-2 py-1 w-2/3"
+                                                                       id="category-{{ business.business_id }}">
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div>
+                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Posts</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.posts_count }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div>
-                                                <h3 class="text-lg font-medium text-gray-900 mb-4">Performance Metrics</h3>
-                                                <div class="grid grid-cols-2 gap-4">
-                                            <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                <div class="text-sm font-medium text-gray-500">Posts</div>
-                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                    {{ business.posts_count }}
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Reviews</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.reviews_count }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                    {{ business.reviews_count }}
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Photos</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.photos_count }}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                <div class="text-sm font-medium text-gray-500">Photos</div>
-                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                    {{ business.photos_count }}
-                                                </div>
-                                            </div>
-                                            <div class="bg-white p-4 rounded-lg shadow-sm">
-                                                <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
-                                                <div class="mt-1 text-2xl font-semibold text-gray-900">
-                                                    {{ business.qanda_count }}
-                                                </div>
-                                            </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Knowledge Base Tab -->
-                                    <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
-                                        <div class="p-4">
-                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Knowledge Base</h3>
-                                            <div class="bg-gray-50 p-4 rounded-lg">
-                                                <p class="text-gray-600 mb-4">Drag and drop documents here to build your business knowledge base.</p>
-                                                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                                    <p class="text-sm text-gray-500">Supported formats: PDF, TXT, DOC</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Settings Tab -->
-                                    <div class="tab-content hidden" id="settings-content-{{ business.business_id }}">
-                                        <div class="p-4">
-                                            <h3 class="text-lg font-medium text-gray-900 mb-4">Business Settings</h3>
-                                            <div class="space-y-4">
-                                                <div class="flex items-center justify-between">
-                                                    <span class="text-gray-700">Email Notifications</span>
-                                                    <label class="switch">
-                                                        <input type="checkbox" checked>
-                                                        <span class="slider round"></span>
-                                                    </label>
-                                                </div>
-                                                <div class="flex items-center justify-between">
-                                                    <span class="text-gray-700">Automation Status</span>
-                                                    <label class="switch">
-                                                        <input type="checkbox" checked>
-                                                        <span class="slider round"></span>
-                                                    </label>
+                                                <div class="bg-white p-4 rounded-lg shadow-sm">
+                                                    <div class="text-sm font-medium text-gray-500">Q&amp;A</div>
+                                                    <div class="mt-1 text-2xl font-semibold text-gray-900">
+                                                        {{ business.qanda_count }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </td>
+
+                                <!-- Knowledge Base Tab -->
+                                <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
+                                    <div class="p-4">
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Knowledge Base</h3>
+                                        <div class="bg-gray-50 p-4 rounded-lg">
+                                            <p class="text-gray-600 mb-4">Drag and drop documents here to build your
+                                                business knowledge base.</p>
+                                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                                                <p class="text-sm text-gray-500">Supported formats: PDF, TXT, DOC</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Settings Tab -->
+                                <div class="tab-content hidden" id="settings-content-{{ business.business_id }}">
+                                    <div class="p-4">
+                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Settings</h3>
+                                        <div class="space-y-4">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-gray-700">Email Notifications</span>
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider round"></span>
+                                                </label>
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-gray-700">Automation Status</span>
+                                                <label class="switch">
+                                                    <input type="checkbox" checked>
+                                                    <span class="slider round"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                        </td>
                         </tr>
                     {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            </tbody>
+            </table>
         </div>
-        {% if unread_notifications_count %}
-            <div class="notification-badge">{{ unread_notifications_count }}</div>
-        {% endif %}
+    </div>
+    {% if unread_notifications_count %}
+        <div class="notification-badge">{{ unread_notifications_count }}</div>
+    {% endif %}
     </div>
 
     <!-- CSRF Token -->
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    
+
     <!-- JavaScript for Business Table Interactions -->
     {% include 'components/alert_banner.html' %}
     {% include 'components/notifications_modal.html' %}
-    
+
     <script>
         function switchTab(businessId, tabName) {
             // Update tab buttons
@@ -1017,7 +1039,7 @@
             const viewMode = document.getElementById(`view-mode-${businessId}`);
             const editMode = document.getElementById(`edit-mode-${businessId}`);
             const editIcon = document.getElementById(`edit-icon-${businessId}`);
-            
+
             if (editMode.classList.contains('hidden')) {
                 // Switch to edit mode
                 viewMode.classList.add('hidden');
@@ -1043,52 +1065,52 @@
                     category: document.getElementById(`category-${businessId}`).value.trim()
                 };
 
-            // Validate required fields
-            const missingFields = Object.entries(data)
-                .filter(([_, value]) => !value)
-                .map(([key]) => key.replace('_', ' '));
+                // Validate required fields
+                const missingFields = Object.entries(data)
+                    .filter(([_, value]) => !value)
+                    .map(([key]) => key.replace('_', ' '));
 
-            if (missingFields.length > 0) {
-                alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/business/${businessId}/update/`, {
-                    method: 'POST', 
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': data.csrfmiddlewaretoken
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(result.message || 'Failed to update business details');
+                if (missingFields.length > 0) {
+                    alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+                    return;
                 }
-            } catch (error) {
-                console.error('Error updating business details:', error);
-                const response = await error.response?.json();
-                
-                if (response?.status === 'verification_required') {
-                    // Show verification modal
-                    const modal = document.getElementById('verificationPromptModal');
-                    if (modal) {
-                        modal.classList.remove('hidden');
+
+                try {
+                    const response = await fetch(`/api/business/${businessId}/update/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': data.csrfmiddlewaretoken
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.message || 'Failed to update business details');
                     }
-                } else {
-                    // Show error in a more user-friendly way
-                    const alertBanner = document.getElementById('alertBanner');
-                    const alertMessage = document.getElementById('alertMessage');
-                    if (alertBanner && alertMessage) {
-                        alertMessage.textContent = response?.message || 'Failed to update business details. Please try again.';
-                        alertBanner.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Error updating business details:', error);
+                    const response = await error.response?.json();
+
+                    if (response?.status === 'verification_required') {
+                        // Show verification modal
+                        const modal = document.getElementById('verificationPromptModal');
+                        if (modal) {
+                            modal.classList.remove('hidden');
+                        }
+                    } else {
+                        // Show error in a more user-friendly way
+                        const alertBanner = document.getElementById('alertBanner');
+                        const alertMessage = document.getElementById('alertMessage');
+                        if (alertBanner && alertMessage) {
+                            alertMessage.textContent = response?.message || 'Failed to update business details. Please try again.';
+                            alertBanner.classList.remove('hidden');
+                        }
                     }
+                    return;
                 }
-                return;
-            }
 
                 // Update the view mode with new values
                 const viewMode = document.getElementById(`view-mode-${businessId}`);
@@ -1108,7 +1130,7 @@
         }
 
         // Check business verification status and profile completion on page load
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             checkBusinessVerification();
             checkProfileCompletion();
         });
@@ -1116,7 +1138,7 @@
         function checkProfileCompletion() {
             const businesses = document.querySelectorAll('.business-table tbody tr:not(.expanded-content)');
             let totalCompletion = 0;
-            
+
             businesses.forEach(business => {
                 const progressBar = business.querySelector('.progress-bar-fill');
                 if (progressBar) {
@@ -1150,7 +1172,7 @@
             const messageEl = document.getElementById('alertMessage');
             banner.classList.remove('hidden');
             messageEl.textContent = message;
-            
+
             if (type === 'red') {
                 banner.classList.remove('bg-orange-100', 'border-orange-400', 'text-orange-700');
                 banner.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
@@ -1182,7 +1204,7 @@
                 .then(data => {
                     const notificationsList = document.getElementById('notificationsList');
                     notificationsList.innerHTML = '';
-                    
+
                     data.notifications.forEach(notification => {
                         const notificationEl = createNotificationElement(notification);
                         notificationsList.appendChild(notificationEl);
@@ -1231,10 +1253,10 @@
             if (row.dataset.verified !== 'Verified') {
                 return; // Don't allow expansion for unverified businesses
             }
-            
+
             const detailsRow = document.getElementById(`details-${businessId}`);
             if (!detailsRow) return;
-            
+
             // Close all other expanded rows
             document.querySelectorAll('.expanded-content').forEach(row => {
                 if (row.id !== `details-${businessId}`) {
@@ -1244,7 +1266,7 @@
 
             // Toggle the clicked row
             detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-            
+
             // Prevent event bubbling
             event.stopPropagation();
         }
@@ -1270,20 +1292,20 @@
             }
         }
 
-    function closeVerificationPromptModal() {
-        const modal = document.getElementById('verificationPromptModal');
-        if (modal) {
-            modal.classList.add('hidden');
+        function closeVerificationPromptModal() {
+            const modal = document.getElementById('verificationPromptModal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
-    }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('verificationPromptModal');
-        if (event.target === modal) {
-            modal.classList.add('hidden');
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const modal = document.getElementById('verificationPromptModal');
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+            }
         }
-    }
     </script>
 {% endblock %}
 
@@ -1302,205 +1324,70 @@
     </div>
     .
     <table class="business-table">
-        <thead>
+        <thead class="bg-gray-50">
         <tr>
-            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Business Name
             </th>
-            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Profile Status
+            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Status & Actions
             </th>
-            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Verification
-            </th>
-            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actionables
-            </th>
-            <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <th class="w-1/3 px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Actions
             </th>
         </tr>
         </thead>
         <tbody>
         {% for business in dashboard_data.businesses %}
-            <tr class="{% cycle 'bg-white dark:bg-dark-card' 'bg-gray-50 dark:bg-dark-secondary' %} hover:bg-blue-50 dark:hover:bg-dark-hover cursor-pointer transition-colors duration-150 relative dark:text-gray-200"
-                onclick="toggleDetails(this)"
-                data-business-id="{{ business.business_id }}">
-                {% if business.is_verified != 'Verified' %}
-                <td colspan="4" class="absolute inset-0 bg-red-50 bg-opacity-95 flex items-center justify-center z-20">
-                    <a href="https://www.google.com/business/" 
-                       target="_blank" 
-                       class="flex items-center justify-center w-full h-full hover:bg-red-100 transition-colors duration-200">
-                        <span class="flex items-center space-x-2 text-red-600 font-semibold text-lg">
-                            <span>⚠️</span>
-                            <span>Account Not Verified</span>
-                            <span class="font-medium">Verify Now</span>
-                            <span>⚠️</span>
-                        </span>
-                    </a>
-                    </div>
-                </td>
-                {% endif %}
-                <td class="p-4">
-                    <div>
-                        <div class="font-medium">{{ business.business_name }}</div>
-                        <span class="text-sm {% if business.no_data %}text-red-600{% else %}text-blue-600{% endif %}">
-                                {% if business.no_data %}
-                                    <a href="http://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
-                                       target="_blank"
-                                       class="inline-flex items-center hover:text-red-700">
-                                        <span class="mr-2">Verify and Add Business Details</span>
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                        </svg>
-                                    </a>
-                                {% else %}
-                                    (Connected via Google)
-                                {% endif %}
-                            </span>
-                    </div>
-                </td>
-                <td class="p-4">
-                    <div class="flex flex-col space-y-2">
-                        <div class="status flex items-center">
-                            <div class="status-icon w-3 h-3 rounded-full mr-2 {% if business.is_verified == 'Verified' %}bg-green-500{% else %}bg-red-500{% endif %}"></div>
-                            <span class="text-sm font-medium">{{ business.is_verified }}</span>
-                        </div>
-                        <div class="action-buttons flex space-x-2">
-                            <button class="btn btn-secondary text-sm px-3 py-1">Edit</button>
-                            <button class="btn btn-primary text-sm px-3 py-1">Analytics</button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr class="details bg-blue-50" style="display: none;">
-                <td colspan="2">
-                    <div class="p-6 space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <h3 class="font-semibold text-gray-900 mb-2">Business Information</h3>
-                                <div class="space-y-2">
-                                    <p><span
-                                            class="font-medium">Address:</span> {{ business.address|default:"No info" }}
-                                    </p>
-                                    <p><span
-                                            class="font-medium">Phone:</span> {{ business.phone_number|default:"No info" }}
-                                    </p>
-                                    <p><span class="font-medium">Website:</span>
-                                        {% if business.website_url != 'No info' %}
-                                            <a href="{{ business.website_url }}"
-                                               class="text-blue-600 hover:underline"
-                                               target="_blank">{{ business.website_url }}</a>
-                                        {% else %}
-                                            No info
-                                        {% endif %}
-                                    </p>
-                                    <p><span
-                                            class="font-medium">Category:</span> {{ business.category|default:"No info" }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 class="font-semibold text-gray-900 mb-2">Metrics</h3>
-                                <div class="space-y-2">
-                                    <p><span
-                                            class="font-medium">Posts:</span> {{ business.posts_count|default:"No info" }}
-                                    </p>
-                                    <p><span
-                                            class="font-medium">Photos:</span> {{ business.photos_count|default:"No info" }}
-                                    </p>
-                                    <p><span
-                                            class="font-medium">Q&amp;A:</span> {{ business.qanda_count|default:"No info" }}
-                                    </p>
-                                    <p><span
-                                            class="font-medium">Reviews:</span> {{ business.reviews_count|default:"No info" }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4">
-                            <h3 class="font-semibold text-gray-900 mb-2">Settings</h3>
-                            <div class="space-y-2">
-                                <p><span
-                                        class="font-medium">Email Settings:</span> {{ business.email_settings|default:"No info" }}
-                                </p>
-                                <p><span
-                                        class="font-medium">Automation Status:</span> {{ business.automation_status|default:"No info" }}
-                                </p>
-                                <p><span
-                                        class="font-medium">Verification Status:</span> {{ business.is_verified|default:"No info" }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        {% empty %}
             <tr>
-                <td colspan="5" class="text-center py-4">
-                    <p class="text-gray-500">No businesses found. <a
-                            href="https://business.google.com/?skipLandingPage=true&gmbsrc=ww-ww-et-gs-z-gmb-v-z-h~bhc-core-u|mybb"
-                            class="text-blue-600 hover:underline">Create a Business Profile</a></p>
+                <!-- Business Name -->
+                <td class="px-6 py-4">
+                    <div class="flex items-center">
+                        <div class="font-medium text-gray-900">{{ business.business_name }}</div>
+                    </div>
                 </td>
-            </tr>
-            <tr class="details" style="display: none;">
-                <td colspan="5">
-                    <div class="p-6 bg-gray-50 space-y-6">
-                        <!-- Business Details Section -->
-                        <div class="grid grid-cols-2 gap-8">
-                            <div class="space-y-4">
-                                <h3 class="text-lg font-semibold text-gray-900">Business Details</h3>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="space-y-2">
-                                        <label class="text-sm font-medium text-gray-500">Address</label>
-                                        <input type="text" value="{{ business.address }}"
-                                               class="w-full px-3 py-2 border rounded-md">
-                                    </div>
-                                    <div class="space-y-2">
-                                        <label class="text-sm font-medium text-gray-500">Phone</label>
-                                        <input type="text" value="{{ business.phone_number }}"
-                                               class="w-full px-3 py-2 border rounded-md">
-                                    </div>
+
+                <!-- Status & Actions -->
+                <td class="px-6 py-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="progress-bar w-32">
+                                <div class="progress-bar-fill 
+                                    {% if business.calculate_profile_completion <= 20 %}bg-red-600
+                                    {% elif business.calculate_profile_completion <= 40 %}bg-yellow-600
+                                    {% elif business.calculate_profile_completion <= 60 %}bg-orange-600
+                                    {% elif business.calculate_profile_completion <= 80 %}bg-green-600
+                                    {% else %}bg-green-700{% endif %}"
+                                     style="width: {{ business.calculate_profile_completion }}%">
                                 </div>
                             </div>
-
-                            <!-- Metrics Section -->
-                            <div class="space-y-4">
-                                <h3 class="text-lg font-semibold text-gray-900">Performance Metrics</h3>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                                        <div class="text-sm font-medium text-gray-500">Total Views</div>
-                                        <div class="mt-1 text-2xl font-semibold text-blue-600">15.2K</div>
-                                    </div>
-                                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                                        <div class="text-sm font-medium text-gray-500">Reviews</div>
-                                        <div class="mt-1 text-2xl font-semibold text-green-600">4.8</div>
-                                    </div>
-                                </div>
+                            <div class="text-sm font-medium">
+                                {{ business.calculate_profile_completion }}% Complete
                             </div>
                         </div>
-
-                        <!-- Action Buttons -->
-                        <div class="flex justify-end space-x-4">
-                            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                Save Changes
-                            </button>
-                            <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
-                                View Analytics
-                            </button>
+                        <div class="flex items-center space-x-2">
+                            <div class="status-icon attention" title="Posts Status">
+                                <i class="fas fa-newspaper"></i>
+                            </div>
+                            <div class="status-icon attention" title="Reviews Status">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="status-icon attention" title="Photos Status">
+                                <i class="fas fa-image"></i>
+                            </div>
                         </div>
-                        <strong>Posts:</strong> {{ business.posts_count|default:"No info" }}<br>
-                        <strong>Photos:</strong> {{ business.photos_count|default:"No info" }}<br>
-                        <strong>Q&amp;A:</strong> {{ business.qanda_count|default:"No info" }}<br>
-                        <strong>Reviews:</strong> {{ business.reviews_count|default:"No info" }}<br>
-                        <strong>Email Settings:</strong> {{ business.email_settings|default:"No info" }}<br>
-                        <strong>Automation:</strong> {{ business.automation_status|default:"No info" }}<br>
-                        <strong>Address:</strong> {{ business.address|default:"No info" }}<br>
-                        <strong>Phone Number:</strong> {{ business.phone_number|default:"No info" }}<br>
-                        <strong>Website URL:</strong> {{ business.website_url|default:"No info" }}<br>
-                        <strong>Category:</strong> {{ business.category|default:"No info" }}<br>
-                        <strong>Verification Status:</strong> {{ business.is_verified|default:"No info" }}
+                    </div>
+                </td>
+
+                <!-- Actions -->
+                <td class="px-6 py-4">
+                    <div class="flex items-center space-x-2">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -1573,18 +1460,18 @@
             if (row.dataset.verified !== 'Verified') {
                 return; // Don't allow expansion for unverified businesses
             }
-    
+
             // Update the profile completion header with business name
             const businessName = row.querySelector('.font-medium').textContent.trim();
             document.getElementById('businessNameHeader').textContent = businessName + "'s";
-    
+
             // Update completion status for this specific business
             checkProfileStatus(businessId);
-            
+
             const detailsRow = document.getElementById(`details-${businessId}`);
             const arrow = document.getElementById(`arrow-${businessId}`);
             const arrowSvg = arrow?.querySelector('svg');
-            
+
             // Close all other rows first
             document.querySelectorAll('[id^="details-"]').forEach(row => {
                 if (row.id !== `details-${businessId}`) {
@@ -1602,7 +1489,7 @@
             if (detailsRow) {
                 const isHidden = detailsRow.style.display === 'none';
                 detailsRow.style.display = isHidden ? 'table-row' : 'none';
-                
+
                 if (arrow && arrowSvg) {
                     arrow.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
                     arrow.style.webkitTransform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
@@ -1650,7 +1537,7 @@
             }
         }
     </script>
-    
+
     <script>
         function switchTab(businessId, tabName) {
             // Update tab buttons
@@ -1668,11 +1555,12 @@
             });
             document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
         }
+
         // Search functionality
-        document.getElementById('businessSearch').addEventListener('input', function(e) {
+        document.getElementById('businessSearch').addEventListener('input', function (e) {
             const searchTerm = e.target.value.toLowerCase();
             const rows = document.querySelectorAll('.expandable-row');
-            
+
             rows.forEach(row => {
                 const businessName = row.querySelector('.font-medium').textContent.toLowerCase();
                 if (businessName.includes(searchTerm)) {
@@ -1689,71 +1577,72 @@
         }
 
         // Listen for messages from OAuth popup
-        window.addEventListener('message', function(event) {
+        window.addEventListener('message', function (event) {
             if (event.data === 'oauth_complete') {
                 refreshBusinessTable();
             }
         });
-    function handleDragOver(event) {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'copy';
-        event.currentTarget.classList.add('bg-blue-50');
-    }
 
-    function handleDragEnter(event) {
-        event.preventDefault();
-        event.currentTarget.classList.add('bg-blue-50');
-    }
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'copy';
+            event.currentTarget.classList.add('bg-blue-50');
+        }
 
-    function handleDragLeave(event) {
-        event.preventDefault();
-        event.currentTarget.classList.remove('bg-blue-50');
-    }
+        function handleDragEnter(event) {
+            event.preventDefault();
+            event.currentTarget.classList.add('bg-blue-50');
+        }
 
-    function handleFileDrop(event, businessId) {
-        event.preventDefault();
-        event.currentTarget.classList.remove('bg-blue-50');
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('bg-blue-50');
+        }
 
-        const files = Array.from(event.dataTransfer.files);
-        const formData = new FormData();
-        
-        // Add all files to formData
-        files.forEach(file => {
-            // Check if file type is accepted
-            if (file.type === 'application/pdf' || 
-                file.type.startsWith('text/') ||
-                file.name.endsWith('.pdf') ||
-                file.name.endsWith('.txt')) {
-                formData.append('files[]', file);
-            }
-        });
+        function handleFileDrop(event, businessId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('bg-blue-50');
 
-        // Add business ID
-        formData.append('business_id', businessId);
+            const files = Array.from(event.dataTransfer.files);
+            const formData = new FormData();
 
-        // Upload files
-        fetch('/api/business/upload-knowledge-base/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert('Files uploaded successfully! Your knowledge base is being processed.');
-                // Update progress if needed
-                checkProfileStatus(businessId);
-            } else {
-                alert('Error uploading files: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Error uploading files. Please try again.');
-        });
-    }
+            // Add all files to formData
+            files.forEach(file => {
+                // Check if file type is accepted
+                if (file.type === 'application/pdf' ||
+                    file.type.startsWith('text/') ||
+                    file.name.endsWith('.pdf') ||
+                    file.name.endsWith('.txt')) {
+                    formData.append('files[]', file);
+                }
+            });
+
+            // Add business ID
+            formData.append('business_id', businessId);
+
+            // Upload files
+            fetch('/api/business/upload-knowledge-base/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Files uploaded successfully! Your knowledge base is being processed.');
+                        // Update progress if needed
+                        checkProfileStatus(businessId);
+                    } else {
+                        alert('Error uploading files: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error uploading files. Please try again.');
+                });
+        }
     </script>
 </div>
 {% include 'verification_modal.html' %}
