@@ -714,6 +714,7 @@
                             ondragover="handleDragOver(event)"
                             ondragenter="handleDragEnter(event)"
                             ondragleave="handleDragLeave(event)">
+{#                        if business is not verified hide all td#}
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative h-[52px]">
                                 <div class="absolute inset-0 bg-red-100 bg-opacity-90 flex items-center px-6 z-20 h-16">
@@ -796,6 +797,7 @@
                                     </span>
                                 {% endif %}
                             </td>
+{#                        hide all td's above if not verified#}
                         </tr>
                         <tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
                             <td colspan="5">
