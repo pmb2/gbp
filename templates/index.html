@@ -1153,7 +1153,7 @@
                                             </div>
 
                                             <!-- Right Panel - Chat Interface (75%) -->
-                                            <div class="bg-white border border-gray-200 rounded-lg flex flex-col">
+                                            <div class="bg-white border border-gray-200 rounded-lg flex flex-col flex-grow">
                                                 <div id="chat-messages-{{ business.business_id }}" class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[400px]">
                                                     <!-- Initial welcome message -->
                                                     <div class="flex items-start">
@@ -2094,5 +2094,6 @@
     
 {% include 'verification_modal.html' %}
 {% include 'components/verification_prompt_modal.html' %}
+{% include 'components/memories_modal.html' %}
 </html>
 </main>

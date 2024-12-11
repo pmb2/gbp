@@ -1,0 +1,155 @@
+<div id="memoriesModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+    <div class="absolute inset-0 bg-gray-600 bg-opacity-50" onclick="closeMemoriesModal()"></div>
+    <div class="relative bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Memories</h3>
+                <div class="flex space-x-2">
+                    <button id="editMemoriesBtn" onclick="toggleEditMode()" class="text-blue-600 hover:text-blue-700">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button onclick="closeMemoriesModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div id="memoriesList" class="space-y-2 max-h-[60vh] overflow-y-auto">
+                <!-- Memories will be listed here -->
+            </div>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="deleteSelectedMemories()" class="text-red-600 hover:text-red-700 px-4 py-2">
+                    Delete Selected
+                </button>
+                <button onclick="saveMemoryChanges()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let isEditMode = false;
+let originalMemories = [];
+
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    const memoriesList = document.getElementById('memoriesList');
+    const items = memoriesList.getElementsByClassName('memory-item');
+    
+    Array.from(items).forEach(item => {
+        const content = item.querySelector('.memory-content');
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        
+        if (isEditMode) {
+            content.contentEditable = 'true';
+            content.classList.add('border', 'border-gray-300', 'rounded', 'p-1');
+            checkbox.style.display = 'inline-block';
+        } else {
+            content.contentEditable = 'false';
+            content.classList.remove('border', 'border-gray-300', 'rounded', 'p-1');
+            checkbox.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('editMemoriesBtn').innerHTML = 
+        isEditMode ? '<i class="fas fa-times"></i> Cancel' : '<i class="fas fa-edit"></i> Edit';
+}
+
+function loadMemories(businessId) {
+    fetch(`/api/business/${businessId}/memories/`)
+        .then(response => response.json())
+        .then(data => {
+            originalMemories = [...data.memories];
+            const memoriesList = document.getElementById('memoriesList');
+            memoriesList.innerHTML = '';
+            
+            data.memories.forEach(memory => {
+                const memoryItem = document.createElement('div');
+                memoryItem.className = 'memory-item flex items-start space-x-2 p-2 hover:bg-gray-50 rounded';
+                memoryItem.innerHTML = `
+                    <input type="checkbox" class="mt-1" style="display: none;">
+                    <div class="memory-content flex-grow">${memory.content}</div>
+                `;
+                memoriesList.appendChild(memoryItem);
+            });
+        });
+}
+
+function saveMemoryChanges() {
+    const memoriesList = document.getElementById('memoriesList');
+    const items = memoriesList.getElementsByClassName('memory-item');
+    const updatedMemories = Array.from(items).map(item => ({
+        content: item.querySelector('.memory-content').textContent,
+        id: item.dataset.memoryId
+    }));
+    
+    fetch(`/api/business/${currentBusinessId}/memories/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ memories: updatedMemories })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            toggleEditMode();
+            loadMemories(currentBusinessId);
+        }
+    });
+}
+
+function deleteSelectedMemories() {
+    const memoriesList = document.getElementById('memoriesList');
+    const selectedItems = memoriesList.querySelectorAll('input[type="checkbox"]:checked');
+    
+    if (selectedItems.length === 0) {
+        alert('Please select memories to delete');
+        return;
+    }
+    
+    if (confirm(`Delete ${selectedItems.length} selected memories?`)) {
+        const memoryIds = Array.from(selectedItems).map(checkbox => 
+            checkbox.closest('.memory-item').dataset.memoryId
+        );
+        
+        fetch(`/api/business/${currentBusinessId}/memories/delete/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ memoryIds })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                loadMemories(currentBusinessId);
+            }
+        });
+    }
+}
+
+function closeMemoriesModal() {
+    if (isEditMode) {
+        if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+            isEditMode = false;
+            document.getElementById('memoriesModal').classList.add('hidden');
+        }
+    } else {
+        document.getElementById('memoriesModal').classList.add('hidden');
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('memoriesModal');
+    if (event.target === modal) {
+        closeMemoriesModal();
+    }
+}
+</script>
