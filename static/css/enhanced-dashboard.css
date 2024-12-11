@@ -146,6 +146,7 @@
 
 .expandable-row:hover {
   background-color: #f9fafb;
+  border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
 .expanded-content {
