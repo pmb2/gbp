@@ -44,6 +44,29 @@
     {% block extra_body %}{% endblock %}
     
     <script>
+        // Automation settings functionality
+        function setAutomation(feature, level, businessId) {
+            const slider = document.getElementById(`${feature}-slider-${businessId}`);
+            let transform = '0';
+            
+            switch(level) {
+                case 'off':
+                    transform = 'translateX(0)';
+                    break;
+                case 'approval':
+                    transform = 'translateX(100%)';
+                    break;
+                case 'auto':
+                    transform = 'translateX(200%)';
+                    break;
+            }
+            
+            slider.style.transform = transform;
+            
+            // Here you would typically make an API call to update the automation settings
+            console.log(`Setting ${feature} automation to ${level} for business ${businessId}`);
+        }
+
         // Theme toggle functionality with system preference detection
         function initTheme() {
             const themeToggle = document.getElementById('themeToggle');

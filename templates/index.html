@@ -791,22 +791,11 @@
                                         </svg>
                                         <span>Knowledge Base</span>
                                     </button>
-                                    <button onclick="switchTab('{{ business.business_id }}', 'settings')"
-                                            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
-                                            id="settings-tab-{{ business.business_id }}">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <span>Settings</span>
-                                    </button>
                                 </div>
 
                                 <!-- Tab Contents -->
                                 <div class="p-4">
-                                    <!-- Business Details Tab -->
+                                    <!-- Business Details & Settings Tab -->
                                     <div class="tab-content active" id="details-content-{{ business.business_id }}">
                                         <div class="grid grid-cols-2 gap-6">
                                             <div>
@@ -873,6 +862,50 @@
                                                                 <input type="text" value="{{ business.category }}"
                                                                        class="border rounded px-2 py-1 w-2/3"
                                                                        id="category-{{ business.business_id }}">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- Automation Settings -->
+                                            <div class="bg-gray-50 p-6 rounded-lg">
+                                                <h3 class="text-lg font-medium text-gray-900 mb-6">Automation Settings</h3>
+                                                <div class="space-y-6">
+                                                    <!-- Q&A Automation -->
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-700">Q&A Responses</span>
+                                                        <div class="relative">
+                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('qa', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="qa-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Posts Automation -->
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-700">Posts Creation</span>
+                                                        <div class="relative">
+                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('posts', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="posts-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Reviews Automation -->
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-gray-700">Review Responses</span>
+                                                        <div class="relative">
+                                                            <div class="flex bg-gray-200 rounded-full h-8 w-48">
+                                                                <div class="absolute inset-y-0 left-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-l-full transition-colors" onclick="setAutomation('reviews', 'off', '{{ business.business_id }}')">Off</div>
+                                                                <div class="absolute inset-y-0 left-1/3 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 transition-colors" onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')">Approval</div>
+                                                                <div class="absolute inset-y-0 right-0 flex items-center justify-center w-1/3 cursor-pointer hover:bg-gray-300 rounded-r-full transition-colors" onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')">Auto</div>
+                                                                <div id="reviews-slider-{{ business.business_id }}" class="absolute h-8 w-1/3 bg-blue-500 rounded-full shadow transition-transform duration-200 ease-in-out"></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -973,28 +1006,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Settings Tab -->
-                                <div class="tab-content hidden" id="settings-content-{{ business.business_id }}">
-                                    <div class="p-4">
-                                        <h3 class="text-lg font-medium text-gray-900 mb-4">Business Settings</h3>
-                                        <div class="space-y-4">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-gray-700">Email Notifications</span>
-                                                <label class="switch">
-                                                    <input type="checkbox" checked>
-                                                    <span class="slider round"></span>
-                                                </label>
-                                            </div>
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-gray-700">Automation Status</span>
-                                                <label class="switch">
-                                                    <input type="checkbox" checked>
-                                                    <span class="slider round"></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                         </div>
                         </td>
                         </tr>
