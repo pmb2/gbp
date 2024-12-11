@@ -742,6 +742,30 @@ def index(request):
         business.qanda_count = business.qanda_set.count()
         business.reviews_count = business.review_set.count()
     
+    # Calculate business statistics
+    stats = {
+        'step1_count': 0,  # Not Verified (0%)
+        'step2_count': 0,  # Getting Started (1-40%)
+        'step3_count': 0,  # In Progress (41-80%)
+        'step4_count': 0,  # Complete (81-100%)
+        'total_businesses': len(businesses),
+        'total_completion': 0
+    }
+    
+    for business in businesses:
+        completion = business.calculate_profile_completion()
+        if not business.is_verified:
+            stats['step1_count'] += 1
+        elif completion <= 40:
+            stats['step2_count'] += 1
+        elif completion <= 80:
+            stats['step3_count'] += 1
+        else:
+            stats['step4_count'] += 1
+        stats['total_completion'] += completion
+    
+    stats['average_completion'] = round(stats['total_completion'] / stats['total_businesses'] if stats['total_businesses'] > 0 else 0)
+    
     # Sort businesses by completion score (after calculating all scores)
     businesses = sorted(businesses, key=lambda x: (x.is_verified, x.profile_completion))
 
@@ -786,7 +810,11 @@ def index(request):
         unread_notifications_count = 0
 
     return render(request, 'index.html', {
-        'dashboard_data': {'businesses': businesses, 'users': users_with_ids},
+        'dashboard_data': {
+            'businesses': businesses, 
+            'users': users_with_ids,
+            'stats': stats
+        },
         'unread_notifications_count': unread_notifications_count
     })
 

@@ -510,7 +510,7 @@
                                     <div class="flex items-center bg-red-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
                                         <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-pulse"></div>
                                         <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-red-700" id="step1-count">0</span>
+                                            <span class="text-lg font-bold text-red-700" id="step1-count">{{ dashboard_data.stats.step1_count }}</span>
                                             <span class="text-xs text-red-600">Not Verified</span>
                                         </div>
                                     </div>
@@ -522,7 +522,7 @@
                                     <div class="flex items-center bg-yellow-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
                                         <div class="w-4 h-4 rounded-full bg-yellow-500 mr-3"></div>
                                         <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-yellow-700" id="step2-count">0</span>
+                                            <span class="text-lg font-bold text-yellow-700" id="step2-count">{{ dashboard_data.stats.step2_count }}</span>
                                             <span class="text-xs text-yellow-600">Getting Started</span>
                                         </div>
                                     </div>
@@ -534,7 +534,7 @@
                                     <div class="flex items-center bg-blue-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
                                         <div class="w-4 h-4 rounded-full bg-blue-500 mr-3"></div>
                                         <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-blue-700" id="step3-count">0</span>
+                                            <span class="text-lg font-bold text-blue-700" id="step3-count">{{ dashboard_data.stats.step3_count }}</span>
                                             <span class="text-xs text-blue-600">In Progress</span>
                                         </div>
                                     </div>
@@ -546,7 +546,7 @@
                                     <div class="flex items-center bg-green-50 rounded-lg px-4 py-2 transition-transform hover:scale-105">
                                         <div class="w-4 h-4 rounded-full bg-green-500 mr-3"></div>
                                         <div class="flex flex-col">
-                                            <span class="text-lg font-bold text-green-700" id="step4-count">0</span>
+                                            <span class="text-lg font-bold text-green-700" id="step4-count">{{ dashboard_data.stats.step4_count }}</span>
                                             <span class="text-xs text-green-600">Complete</span>
                                         </div>
                                     </div>
@@ -559,11 +559,11 @@
                             <div class="flex items-center space-x-4 border-l pl-4">
                                 <div>
                                     <span class="text-sm text-gray-500">Total Businesses:</span>
-                                    <span class="text-sm font-medium ml-1" id="totalBusinessCount">0</span>
+                                    <span class="text-sm font-medium ml-1" id="totalBusinessCount">{{ dashboard_data.stats.total_businesses }}</span>
                                 </div>
                                 <div>
                                     <span class="text-sm text-gray-500">Completion Rate:</span>
-                                    <span class="text-sm font-medium ml-1" id="averageCompletion">0%</span>
+                                    <span class="text-sm font-medium ml-1" id="averageCompletion">{{ dashboard_data.stats.average_completion }}%</span>
                                 </div>
                             </div>
                         </div>
@@ -621,7 +621,7 @@
                             ondragleave="handleDragLeave(event)">
                             {% if business.is_verified != 'Verified' %}
                             <td colspan="4" class="relative h-[52px]">
-                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-between px-6 z-20">
+                                <div class="absolute inset-0 bg-red-50 bg-opacity-75 flex items-center justify-between px-6 z-20 h-16">
                                     <div class="font-medium text-gray-900">{{ business.business_name }}</div>
                                     <a href="https://www.google.com/business/" 
                                        target="_blank" 
