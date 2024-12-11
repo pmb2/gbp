@@ -28,4 +28,6 @@ urlpatterns = [
          views.bulk_upload_businesses, name='bulk_upload_businesses'),
     path('api/business/verify-email/<str:token>/',
          views.verify_business_email, name='verify_business_email'),
+    path('api/feedback/',
+         views.submit_feedback, name='submit_feedback'),
 ]

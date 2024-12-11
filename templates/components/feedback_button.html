@@ -1,0 +1,88 @@
+<div id="feedbackButton" class="fixed bottom-4 left-4 z-50">
+    <button onclick="toggleFeedbackForm()" 
+            class="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+</div>
+
+<div id="feedbackModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Send Feedback</h3>
+            <button onclick="toggleFeedbackForm()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="feedbackForm" onsubmit="submitFeedback(event)" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="feedbackType" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type</label>
+                <select id="feedbackType" name="type" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600">
+                    <option value="suggestion">Suggestion</option>
+                    <option value="bug">Bug Report</option>
+                    <option value="feature">Feature Request</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div>
+                <label for="feedbackMessage" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Message</label>
+                <textarea id="feedbackMessage" name="message" rows="4" required
+                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                          placeholder="Tell us what's on your mind..."></textarea>
+            </div>
+            <div class="flex justify-end">
+                <button type="submit" 
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                    Send Feedback
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function toggleFeedbackForm() {
+    const modal = document.getElementById('feedbackModal');
+    modal.classList.toggle('hidden');
+}
+
+function submitFeedback(event) {
+    event.preventDefault();
+    const form = event.target;
+    const data = {
+        type: form.querySelector('#feedbackType').value,
+        message: form.querySelector('#feedbackMessage').value
+    };
+
+    fetch('/api/feedback/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Thank you for your feedback!');
+            toggleFeedbackForm();
+            form.reset();
+        } else {
+            alert('Error sending feedback. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error sending feedback. Please try again.');
+    });
+}
+
+// Close modal when clicking outside
+document.getElementById('feedbackModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        toggleFeedbackForm();
+    }
+});
+</script>

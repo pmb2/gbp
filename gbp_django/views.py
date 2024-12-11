@@ -874,6 +874,42 @@ def logout_view(request):
     return redirect(reverse('login'))
 
 
+@require_http_methods(["POST"])
+def submit_feedback(request):
+    try:
+        data = json.loads(request.body)
+        feedback_type = data.get('type', 'Not specified')
+        message = data.get('message', '')
+        user_email = request.user.email if request.user.is_authenticated else 'Anonymous'
+
+        # Construct email
+        subject = f'GBP Automation Pro Feedback - {feedback_type}'
+        email_body = f"""
+New feedback received:
+
+Type: {feedback_type}
+From: {user_email}
+Message:
+{message}
+        """
+
+        # Send email
+        send_mail(
+            subject=subject,
+            message=email_body,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.FEEDBACK_EMAIL],
+            fail_silently=False,
+        )
+
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        print(f"Error sending feedback: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Failed to send feedback'
+        }, status=500)
+
 def root_view(request):
     """
     Root view that handles the base URL '/'.
