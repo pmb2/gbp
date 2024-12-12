@@ -840,7 +840,13 @@ def index(request):
             business.reviews_count = Review.objects.filter(business=business).count()
         
         # Set default values for empty fields
-        business.email_settings = getattr(business, 'email_settings', 'Enabled')
+        business.email_settings = getattr(business, 'email_settings', {
+            'enabled': True,
+            'compliance_alerts': True,
+            'content_approval': True,
+            'weekly_summary': True,
+            'verification_reminders': True
+        })
         business.automation_status = getattr(business, 'automation_status', 'Active')
         business.address = business.address or 'No info'
         business.phone_number = business.phone_number or 'No info'
