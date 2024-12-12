@@ -35,7 +35,7 @@ let isEditMode = false;
 let originalMemories = [];
 let currentBusinessId = null;
 
-function showMemoriesModal(businessId) {
+window.showMemoriesModal = function(businessId) {
     currentBusinessId = businessId;
     const modal = document.getElementById('memoriesModal');
     modal.classList.remove('hidden');
