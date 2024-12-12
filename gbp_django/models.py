@@ -77,7 +77,25 @@ class Business(models.Model):
     website_url = models.TextField(blank=True, null=True, default='No info')
     category = models.CharField(max_length=255, blank=True, null=True, default='No info')
     is_verified = models.BooleanField(default=False)
-    email_settings = models.CharField(max_length=50, default='Enabled')
+    email_settings = models.JSONField(default=dict)
+    
+    def get_email_preferences(self):
+        """Get email preferences with defaults"""
+        defaults = {
+            'compliance_alerts': True,
+            'content_approval': True,
+            'weekly_summary': True,
+            'verification_reminders': True,
+            'auto_approve_hours': 24
+        }
+        return {**defaults, **self.email_settings}
+    
+    def update_email_preferences(self, preferences):
+        """Update email preferences"""
+        current = self.get_email_preferences()
+        current.update(preferences)
+        self.email_settings = current
+        self.save(update_fields=['email_settings'])
     automation_status = models.CharField(max_length=50, default='Active')
     qa_automation = models.CharField(max_length=20, default='manual')  # manual, approval, auto
     posts_automation = models.CharField(max_length=20, default='manual')
