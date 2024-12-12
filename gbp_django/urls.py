@@ -30,4 +30,8 @@ urlpatterns = [
          views.verify_business_email, name='verify_business_email'),
     path('api/feedback/',
          views.submit_feedback, name='submit_feedback'),
+    path('api/business/<str:business_id>/chat/',
+         views.chat_message, name='chat_message'),
+    path('api/business/<str:business_id>/knowledge/',
+         views.add_knowledge, name='add_knowledge'),
 ]

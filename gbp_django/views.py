@@ -875,6 +875,8 @@ def logout_view(request):
 
 
 @require_http_methods(["POST"])
+from .utils.rag_utils import answer_question, add_to_knowledge_base
+
 def submit_feedback(request):
     try:
         data = json.loads(request.body)
@@ -908,6 +910,72 @@ Message:
         return JsonResponse({
             'status': 'error',
             'message': 'Failed to send feedback'
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"])
+def chat_message(request, business_id):
+    """Handle chat messages using RAG"""
+    try:
+        data = json.loads(request.body)
+        message = data.get('message')
+        
+        if not message:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No message provided'
+            }, status=400)
+            
+        # Get response using RAG
+        response = answer_question(message, business_id)
+        
+        return JsonResponse({
+            'status': 'success',
+            'response': response
+        })
+        
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+@login_required
+@require_http_methods(["POST"]) 
+def add_knowledge(request, business_id):
+    """Add new knowledge to the business knowledge base"""
+    try:
+        data = json.loads(request.body)
+        question = data.get('question')
+        answer = data.get('answer')
+        
+        if not question or not answer:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Question and answer are required'
+            }, status=400)
+            
+        # Add to knowledge base
+        faq = add_to_knowledge_base(business_id, question, answer)
+        
+        return JsonResponse({
+            'status': 'success',
+            'data': {
+                'id': faq.id,
+                'question': faq.question,
+                'answer': faq.answer
+            }
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
         }, status=500)
 
 def root_view(request):
