@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.conf import settings
+from .utils.rag_utils import answer_question, add_to_knowledge_base
 
 def send_verification_email(business):
     """Send verification email to business email address"""
@@ -875,8 +876,6 @@ def logout_view(request):
 
 
 @require_http_methods(["POST"])
-from .utils.rag_utils import answer_question, add_to_knowledge_base
-
 def submit_feedback(request):
     try:
         data = json.loads(request.body)
