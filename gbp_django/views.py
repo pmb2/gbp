@@ -449,7 +449,7 @@ from .api.business_management import update_business_details
 @login_required
 def get_notifications(request):
     notifications = Notification.objects.filter(
-        user=request.user,
+        user_id=request.user.id,
         read=False
     ).order_by('-created_at').values(
         'id', 
@@ -472,7 +472,7 @@ def get_notifications(request):
 @require_http_methods(["POST"])
 def mark_all_notifications_read(request):
     Notification.objects.filter(
-        user=request.user,
+        user_id=request.user.id,
         read=False
     ).update(read=True)
     return JsonResponse({'status': 'success'})
