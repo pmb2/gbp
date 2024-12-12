@@ -1113,9 +1113,6 @@
                                             <div class="w-1/4 bg-gray-50 p-4 rounded-lg">
                                                 <div class="flex justify-between items-center mb-4">
                                                     <h4 class="font-medium text-gray-700">Knowledge Base</h4>
-                                                    <button class="text-sm text-blue-600 hover:text-blue-800" onclick="deleteSelectedFiles('{{ business.business_id }}')">
-                                                        Delete Selected
-                                                    </button>
                                                 </div>
                                                 <!-- Memories Section -->
                                                 <div class="mb-4">
@@ -1130,12 +1127,16 @@
                                                 <div id="file-list-{{ business.business_id }}" class="space-y-2 mb-4 max-h-[300px] overflow-y-auto">
                                                     <!-- Files will be listed here dynamically -->
                                                     <template id="file-item-template">
-                                                        <div class="file-item flex items-center space-x-2 p-2 hover:bg-gray-100 rounded">
-                                                            <button class="delete-file text-gray-400 hover:text-red-500">
+                                                        <div class="file-item flex items-center justify-between p-2 hover:bg-gray-100 rounded group">
+                                                            <div class="flex items-center space-x-2 flex-grow">
+                                                                <i class="fas fa-file text-gray-400"></i>
+                                                                <span class="flex-1 filename truncate"></span>
+                                                                <span class="text-sm text-gray-500 filesize"></span>
+                                                            </div>
+                                                            <button class="delete-file text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                                    onclick="deleteFile(this.closest('.file-item').dataset.fileId)">
                                                                 <i class="fas fa-times"></i>
                                                             </button>
-                                                            <span class="flex-1 filename"></span>
-                                                            <span class="text-sm text-gray-500 filesize"></span>
                                                         </div>
                                                     </template>
                                                 </div>
@@ -1942,12 +1943,18 @@
         function handleDragOver(event) {
             event.preventDefault();
             event.dataTransfer.dropEffect = 'copy';
-            event.currentTarget.classList.add('bg-blue-50');
+            const row = event.currentTarget.closest('.expandable-row');
+            if (row && row.dataset.verified === 'true') {
+                event.currentTarget.classList.add('bg-blue-50');
+            }
         }
 
         function handleDragEnter(event) {
             event.preventDefault();
-            event.currentTarget.classList.add('bg-blue-50');
+            const row = event.currentTarget.closest('.expandable-row');
+            if (row && row.dataset.verified === 'true') {
+                event.currentTarget.classList.add('bg-blue-50');
+            }
         }
 
         function handleDragLeave(event) {
@@ -1960,46 +1967,102 @@
             event.preventDefault();
             event.currentTarget.classList.remove('bg-blue-50');
 
+            const row = event.currentTarget.closest('.expandable-row');
+            if (!row || row.dataset.verified !== 'true') {
+                showErrorMessage('Please verify your business profile before uploading files.');
+                return;
+            }
+
             const files = Array.from(event.dataTransfer.files);
             const formData = new FormData();
+            let hasValidFiles = false;
 
-            // Add all files to formData
-            files.forEach(file => {
-                // Check if file type is accepted
-                if (file.type === 'application/pdf' ||
-                    file.type.startsWith('text/') ||
-                    file.name.endsWith('.pdf') ||
-                    file.name.endsWith('.txt') ||
-                    file.name.endsWith('.doc') ||
-                    file.name.endsWith('.docx')) {
-                    formData.append('files[]', file);
+            // Process files and folders recursively
+            async function processEntry(entry) {
+                if (entry.isFile) {
+                    const file = await new Promise(resolve => entry.file(resolve));
+                    if (isValidFileType(file)) {
+                        formData.append('files[]', file);
+                        hasValidFiles = true;
+                    }
+                } else if (entry.isDirectory) {
+                    const reader = entry.createReader();
+                    const entries = await new Promise(resolve => reader.readEntries(resolve));
+                    for (const childEntry of entries) {
+                        await processEntry(childEntry);
+                    }
                 }
-            });
+            }
 
-            // Add business ID
-            formData.append('business_id', businessId);
-
-            // Upload files
-            fetch('/api/business/upload-knowledge-base/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    updateFileList(businessId, data.files);
-                    showSuccessMessage('Files uploaded successfully!');
-                } else {
-                    showErrorMessage('Error uploading files: ' + data.message);
+            // Handle both files and folders
+            Promise.all(Array.from(event.dataTransfer.items).map(item => {
+                const entry = item.webkitGetAsEntry || item.getAsEntry();
+                return entry ? processEntry(entry) : Promise.resolve();
+            })).then(() => {
+                if (!hasValidFiles) {
+                    showErrorMessage('No valid files found. Supported formats: PDF, TXT, DOC, DOCX');
+                    return;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorMessage('Error uploading files. Please try again.');
+
+                formData.append('business_id', businessId);
+
+                // Upload files
+                fetch('/api/business/upload-knowledge-base/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        updateFileList(businessId, data.files);
+                        showSuccessMessage('Files uploaded successfully!');
+                    } else {
+                        showErrorMessage('Error uploading files: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('Error uploading files. Please try again.');
+                });
             });
+        }
+
+        function isValidFileType(file) {
+            return file.type === 'application/pdf' ||
+                   file.type.startsWith('text/') ||
+                   file.name.endsWith('.pdf') ||
+                   file.name.endsWith('.txt') ||
+                   file.name.endsWith('.doc') ||
+                   file.name.endsWith('.docx');
+        }
+
+        function deleteFile(fileId) {
+            if (confirm('Are you sure you want to delete this file?')) {
+                const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+                const businessId = fileItem.closest('[id^="file-list-"]').dataset.businessId;
+
+                fetch(`/api/business/${businessId}/files/${fileId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        fileItem.remove();
+                        showSuccessMessage('File deleted successfully');
+                    } else {
+                        showErrorMessage('Error deleting file');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('Error deleting file');
+                });
+            }
         }
 
         // Make business rows droppable
