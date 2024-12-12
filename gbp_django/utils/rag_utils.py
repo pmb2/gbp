@@ -34,17 +34,20 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 3) -> List[
                 except Exception as e:
                     print(f"[ERROR] Failed to calculate similarity: {str(e)}")
                     continue
-    
-    # Sort by similarity and get top_k
-    similarities.sort(key=lambda x: x[0], reverse=True)
-    return [
-        {
-            'question': faq.question,
-            'answer': faq.answer,
-            'similarity': float(sim)
-        }
-        for sim, faq in similarities[:top_k]
-    ]
+        
+        # Sort by similarity and get top_k
+        similarities.sort(key=lambda x: x[0], reverse=True)
+        return [
+            {
+                'question': faq.question,
+                'answer': faq.answer,
+                'similarity': float(sim)
+            }
+            for sim, faq in similarities[:top_k]
+        ]
+    except Exception as e:
+        print(f"[ERROR] Failed to search knowledge base: {str(e)}")
+        return []
 
 def get_relevant_context(query: str, business_id: str) -> str:
     """Get relevant context from knowledge base"""
