@@ -84,6 +84,9 @@ class Business(models.Model):
     reviews_automation = models.CharField(max_length=20, default='manual')
     description = models.TextField(blank=True, null=True)
     embedding = VectorField(dimensions=1536, null=True)  # For business profile embedding
+    compliance_score = models.IntegerField(default=0)  # Store compliance percentage
+    last_post_date = models.DateTimeField(null=True, blank=True)
+    next_update_date = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

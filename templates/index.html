@@ -748,7 +748,8 @@
                             <td class="w-1/2">
                                 <div class="flex flex-col space-y-2">
                                     <!-- Status Overview -->
-                                    <div class="flex items-center justify-between">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <!-- Status Badges -->
                                         <div class="flex items-center space-x-3">
                                             {% if business.is_verified == 'Verified' %}
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -761,10 +762,15 @@
                                                     {{ business.automation_status }}
                                                 </span>
                                                 
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <button onclick="showComplianceModal('{{ business.business_id }}')"
+                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                        {% if business.compliance_score >= 80 %}bg-green-100 text-green-800
+                                                        {% elif business.compliance_score >= 50 %}bg-yellow-100 text-yellow-800
+                                                        {% else %}bg-red-100 text-red-800{% endif %}
+                                                        hover:opacity-75 transition-opacity">
                                                     <i class="fas fa-shield-check mr-1"></i>
-                                                    Compliant
-                                                </span>
+                                                    {{ business.compliance_score }}% Compliant
+                                                </button>
                                             {% else %}
                                                 <a href="https://business.google.com/"
                                                    target="_blank"
@@ -774,35 +780,33 @@
                                                 </a>
                                             {% endif %}
                                         </div>
-                                        
-                                        <!-- Profile Status -->
-                                        <div class="flex items-center space-x-2">
-                                            <span class="text-sm font-medium text-gray-600">
-                                                {{ business.calculate_profile_completion }}% Complete
-                                            </span>
-                                        </div>
-                                    </div>
 
-                                    <!-- Activity Timeline -->
-                                    {% if business.is_verified == 'Verified' %}
-                                        <div class="text-sm text-gray-600">
-                                            <div class="flex items-center space-x-2">
-                                                <i class="fas fa-clock text-gray-400"></i>
-                                                <span>Last Post: 
-                                                    {% if business.posts_count and business.posts_count != '0' %}
-                                                        <span class="font-medium">2 days ago</span>
-                                                    {% else %}
-                                                        <span class="text-blue-600">No posts yet</span>
-                                                    {% endif %}
-                                                </span>
+                                        <!-- Activity Timeline -->
+                                        {% if business.is_verified == 'Verified' %}
+                                            <div class="text-sm text-gray-600">
+                                                <div class="flex items-center justify-end space-x-2">
+                                                    <i class="fas fa-clock text-gray-400"></i>
+                                                    <span>Last Post: 
+                                                        {% if business.last_post_date %}
+                                                            <span class="font-medium">{{ business.last_post_date|timesince }} ago</span>
+                                                        {% else %}
+                                                            <span class="text-blue-600">No posts yet</span>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                                <div class="flex items-center justify-end space-x-2 mt-1">
+                                                    <i class="fas fa-sync text-gray-400"></i>
+                                                    <span>Next Update: 
+                                                        {% if business.next_update_date %}
+                                                            <span class="font-medium">{{ business.next_update_date|timeuntil }}</span>
+                                                        {% else %}
+                                                            <span class="text-gray-400">Not scheduled</span>
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
                                             </div>
-                                            <div class="flex items-center space-x-2 mt-1">
-                                                <i class="fas fa-sync text-gray-400"></i>
-                                                <span>Next Update: 
-                                                    <span class="font-medium">Tomorrow</span>
-                                                </span>
-                                            </div>
-                                        </div>
+                                        {% endif %}
+                                    </div>
 
                                         <!-- SEO Health -->
                                         <div class="mt-2">

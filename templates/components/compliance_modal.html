@@ -1,0 +1,119 @@
+<div id="complianceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="relative top-20 mx-auto p-6 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Compliance Checklist</h3>
+            <button onclick="closeComplianceModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="posts-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Regular Posts (Weekly)</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="reviews-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Review Responses (Within 48h)</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="qa-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Q&A Responses (Within 24h)</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="photos-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Fresh Photos (Monthly)</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="info-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Business Info Up to Date</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="hours-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Operating Hours Current</span>
+            </div>
+            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="attributes-compliance">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Business Attributes Complete</span>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="text-sm text-gray-500">
+                Overall Compliance Score: <span id="compliance-score" class="font-semibold">0</span>%
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div id="compliance-progress" class="h-2 rounded-full transition-all duration-500"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showComplianceModal(businessId) {
+    const modal = document.getElementById('complianceModal');
+    modal.classList.remove('hidden');
+    loadComplianceData(businessId);
+}
+
+function closeComplianceModal() {
+    document.getElementById('complianceModal').classList.add('hidden');
+}
+
+function loadComplianceData(businessId) {
+    fetch(`/api/business/${businessId}/compliance/`)
+        .then(response => response.json())
+        .then(data => {
+            updateComplianceChecklist(data);
+        });
+}
+
+function updateComplianceChecklist(data) {
+    const items = {
+        'posts': data.posts_compliance,
+        'reviews': data.reviews_compliance,
+        'qa': data.qa_compliance,
+        'photos': data.photos_compliance,
+        'info': data.info_compliance,
+        'hours': data.hours_compliance,
+        'attributes': data.attributes_compliance
+    };
+
+    Object.entries(items).forEach(([key, value]) => {
+        const item = document.getElementById(`${key}-compliance`);
+        const icon = item.querySelector('div');
+        
+        if (value >= 80) {
+            item.classList.add('bg-green-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        } else if (value >= 50) {
+            item.classList.add('bg-yellow-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        } else {
+            item.classList.add('bg-red-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        }
+    });
+
+    // Update overall compliance score
+    const score = data.overall_compliance;
+    document.getElementById('compliance-score').textContent = score;
+    const progress = document.getElementById('compliance-progress');
+    progress.style.width = `${score}%`;
+    
+    if (score >= 80) {
+        progress.classList.add('bg-green-500');
+    } else if (score >= 50) {
+        progress.classList.add('bg-yellow-500');
+    } else {
+        progress.classList.add('bg-red-500');
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('complianceModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeComplianceModal();
+    }
+});
+</script>
