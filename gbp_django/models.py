@@ -77,7 +77,7 @@ class Business(models.Model):
     website_url = models.TextField(blank=True, null=True, default='No info')
     category = models.CharField(max_length=255, blank=True, null=True, default='No info')
     is_verified = models.BooleanField(default=False)
-    email_settings = models.JSONField(default=dict, help_text="Email notification preferences")
+    email_settings = models.JSONField(default=dict, help_text="Email notification preferences", blank=True)
     
     def get_email_preferences(self):
         """Get email preferences with defaults"""

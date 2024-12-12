@@ -3,7 +3,7 @@ from django.db import migrations
 def update_email_settings(apps, schema_editor):
     Business = apps.get_model('gbp_django', 'Business')
     for business in Business.objects.all():
-        if not isinstance(business.email_settings, dict):
+        if business.email_settings == 'Enabled' or not isinstance(business.email_settings, dict):
             business.email_settings = {
                 'enabled': True,
                 'compliance_alerts': True,
@@ -13,6 +13,12 @@ def update_email_settings(apps, schema_editor):
             }
             business.save()
 
+def reverse_email_settings(apps, schema_editor):
+    Business = apps.get_model('gbp_django', 'Business')
+    for business in Business.objects.all():
+        business.email_settings = {}
+        business.save()
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -20,5 +26,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_email_settings),
+        migrations.RunPython(update_email_settings, reverse_email_settings),
     ]
