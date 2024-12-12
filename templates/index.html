@@ -1132,11 +1132,12 @@
                                                                 <i class="fas fa-file text-gray-400"></i>
                                                                 <span class="flex-1 filename truncate"></span>
                                                                 <span class="text-sm text-gray-500 filesize"></span>
+                                                                <button class="delete-file text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                                                                        onclick="deleteFile(this.closest('.file-item').dataset.fileId, '{{ business.business_id }}')"
+                                                                        style="display: none;">
+                                                                    <i class="fas fa-times"></i>
+                                                                </button>
                                                             </div>
-                                                            <button class="delete-file text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                    onclick="deleteFile(this.closest('.file-item').dataset.fileId)">
-                                                                <i class="fas fa-times"></i>
-                                                            </button>
                                                         </div>
                                                     </template>
                                                 </div>
@@ -1259,13 +1260,27 @@
                 const fileItem = template.content.cloneNode(true).firstElementChild;
                 fileItem.dataset.fileId = file.id;
                 fileItem.querySelector('.filename').textContent = file.name;
-                fileItem.querySelector('.filesize').textContent = file.size;
+                fileItem.querySelector('.filesize').textContent = formatFileSize(file.size);
                 
-                // Add delete handler
-                fileItem.querySelector('.delete-file').addEventListener('click', () => deleteFile(businessId, file.id));
+                // Show delete button only for regular files (not chat memories)
+                const deleteButton = fileItem.querySelector('.delete-file');
+                if (!file.is_chat_memory) {
+                    deleteButton.style.display = 'block';
+                    fileItem.classList.add('regular-file');
+                } else {
+                    fileItem.classList.add('chat-memory');
+                }
                 
                 fileList.appendChild(fileItem);
             });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
         function deleteFile(businessId, fileId) {
@@ -1968,36 +1983,74 @@
             event.currentTarget.classList.remove('bg-blue-50');
 
             const row = event.currentTarget.closest('.expandable-row');
-            if (!row || row.dataset.verified !== 'true') {
+            if (!row) {
+                showErrorMessage('Invalid drop target');
+                return;
+            }
+
+            // Check business verification
+            if (row.dataset.verified !== 'true') {
                 showErrorMessage('Please verify your business profile before uploading files.');
                 return;
             }
 
-            const files = Array.from(event.dataTransfer.files);
+            const items = event.dataTransfer.items;
             const formData = new FormData();
             let hasValidFiles = false;
+            let processedItems = 0;
+            let totalItems = 0;
 
             // Process files and folders recursively
-            async function processEntry(entry) {
+            async function processEntry(entry, path = '') {
                 if (entry.isFile) {
-                    const file = await new Promise(resolve => entry.file(resolve));
-                    if (isValidFileType(file)) {
-                        formData.append('files[]', file);
-                        hasValidFiles = true;
+                    try {
+                        const file = await new Promise(resolve => entry.file(resolve));
+                        if (isValidFileType(file)) {
+                            // Preserve folder structure in name if it exists
+                            const fullPath = path ? `${path}/${file.name}` : file.name;
+                            formData.append('files[]', file, fullPath);
+                            hasValidFiles = true;
+                        }
+                        processedItems++;
+                        updateUploadProgress(processedItems, totalItems);
+                    } catch (error) {
+                        console.error('Error processing file:', error);
                     }
                 } else if (entry.isDirectory) {
                     const reader = entry.createReader();
-                    const entries = await new Promise(resolve => reader.readEntries(resolve));
-                    for (const childEntry of entries) {
-                        await processEntry(childEntry);
+                    try {
+                        const entries = await new Promise(resolve => reader.readEntries(resolve));
+                        totalItems += entries.length;
+                        for (const childEntry of entries) {
+                            await processEntry(childEntry, path ? `${path}/${entry.name}` : entry.name);
+                        }
+                    } catch (error) {
+                        console.error('Error reading directory:', error);
                     }
                 }
             }
 
-            // Handle both files and folders
-            Promise.all(Array.from(event.dataTransfer.items).map(item => {
+            // Count total items first
+            async function countItems(entry) {
+                if (entry.isFile) {
+                    totalItems++;
+                } else if (entry.isDirectory) {
+                    const reader = entry.createReader();
+                    const entries = await new Promise(resolve => reader.readEntries(resolve));
+                    totalItems += entries.length;
+                    for (const childEntry of entries) {
+                        await countItems(childEntry);
+                    }
+                }
+            }
+
+            // Process all items
+            Promise.all(Array.from(items).map(async item => {
                 const entry = item.webkitGetAsEntry || item.getAsEntry();
-                return entry ? processEntry(entry) : Promise.resolve();
+                if (entry) {
+                    await countItems(entry);
+                    await processEntry(entry);
+                }
             })).then(() => {
                 if (!hasValidFiles) {
                     showErrorMessage('No valid files found. Supported formats: PDF, TXT, DOC, DOCX');
@@ -2028,6 +2081,12 @@
                     showErrorMessage('Error uploading files. Please try again.');
                 });
             });
+        }
+
+        function updateUploadProgress(processed, total) {
+            const progress = (processed / total) * 100;
+            // Update UI with progress (you can add a progress bar element)
+            console.log(`Upload progress: ${Math.round(progress)}%`);
         }
 
         function isValidFileType(file) {
