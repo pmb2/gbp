@@ -1,0 +1,42 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Action Required: {{ task_type|title }} Update{% endblock %}
+
+{% block content %}
+<h2>{{ business_name }} Needs Your Attention</h2>
+
+<div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3>{{ task_type|title }} Update Required</h3>
+    <p>{{ task_description }}</p>
+    
+    {% if task_type == 'post' %}
+        <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px;">
+            <h4>Suggested Post Content:</h4>
+            <p>{{ content }}</p>
+        </div>
+    {% endif %}
+    
+    {% if task_type == 'review' %}
+        <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px;">
+            <h4>Customer Review:</h4>
+            <p>{{ review_content }}</p>
+            <h4>Suggested Response:</h4>
+            <p>{{ content }}</p>
+        </div>
+    {% endif %}
+    
+    {% if task_type == 'qa' %}
+        <div style="background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px;">
+            <h4>Customer Question:</h4>
+            <p>{{ question }}</p>
+            <h4>Suggested Answer:</h4>
+            <p>{{ content }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<p>Please take action to maintain your business profile's optimal performance:</p>
+<a href="{{ action_url }}" class="button">Update Now</a>
+
+<p><small>Your current automation setting for {{ task_type }}s is set to "Manual".</small></p>
+{% endblock %}

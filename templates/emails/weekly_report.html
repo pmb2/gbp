@@ -1,0 +1,58 @@
+{% extends "emails/base_email.html" %}
+
+{% block title %}Weekly Performance Report{% endblock %}
+
+{% block content %}
+<h2>{{ business_name }} Weekly Summary</h2>
+
+<div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <h3>Profile Performance</h3>
+    
+    <!-- Profile Completion -->
+    <div style="margin-bottom: 20px;">
+        <h4>Profile Completion: {{ profile_completion }}%</h4>
+        <div style="background: #e5e7eb; height: 8px; border-radius: 4px;">
+            <div style="background: #2563eb; height: 100%; width: {{ profile_completion }}%; border-radius: 4px;"></div>
+        </div>
+    </div>
+    
+    <!-- Weekly Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <div style="background: #fff; padding: 15px; border-radius: 5px; text-align: center;">
+            <h4>Posts</h4>
+            <p>{{ stats.posts_count }} new posts</p>
+            <p>{{ stats.posts_engagement }} engagements</p>
+        </div>
+        
+        <div style="background: #fff; padding: 15px; border-radius: 5px; text-align: center;">
+            <h4>Reviews</h4>
+            <p>{{ stats.reviews_count }} new reviews</p>
+            <p>{{ stats.average_rating }} avg rating</p>
+        </div>
+        
+        <div style="background: #fff; padding: 15px; border-radius: 5px; text-align: center;">
+            <h4>Q&A</h4>
+            <p>{{ stats.qa_count }} new questions</p>
+            <p>{{ stats.response_rate }}% response rate</p>
+        </div>
+    </div>
+</div>
+
+<!-- Compliance Score -->
+<div style="background: {% if compliance_score >= 80 %}#f0fdf4{% elif compliance_score >= 60 %}#fef3c7{% else %}#fef2f2{% endif %}; 
+            padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3>Compliance Score: {{ compliance_score }}%</h3>
+    {% if compliance_issues %}
+        <h4>Areas Needing Attention:</h4>
+        <ul>
+            {% for issue in compliance_issues %}
+                <li>{{ issue }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<a href="{{ dashboard_url }}" class="button">View Full Report</a>
+
+<p><small>Next report scheduled for {{ next_report_date|date:"F j, Y" }}</small></p>
+{% endblock %}
