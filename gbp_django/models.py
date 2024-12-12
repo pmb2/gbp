@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from pgvector.django import VectorField
 
 class UserManager(BaseUserManager):
     def create_user(self, email, google_id, password=None, **extra_fields):
@@ -81,6 +82,8 @@ class Business(models.Model):
     qa_automation = models.CharField(max_length=20, default='manual')  # manual, approval, auto
     posts_automation = models.CharField(max_length=20, default='manual')
     reviews_automation = models.CharField(max_length=20, default='manual')
+    description = models.TextField(blank=True, null=True)
+    embedding = VectorField(dimensions=1536, null=True)  # For business profile embedding
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -147,6 +150,17 @@ class QandA(models.Model):
     answered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+class FAQ(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='faqs')
+    question = models.TextField()
+    answer = models.TextField()
+    embedding = VectorField(dimensions=1536)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.business.business_name} - {self.question[:50]}"
 
 class AutomationLog(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
