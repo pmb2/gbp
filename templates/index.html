@@ -1133,7 +1133,7 @@
                                                                 <span class="flex-1 filename truncate"></span>
                                                                 <span class="text-sm text-gray-500 filesize"></span>
                                                                 <button class="delete-file text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                                                        onclick="deleteFile(this.closest('.file-item').dataset.fileId, '{{ business.business_id }}')"
+                                                                        onclick="deleteFile('{{ business.business_id }}', this.closest('.file-item').dataset.fileId)"
                                                                         style="display: none;">
                                                                     <i class="fas fa-times"></i>
                                                                 </button>
@@ -1970,30 +1970,43 @@
             event.preventDefault();
             event.dataTransfer.dropEffect = 'copy';
             const row = event.currentTarget.closest('.expandable-row');
-            if (row && row.dataset.verified === 'true') {
-                event.currentTarget.classList.add('bg-blue-50');
+            if (row) {
+                if (row.dataset.verified === 'true') {
+                    row.classList.add('drag-over');
+                } else {
+                    row.classList.add('drag-invalid');
+                }
             }
         }
 
         function handleDragEnter(event) {
             event.preventDefault();
             const row = event.currentTarget.closest('.expandable-row');
-            if (row && row.dataset.verified === 'true') {
-                event.currentTarget.classList.add('bg-blue-50');
+            if (row) {
+                if (row.dataset.verified === 'true') {
+                    row.classList.add('drag-over');
+                } else {
+                    row.classList.add('drag-invalid');
+                }
             }
         }
 
         function handleDragLeave(event) {
             event.preventDefault();
-            event.currentTarget.classList.remove('bg-blue-50');
+            const row = event.currentTarget.closest('.expandable-row');
+            if (row) {
+                row.classList.remove('drag-over', 'drag-invalid');
+            }
         }
 
         // Handle file drops anywhere on the business row
         function handleFileDrop(event, businessId) {
             event.preventDefault();
-            event.currentTarget.classList.remove('bg-blue-50');
-
             const row = event.currentTarget.closest('.expandable-row');
+            if (row) {
+                row.classList.remove('drag-over', 'drag-invalid');
+            }
+
             if (!row) {
                 showErrorMessage('Invalid drop target');
                 return;
@@ -2010,6 +2023,7 @@
             let hasValidFiles = false;
             let processedItems = 0;
             let totalItems = 0;
+            let uploadProgress = 0;
 
             // Process files and folders recursively
             async function processEntry(entry, path = '') {
@@ -2021,11 +2035,15 @@
                             const fullPath = path ? `${path}/${file.name}` : file.name;
                             formData.append('files[]', file, fullPath);
                             hasValidFiles = true;
+                            
+                            // Update progress
+                            processedItems++;
+                            uploadProgress = (processedItems / totalItems) * 100;
+                            updateUploadProgress(uploadProgress);
                         }
-                        processedItems++;
-                        updateUploadProgress(processedItems, totalItems);
                     } catch (error) {
                         console.error('Error processing file:', error);
+                        showErrorMessage(`Error processing file: ${error.message}`);
                     }
                 } else if (entry.isDirectory) {
                     const reader = entry.createReader();
@@ -2037,6 +2055,7 @@
                         }
                     } catch (error) {
                         console.error('Error reading directory:', error);
+                        showErrorMessage(`Error reading directory: ${error.message}`);
                     }
                 }
             }
@@ -2044,11 +2063,12 @@
             // Count total items first
             async function countItems(entry) {
                 if (entry.isFile) {
-                    totalItems++;
+                    if (entry.name.match(/\.(pdf|txt|doc|docx)$/i)) {
+                        totalItems++;
+                    }
                 } else if (entry.isDirectory) {
                     const reader = entry.createReader();
                     const entries = await new Promise(resolve => reader.readEntries(resolve));
-                    totalItems += entries.length;
                     for (const childEntry of entries) {
                         await countItems(childEntry);
                     }
@@ -2094,10 +2114,14 @@
             });
         }
 
-        function updateUploadProgress(processed, total) {
-            const progress = (processed / total) * 100;
-            // Update UI with progress (you can add a progress bar element)
-            console.log(`Upload progress: ${Math.round(progress)}%`);
+        function updateUploadProgress(progress) {
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressText = document.getElementById('uploadProgressText');
+            
+            if (progressBar && progressText) {
+                progressBar.style.width = `${progress}%`;
+                progressText.textContent = `${Math.round(progress)}%`;
+            }
         }
 
         function isValidFileType(file) {
