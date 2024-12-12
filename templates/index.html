@@ -1284,6 +1284,13 @@
         }
 
         function deleteFile(businessId, fileId) {
+            // Check if file is a chat memory
+            const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+            if (fileItem && fileItem.classList.contains('chat-memory')) {
+                showErrorMessage('Chat memories cannot be deleted');
+                return;
+            }
+
             if (confirm('Are you sure you want to delete this file?')) {
                 fetch(`/api/business/${businessId}/files/${fileId}/`, {
                     method: 'DELETE',
@@ -1293,11 +1300,15 @@
                 })
                 .then(response => {
                     if (response.ok) {
-                        const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
-                        if (fileItem) {
-                            fileItem.remove();
-                        }
+                        fileItem.remove();
+                        showSuccessMessage('File deleted successfully');
+                    } else {
+                        showErrorMessage('Error deleting file');
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showErrorMessage('Error deleting file');
                 });
             }
         }
