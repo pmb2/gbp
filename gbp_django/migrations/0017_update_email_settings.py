@@ -1,6 +1,5 @@
 from django.db import migrations
 from django.db.models import Value
-from django.contrib.postgres.fields.jsonb import KeyTextTransform
 
 def update_email_settings(apps, schema_editor):
     Business = apps.get_model('gbp_django', 'Business')
