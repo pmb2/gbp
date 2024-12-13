@@ -1,0 +1,109 @@
+<div id="seoHealthModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="relative top-20 mx-auto p-6 border w-11/12 max-w-md shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">SEO Health Analysis</h3>
+            <button onclick="closeSeoHealthModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="space-y-4">
+            <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="meta-tags">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Meta Tags Optimization</span>
+            </div>
+            <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="content-quality">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Content Quality</span>
+            </div>
+            <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="mobile-friendly">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Mobile Friendliness</span>
+            </div>
+            <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="page-speed">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Page Speed</span>
+            </div>
+            <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="backlinks">
+                <div class="w-6 h-6 flex-shrink-0"></div>
+                <span>Backlink Profile</span>
+            </div>
+        </div>
+        <div class="mt-6">
+            <div class="text-sm text-gray-500">
+                Overall SEO Score: <span id="seo-score" class="font-semibold">0</span>%
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div id="seo-progress" class="h-2 rounded-full transition-all duration-500"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showSeoHealthModal(businessId) {
+    const modal = document.getElementById('seoHealthModal');
+    modal.classList.remove('hidden');
+    loadSeoData(businessId);
+}
+
+function closeSeoHealthModal() {
+    document.getElementById('seoHealthModal').classList.add('hidden');
+}
+
+function loadSeoData(businessId) {
+    fetch(`/api/business/${businessId}/seo-health/`)
+        .then(response => response.json())
+        .then(data => {
+            updateSeoChecklist(data);
+        });
+}
+
+function updateSeoChecklist(data) {
+    const items = {
+        'meta-tags': data.meta_tags_score,
+        'content-quality': data.content_quality_score,
+        'mobile-friendly': data.mobile_friendly_score,
+        'page-speed': data.page_speed_score,
+        'backlinks': data.backlinks_score
+    };
+
+    Object.entries(items).forEach(([key, value]) => {
+        const item = document.getElementById(key);
+        const icon = item.querySelector('div');
+        
+        if (value >= 80) {
+            item.classList.add('bg-green-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+        } else if (value >= 50) {
+            item.classList.add('bg-yellow-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+        } else {
+            item.classList.add('bg-red-50');
+            icon.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+        }
+    });
+
+    // Update overall score
+    const score = data.overall_score;
+    document.getElementById('seo-score').textContent = score;
+    const progress = document.getElementById('seo-progress');
+    progress.style.width = `${score}%`;
+    
+    if (score >= 80) {
+        progress.classList.add('bg-green-500');
+    } else if (score >= 50) {
+        progress.classList.add('bg-yellow-500');
+    } else {
+        progress.classList.add('bg-red-500');
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('seoHealthModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeSeoHealthModal();
+    }
+});
+</script>

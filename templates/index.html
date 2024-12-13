@@ -729,8 +729,14 @@
                             ondragover="handleDragOver(event)"
                             ondragenter="handleDragEnter(event)"
                             ondragleave="handleDragLeave(event)">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center">
+                            <td class="px-6 py-4 relative">
+                                <div class="absolute top-0 left-0 p-1 text-xs font-medium rounded-br
+                                    {% if business.calculate_profile_completion <= 30 %}bg-red-600 text-white
+                                    {% elif business.calculate_profile_completion <= 70 %}bg-yellow-600 text-white
+                                    {% else %}bg-green-600 text-white{% endif %}">
+                                    {{ business.calculate_profile_completion }}%
+                                </div>
+                                <div class="flex items-center mt-2">
                                     {% if business.is_verified == 'Verified' %}
                                         <div class="mr-2 cursor-pointer"
                                              id="arrow-{{ business.business_id }}"
@@ -750,26 +756,71 @@
                                     <!-- Status Overview -->
                                     <div class="grid grid-cols-2 gap-4">
                                         <!-- Status Badges -->
-                                        <div class="flex items-center space-x-3">
+                                        <div class="flex items-center space-x-4">
                                             {% if business.is_verified == 'Verified' %}
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                    {% if business.automation_status == 'Active' %}
-                                                        bg-green-100 text-green-800
-                                                    {% else %}
-                                                        bg-yellow-100 text-yellow-800
-                                                    {% endif %}">
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                     <span class="mr-1">●</span>
-                                                    {{ business.automation_status }}
+                                                    Verified
                                                 </span>
                                                 
+                                                <!-- Compliance Circle -->
                                                 <button onclick="showComplianceModal('{{ business.business_id }}')"
-                                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                                        {% if business.compliance_score >= 80 %}bg-green-100 text-green-800
-                                                        {% elif business.compliance_score >= 50 %}bg-yellow-100 text-yellow-800
-                                                        {% else %}bg-red-100 text-red-800{% endif %}
-                                                        hover:opacity-75 transition-opacity">
-                                                    <i class="fas fa-shield-check mr-1"></i>
-                                                    {{ business.compliance_score }}% Compliant
+                                                        class="relative inline-flex items-center justify-center w-12 h-12 cursor-pointer group">
+                                                    <svg class="transform -rotate-90 w-12 h-12">
+                                                        <circle class="text-gray-200"
+                                                                stroke-width="3"
+                                                                stroke="currentColor"
+                                                                fill="transparent"
+                                                                r="20"
+                                                                cx="24"
+                                                                cy="24"/>
+                                                        <circle class="
+                                                            {% if business.compliance_score >= 80 %}text-green-500
+                                                            {% elif business.compliance_score >= 50 %}text-yellow-500
+                                                            {% else %}text-red-500{% endif %}"
+                                                                stroke-width="3"
+                                                                stroke-dasharray="{{ business.compliance_score|multiply:1.256 }},126"
+                                                                stroke-linecap="round"
+                                                                stroke="currentColor"
+                                                                fill="transparent"
+                                                                r="20"
+                                                                cx="24"
+                                                                cy="24"/>
+                                                    </svg>
+                                                    <span class="absolute text-xs font-medium">{{ business.compliance_score }}%</span>
+                                                    <span class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
+                                                        Compliance Score
+                                                    </span>
+                                                </button>
+
+                                                <!-- SEO Health Circle -->
+                                                <button onclick="showSeoHealthModal('{{ business.business_id }}')"
+                                                        class="relative inline-flex items-center justify-center w-12 h-12 cursor-pointer group">
+                                                    <svg class="transform -rotate-90 w-12 h-12">
+                                                        <circle class="text-gray-200"
+                                                                stroke-width="3"
+                                                                stroke="currentColor"
+                                                                fill="transparent"
+                                                                r="20"
+                                                                cx="24"
+                                                                cy="24"/>
+                                                        <circle class="
+                                                            {% if business.seo_health >= 80 %}text-green-500
+                                                            {% elif business.seo_health >= 50 %}text-yellow-500
+                                                            {% else %}text-red-500{% endif %}"
+                                                                stroke-width="3"
+                                                                stroke-dasharray="{{ business.seo_health|multiply:1.256 }},126"
+                                                                stroke-linecap="round"
+                                                                stroke="currentColor"
+                                                                fill="transparent"
+                                                                r="20"
+                                                                cx="24"
+                                                                cy="24"/>
+                                                    </svg>
+                                                    <span class="absolute text-xs font-medium">{{ business.seo_health }}%</span>
+                                                    <span class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
+                                                        SEO Health
+                                                    </span>
                                                 </button>
                                             {% else %}
                                                 <a href="https://business.google.com/"
