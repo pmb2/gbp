@@ -5,25 +5,17 @@ def update_email_settings(apps, schema_editor):
     Business = apps.get_model('gbp_django', 'Business')
     db_alias = schema_editor.connection.alias
     
-    # First update any string 'Enabled' values to proper JSON
-    Business.objects.using(db_alias).filter(
-        email_settings='Enabled'
-    ).update(
-        email_settings={
-            'enabled': True,
-            'compliance_alerts': True,
-            'content_approval': True,
-            'weekly_summary': True,
-            'verification_reminders': True
-        }
-    )
+    # Update all businesses to have proper JSON email settings
+    default_settings = {
+        'enabled': True,
+        'compliance_alerts': True,
+        'content_approval': True,
+        'weekly_summary': True,
+        'verification_reminders': True
+    }
     
-    # Then handle any null or invalid values
-    Business.objects.using(db_alias).filter(
-        email_settings__isnull=True
-    ).update(
-        email_settings={}
-    )
+    # Update all businesses
+    Business.objects.using(db_alias).all().update(email_settings=default_settings)
 
 def reverse_email_settings(apps, schema_editor):
     Business = apps.get_model('gbp_django', 'Business')
