@@ -470,37 +470,49 @@ def google_oauth_callback(request):
         print(f"[INFO] Fetching locations for account {account['name']}...")
         locations = get_locations(access_token, account['name'])
         print(f"[INFO] Locations fetched for account {account['name']}:", locations)
-        for location in locations.get('locations', []):
-            # Fetch and store posts
-            print(f"[INFO] Fetching posts for location {location['name']}...")
-            posts_data = get_posts(access_token, account['name'], location['name'])
-            print(f"[INFO] Posts fetched for location {location['name']}:", posts_data)
-            store_posts(posts_data, location['name'])
-            print(f"[INFO] Posts stored for location {location['name']}.")
+        
+        try:
+            for location in locations.get('locations', []):
+                # Fetch and store posts
+                print(f"[INFO] Fetching posts for location {location['name']}...")
+                posts_data = get_posts(access_token, account['name'], location['name'])
+                print(f"[INFO] Posts fetched for location {location['name']}:", posts_data)
+                store_posts(posts_data, location['name'])
+                print(f"[INFO] Posts stored for location {location['name']}.")
 
-            # Fetch and store reviews
-            print(f"[INFO] Fetching reviews for location {location['name']}...")
-            reviews_data = get_reviews(access_token, account['name'], location['name'])
-            print(f"[INFO] Reviews fetched for location {location['name']}:", reviews_data)
-            store_reviews(reviews_data, location['name'])
-            print(f"[INFO] Reviews stored for location {location['name']}.")
+                # Fetch and store reviews
+                print(f"[INFO] Fetching reviews for location {location['name']}...")
+                reviews_data = get_reviews(access_token, account['name'], location['name'])
+                print(f"[INFO] Reviews fetched for location {location['name']}:", reviews_data)
+                store_reviews(reviews_data, location['name'])
+                print(f"[INFO] Reviews stored for location {location['name']}.")
 
-            # Fetch and store Q&A
-            print(f"[INFO] Fetching Q&A for location {location['name']}...")
-            qa_data = get_questions_and_answers(access_token, account['name'], location['name'])
-            print(f"[INFO] Q&A fetched for location {location['name']}:", qa_data)
-            store_questions_and_answers(qa_data, location['name'])
-            print(f"[INFO] Q&A stored for location {location['name']}.")
+                # Fetch and store Q&A
+                print(f"[INFO] Fetching Q&A for location {location['name']}...")
+                qa_data = get_questions_and_answers(access_token, account['name'], location['name'])
+                print(f"[INFO] Q&A fetched for location {location['name']}:", qa_data)
+                store_questions_and_answers(qa_data, location['name'])
+                print(f"[INFO] Q&A stored for location {location['name']}.")
 
-            # Fetch and store photos
-            print(f"[INFO] Fetching photos for location {location['name']}...")
-            photos_data = get_photos(access_token, account['name'], location['name'])
-            print(f"[INFO] Photos fetched for location {location['name']}:", photos_data)
-            store_photos(photos_data, location['name'])
-            print(f"[INFO] Photos stored for location {location['name']}.")
+                # Fetch and store photos
+                print(f"[INFO] Fetching photos for location {location['name']}...")
+                photos_data = get_photos(access_token, account['name'], location['name'])
+                print(f"[INFO] Photos fetched for location {location['name']}:", photos_data)
+                store_photos(photos_data, location['name'])
+                print(f"[INFO] Photos stored for location {location['name']}.")
 
-    messages.success(request, 'Successfully connected with Google')
-    return redirect('index')
+            messages.success(request, 'Successfully connected with Google')
+            return redirect('index')
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to fetch additional data: {str(e)}")
+            messages.warning(request, "Connected successfully but failed to fetch some data. Please try refreshing.")
+            return redirect('index')
+            
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch location data: {str(e)}")
+        messages.error(request, "There was an error connecting to Google Business Profile. Please try again.")
+        return redirect('index')
 
 
 from django.http import JsonResponse
