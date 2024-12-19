@@ -1,2 +1,19 @@
 .aider*
 .env
+
+# Ignore dependencies
+node_modules/
+
+# Ignore IDE settings
+.idea/
+
+# Ignore static files
+staticfiles/
+
+# Ignore scraper tools
+dorks_scraper/
+
+# Ignore fontawesome files
+fontawesome-free-6.0.0-web/
+
+pgvector/

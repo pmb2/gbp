@@ -1,8 +1,0 @@
-<changelist name="Changes" date="1733548306778" recycled="false">
-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/shelved.patch" />
-  <option name="DESCRIPTION" value="Changes" />
-  <binary>
-    <option name="AFTER_PATH" value="staticfiles/django_extensions/img/indicator.gif" />
-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Changes/indicator.gif" />
-  </binary>
-</changelist>
