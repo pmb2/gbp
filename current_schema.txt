@@ -1,0 +1,663 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#   * Rearrange models' order
+#   * Make sure each model has one field with primary_key=True
+#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
+#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
+# Feel free to rename the models, but don't rename db_table values or field names.
+from django.db import models
+
+
+class AccountEmailaddress(models.Model):
+    email = models.CharField(unique=True, max_length=254)
+    verified = models.BooleanField()
+    primary = models.BooleanField()
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'account_emailaddress'
+        unique_together = (('user', 'email'), ('user', 'primary'),)
+
+
+class AccountEmailconfirmation(models.Model):
+    created = models.DateTimeField()
+    sent = models.DateTimeField(blank=True, null=True)
+    key = models.CharField(unique=True, max_length=64)
+    email_address = models.ForeignKey(AccountEmailaddress, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'account_emailconfirmation'
+
+
+class AlembicVersion(models.Model):
+    version_num = models.CharField(primary_key=True, max_length=32)
+
+    class Meta:
+        managed = False
+        db_table = 'alembic_version'
+
+
+class Analytics(models.Model):
+    metric_name = models.CharField(max_length=255)
+    value = models.FloatField()
+    recorded_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'analytics'
+
+
+class AuthGroup(models.Model):
+    name = models.CharField(unique=True, max_length=150)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group'
+
+
+class AuthGroupPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_group_permissions'
+        unique_together = (('group', 'permission'),)
+
+
+class AuthPermission(models.Model):
+    name = models.CharField(max_length=255)
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    codename = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_permission'
+        unique_together = (('content_type', 'codename'),)
+
+
+class AuthUser(models.Model):
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    is_superuser = models.BooleanField()
+    username = models.CharField(unique=True, max_length=150)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.CharField(max_length=254)
+    is_staff = models.BooleanField()
+    is_active = models.BooleanField()
+    date_joined = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user'
+
+
+class AuthUserGroups(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user_groups'
+        unique_together = (('user', 'group'),)
+
+
+class AuthUserUserPermissions(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user_user_permissions'
+        unique_together = (('user', 'permission'),)
+
+
+class AutomationLogs(models.Model):
+    business = models.ForeignKey('Businesses', models.DO_NOTHING, blank=True, null=True)
+    action_type = models.CharField(max_length=50)
+    details = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=50, blank=True, null=True)
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    error_message = models.TextField(blank=True, null=True)
+    retries = models.IntegerField(blank=True, null=True)
+    executed_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'automation_logs'
+
+
+class BusinessAttributes(models.Model):
+    business = models.ForeignKey('Businesses', models.DO_NOTHING, blank=True, null=True)
+    key = models.CharField(max_length=255)
+    value = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'business_attributes'
+
+
+class Businesses(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    business_name = models.CharField(max_length=255)
+    business_id = models.CharField(unique=True, max_length=255)
+    address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    website_url = models.TextField(blank=True, null=True)
+    category = models.CharField(max_length=255, blank=True, null=True)
+    is_verified = models.BooleanField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'businesses'
+
+
+class Company(models.Model):
+    name = models.CharField(unique=True, max_length=255)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'company'
+
+
+class DjangoAdminLog(models.Model):
+    action_time = models.DateTimeField()
+    object_id = models.TextField(blank=True, null=True)
+    object_repr = models.CharField(max_length=200)
+    action_flag = models.SmallIntegerField()
+    change_message = models.TextField()
+    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'django_admin_log'
+
+
+class DjangoContentType(models.Model):
+    app_label = models.CharField(max_length=100)
+    model = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+        unique_together = (('app_label', 'model'),)
+
+
+class DjangoMigrations(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    app = models.CharField(max_length=255)
+    name = models.CharField(max_length=255)
+    applied = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_migrations'
+
+
+class DjangoSession(models.Model):
+    session_key = models.CharField(primary_key=True, max_length=40)
+    session_data = models.TextField()
+    expire_date = models.DateTimeField()
+
+    class Meta:
+        managed = False
+        db_table = 'django_session'
+
+
+class DjangoSite(models.Model):
+    domain = models.CharField(unique=True, max_length=100)
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = 'django_site'
+
+
+class EmailLogs(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING)
+    task = models.ForeignKey('Tasks', models.DO_NOTHING, blank=True, null=True)
+    type = models.CharField(max_length=50)
+    status = models.CharField(max_length=20)
+    sent_at = models.DateTimeField(blank=True, null=True)
+    opened_at = models.DateTimeField(blank=True, null=True)
+    clicked_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'email_logs'
+
+
+class GbpDjangoAutomationlog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    action_type = models.CharField(max_length=50)
+    details = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=50)
+    error_message = models.TextField(blank=True, null=True)
+    retries = models.IntegerField()
+    executed_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField()
+    business = models.ForeignKey('GbpDjangoBusiness', models.DO_NOTHING)
+    user = models.ForeignKey('GbpDjangoUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_automationlog'
+
+
+class GbpDjangoBusiness(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    business_name = models.CharField(max_length=255)
+    business_id = models.CharField(unique=True, max_length=255)
+    address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    website_url = models.TextField(blank=True, null=True)
+    category = models.CharField(max_length=255, blank=True, null=True)
+    is_verified = models.BooleanField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+    automation_status = models.CharField(max_length=50)
+    email_settings = models.CharField(max_length=50)
+    business_email = models.CharField(max_length=255)
+    email_verification_pending = models.BooleanField()
+    email_verification_token = models.CharField(max_length=100, blank=True, null=True)
+    email_verified_at = models.DateTimeField(blank=True, null=True)
+    posts_automation = models.CharField(max_length=20)
+    qa_automation = models.CharField(max_length=20)
+    reviews_automation = models.CharField(max_length=20)
+    description = models.TextField(blank=True, null=True)
+    embedding = models.TextField(blank=True, null=True)  # This field type is a guess.
+    compliance_score = models.IntegerField()
+    last_post_date = models.DateTimeField(blank=True, null=True)
+    next_update_date = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_business'
+
+
+class GbpDjangoBusinessattribute(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    key = models.CharField(max_length=255)
+    value = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField()
+    business = models.ForeignKey(GbpDjangoBusiness, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_businessattribute'
+
+
+class GbpDjangoEmaillog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    status = models.CharField(max_length=20)
+    sent_at = models.DateTimeField()
+    opened_at = models.DateTimeField(blank=True, null=True)
+    clicked_at = models.DateTimeField(blank=True, null=True)
+    task = models.ForeignKey('GbpDjangoTask', models.DO_NOTHING, blank=True, null=True)
+    user = models.ForeignKey('GbpDjangoUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_emaillog'
+
+
+class GbpDjangoFaq(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    question = models.TextField()
+    answer = models.TextField()
+    embedding = models.TextField()  # This field type is a guess.
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    business = models.ForeignKey(GbpDjangoBusiness, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_faq'
+
+
+class GbpDjangoNotification(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    message = models.TextField()
+    read = models.BooleanField()
+    created_at = models.DateTimeField()
+    user = models.ForeignKey('GbpDjangoUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_notification'
+
+
+class GbpDjangoPost(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    post_type = models.CharField(max_length=50)
+    content = models.TextField(blank=True, null=True)
+    media_url = models.TextField(blank=True, null=True)
+    scheduled_at = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=50)
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    business = models.ForeignKey(GbpDjangoBusiness, models.DO_NOTHING)
+    post_id = models.CharField(unique=True, max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_post'
+
+
+class GbpDjangoQanda(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    question = models.TextField()
+    answer = models.TextField(blank=True, null=True)
+    answered = models.BooleanField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    business = models.ForeignKey(GbpDjangoBusiness, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_qanda'
+
+
+class GbpDjangoReview(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    review_id = models.CharField(unique=True, max_length=255)
+    reviewer_name = models.CharField(max_length=255, blank=True, null=True)
+    reviewer_profile_url = models.TextField(blank=True, null=True)
+    rating = models.IntegerField()
+    content = models.TextField(blank=True, null=True)
+    responded = models.BooleanField()
+    response = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    business = models.ForeignKey(GbpDjangoBusiness, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_review'
+
+
+class GbpDjangoSession(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    state = models.CharField(max_length=255)
+    priority = models.CharField(max_length=50)
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    user = models.ForeignKey('GbpDjangoUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_session'
+
+
+class GbpDjangoTask(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    type = models.CharField(max_length=50)
+    status = models.CharField(max_length=50)
+    content = models.JSONField()
+    created_at = models.DateTimeField()
+    scheduled_for = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    approval_token = models.CharField(unique=True, max_length=100)
+    user = models.ForeignKey('GbpDjangoUser', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_task'
+
+
+class GbpDjangoUser(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(blank=True, null=True)
+    google_id = models.CharField(unique=True, max_length=255, blank=True, null=True)
+    email = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    profile_picture_url = models.TextField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField()
+    is_staff = models.BooleanField()
+    google_access_token = models.TextField(blank=True, null=True)
+    google_refresh_token = models.TextField(blank=True, null=True)
+    google_token_expiry = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'gbp_django_user'
+
+
+class Notification(models.Model):
+    recipient = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()
+    status = models.CharField(max_length=50, blank=True, null=True)
+    sent_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'notification'
+
+
+class Notifications(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    message = models.TextField()
+    read = models.BooleanField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'notifications'
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'post'
+
+
+class Posts(models.Model):
+    business = models.ForeignKey(Businesses, models.DO_NOTHING, blank=True, null=True)
+    post_type = models.CharField(max_length=50)
+    content = models.TextField(blank=True, null=True)
+    media_url = models.TextField(blank=True, null=True)
+    scheduled_at = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=50, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'posts'
+
+
+class Qanda(models.Model):
+    business = models.ForeignKey(Businesses, models.DO_NOTHING, blank=True, null=True)
+    question = models.TextField()
+    answer = models.TextField(blank=True, null=True)
+    answered = models.BooleanField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'qanda'
+
+
+class Question(models.Model):
+    text = models.TextField()
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'question'
+
+
+class Review(models.Model):
+    content = models.TextField()
+    rating = models.IntegerField()
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'review'
+
+
+class Reviews(models.Model):
+    business = models.ForeignKey(Businesses, models.DO_NOTHING, blank=True, null=True)
+    review_id = models.CharField(unique=True, max_length=255)
+    reviewer_name = models.CharField(max_length=255, blank=True, null=True)
+    reviewer_profile_url = models.TextField(blank=True, null=True)
+    rating = models.IntegerField()
+    content = models.TextField(blank=True, null=True)
+    responded = models.BooleanField(blank=True, null=True)
+    response = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'reviews'
+
+
+class Sessions(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING, blank=True, null=True)
+    state = models.CharField(max_length=255)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    priority = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
+        db_table = 'sessions'
+
+
+class Setting(models.Model):
+    key = models.CharField(unique=True, max_length=255)
+    value = models.TextField()
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'setting'
+
+
+class SocialaccountSocialaccount(models.Model):
+    provider = models.CharField(max_length=200)
+    uid = models.CharField(max_length=191)
+    last_login = models.DateTimeField()
+    date_joined = models.DateTimeField()
+    extra_data = models.JSONField()
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialaccount'
+        unique_together = (('provider', 'uid'),)
+
+
+class SocialaccountSocialapp(models.Model):
+    provider = models.CharField(max_length=30)
+    name = models.CharField(max_length=40)
+    client_id = models.CharField(max_length=191)
+    secret = models.CharField(max_length=191)
+    key = models.CharField(max_length=191)
+    provider_id = models.CharField(max_length=200)
+    settings = models.JSONField()
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialapp'
+
+
+class SocialaccountSocialappSites(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    socialapp = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING)
+    site = models.ForeignKey(DjangoSite, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialapp_sites'
+        unique_together = (('socialapp', 'site'),)
+
+
+class SocialaccountSocialtoken(models.Model):
+    token = models.TextField()
+    token_secret = models.TextField()
+    expires_at = models.DateTimeField(blank=True, null=True)
+    account = models.ForeignKey(SocialaccountSocialaccount, models.DO_NOTHING)
+    app = models.ForeignKey(SocialaccountSocialapp, models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'socialaccount_socialtoken'
+        unique_together = (('app', 'account'),)
+
+
+class Tasks(models.Model):
+    user = models.ForeignKey('Users', models.DO_NOTHING)
+    type = models.TextField()  # This field type is a guess.
+    status = models.TextField()  # This field type is a guess.
+    content = models.TextField(blank=True, null=True)  # This field type is a guess.
+    created_at = models.DateTimeField(blank=True, null=True)
+    scheduled_for = models.DateTimeField(blank=True, null=True)
+    completed_at = models.DateTimeField(blank=True, null=True)
+    approval_token = models.CharField(unique=True, max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tasks'
+
+
+class User(models.Model):
+    email = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'user'
+
+
+class UserAction(models.Model):
+    user = models.ForeignKey(User, models.DO_NOTHING)
+    action = models.CharField(max_length=255)
+    timestamp = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'user_action'
+
+
+class Users(models.Model):
+    google_id = models.CharField(unique=True, max_length=255)
+    email = models.CharField(unique=True, max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    profile_picture_url = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    deleted_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'users'
