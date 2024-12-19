@@ -188,11 +188,11 @@ def google_oauth_callback(request):
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
     
-    # Clear any existing businesses for this user that start with 'dummy-'
+    # Clear any existing unverified businesses for this user
     if request.user.is_authenticated:
         Business.objects.filter(
             user=request.user,
-            business_id__startswith='dummy-'
+            business_id__startswith='unverified-'
         ).delete()
     
     print(f"[DEBUG] Code present: {bool(code)}")
@@ -722,44 +722,26 @@ def index(request):
         messages.warning(request, 'Please connect your Google account to access all features')
 
     print("[DEBUG] Fetching businesses and related data...")
-    # Create dummy businesses if none exist
+    # Check if user has any businesses
     if not Business.objects.filter(user=request.user).exists():
-        dummy_businesses = [
-            {
-                'business_name': 'Dummy Business A',
-                'business_id': 'dummy-business-a',
-                'is_verified': False,
-                'address': '123 Test St, Suite A',
-                'phone_number': '(555) 000-0001',
-                'website_url': 'No info',
-                'category': 'No info'
-            },
-            {
-                'business_name': 'Dummy Business B',
-                'business_id': 'dummy-business-b',
-                'is_verified': True,
-                'address': '456 Test Ave, Suite B',
-                'phone_number': '(555) 000-0002',
-                'website_url': 'https://dummy-b.example.com',
-                'category': 'Test Business B'
-            },
-            {
-                'business_name': 'Dummy Business C',
-                'business_id': 'dummy-business-c',
-                'is_verified': False,
-                'address': 'No info',
-                'phone_number': 'No info',
-                'website_url': 'No info',
-                'category': 'No info'
-            }
-        ]
-        
-        for business_data in dummy_businesses:
+        # Create unverified business placeholder if no Google OAuth connection
+        if not request.user.socialaccount_set.filter(provider='google').exists():
+            timestamp = int(time.time())
+            business_id = f"unverified-{request.user.id}-{timestamp}"
             Business.objects.create(
                 user=request.user,
-                business_email='dummy@example.com',  # Add required field
-                **business_data
+                business_id=business_id,
+                business_name="Unverified Business",
+                business_email=request.user.email,
+                is_verified=False,
+                email_verification_pending=True,
+                email_verification_token=secrets.token_urlsafe(32),
+                address='Pending verification',
+                phone_number='Pending verification',
+                website_url='Pending verification',
+                category='Pending verification'
             )
+            messages.warning(request, 'Please connect your Google Business Profile to access all features')
 
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(

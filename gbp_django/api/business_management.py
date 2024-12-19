@@ -159,20 +159,6 @@ def store_business_data(business_data, user_id, access_token):
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
-        # Only create unverified placeholder if no businesses exist for this user
-        if not existing_businesses.exists():
-            unverified_business = Business.objects.create(
-                user_id=user_id,
-                business_name="Unverified Business",
-                business_id=f"unverified-{user_id}-{int(time.time())}",
-                is_verified=False,
-                address="Pending verification",
-                phone_number="Pending verification",
-                website_url="Pending verification",
-                category="Pending verification"
-            )
-            stored_businesses.append(unverified_business)
-            print("[INFO] Created unverified business placeholder")
         return stored_businesses
         
     for account in accounts:
