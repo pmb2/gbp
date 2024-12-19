@@ -240,6 +240,56 @@ def google_oauth_callback(request):
             print("[INFO] Storing business data...")
             stored_businesses = store_business_data(business_data, request.user.id, access_token)
                 
+            # Fetch additional data for each business
+            for business in stored_businesses:
+                if business.is_verified:
+                    try:
+                        print(f"[INFO] Fetching additional data for {business.business_name}")
+                        locations = get_locations(access_token, business.business_id)
+                            
+                        if locations.get('locations'):
+                            for location in locations['locations']:
+                                # Store business attributes
+                                attributes = {
+                                    'opening_hours': location.get('regularHours', {}),
+                                    'special_hours': location.get('specialHours', {}),
+                                    'service_area': location.get('serviceArea', {}),
+                                    'labels': location.get('labels', []),
+                                    'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                                    'business_type': location.get('metadata', {}).get('businessType', ''),
+                                    'year_established': location.get('metadata', {}).get('yearEstablished', ''),
+                                    'employee_count': location.get('metadata', {}).get('employeeCount', '')
+                                }
+                                    
+                                for key, value in attributes.items():
+                                    BusinessAttribute.objects.update_or_create(
+                                        business=business,
+                                        key=key,
+                                        defaults={'value': str(value)}
+                                    )
+                                        
+                                # Store additional location-specific attributes
+                                BusinessAttribute.objects.update_or_create(
+                                    business=business,
+                                    key='location_name',
+                                    defaults={'value': location.get('locationName', '')}
+                                )
+                                    
+                                BusinessAttribute.objects.update_or_create(
+                                    business=business,
+                                    key='primary_category',
+                                    defaults={'value': location.get('primaryCategory', {}).get('displayName', '')}
+                                )
+                                    
+                                BusinessAttribute.objects.update_or_create(
+                                    business=business,
+                                    key='additional_categories',
+                                    defaults={'value': str(location.get('additionalCategories', []))}
+                                )
+                    except Exception as e:
+                        print(f"[ERROR] Failed to store additional data: {str(e)}")
+                        continue
+                
             if stored_businesses:
                 print(f"[INFO] Stored {len(stored_businesses)} businesses")
                     

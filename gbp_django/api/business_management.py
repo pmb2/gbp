@@ -156,8 +156,8 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # If no accounts found, create unvalidated business entry
-    if not accounts:
+    # If no accounts found or user has no businesses, create unvalidated entry
+    if not accounts and not Business.objects.filter(user_id=user_id).exists():
         print("[INFO] No accounts found - creating unvalidated business")
         timestamp = int(time.time())
         business_id = f"unvalidated-{user_id}-{timestamp}"
