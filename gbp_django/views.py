@@ -135,9 +135,15 @@ def direct_google_oauth(request):
     """
     Directly initiate Google OAuth process without intermediate page
     """
+    # Check if user already has valid social account
+    if request.user.socialaccount_set.filter(provider='google').exists():
+        print("[DEBUG] User already has Google OAuth connection")
+        return redirect('index')
+
     # Initialize provider with request
     provider_class = providers.registry.get_class('google')
-    # Get the app configuration directly from allauth
+    
+    # Get the app configuration
     from allauth.socialaccount.models import SocialApp
     try:
         app = SocialApp.objects.get(provider='google')
@@ -146,26 +152,21 @@ def direct_google_oauth(request):
 
     provider = provider_class(request, app)
 
-    # Get the app configuration directly from allauth
-    from allauth.socialaccount.models import SocialApp
-    try:
-        app = SocialApp.objects.get(provider='google')
-    except SocialApp.DoesNotExist:
-        raise ValueError("Google SocialApp is not configured. Please add it in the admin interface.")
-
     # Construct OAuth URL
     callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
-    scope = ' '.join(provider.get_default_scope())
+    scope = ' '.join([
+        'openid',
+        'https://www.googleapis.com/auth/business.manage',
+        'https://www.googleapis.com/auth/userinfo.email',
+        'https://www.googleapis.com/auth/userinfo.profile',
+    ])
 
-    # Get state from session
-    import string
-    import random
-
-    # Generate a random state string
-    state = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    # Generate and store state
+    import secrets
+    state = secrets.token_urlsafe(16)
     request.session['oauth_state'] = state
 
-    # Construct the authorization URL
+    # Construct the authorization URL with all required scopes
     authorize_url = (
         'https://accounts.google.com/o/oauth2/v2/auth?'
         f'client_id={app.client_id}&'
@@ -250,7 +251,7 @@ def google_oauth_callback(request):
         user.save()
 
         # Create social account connection
-        from allauth.socialaccount.models import SocialAccount, SocialApp
+        from allauth.socialaccount.models import SocialAccount, SocialApp, SocialToken
         google_app = SocialApp.objects.get(provider='google')
         
         # Create or update social account
@@ -267,7 +268,18 @@ def google_oauth_callback(request):
             social_account.extra_data = user_info
             social_account.save()
 
-        print("[DEBUG] Social account created/updated successfully")
+        # Create or update social token
+        SocialToken.objects.update_or_create(
+            account=social_account,
+            app=google_app,
+            defaults={
+                'token': access_token,
+                'token_secret': '',  # Not used for OAuth2
+                'expires_at': user.google_token_expiry
+            }
+        )
+
+        print("[DEBUG] Social account and token created/updated successfully")
 
     except Exception as e:
         messages.error(request, f'OAuth error: {str(e)}')
@@ -716,14 +728,11 @@ def index(request):
     print("\n[DEBUG] Loading dashboard index...")
     print(f"[DEBUG] User: {request.user.email}")
     
-    # Check if user has completed Google OAuth and has valid tokens
-    if not request.user.socialaccount_set.filter(provider='google').exists():
-        print("[DEBUG] User has not completed Google OAuth")
-        messages.warning(request, 'Please connect your Google account to access all features')
-
     print("[DEBUG] Fetching businesses and related data...")
-    # Check if user has Google OAuth connection
-    if not request.user.socialaccount_set.filter(provider='google').exists():
+    # Only redirect to OAuth if user has no social accounts AND no businesses
+    if (not request.user.socialaccount_set.filter(provider='google').exists() and 
+        not Business.objects.filter(user=request.user).exists()):
+        print("[DEBUG] User needs Google OAuth - no social accounts or businesses")
         messages.warning(request, 'Please connect your Google Business Profile to access all features')
         return redirect('google_oauth')
 
