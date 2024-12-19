@@ -217,7 +217,7 @@ def google_oauth_callback(request):
         # Get tokens using the authorization code
         from allauth.socialaccount.models import SocialApp
         google_app = SocialApp.objects.get(provider='google')
-        
+            
         tokens = get_access_token(
             code,
             google_app.client_id,
@@ -227,10 +227,58 @@ def google_oauth_callback(request):
 
         access_token = tokens.get('access_token')
         refresh_token = tokens.get('refresh_token')
-        
+            
         if not access_token:
             messages.error(request, 'Failed to get access token')
             return redirect('login')
+
+        # Fetch and store business data immediately after getting tokens
+        try:
+            print("[INFO] Fetching business accounts...")
+            business_data = get_business_accounts(access_token)
+                
+            print("[INFO] Storing business data...")
+            stored_businesses = store_business_data(business_data, request.user.id, access_token)
+                
+            if stored_businesses:
+                print(f"[INFO] Stored {len(stored_businesses)} businesses")
+                    
+                # Fetch additional data for verified businesses
+                for business in stored_businesses:
+                    if business.is_verified:
+                        try:
+                            print(f"[INFO] Fetching additional data for {business.business_name}")
+                            locations = get_locations(access_token, business.business_id)
+                                
+                            if locations.get('locations'):
+                                for location in locations['locations']:
+                                    # Store business attributes
+                                    attributes = {
+                                        'opening_hours': location.get('regularHours', {}),
+                                        'special_hours': location.get('specialHours', {}),
+                                        'service_area': location.get('serviceArea', {}),
+                                        'labels': location.get('labels', []),
+                                        'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                                        'business_type': location.get('metadata', {}).get('businessType', ''),
+                                        'year_established': location.get('metadata', {}).get('yearEstablished', ''),
+                                        'employee_count': location.get('metadata', {}).get('employeeCount', '')
+                                    }
+                                        
+                                    for key, value in attributes.items():
+                                        BusinessAttribute.objects.update_or_create(
+                                            business=business,
+                                            key=key,
+                                            defaults={'value': str(value)}
+                                        )
+                        except Exception as e:
+                            print(f"[ERROR] Failed to fetch additional data: {str(e)}")
+                            continue
+            else:
+                print("[WARNING] No businesses stored")
+                messages.warning(request, "No business accounts were found. A placeholder business has been created.")
+        except Exception as e:
+            print(f"[ERROR] Failed to process business data: {str(e)}")
+            messages.error(request, "Failed to process business data. Please try again.")
 
         # Store tokens in session
         request.session['google_token'] = access_token

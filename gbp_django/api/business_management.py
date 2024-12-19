@@ -156,6 +156,43 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
+    # If no accounts found, create unvalidated business entry
+    if not accounts:
+        print("[INFO] No accounts found - creating unvalidated business")
+        timestamp = int(time.time())
+        business_id = f"unvalidated-{user_id}-{timestamp}"
+        
+        business = Business.objects.create(
+            user_id=user_id,
+            business_id=business_id,
+            business_name="My Business",
+            business_email="pending@verification.com",
+            is_verified=False,
+            email_verification_pending=True,
+            email_verification_token=secrets.token_urlsafe(32),
+            address='Pending verification',
+            phone_number='Pending verification',
+            website_url='Pending verification',
+            category='Pending verification',
+            email_settings={
+                'enabled': True,
+                'compliance_alerts': True,
+                'content_approval': True,
+                'weekly_summary': True,
+                'verification_reminders': True
+            },
+            automation_status='Active'
+        )
+        
+        # Create notification
+        Notification.objects.create(
+            user_id=user_id,
+            message="Please complete your business profile to get started."
+        )
+        
+        stored_businesses = [business]
+        return stored_businesses
+
     # Process each account's business data
     
     if not accounts:
