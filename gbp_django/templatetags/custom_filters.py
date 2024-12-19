@@ -2,7 +2,7 @@ from django import template
 
 register = template.Library()
 
-@register.filter
+@register.filter(name='multiply')
 def multiply(value, arg):
     """Multiply the value by the argument"""
     try:

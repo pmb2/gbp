@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gbp_django',  # Ensure this is the correct app name
+    'gbp_django.templatetags',  # Add templatetags
     'django.contrib.sites',  # Add this if not present
     'django_extensions',
     'allauth',
