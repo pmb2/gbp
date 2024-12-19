@@ -281,39 +281,40 @@ def google_oauth_callback(request):
 
         print("[DEBUG] Social account and token created/updated successfully")
 
-        # Create unvalidated business entry if no Google business data exists
+        # Fetch and store business data
         try:
             business_data = get_business_accounts(access_token)
-            if not business_data or not business_data.get('accounts'):
-                print("[DEBUG] No Google business accounts found, creating unvalidated entry")
-                timestamp = int(time.time())
-                business_id = f"unvalidated-{user.id}-{timestamp}"
+            stored_businesses = store_business_data(business_data, user.id, access_token)
                 
-                Business.objects.create(
-                    user=user,
-                    business_id=business_id,
-                    business_name="Unvalidated Business",
-                    business_email=user.email,
-                    is_verified=False,
-                    email_verification_pending=True,
-                    email_verification_token=secrets.token_urlsafe(32),
-                    address='Pending verification',
-                    phone_number='Pending verification',
-                    website_url='Pending verification',
-                    category='Pending verification'
-                )
+            if stored_businesses:
+                for business in stored_businesses:
+                    if business.is_verified:
+                        # Store additional data for verified businesses
+                        try:
+                            locations = get_locations(access_token, business.business_id)
+                            if locations.get('locations'):
+                                for location in locations['locations']:
+                                    # Store business attributes
+                                    for key, value in location.items():
+                                        if key not in ['name', 'locationName', 'address']:
+                                            BusinessAttribute.objects.update_or_create(
+                                                business=business,
+                                                key=key,
+                                                defaults={'value': str(value)}
+                                            )
+                        except Exception as e:
+                            print(f"[ERROR] Failed to store additional business data: {str(e)}")
+                            continue
+                    
+                messages.success(request, f"Successfully added {len(stored_businesses)} business(es) to your account.")
+            else:
+                messages.warning(request, "No business accounts were found. A placeholder business has been created.")
                 
-                # Create notification for new unvalidated business
-                Notification.objects.create(
-                    user=user,
-                    message="Please complete your business profile verification to access all features."
-                )
+            return redirect('index')
                 
-                print("[DEBUG] Created unvalidated business entry")
-                return redirect('index')
         except Exception as e:
-            print(f"[ERROR] Failed to check/create business entry: {str(e)}")
-            messages.warning(request, "Connected successfully but failed to verify business data.")
+            print(f"[ERROR] Failed to process business data: {str(e)}")
+            messages.error(request, "Failed to process business data. Please try again.")
             return redirect('index')
 
     except Exception as e:
