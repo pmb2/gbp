@@ -10,20 +10,14 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='business',
             name='email_settings',
-            field=models.JSONField(blank=True, default=dict, help_text='Email notification preferences'),
+            field=models.TextField(blank=True, default='{}', help_text='Email notification preferences'),
         ),
         migrations.RunPython(
             code=lambda apps, schema_editor: apps.get_model('gbp_django', 'Business').objects.update(
-                email_settings={
-                    'enabled': True,
-                    'compliance_alerts': True,
-                    'content_approval': True,
-                    'weekly_summary': True,
-                    'verification_reminders': True
-                }
+                email_settings='{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}'
             ),
             reverse_code=lambda apps, schema_editor: apps.get_model('gbp_django', 'Business').objects.update(
-                email_settings={}
+                email_settings='{}'
             )
         ),
     ]
