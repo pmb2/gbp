@@ -184,11 +184,18 @@ def store_business_data(business_data, user_id, access_token):
             automation_status='Active'
         )
         
-        # Create notification
-        Notification.objects.create(
-            user_id=user_id,
-            message="Please complete your business profile to get started."
-        )
+        # Create notification only if user exists
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        
+        try:
+            user = User.objects.get(id=user_id)
+            Notification.objects.create(
+                user=user,
+                message="Please complete your business profile to get started."
+            )
+        except User.DoesNotExist:
+            print(f"[WARNING] User {user_id} not found - skipping notification creation")
         
         stored_businesses = [business]
         return stored_businesses
