@@ -158,7 +158,6 @@ def store_business_data(business_data, user_id, access_token):
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
-        messages.warning(request, 'No business accounts found. Please verify your Google Business Profile connection.')
         return stored_businesses
         
     for account in accounts:

@@ -423,14 +423,21 @@
 
 
                 <!-- User Profile -->
-                <div class="relative group cursor-pointer" onclick="toggleUserMenu()">
-                    <img src="
-                            {% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
-                         alt="Profile"
-                         class="h-8 w-8 rounded-full">
-                    <span class="absolute right-full mr-3 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-sm text-gray-700">
-                        {{ user.email }}
-                    </span>
+                <div class="relative">
+                    <div class="cursor-pointer" onclick="toggleUserMenu()">
+                        <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
+                             alt="Profile"
+                             class="h-8 w-8 rounded-full">
+                    </div>
+                    <!-- Dropdown Menu -->
+                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
+                        <div class="px-4 py-2 text-sm text-gray-700 border-b">
+                            {{ user.email }}
+                        </div>
+                        <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Logout
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1761,8 +1768,8 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-4">
                                     <div class="flex flex-col">
-                                        <div class="progress-bar w-32">
-                                            <div class="progress-bar-fill 
+                                        <div class="w-32 bg-gray-200 rounded-full h-2">
+                                            <div class="h-2 rounded-full transition-all duration-500
                                             {% if completion <= 20 %}bg-red-600
                                             {% elif completion <= 40 %}bg-yellow-600
                                             {% elif completion <= 60 %}bg-orange-600
@@ -2305,7 +2312,7 @@
     
 <!-- Memories Modal -->
 <div id="memoriesModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="absolute inset-0 bg-gray-600 bg-opacity-50"></div>
+    <div class="absolute inset-0 bg-transparent"></div>
     <div class="relative bg-white rounded-lg shadow-xl w-full max-w-2xl m-4">
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
