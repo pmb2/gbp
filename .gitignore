@@ -16,4 +16,12 @@ dorks_scraper/
 # Ignore fontawesome files
 fontawesome-free-6.0.0-web/
 
+# Ignore log files
+debug.log
+
+# Ignore npm files
+package.json
+package-lock.json
+
+# Ignore pgvector directory
 pgvector/
