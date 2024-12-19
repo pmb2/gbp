@@ -3,7 +3,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('gbp_django', '0016_auto_20231218_2028'),
+        ('gbp_django', '0001_initial'),
     ]
 
     operations = [
