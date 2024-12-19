@@ -153,12 +153,12 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # Get existing businesses for this user
-    existing_businesses = Business.objects.filter(user_id=user_id)
-    existing_business_ids = set(existing_businesses.values_list('business_id', flat=True))
+    # Delete any existing businesses for this user
+    Business.objects.filter(user_id=user_id).delete()
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
+        messages.warning(request, 'No business accounts found. Please verify your Google Business Profile connection.')
         return stored_businesses
         
     for account in accounts:

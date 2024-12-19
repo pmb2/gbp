@@ -722,26 +722,10 @@ def index(request):
         messages.warning(request, 'Please connect your Google account to access all features')
 
     print("[DEBUG] Fetching businesses and related data...")
-    # Check if user has any businesses
-    if not Business.objects.filter(user=request.user).exists():
-        # Create unverified business placeholder if no Google OAuth connection
-        if not request.user.socialaccount_set.filter(provider='google').exists():
-            timestamp = int(time.time())
-            business_id = f"unverified-{request.user.id}-{timestamp}"
-            Business.objects.create(
-                user=request.user,
-                business_id=business_id,
-                business_name="Unverified Business",
-                business_email=request.user.email,
-                is_verified=False,
-                email_verification_pending=True,
-                email_verification_token=secrets.token_urlsafe(32),
-                address='Pending verification',
-                phone_number='Pending verification',
-                website_url='Pending verification',
-                category='Pending verification'
-            )
-            messages.warning(request, 'Please connect your Google Business Profile to access all features')
+    # Check if user has Google OAuth connection
+    if not request.user.socialaccount_set.filter(provider='google').exists():
+        messages.warning(request, 'Please connect your Google Business Profile to access all features')
+        return redirect('google_oauth')
 
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
