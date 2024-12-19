@@ -146,6 +146,7 @@ from ..models import Business
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
+    """Store business data from Google API response"""
     print("\n[DEBUG] Starting business data storage...")
     print(f"[DEBUG] Raw business data received: {business_data}")
     
@@ -153,8 +154,7 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # Delete any existing businesses for this user
-    Business.objects.filter(user_id=user_id).delete()
+    # Don't delete existing businesses - we'll update them instead
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
@@ -203,6 +203,35 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
             continue
     
+    # If no businesses were stored and user has no existing businesses,
+    # create a placeholder business
+    if not stored_businesses and not Business.objects.filter(user_id=user_id).exists():
+        print("\n[DEBUG] Creating placeholder business record")
+        timestamp = int(time.time())
+        business_id = f"unverified-{user_id}-{timestamp}"
+        
+        placeholder_business = Business.objects.create(
+            user_id=user_id,
+            business_id=business_id,
+            business_name="My Business",
+            business_email="pending@verification.com",
+            is_verified=False,
+            email_verification_pending=True,
+            email_verification_token=secrets.token_urlsafe(32),
+            address='Pending verification',
+            phone_number='Pending verification',
+            website_url='Pending verification',
+            category='Pending verification'
+        )
+        
+        # Create notification for new business
+        Notification.objects.create(
+            user_id=user_id,
+            message="Please complete your business profile to get started."
+        )
+        
+        stored_businesses = [placeholder_business]
+        
     return stored_businesses
 
 def get_locations(access_token, account_id):
