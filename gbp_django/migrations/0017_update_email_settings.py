@@ -31,3 +31,18 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(update_email_settings, reverse_email_settings),
     ]
+from django.db import migrations, models
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('gbp_django', '0016_auto_20231218_2028'),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name='business',
+            name='email_settings',
+            field=models.JSONField(blank=True, default=dict, help_text='Email notification preferences'),
+        ),
+    ]
