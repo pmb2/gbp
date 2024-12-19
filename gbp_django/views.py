@@ -281,6 +281,41 @@ def google_oauth_callback(request):
 
         print("[DEBUG] Social account and token created/updated successfully")
 
+        # Create unvalidated business entry if no Google business data exists
+        try:
+            business_data = get_business_accounts(access_token)
+            if not business_data or not business_data.get('accounts'):
+                print("[DEBUG] No Google business accounts found, creating unvalidated entry")
+                timestamp = int(time.time())
+                business_id = f"unvalidated-{user.id}-{timestamp}"
+                
+                Business.objects.create(
+                    user=user,
+                    business_id=business_id,
+                    business_name="Unvalidated Business",
+                    business_email=user.email,
+                    is_verified=False,
+                    email_verification_pending=True,
+                    email_verification_token=secrets.token_urlsafe(32),
+                    address='Pending verification',
+                    phone_number='Pending verification',
+                    website_url='Pending verification',
+                    category='Pending verification'
+                )
+                
+                # Create notification for new unvalidated business
+                Notification.objects.create(
+                    user=user,
+                    message="Please complete your business profile verification to access all features."
+                )
+                
+                print("[DEBUG] Created unvalidated business entry")
+                return redirect('index')
+        except Exception as e:
+            print(f"[ERROR] Failed to check/create business entry: {str(e)}")
+            messages.warning(request, "Connected successfully but failed to verify business data.")
+            return redirect('index')
+
     except Exception as e:
         messages.error(request, f'OAuth error: {str(e)}')
         return redirect('login')
