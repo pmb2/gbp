@@ -57,13 +57,9 @@ def login(request):
     
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
-        # If already authenticated and has Google OAuth, go to dashboard
-        if request.user.socialaccount_set.filter(provider='google').exists():
-            print("[DEBUG] User has Google OAuth, redirecting to dashboard")
-            return redirect('index')
-        # If authenticated but no Google OAuth, redirect to OAuth
-        print("[DEBUG] User needs Google OAuth, redirecting to OAuth")
-        return redirect('google_oauth')
+        # Always redirect to index if authenticated
+        print("[DEBUG] Redirecting to dashboard")
+        return redirect('index')
 
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -723,7 +719,7 @@ def index(request):
     # Check if user has completed Google OAuth and has valid tokens
     if not request.user.socialaccount_set.filter(provider='google').exists():
         print("[DEBUG] User has not completed Google OAuth")
-        return redirect(reverse('google_oauth'))
+        messages.warning(request, 'Please connect your Google account to access all features')
 
     print("[DEBUG] Fetching businesses and related data...")
     # Create dummy businesses if none exist
