@@ -293,44 +293,48 @@ def google_oauth_callback(request):
         print("\n[INFO] Fetching business accounts...")
         try:
             business_data = get_business_accounts(access_token)
-            if business_data:
-                print(f"[DEBUG] Raw business data received: {business_data}")
+            if not business_data:
+                print("[WARNING] No business data returned from API")
+                messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
+                return redirect('index')
                 
-                print("\n[DEBUG] Processing business data storage...")
-                stored_businesses = store_business_data(business_data, user.id, access_token)
-                
-                # Store additional business attributes
-                for business in stored_businesses:
-                    try:
-                        locations = get_locations(access_token, business.business_id)
-                        if locations.get('locations'):
-                            for location in locations['locations']:
-                                # Store business attributes
-                                BusinessAttribute.objects.update_or_create(
-                                    business=business,
-                                    key='opening_hours',
-                                    defaults={'value': str(location.get('regularHours', {}))}
-                                )
-                                BusinessAttribute.objects.update_or_create(
-                                    business=business,
-                                    key='special_hours',
-                                    defaults={'value': str(location.get('specialHours', {}))}
-                                )
-                                BusinessAttribute.objects.update_or_create(
-                                    business=business,
-                                    key='service_area',
-                                    defaults={'value': str(location.get('serviceArea', {}))}
-                                )
-                                BusinessAttribute.objects.update_or_create(
-                                    business=business,
-                                    key='labels',
-                                    defaults={'value': str(location.get('labels', []))}
-                                )
-                    except Exception as e:
-                        print(f"[ERROR] Failed to store business attributes: {str(e)}")
-                        continue
-                
-                # Print existing businesses for debugging
+            print(f"[DEBUG] Raw business data received: {business_data}")
+            
+            print("\n[DEBUG] Processing business data storage...")
+            stored_businesses = store_business_data(business_data, user.id, access_token)
+            
+            # Store additional business attributes
+            for business in stored_businesses:
+                try:
+                    locations = get_locations(access_token, business.business_id)
+                    if locations.get('locations'):
+                        for location in locations['locations']:
+                            # Store business attributes
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key='opening_hours',
+                                defaults={'value': str(location.get('regularHours', {}))}
+                            )
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key='special_hours',
+                                defaults={'value': str(location.get('specialHours', {}))}
+                            )
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key='service_area',
+                                defaults={'value': str(location.get('serviceArea', {}))}
+                            )
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key='labels',
+                                defaults={'value': str(location.get('labels', []))}
+                            )
+                except Exception as e:
+                    print(f"[ERROR] Failed to store business attributes: {str(e)}")
+                    continue
+            
+            # Print existing businesses for debugging
             print("\n[DEBUG] Current businesses for user:")
             existing_businesses = Business.objects.filter(user=user)
             for b in existing_businesses:
