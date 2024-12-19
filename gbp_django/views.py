@@ -441,9 +441,19 @@ def google_oauth_callback(request):
                             except Exception as e:
                                 print(f"[ERROR] Failed to fetch/store photos: {str(e)}")
 
-            if not business_data.get('accounts'):
-                print("[WARNING] No business data returned from API")
-                messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
+            try:
+                # Only fetch additional data if we have business data
+                if not business_data.get('accounts'):
+                    print("[WARNING] No business data returned from API")
+                    messages.warning(request, "No business accounts were found. You may need to create a Google Business Profile first.")
+                    return redirect('index')
+
+                messages.success(request, 'Successfully connected with Google')
+                return redirect('index')
+                
+            except Exception as e:
+                print(f"[ERROR] Failed to fetch additional data: {str(e)}")
+                messages.warning(request, "Connected successfully but failed to fetch some data. Please try refreshing.")
                 return redirect('index')
 
     except Exception as e:
