@@ -8,4 +8,4 @@ def multiply(value, arg):
     try:
         return float(value) * float(arg)
     except (ValueError, TypeError):
-        return ''
+        return 0
