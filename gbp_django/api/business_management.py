@@ -156,10 +156,37 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # Don't delete existing businesses - we'll update them instead
+    # Process each account's business data
     
     if not accounts:
         print("[WARNING] No accounts found in business data")
+        # Create unvalidated business entry
+        timestamp = int(time.time())
+        business_id = f"unvalidated-{user_id}-{timestamp}"
+        
+        business = Business.objects.create(
+            user_id=user_id,
+            business_id=business_id,
+            business_name="Unvalidated Business",
+            business_email="pending@verification.com",
+            is_verified=False,
+            email_verification_pending=True,
+            email_verification_token=secrets.token_urlsafe(32),
+            address='Pending verification',
+            phone_number='Pending verification',
+            website_url='Pending verification',
+            category='Pending verification',
+            email_settings='{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
+            automation_status='Active'
+        )
+        
+        # Create notification
+        Notification.objects.create(
+            user_id=user_id,
+            message="Please complete your business profile to get started."
+        )
+        
+        stored_businesses = [business]
         return stored_businesses
         
     for account in accounts:
@@ -174,13 +201,17 @@ def store_business_data(business_data, user_id, access_token):
                         'user_id': user_id,
                         'business_name': account.get('accountName', 'Unnamed Business'),
                         'business_id': account['name'],
+                        'business_email': account.get('primaryOwner', {}).get('email', 'pending@verification.com'),
                         'address': location.get('address', {}).get('formattedAddress', 'No info'),
                         'phone_number': location.get('primaryPhone', 'No info'),
                         'website_url': location.get('websiteUrl', 'No info'),
                         'category': location.get('primaryCategory', {}).get('displayName', 'No info'),
                         'is_verified': location.get('locationState', {}).get('isVerified', False),
-                        'email_settings': 'Enabled',
-                        'automation_status': 'Active'
+                        'email_verification_pending': True,
+                        'email_verification_token': secrets.token_urlsafe(32),
+                        'email_settings': '{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
+                        'automation_status': 'Active',
+                        'description': location.get('profile', {}).get('description', '')
                     }
 
                     # Store additional attributes
@@ -190,6 +221,9 @@ def store_business_data(business_data, user_id, access_token):
                         'service_area': location.get('serviceArea', {}),
                         'labels': location.get('labels', []),
                         'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                        'business_type': location.get('metadata', {}).get('businessType', ''),
+                        'year_established': location.get('metadata', {}).get('yearEstablished', ''),
+                        'employee_count': location.get('metadata', {}).get('employeeCount', '')
                     }
                 
                 # Get or create the business record
