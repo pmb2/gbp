@@ -931,9 +931,8 @@ def index(request):
     print(f"[DEBUG] User: {request.user.email}")
     
     print("[DEBUG] Fetching businesses and related data...")
-    # Only redirect to OAuth if user has no social accounts AND no businesses
-    if (not request.user.socialaccount_set.filter(provider='google').exists() and 
-        not Business.objects.filter(user=request.user).exists()):
+    # Only redirect to OAuth if user has no social accounts
+    if not request.user.socialaccount_set.filter(provider='google').exists():
         print("[DEBUG] User needs Google OAuth - no social accounts or businesses")
         messages.warning(request, 'Please connect your Google Business Profile to access all features')
         return redirect('google_oauth')
