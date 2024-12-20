@@ -57,9 +57,10 @@ def login(request):
     
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
-        # Check if user has Google OAuth connection
-        if request.user.socialaccount_set.filter(provider='google').exists():
-            print("[DEBUG] User has Google OAuth - redirecting to dashboard")
+        # Check if we just completed OAuth
+        oauth_success = request.session.get('oauth_success', False)
+        if oauth_success or request.user.socialaccount_set.filter(provider='google').exists():
+            print("[DEBUG] User has Google OAuth or just completed OAuth - redirecting to dashboard")
             return redirect('index')
         else:
             print("[DEBUG] User needs Google OAuth")

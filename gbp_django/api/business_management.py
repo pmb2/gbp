@@ -86,6 +86,10 @@ def get_business_accounts(access_token):
 
     for attempt in range(retries):
         try:
+            # Add delay between attempts
+            if attempt > 0:
+                time.sleep(2 ** attempt)  # Exponential backoff
+            
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
@@ -272,18 +276,14 @@ def store_business_data(business_data, user_id, access_token):
             automation_status='Active'
         )
         
-        # Create notification only if user exists
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        
+        # Create notification
         try:
-            user = User.objects.get(id=user_id)
             Notification.objects.create(
-                user=user,
+                user_id=user_id,
                 message="Please complete your business profile to get started."
             )
-        except User.DoesNotExist:
-            print(f"[WARNING] User {user_id} not found - skipping notification creation")
+        except Exception as e:
+            print(f"[WARNING] Failed to create notification: {str(e)}")
         
         stored_businesses = [business]
         return stored_businesses
