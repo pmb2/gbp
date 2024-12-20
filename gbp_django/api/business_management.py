@@ -327,10 +327,19 @@ def store_business_data(business_data, user_id, access_token):
                         'employee_count': location.get('metadata', {}).get('employeeCount', '')
                     }
                 
-                # Get or create the business record
+                # Get or create the business record with enhanced details
                 business, created = Business.objects.update_or_create(
                     business_id=account['name'],
-                    defaults=business_details
+                    defaults={
+                        **business_details,
+                        'is_verified': location.get('verification_state') == 'VERIFIED',
+                        'is_connected': True,
+                        'google_location_id': location.get('name', ''),
+                        'compliance_score': calculate_compliance_score(location),
+                        'automation_status': 'Active',
+                        'last_post_date': location.get('profile', {}).get('lastPostDate'),
+                        'next_update_date': calculate_next_update(location)
+                    }
                 )
                 
                 stored_businesses.append(business)
@@ -372,8 +381,65 @@ def store_business_data(business_data, user_id, access_token):
     return stored_businesses
 
 def get_locations(access_token, account_id):
-    url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    return response.json()
+    """Get detailed location information including verification status"""
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        # Get additional verification details for each location
+        locations_data = response.json()
+        if 'locations' in locations_data:
+            for location in locations_data['locations']:
+                verification_url = f"https://mybusinessverifications.googleapis.com/v1/{location['name']}/verification"
+                verification_response = requests.get(verification_url, headers=headers)
+                if verification_response.ok:
+                    verification_data = verification_response.json()
+                    location['verification_state'] = verification_data.get('state', 'UNVERIFIED')
+                    location['verification_method'] = verification_data.get('method', 'NONE')
+                
+        return locations_data
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching location data: {str(e)}")
+        if hasattr(e.response, 'json'):
+            print(f"API Error details: {e.response.json()}")
+        return {"locations": []}
+def calculate_compliance_score(location_data):
+    """Calculate compliance score based on profile completeness"""
+    score = 0
+    total_checks = 7
+    
+    # Check basic info
+    if location_data.get('locationName'): score += 1
+    if location_data.get('primaryPhone'): score += 1
+    if location_data.get('websiteUrl'): score += 1
+    if location_data.get('regularHours'): score += 1
+    
+    # Check address
+    address = location_data.get('address', {})
+    if address and all(address.get(f) for f in ['addressLines', 'locality', 'regionCode']):
+        score += 1
+        
+    # Check categories
+    if location_data.get('primaryCategory'): score += 1
+    
+    # Check profile completeness
+    profile = location_data.get('profile', {})
+    if profile and profile.get('description') and profile.get('primaryPhoto'):
+        score += 1
+        
+    return int((score / total_checks) * 100)
+
+def calculate_next_update(location_data):
+    """Calculate next update date based on last activity"""
+    from datetime import datetime, timedelta
+    
+    last_post = location_data.get('profile', {}).get('lastPostDate')
+    if last_post:
+        last_post_date = datetime.fromisoformat(last_post.replace('Z', '+00:00'))
+        return last_post_date + timedelta(days=7)
+    return datetime.now() + timedelta(days=1)
