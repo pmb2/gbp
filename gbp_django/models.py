@@ -68,16 +68,18 @@ class Session(models.Model):
 class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
-    business_id = models.CharField(max_length=255, unique=True)  # Can be either Google ID or unvalidated-{user_id}-{timestamp}
+    business_id = models.CharField(max_length=255, unique=True)  # Google account ID
+    google_location_id = models.CharField(max_length=255, null=True, blank=True)  # Location ID from Google
     business_email = models.EmailField(max_length=255)
     email_verification_token = models.CharField(max_length=100, null=True, blank=True)
     email_verification_pending = models.BooleanField(default=True)
     email_verified_at = models.DateTimeField(null=True, blank=True)
-    address = models.TextField(blank=True, null=True, default='No info')
-    phone_number = models.CharField(max_length=20, blank=True, null=True, default='No info')
-    website_url = models.TextField(blank=True, null=True, default='No info')
-    category = models.CharField(max_length=255, blank=True, null=True, default='No info')
+    address = models.TextField(blank=True, null=True, default='Pending')
+    phone_number = models.CharField(max_length=20, blank=True, null=True, default='Pending')
+    website_url = models.TextField(blank=True, null=True, default='Pending')
+    category = models.CharField(max_length=255, blank=True, null=True, default='Pending')
     is_verified = models.BooleanField(default=False)
+    is_connected = models.BooleanField(default=False)  # Indicates if connected via Google OAuth
     email_settings = models.JSONField(default=dict, help_text="Email notification preferences", blank=True)
     
     def get_email_preferences(self):
