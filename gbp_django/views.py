@@ -57,9 +57,13 @@ def login(request):
     
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
-        # Always redirect to index if authenticated
-        print("[DEBUG] Redirecting to dashboard")
-        return redirect('index')
+        # Check if user has Google OAuth connection
+        if request.user.socialaccount_set.filter(provider='google').exists():
+            print("[DEBUG] User has Google OAuth - redirecting to dashboard")
+            return redirect('index')
+        else:
+            print("[DEBUG] User needs Google OAuth")
+            return redirect('google_oauth')
 
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -636,6 +640,8 @@ def google_oauth_callback(request):
                 print(f"[INFO] Photos stored for location {location['name']}.")
 
             messages.success(request, 'Successfully connected with Google')
+            # Store success flag in session
+            request.session['oauth_success'] = True
             return redirect('index')
             
         except Exception as e:
@@ -931,8 +937,11 @@ def index(request):
     print(f"[DEBUG] User: {request.user.email}")
     
     print("[DEBUG] Fetching businesses and related data...")
-    # Only redirect to OAuth if user has no social accounts
-    if not request.user.socialaccount_set.filter(provider='google').exists():
+    # Check if we just completed OAuth successfully
+    oauth_success = request.session.pop('oauth_success', False)
+    
+    # Only redirect to OAuth if user has no social accounts and didn't just complete OAuth
+    if not request.user.socialaccount_set.filter(provider='google').exists() and not oauth_success:
         print("[DEBUG] User needs Google OAuth - no social accounts or businesses")
         messages.warning(request, 'Please connect your Google Business Profile to access all features')
         return redirect('google_oauth')
