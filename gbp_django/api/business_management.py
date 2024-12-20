@@ -254,10 +254,6 @@ def store_business_data(business_data, user_id, access_token):
                 'verification_reminders': True
             },
             automation_status='Active'
-                'weekly_summary': True,
-                'verification_reminders': True
-            },
-            automation_status='Active'
         )
         
         # Create notification only if user exists
