@@ -57,15 +57,28 @@ def login(request):
     
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
+        print(f"[DEBUG] Session contents: {dict(request.session)}")
+        
+        # Check if OAuth was just completed successfully
+        if request.session.get('oauth_success'):
+            print("[DEBUG] OAuth success flag found - redirecting to dashboard")
+            request.session.pop('oauth_success', None)
+            return redirect('index')
+            
         # Check if we're in the OAuth flow
         if request.session.get('oauth_in_progress'):
             print("[DEBUG] OAuth in progress, continuing...")
             return
+            
         # Check if user needs OAuth
-        if not request.user.socialaccount_set.filter(provider='google').exists():
+        has_oauth = request.user.socialaccount_set.filter(provider='google').exists()
+        print(f"[DEBUG] User has OAuth: {has_oauth}")
+        
+        if not has_oauth:
             print("[DEBUG] User needs Google OAuth")
             request.session['oauth_in_progress'] = True
             return redirect('google_oauth')
+            
         print("[DEBUG] User has Google OAuth - redirecting to dashboard")
         return redirect('index')
 
@@ -192,6 +205,8 @@ def direct_google_oauth(request):
 def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
     print("\n[DEBUG] Starting Google OAuth callback...")
+    print(f"[DEBUG] Session contents: {dict(request.session)}")
+    print(f"[DEBUG] User authenticated: {request.user.is_authenticated}")
     
     code = request.GET.get('code')
     state = request.GET.get('state')
@@ -199,6 +214,7 @@ def google_oauth_callback(request):
     
     # Clear any existing unverified businesses for this user
     if request.user.is_authenticated:
+        print(f"[DEBUG] Clearing unverified businesses for user {request.user.id}")
         Business.objects.filter(
             user=request.user,
             business_id__startswith='unverified-'
@@ -338,11 +354,14 @@ def google_oauth_callback(request):
             print(f"[ERROR] Failed to process business data: {str(e)}")
             messages.error(request, "Failed to process business data. Please try again.")
 
-        # Store tokens and clear OAuth progress flag
+        # Store tokens and update session flags
         request.session['google_token'] = access_token
         if refresh_token:
             request.session['refresh_token'] = refresh_token
+        request.session['oauth_success'] = True
         request.session.pop('oauth_in_progress', None)
+        request.session.pop('oauth_state', None)
+        print("[DEBUG] Updated session flags - oauth_success=True, cleared oauth_in_progress and oauth_state")
 
         # Get user info from Google
         user_info = get_user_info(access_token)

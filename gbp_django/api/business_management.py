@@ -88,7 +88,9 @@ def get_business_accounts(access_token):
         try:
             # Add delay between attempts
             if attempt > 0:
-                time.sleep(1)  # Fixed 1 second delay between retries
+                delay = min(1 * (attempt + 1), 3)  # Progressive delay capped at 3 seconds
+                print(f"[DEBUG] API retry attempt {attempt + 1} with {delay}s delay")
+                time.sleep(delay)
             
             response = requests.get(url, headers=headers)
             response.raise_for_status()
