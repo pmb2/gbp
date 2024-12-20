@@ -95,11 +95,9 @@ def get_business_accounts(access_token):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
-            if not data:
-                print("[WARNING] Empty response from Google API")
-                return {"accounts": []}
-            if not data.get('accounts'):
+            if not data or not data.get('accounts'):
                 print("[WARNING] No business accounts found")
+                # Return empty accounts list but don't fail
                 return {"accounts": []}
             return data
         except requests.exceptions.HTTPError as e:
@@ -118,7 +116,7 @@ def get_business_accounts(access_token):
             elif response.status_code == 429:
                 # Too many requests, apply exponential backoff
                 if attempt < retries - 1:
-                    wait_time = backoff_factor ** attempt + random.uniform(0, 1)
+                    wait_time = 0.5 * (attempt + 1)  # Linear backoff: 0.5s, 1s, 1.5s
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time} seconds...")
                     time.sleep(wait_time)
                 elif response.status_code == 401:
@@ -231,8 +229,7 @@ def store_business_data(business_data, user_id, access_token):
     # If no businesses were stored, create an unverified business entry from OAuth data
     if not stored_businesses:
         print("\n[DEBUG] No businesses found - creating unverified business record")
-        timestamp = int(time.time())
-        business_id = f"biz_{user_id}_{timestamp}"
+        business_id = f"oauth-business-{user_id}"
         
         # Get user info from social account
         from allauth.socialaccount.models import SocialAccount
@@ -280,11 +277,8 @@ def store_business_data(business_data, user_id, access_token):
         
         # Create notification
         try:
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            user = User.objects.get(id=user_id)
             Notification.objects.create(
-                user=user,
+                user_id=user_id,
                 message="Please complete your business profile to get started."
             )
         except Exception as e:
