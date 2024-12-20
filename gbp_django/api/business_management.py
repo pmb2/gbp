@@ -156,11 +156,61 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # If no accounts found or user has no businesses, create unvalidated entry
-    if not accounts and not Business.objects.filter(user_id=user_id).exists():
-        print("[INFO] No accounts found - creating unvalidated business")
+    # Process each account from Google API
+    for account in accounts:
+        try:
+            # Basic business details from account
+            business_details = {
+                'user_id': user_id,
+                'business_id': account['name'],  # Google account ID
+                'business_name': account.get('accountName', 'Unnamed Business'),
+                'business_email': account.get('primaryOwner', {}).get('email', ''),
+                'is_connected': True  # Mark as connected via OAuth
+            }
+
+            # Get locations for this account
+            locations = get_locations(access_token, account['name'])
+            
+            if locations.get('locations'):
+                # Use first location's details
+                location = locations['locations'][0]
+                business_details.update({
+                    'google_location_id': location['name'],
+                    'address': location.get('address', {}).get('formattedAddress', 'Pending'),
+                    'phone_number': location.get('primaryPhone', 'Pending'),
+                    'website_url': location.get('websiteUrl', 'Pending'),
+                    'category': location.get('primaryCategory', {}).get('displayName', 'Pending'),
+                    'is_verified': location.get('locationState', {}).get('isVerified', False),
+                    'description': location.get('profile', {}).get('description', '')
+                })
+            else:
+                # No locations found - store with pending values
+                business_details.update({
+                    'is_verified': False,
+                    'address': 'Pending',
+                    'phone_number': 'Pending',
+                    'website_url': 'Pending',
+                    'category': 'Pending'
+                })
+
+            # Create or update business record
+            business, created = Business.objects.update_or_create(
+                business_id=business_details['business_id'],
+                defaults=business_details
+            )
+            
+            stored_businesses.append(business)
+            print(f"[INFO] {'Created' if created else 'Updated'} business: {business.business_name}")
+
+        except Exception as e:
+            print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
+            continue
+
+    # If no businesses were stored, create placeholder
+    if not stored_businesses and not Business.objects.filter(user_id=user_id).exists():
+        print("[INFO] Creating placeholder business")
         timestamp = int(time.time())
-        business_id = f"unvalidated-{user_id}-{timestamp}"
+        business_id = f"placeholder-{user_id}-{timestamp}"
         
         business = Business.objects.create(
             user_id=user_id,
