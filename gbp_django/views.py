@@ -1172,8 +1172,7 @@ def get_verification_status(request, business_id):
     try:
         business = Business.objects.get(business_id=business_id, user=request.user)
         
-        # Only check verification for OAuth-connected businesses
-        # Initialize default status
+        # Check verification status for any business
         status = {
             'business_name': False,
             'address': False,

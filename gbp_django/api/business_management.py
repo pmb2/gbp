@@ -160,9 +160,13 @@ def store_business_data(business_data, user_id, access_token):
     for account in accounts:
         try:
             # Basic business details from account
+            # Generate unique business ID if not exists
+            business_id = f"biz_{user_id}_{int(time.time())}"
+            
             business_details = {
                 'user_id': user_id,
-                'business_id': account['name'],  # Google account ID
+                'business_id': business_id,
+                'google_account_id': account['name'],  # Store Google account ID separately
                 'business_name': account.get('accountName', 'Unnamed Business'),
                 'business_email': account.get('primaryOwner', {}).get('email', ''),
                 'is_connected': True  # Mark as connected via OAuth
@@ -194,10 +198,22 @@ def store_business_data(business_data, user_id, access_token):
                 })
 
             # Create or update business record
-            business, created = Business.objects.update_or_create(
-                business_id=business_details['business_id'],
-                defaults=business_details
-            )
+            # Try to find existing business by Google account ID first
+            existing_business = Business.objects.filter(
+                google_account_id=business_details['google_account_id']
+            ).first()
+            
+            if existing_business:
+                # Update existing business
+                for key, value in business_details.items():
+                    setattr(existing_business, key, value)
+                existing_business.save()
+                business = existing_business
+                created = False
+            else:
+                # Create new business
+                business = Business.objects.create(**business_details)
+                created = True
             
             stored_businesses.append(business)
             print(f"[INFO] {'Created' if created else 'Updated'} business: {business.business_name}")
@@ -210,7 +226,7 @@ def store_business_data(business_data, user_id, access_token):
     if not stored_businesses:
         print("\n[DEBUG] No businesses found - creating unverified business record")
         timestamp = int(time.time())
-        business_id = f"unverified-{user_id}-{timestamp}"
+        business_id = f"biz_{user_id}_{timestamp}"
         
         # Get user info from social account
         from allauth.socialaccount.models import SocialAccount
