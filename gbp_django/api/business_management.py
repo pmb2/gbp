@@ -138,7 +138,7 @@ def get_business_accounts(access_token):
                     return {"accounts": []}  # Return an empty structure to continue the flow
         except requests.exceptions.RequestException as e:
             if attempt < retries - 1:
-                wait_time = backoff_factor ** attempt + random.uniform(0, 1)
+                wait_time = 0.5 * (attempt + 1)  # Linear backoff: 0.5s, 1s
                 print(f"[INFO] Request failed. Retrying in {wait_time} seconds...")
                 time.sleep(wait_time)
             else:
