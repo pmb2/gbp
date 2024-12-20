@@ -941,7 +941,7 @@ def index(request):
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
-    ).order_by('is_verified')  # Show unverified first
+    ).order_by('-is_connected', '-is_verified')  # Show connected but unverified first
     
     print(f"\n[DEBUG] Found {businesses.count()} businesses")
     print("[DEBUG] Business details:")

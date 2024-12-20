@@ -115,11 +115,23 @@ class Business(models.Model):
         """Calculate profile completion percentage"""
         print(f"\n[DEBUG] Calculating profile completion for business: {self.business_name}")
         print(f"[DEBUG] Verification status: {self.is_verified}")
+        print(f"[DEBUG] Connection status: {self.is_connected}")
         print(f"[DEBUG] Business ID: {self.business_id}")
         
-        if not self.is_verified:
-            print("[DEBUG] Business not verified, returning 0%")
+        # For unconnected businesses, return 0%
+        if not self.is_connected:
+            print("[DEBUG] Business not connected, returning 0%")
             return 0
+            
+        # For connected but unverified businesses, calculate basic completion
+        if not self.is_verified:
+            completion_score = 0
+            if self.business_name and self.business_name != 'My Business':
+                completion_score += 20
+            if self.business_email and self.business_email != 'pending@verification.com':
+                completion_score += 20
+            print(f"[DEBUG] Unverified business completion: {completion_score}%")
+            return completion_score
             
         completion_score = 0
         required_fields = [

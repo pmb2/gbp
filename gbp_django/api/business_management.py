@@ -349,34 +349,53 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
             continue
     
-    # If no businesses were stored and user has no existing businesses,
-    # create a placeholder business
-    if not stored_businesses and not Business.objects.filter(user_id=user_id).exists():
-        print("\n[DEBUG] Creating placeholder business record")
+    # If no businesses were stored, create an unverified business entry
+    if not stored_businesses:
+        print("\n[DEBUG] No businesses found - creating unverified business record")
         timestamp = int(time.time())
         business_id = f"unverified-{user_id}-{timestamp}"
         
-        placeholder_business = Business.objects.create(
+        # Get user info from social account if available
+        from allauth.socialaccount.models import SocialAccount
+        try:
+            social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+            user_info = social_account.extra_data
+            business_name = user_info.get('name', 'My Business')
+            business_email = user_info.get('email', 'pending@verification.com')
+        except SocialAccount.DoesNotExist:
+            business_name = 'My Business'
+            business_email = 'pending@verification.com'
+            
+        unverified_business = Business.objects.create(
             user_id=user_id,
             business_id=business_id,
-            business_name="My Business",
-            business_email="pending@verification.com",
+            business_name=business_name,
+            business_email=business_email,
             is_verified=False,
+            is_connected=True,  # Connected via OAuth but not verified
             email_verification_pending=True,
             email_verification_token=secrets.token_urlsafe(32),
             address='Pending verification',
             phone_number='Pending verification',
             website_url='Pending verification',
-            category='Pending verification'
+            category='Pending verification',
+            email_settings={
+                'enabled': True,
+                'compliance_alerts': True,
+                'content_approval': True,
+                'weekly_summary': True,
+                'verification_reminders': True
+            },
+            automation_status='Active'
         )
         
         # Create notification for new business
         Notification.objects.create(
             user_id=user_id,
-            message="Please complete your business profile to get started."
+            message="Please verify your business profile to unlock all features."
         )
         
-        stored_businesses = [placeholder_business]
+        stored_businesses = [unverified_business]
         
     return stored_businesses
 
