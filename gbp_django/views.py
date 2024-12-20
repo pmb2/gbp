@@ -57,14 +57,17 @@ def login(request):
     
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
-        # Check if we just completed OAuth
-        oauth_success = request.session.get('oauth_success', False)
-        if oauth_success or request.user.socialaccount_set.filter(provider='google').exists():
-            print("[DEBUG] User has Google OAuth or just completed OAuth - redirecting to dashboard")
-            return redirect('index')
-        else:
+        # Check if we're in the OAuth flow
+        if request.session.get('oauth_in_progress'):
+            print("[DEBUG] OAuth in progress, continuing...")
+            return
+        # Check if user needs OAuth
+        if not request.user.socialaccount_set.filter(provider='google').exists():
             print("[DEBUG] User needs Google OAuth")
+            request.session['oauth_in_progress'] = True
             return redirect('google_oauth')
+        print("[DEBUG] User has Google OAuth - redirecting to dashboard")
+        return redirect('index')
 
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -335,10 +338,11 @@ def google_oauth_callback(request):
             print(f"[ERROR] Failed to process business data: {str(e)}")
             messages.error(request, "Failed to process business data. Please try again.")
 
-        # Store tokens in session
+        # Store tokens and clear OAuth progress flag
         request.session['google_token'] = access_token
         if refresh_token:
             request.session['refresh_token'] = refresh_token
+        request.session.pop('oauth_in_progress', None)
 
         # Get user info from Google
         user_info = get_user_info(access_token)

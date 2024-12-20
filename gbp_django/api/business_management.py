@@ -88,7 +88,7 @@ def get_business_accounts(access_token):
         try:
             # Add delay between attempts
             if attempt > 0:
-                time.sleep(2 ** attempt)  # Exponential backoff
+                time.sleep(1)  # Fixed 1 second delay between retries
             
             response = requests.get(url, headers=headers)
             response.raise_for_status()
@@ -278,8 +278,11 @@ def store_business_data(business_data, user_id, access_token):
         
         # Create notification
         try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            user = User.objects.get(id=user_id)
             Notification.objects.create(
-                user_id=user_id,
+                user=user,
                 message="Please complete your business profile to get started."
             )
         except Exception as e:
