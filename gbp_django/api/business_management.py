@@ -79,18 +79,16 @@ def get_business_accounts(access_token):
     print("\n[DEBUG] Starting business accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     headers = {"Authorization": f"Bearer {access_token}"}
-    retries = 3
-    backoff_factor = 2
+    retries = 2  # Reduced retries
     print(f"[DEBUG] Request URL: {url}")
     print(f"[DEBUG] Authorization header present: {'Authorization' in headers}")
 
     for attempt in range(retries):
         try:
-            # Add delay between attempts
+            # Minimal delay between attempts
             if attempt > 0:
-                delay = min(1 * (attempt + 1), 3)  # Progressive delay capped at 3 seconds
-                print(f"[DEBUG] API retry attempt {attempt + 1} with {delay}s delay")
-                time.sleep(delay)
+                time.sleep(0.5)  # Fixed 0.5s delay between retries
+                print(f"[DEBUG] API retry attempt {attempt + 1}")
             
             response = requests.get(url, headers=headers)
             response.raise_for_status()
@@ -229,57 +227,54 @@ def store_business_data(business_data, user_id, access_token):
     # If no businesses were stored, create an unverified business entry from OAuth data
     if not stored_businesses:
         print("\n[DEBUG] No businesses found - creating unverified business record")
-        business_id = f"oauth-business-{user_id}"
+        business_id = f"biz_{user_id}_{int(time.time())}"
         
         # Get user info from social account
         from allauth.socialaccount.models import SocialAccount
         try:
             social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
             user_info = social_account.extra_data
-            business_name = user_info.get('name', 'My Business')
-            business_email = user_info.get('email', 'pending@verification.com')
-            
-            # Try to get organization info if available
-            org_info = user_info.get('organization', {})
-            address = org_info.get('address', 'Pending verification')
-            phone = org_info.get('phone', 'Pending verification')
-            website = org_info.get('website', 'Pending verification')
-            
+            business_name = user_info.get('name', '').strip() or 'My Business'
+            business_email = user_info.get('email', '').strip() or 'pending@verification.com'
         except SocialAccount.DoesNotExist:
             business_name = 'My Business'
             business_email = 'pending@verification.com'
-            address = 'Pending verification'
-            phone = 'Pending verification' 
-            website = 'Pending verification'
             
-        business = Business.objects.create(
+        # Create or get existing unverified business
+        business, created = Business.objects.get_or_create(
             user_id=user_id,
-            business_id=business_id,
-            business_name=business_name,
-            business_email=business_email,
             is_verified=False,
-            is_connected=True,  # Connected via OAuth
-            email_verification_pending=True,
-            email_verification_token=secrets.token_urlsafe(32),
-            address=address,
-            phone_number=phone,
-            website_url=website,
-            category='Pending verification',
-            email_settings={
-                'enabled': True,
-                'compliance_alerts': True,
-                'content_approval': True,
-                'weekly_summary': True,
-                'verification_reminders': True
-            },
-            automation_status='Active'
+            defaults={
+                'business_id': business_id,
+                'business_name': business_name,
+                'business_email': business_email,
+                'is_connected': True,  # Connected via OAuth
+                'email_verification_pending': True,
+                'email_verification_token': secrets.token_urlsafe(32),
+                'address': 'Pending verification',
+                'phone_number': 'Pending verification',
+                'website_url': 'Pending verification',
+                'category': 'Pending verification',
+                'email_settings': {
+                    'enabled': True,
+                    'compliance_alerts': True,
+                    'content_approval': True,
+                    'weekly_summary': True,
+                    'verification_reminders': True
+                },
+                'automation_status': 'Active'
+            }
         )
         
         # Create notification
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
         try:
+            user = User.objects.get(id=user_id)
             Notification.objects.create(
-                user_id=user_id,
-                message="Please complete your business profile to get started."
+                user=user,
+                message="Please complete your business profile to get started.",
+                notification_type="PROFILE_COMPLETION"
             )
         except Exception as e:
             print(f"[WARNING] Failed to create notification: {str(e)}")
