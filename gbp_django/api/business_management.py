@@ -206,28 +206,54 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
             continue
 
-    # If no businesses were stored, create placeholder
-    if not stored_businesses and not Business.objects.filter(user_id=user_id).exists():
-        print("[INFO] Creating placeholder business")
+    # If no businesses were stored, create an unverified business entry from OAuth data
+    if not stored_businesses:
+        print("\n[DEBUG] No businesses found - creating unverified business record")
         timestamp = int(time.time())
-        business_id = f"placeholder-{user_id}-{timestamp}"
+        business_id = f"unverified-{user_id}-{timestamp}"
         
+        # Get user info from social account
+        from allauth.socialaccount.models import SocialAccount
+        try:
+            social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+            user_info = social_account.extra_data
+            business_name = user_info.get('name', 'My Business')
+            business_email = user_info.get('email', 'pending@verification.com')
+            
+            # Try to get organization info if available
+            org_info = user_info.get('organization', {})
+            address = org_info.get('address', 'Pending verification')
+            phone = org_info.get('phone', 'Pending verification')
+            website = org_info.get('website', 'Pending verification')
+            
+        except SocialAccount.DoesNotExist:
+            business_name = 'My Business'
+            business_email = 'pending@verification.com'
+            address = 'Pending verification'
+            phone = 'Pending verification' 
+            website = 'Pending verification'
+            
         business = Business.objects.create(
             user_id=user_id,
             business_id=business_id,
-            business_name="My Business",
-            business_email="pending@verification.com",
+            business_name=business_name,
+            business_email=business_email,
             is_verified=False,
+            is_connected=True,  # Connected via OAuth
             email_verification_pending=True,
             email_verification_token=secrets.token_urlsafe(32),
-            address='Pending verification',
-            phone_number='Pending verification',
-            website_url='Pending verification',
+            address=address,
+            phone_number=phone,
+            website_url=website,
             category='Pending verification',
             email_settings={
                 'enabled': True,
                 'compliance_alerts': True,
                 'content_approval': True,
+                'weekly_summary': True,
+                'verification_reminders': True
+            },
+            automation_status='Active'
                 'weekly_summary': True,
                 'verification_reminders': True
             },
