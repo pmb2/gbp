@@ -64,6 +64,7 @@ class Session(models.Model):
         except Session.DoesNotExist:
             return None
 
+#
 class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
