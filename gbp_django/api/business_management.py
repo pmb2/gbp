@@ -85,9 +85,9 @@ def get_business_accounts(access_token):
 
     for attempt in range(retries):
         try:
-            # Minimal delay between attempts
+            # Very minimal delay between attempts
             if attempt > 0:
-                time.sleep(0.5)  # Fixed 0.5s delay between retries
+                time.sleep(0.1)  # Reduced to 0.1s delay
                 print(f"[DEBUG] API retry attempt {attempt + 1}")
             
             response = requests.get(url, headers=headers)
@@ -114,7 +114,7 @@ def get_business_accounts(access_token):
             elif response.status_code == 429:
                 # Too many requests, apply exponential backoff
                 if attempt < retries - 1:
-                    wait_time = 0.5 * (attempt + 1)  # Linear backoff: 0.5s, 1s, 1.5s
+                    wait_time = 0.1 * (attempt + 1)  # Reduced linear backoff: 0.1s, 0.2s
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time} seconds...")
                     time.sleep(wait_time)
                 elif response.status_code == 401:
@@ -306,18 +306,11 @@ def store_business_data(business_data, user_id, access_token):
             automation_status='Active'
         )
         
-        # Create notification only if user exists
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-            
-        try:
-            user = User.objects.get(id=user_id)
-            Notification.objects.create(
-                user=user,
-                message="Please complete your business profile to get started."
-            )
-        except User.DoesNotExist:
-            print(f"[WARNING] User {user_id} not found - skipping notification creation")
+        # Create notification
+        Notification.objects.create(
+            user_id=user_id,
+            message="Please complete your business profile to get started."
+        )
         
         stored_businesses = [business]
         return stored_businesses

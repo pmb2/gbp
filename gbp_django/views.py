@@ -964,11 +964,9 @@ def index(request):
     # Check if we just completed OAuth successfully
     oauth_success = request.session.pop('oauth_success', False)
     
-    # Only redirect to OAuth if user has no social accounts and didn't just complete OAuth
-    if not request.user.socialaccount_set.filter(provider='google').exists() and not oauth_success:
-        print("[DEBUG] User needs Google OAuth - no social accounts or businesses")
-        messages.warning(request, 'Please connect your Google Business Profile to access all features')
-        return redirect('google_oauth')
+    # If we just completed OAuth successfully, continue to dashboard
+    if oauth_success:
+        print("[DEBUG] OAuth just completed successfully - continuing to dashboard")
 
     # Get all businesses for the current user with related counts
     businesses = Business.objects.filter(user=request.user).prefetch_related(
