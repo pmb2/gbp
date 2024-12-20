@@ -199,11 +199,29 @@ def store_business_data(business_data, user_id, access_token):
                     'category': 'Pending'
                 })
 
-            # Create or update business record
-            # Try to find existing business by Google account ID first
-            existing_business = Business.objects.filter(
-                google_account_id=business_details['google_account_id']
-            ).first()
+            # Get the Google email from the user's social account
+            from allauth.socialaccount.models import SocialAccount
+            try:
+                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+                google_email = social_account.extra_data.get('email')
+            except SocialAccount.DoesNotExist:
+                google_email = None
+
+            # Try to find existing business by Google email first
+            existing_business = None
+            if google_email:
+                existing_business = Business.objects.filter(
+                    google_email=google_email
+                ).first()
+
+            # If not found by email, try Google account ID as fallback
+            if not existing_business:
+                existing_business = Business.objects.filter(
+                    google_account_id=business_details['google_account_id']
+                ).first()
+
+            # Add Google email to business details
+            business_details['google_email'] = google_email
             
             if existing_business:
                 # Update existing business

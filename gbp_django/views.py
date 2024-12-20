@@ -365,11 +365,18 @@ def google_oauth_callback(request):
 
         # Get user info from Google
         user_info = get_user_info(access_token)
+        google_email = user_info.get('email')
         
         # Update user's Google information
         user = request.user
         user.google_id = user_info.get('sub')
         user.name = user_info.get('name')
+        
+        # Update any existing unverified businesses with this Google email
+        Business.objects.filter(
+            user=user,
+            is_verified=False
+        ).update(google_email=google_email)
         user.profile_picture_url = user_info.get('picture')
         user.google_access_token = access_token
         user.google_refresh_token = refresh_token

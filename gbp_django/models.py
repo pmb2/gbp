@@ -71,6 +71,7 @@ class Business(models.Model):
     business_id = models.CharField(max_length=255, unique=True)  # Unique identifier
     google_account_id = models.CharField(max_length=255, null=True, blank=True)  # Google account ID
     google_location_id = models.CharField(max_length=255, null=True, blank=True)  # Location ID from Google
+    google_email = models.EmailField(max_length=255, null=True, blank=True)  # Gmail from OAuth
     business_email = models.EmailField(max_length=255)
     email_verification_token = models.CharField(max_length=100, null=True, blank=True)
     email_verification_pending = models.BooleanField(default=True)
