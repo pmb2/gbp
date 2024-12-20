@@ -430,8 +430,8 @@
                              class="h-8 w-8 rounded-full">
                     </div>
                     <!-- Dropdown Menu -->
-                    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden">
-                        <div class="px-4 py-2 text-sm text-gray-700 border-b">
+                    <div id="userMenu" class="absolute right-0 transform -translate-x-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-50">
+                        <div class="px-4 py-2 text-sm text-gray-700 border-b truncate">
                             {{ user.email }}
                         </div>
                         <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
