@@ -228,6 +228,20 @@ body {
   }
 }
 
+/* Dropdown menu positioning */
+.dropdown-menu {
+  right: auto;
+  left: 0;
+  min-width: 200px;
+}
+
+/* Enhanced responsive breakpoints */
+@media screen and (max-width: 1200px) {
+  .analytics-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media screen and (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
@@ -240,5 +254,28 @@ body {
   
   .analytics-section {
     grid-template-columns: 1fr;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .card-content {
+    font-size: 0.875rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
   }
 }

@@ -1,3 +1,4 @@
+{% if user.is_authenticated %}
 <div id="feedbackButton" class="fixed bottom-4 left-4 z-50">
     <button onclick="toggleFeedbackForm()" 
             class="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110">
@@ -86,3 +87,4 @@ document.getElementById('feedbackModal').addEventListener('click', function(even
     }
 });
 </script>
+{% endif %}
