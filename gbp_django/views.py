@@ -76,16 +76,35 @@ def login(request):
         # Try to find the user first
         try:
             user_obj = User.objects.get(email=email)
-            print(f"\n[DEBUG] Found user in database: {user_obj.email}")
-            print(f"[DEBUG] Stored password hash: {user_obj.password[:20]}...")
-            print(f"[DEBUG] Full stored hash: {user_obj.password}")
-            print(f"[DEBUG] Hash algorithm: {user_obj.password.split('$')[0]}")
-            print(f"[DEBUG] Hash iterations: {user_obj.password.split('$')[1]}")
+            print("\n[DEBUG] ====== PASSWORD DEBUGGING ======")
+            print(f"[DEBUG] Found user in database: {user_obj.email}")
+            print(f"[DEBUG] Raw password provided: {password}")
             
-            # Debug the authentication process
-            from django.contrib.auth.hashers import check_password
+            # Debug stored password hash components
+            hash_parts = user_obj.password.split('$')
+            print("\n[DEBUG] Stored Password Hash Details:")
+            print(f"[DEBUG] Full stored hash: {user_obj.password}")
+            print(f"[DEBUG] Hash algorithm: {hash_parts[0]}")
+            print(f"[DEBUG] Hash iterations: {hash_parts[1]}")
+            print(f"[DEBUG] Salt: {hash_parts[2]}")
+            print(f"[DEBUG] Hash value: {hash_parts[3]}")
+            
+            # Debug the authentication process step by step
+            from django.contrib.auth.hashers import check_password, make_password
+            
+            # Generate a new hash with the provided password
+            new_hash = make_password(password, salt=hash_parts[2])
+            print("\n[DEBUG] New Hash Generation:")
+            print(f"[DEBUG] New hash with same salt: {new_hash}")
+            new_hash_parts = new_hash.split('$')
+            print(f"[DEBUG] New hash value: {new_hash_parts[3]}")
+            print(f"[DEBUG] Hash comparison: {new_hash_parts[3] == hash_parts[3]}")
+            
+            # Use check_password
             raw_valid = check_password(password, user_obj.password)
-            print(f"[DEBUG] Raw password check result: {raw_valid}")
+            print("\n[DEBUG] Password Check Results:")
+            print(f"[DEBUG] check_password() result: {raw_valid}")
+            print("[DEBUG] ==============================")
         except User.DoesNotExist:
             print(f"[DEBUG] No user found with email: {email}")
             messages.error(request, f'No account found with email: {email}')
