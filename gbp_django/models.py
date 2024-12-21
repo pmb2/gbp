@@ -68,7 +68,8 @@ class Session(models.Model):
 class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
-    business_id = models.CharField(max_length=255, unique=True)  # Unique identifier
+    business_id = models.AutoField(primary_key=True)  # Internal auto-incrementing ID
+    google_business_id = models.CharField(max_length=255, unique=True, null=True, blank=True)  # ID from Google OAuth
     google_account_id = models.CharField(max_length=255, null=True, blank=True)  # Google account ID
     google_location_id = models.CharField(max_length=255, null=True, blank=True)  # Location ID from Google
     google_email = models.EmailField(max_length=255, null=True, blank=True)  # Gmail from OAuth
