@@ -8,12 +8,11 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
+        extra_fields.setdefault('is_active', True)
         user = self.model(email=email, google_id=google_id, **extra_fields)
         if password:
             user.set_password(password)
         user.save(using=self._db)
-        # Initialize session state after user is saved
-        Session.store_session_state(user_id=user.id, state='initialized')
         return user
 
     def create_superuser(self, email, google_id, password=None, **extra_fields):

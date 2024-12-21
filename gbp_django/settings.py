@@ -19,6 +19,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # Custom adapter for handling multiple social apps
@@ -121,7 +122,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'https://www.googleapis.com/auth/userinfo.profile',
         ],
         'AUTH_PARAMS': {
-            'access_type': 'online',
+            'access_type': 'offline',
+            'prompt': 'consent',
         },
         'APP': {
             'client_id': os.getenv('CLIENT_ID'),
@@ -130,6 +132,12 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 SITE_ID = 3
 
