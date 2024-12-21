@@ -142,8 +142,8 @@ def register(request):
             google_id=None  # Will be updated when connecting with Google
         )
 
-        # Log user in
-        auth_login(request, user)
+        # Log user in with the default backend
+        auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
         # Redirect to Google OAuth
         return redirect('/accounts/google/login/')
