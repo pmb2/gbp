@@ -93,8 +93,16 @@ def login(request):
         # Try to find the user first
         try:
             user_obj = User.objects.get(email=email)
-            print(f"[DEBUG] Found user in database: {user_obj.email}")
-            print(f"[DEBUG] User password hash: {user_obj.password[:20]}...")
+            print(f"\n[DEBUG] Found user in database: {user_obj.email}")
+            print(f"[DEBUG] Stored password hash: {user_obj.password[:20]}...")
+            print(f"[DEBUG] Full stored hash: {user_obj.password}")
+            print(f"[DEBUG] Hash algorithm: {user_obj.password.split('$')[0]}")
+            print(f"[DEBUG] Hash iterations: {user_obj.password.split('$')[1]}")
+            
+            # Debug the authentication process
+            from django.contrib.auth.hashers import check_password
+            raw_valid = check_password(password, user_obj.password)
+            print(f"[DEBUG] Raw password check result: {raw_valid}")
         except User.DoesNotExist:
             print(f"[DEBUG] No user found with email: {email}")
             messages.error(request, f'No account found with email: {email}')
@@ -123,7 +131,7 @@ def login(request):
             print("[DEBUG] Redirecting to dashboard")
             return redirect(reverse('index'))
         else:
-            print("[ERROR] Authentication failed for user:", email)
+            print("\n[ERROR] Authentication failed for user:", email)
             print("[ERROR] User exists but authentication failed")
             print("[ERROR] This might indicate an incorrect password")
             
@@ -131,6 +139,14 @@ def login(request):
             from django.contrib.auth import get_backends
             backends = get_backends()
             print("[DEBUG] Available authentication backends:", [b.__class__.__name__ for b in backends])
+            
+            # Try each backend manually for debugging
+            for backend in backends:
+                try:
+                    auth_attempt = backend.authenticate(request, username=email, password=password)
+                    print(f"[DEBUG] Auth attempt with {backend.__class__.__name__}: {'Success' if auth_attempt else 'Failed'}")
+                except Exception as e:
+                    print(f"[DEBUG] Backend {backend.__class__.__name__} error: {str(e)}")
             
             messages.error(request, 'Invalid password. Please try again.')
 
@@ -156,11 +172,21 @@ def register(request):
 
         try:
             # Create new user
+            print(f"\n[DEBUG] Starting user registration for email: {email}")
+            print("[DEBUG] Creating user with hashed password...")
+            
             user = User.objects.create_user(
                 email=email,
                 password=password,
                 google_id=None  # Will be updated when connecting with Google
             )
+            
+            # Debug password hash
+            print(f"[DEBUG] User created successfully")
+            print(f"[DEBUG] Generated password hash: {user.password[:20]}...")
+            print(f"[DEBUG] Password hash algorithm: {user.password.split('$')[0]}")
+            print(f"[DEBUG] Password hash iterations: {user.password.split('$')[1]}")
+            
             messages.success(request, 'Registration successful! Please login.')
             return redirect('login')
         except Exception as e:
