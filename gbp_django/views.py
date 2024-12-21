@@ -196,16 +196,10 @@ def register(request):
     return render(request, 'register.html')
 
 
-@login_required
 def direct_google_oauth(request):
     """
     Directly initiate Google OAuth process without intermediate page
     """
-    # Check if user already has valid social account
-    if request.user.socialaccount_set.filter(provider='google').exists():
-        print("[DEBUG] User already has Google OAuth connection")
-        return redirect('index')
-
     # Initialize provider with request
     provider_class = providers.registry.get_class('google')
     
@@ -215,8 +209,6 @@ def direct_google_oauth(request):
         app = SocialApp.objects.get(provider='google')
     except SocialApp.DoesNotExist:
         raise ValueError("Google SocialApp is not configured. Please add it in the admin interface.")
-
-    provider = provider_class(request, app)
 
     # Construct OAuth URL
     callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
@@ -228,9 +220,9 @@ def direct_google_oauth(request):
     ])
 
     # Generate and store state
-    import secrets
     state = secrets.token_urlsafe(16)
     request.session['oauth_state'] = state
+    request.session['oauth_in_progress'] = True
 
     # Construct the authorization URL with all required scopes
     authorize_url = (
