@@ -290,7 +290,10 @@ def google_oauth_callback(request):
             google_token_expiry=datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
         )
     
-    # Log the user in
+    # Log the user in with the default backend
+    from django.contrib.auth import get_backends
+    auth_backend = get_backends()[0]
+    user.backend = f"{auth_backend.__module__}.{auth_backend.__class__.__name__}"
     auth_login(request, user)
     print(f"[DEBUG] User logged in: {user.email}")
     
