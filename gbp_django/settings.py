@@ -19,7 +19,6 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # Custom adapter for handling multiple social apps
@@ -71,11 +70,7 @@ TEMPLATES = [
     },
 ]
 
-# Remove or update the ACCOUNT_FORMS setting if the forms module does not exist
-# ACCOUNT_FORMS = {
-#     'login': 'gbp_django.forms.CustomLoginForm',
-#     'signup': 'gbp_django.forms.CustomSignupForm',
-# }
+AUTH_USER_MODEL = 'gbp_django.User'
 
 WSGI_APPLICATION = 'gbp_django.wsgi.application'
 
@@ -94,20 +89,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
