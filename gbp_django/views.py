@@ -90,6 +90,17 @@ def login(request):
         print(f"[DEBUG] Login attempt for email: {email}")
         print(f"[DEBUG] Remember me: {remember_me}")
 
+        # Try to find the user first
+        try:
+            user_obj = User.objects.get(email=email)
+            print(f"[DEBUG] Found user in database: {user_obj.email}")
+            print(f"[DEBUG] User password hash: {user_obj.password[:20]}...")
+        except User.DoesNotExist:
+            print(f"[DEBUG] No user found with email: {email}")
+            messages.error(request, f'No account found with email: {email}')
+            return render(request, 'login.html')
+
+        # Attempt authentication
         user = authenticate(request, username=email, password=password)
         if user is not None:
             print(f"[DEBUG] User authenticated successfully: {user.email}")
@@ -113,8 +124,15 @@ def login(request):
             return redirect(reverse('index'))
         else:
             print("[ERROR] Authentication failed for user:", email)
-            print("[ERROR] Authentication error details:", str(user))
-            messages.error(request, f'Login failed. Please check your email and password.')
+            print("[ERROR] User exists but authentication failed")
+            print("[ERROR] This might indicate an incorrect password")
+            
+            # Get the backend that was used
+            from django.contrib.auth import get_backends
+            backends = get_backends()
+            print("[DEBUG] Available authentication backends:", [b.__class__.__name__ for b in backends])
+            
+            messages.error(request, 'Invalid password. Please try again.')
 
     return render(request, 'login.html')
 
