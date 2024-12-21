@@ -112,8 +112,9 @@ def login(request):
             print("[DEBUG] Redirecting to dashboard")
             return redirect(reverse('index'))
         else:
-            print("[ERROR] Authentication failed")
-            messages.error(request, 'Invalid login credentials')
+            print("[ERROR] Authentication failed for user:", email)
+            print("[ERROR] Authentication error details:", str(user))
+            messages.error(request, f'Login failed. Please check your email and password.')
 
     return render(request, 'login.html')
 
@@ -135,18 +136,18 @@ def register(request):
             messages.error(request, 'Email already registered')
             return render(request, 'register.html')
 
-        # Create new user
-        user = User.objects.create_user(
-            email=email,
-            password=password,
-            google_id=None  # Will be updated when connecting with Google
-        )
-
-        # Log user in with the default backend
-        auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-
-        # Redirect to Google OAuth
-        return redirect('/accounts/google/login/')
+        try:
+            # Create new user
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                google_id=None  # Will be updated when connecting with Google
+            )
+            messages.success(request, 'Registration successful! Please login.')
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f'Registration failed: {str(e)}')
+            return render(request, 'register.html')
 
     return render(request, 'register.html')
 
