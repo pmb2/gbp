@@ -231,8 +231,31 @@ def google_oauth_callback(request):
     code = request.GET.get('code')
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
+
+    if not code or not state or state != stored_state:
+        print("[ERROR] OAuth validation failed")
+        messages.error(request, 'Invalid OAuth state or missing code')
+        return redirect('login')
+
+    # Get tokens using the authorization code
+    from allauth.socialaccount.models import SocialApp
+    google_app = SocialApp.objects.get(provider='google')
     
-    # Get user info from Google first
+    tokens = get_access_token(
+        code,
+        google_app.client_id,
+        google_app.secret,
+        request.build_absolute_uri(reverse('google_oauth_callback'))
+    )
+    
+    access_token = tokens.get('access_token')
+    refresh_token = tokens.get('refresh_token')
+    
+    if not access_token:
+        messages.error(request, 'Failed to get access token')
+        return redirect('login')
+        
+    # Now get user info using the access token
     user_info = get_user_info(access_token)
     google_email = user_info.get('email')
     google_id = user_info.get('sub')
