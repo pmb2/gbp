@@ -81,13 +81,18 @@ def login(request):
             print(f"[DEBUG] Raw password provided: {password}")
             
             # Debug stored password hash components
-            hash_parts = user_obj.password.split('$')
             print("\n[DEBUG] Stored Password Hash Details:")
             print(f"[DEBUG] Full stored hash: {user_obj.password}")
-            print(f"[DEBUG] Hash algorithm: {hash_parts[0]}")
-            print(f"[DEBUG] Hash iterations: {hash_parts[1]}")
-            print(f"[DEBUG] Salt: {hash_parts[2]}")
-            print(f"[DEBUG] Hash value: {hash_parts[3]}")
+            
+            # Safely parse hash components
+            hash_parts = user_obj.password.split('$')
+            if len(hash_parts) >= 4:
+                print(f"[DEBUG] Hash algorithm: {hash_parts[0]}")
+                print(f"[DEBUG] Hash iterations: {hash_parts[1]}")
+                print(f"[DEBUG] Salt: {hash_parts[2]}")
+                print(f"[DEBUG] Hash value: {hash_parts[3]}")
+            else:
+                print("[DEBUG] Password hash not in standard format")
             
             # Debug the authentication process step by step
             from django.contrib.auth.hashers import check_password, make_password
