@@ -232,13 +232,44 @@ def google_oauth_callback(request):
     state = request.GET.get('state')
     stored_state = request.session.get('oauth_state')
     
-    # Clear any existing unverified businesses for this user
-    if request.user.is_authenticated:
-        print(f"[DEBUG] Clearing unverified businesses for user {request.user.id}")
-        Business.objects.filter(
-            user=request.user,
-            business_id__startswith='unverified-'
-        ).delete()
+    # Get user info from Google first
+    user_info = get_user_info(access_token)
+    google_email = user_info.get('email')
+    google_id = user_info.get('sub')
+    
+    print(f"[DEBUG] Google user info: {google_email}")
+    
+    # Try to find existing user
+    try:
+        user = User.objects.get(email=google_email)
+        print(f"[DEBUG] Found existing user: {user.email}")
+        
+        # Update Google credentials
+        user.google_id = google_id
+        user.name = user_info.get('name')
+        user.profile_picture_url = user_info.get('picture')
+        user.google_access_token = access_token
+        user.google_refresh_token = refresh_token
+        user.google_token_expiry = datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        user.save()
+        
+    except User.DoesNotExist:
+        print(f"[DEBUG] Creating new user for: {google_email}")
+        # Create new user
+        user = User.objects.create_user(
+            email=google_email,
+            google_id=google_id,
+            password=None,  # No password for OAuth users
+            name=user_info.get('name'),
+            profile_picture_url=user_info.get('picture'),
+            google_access_token=access_token,
+            google_refresh_token=refresh_token,
+            google_token_expiry=datetime.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        )
+    
+    # Log the user in
+    auth_login(request, user)
+    print(f"[DEBUG] User logged in: {user.email}")
     
     print(f"[DEBUG] Code present: {bool(code)}")
     print(f"[DEBUG] State present: {bool(state)}")
