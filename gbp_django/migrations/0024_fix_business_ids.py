@@ -6,6 +6,8 @@ def convert_business_ids(apps, schema_editor):
         # Generate a unique business_id if none exists
         if not business.business_id:
             business.business_id = f"BIZ_{business.id}"
+        elif isinstance(business.business_id, int):
+            business.business_id = f"BIZ_{business.business_id}"
         business.save()
 
 class Migration(migrations.Migration):
