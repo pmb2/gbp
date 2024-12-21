@@ -34,6 +34,7 @@ def send_verification_email(business):
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password, make_password
 from django.urls import reverse
 from django.contrib import messages
 from django.conf import settings
