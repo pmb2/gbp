@@ -55,31 +55,14 @@ def login(request):
     print("\n[DEBUG] Starting login process...")
     print(f"[DEBUG] Request method: {request.method}")
     
+    # Check if we're returning from OAuth
+    if request.session.get('oauth_success'):
+        print("[DEBUG] OAuth success flag found - redirecting to dashboard")
+        request.session.pop('oauth_success', None)
+        return redirect('index')
+
     if request.user.is_authenticated:
         print(f"[DEBUG] User already authenticated: {request.user.email}")
-        print(f"[DEBUG] Session contents: {dict(request.session)}")
-        
-        # Check if OAuth was just completed successfully
-        if request.session.get('oauth_success'):
-            print("[DEBUG] OAuth success flag found - redirecting to dashboard")
-            request.session.pop('oauth_success', None)
-            return redirect('index')
-            
-        # Check if we're in the OAuth flow
-        if request.session.get('oauth_in_progress'):
-            print("[DEBUG] OAuth in progress, continuing...")
-            return
-            
-        # Check if user needs OAuth
-        has_oauth = request.user.socialaccount_set.filter(provider='google').exists()
-        print(f"[DEBUG] User has OAuth: {has_oauth}")
-        
-        if not has_oauth:
-            print("[DEBUG] User needs Google OAuth")
-            request.session['oauth_in_progress'] = True
-            return redirect('google_oauth')
-            
-        print("[DEBUG] User has Google OAuth - redirecting to dashboard")
         return redirect('index')
 
     if request.method == 'POST':
@@ -267,12 +250,9 @@ def google_oauth_callback(request):
         messages.error(request, 'Invalid OAuth state or missing code')
         return redirect('login')
 
-    if not request.user.is_authenticated:
-        print("[ERROR] User not authenticated")
-        messages.error(request, 'Please log in first')
-        return redirect('login')
-        
-    print(f"[DEBUG] Authenticated user: {request.user.email}")
+    # Get tokens using the authorization code
+    from allauth.socialaccount.models import SocialApp
+    google_app = SocialApp.objects.get(provider='google')
 
     try:
         # Get tokens using the authorization code
