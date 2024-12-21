@@ -171,7 +171,7 @@ def register(request):
             print(f"[DEBUG] Password hash iterations: {user.password.split('$')[1]}")
             
             messages.success(request, 'Registration successful! Please login.')
-            return redirect('login')
+            return redirect('index')
         except Exception as e:
             messages.error(request, f'Registration failed: {str(e)}')
             return render(request, 'register.html')
