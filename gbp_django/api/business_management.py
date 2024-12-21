@@ -245,43 +245,42 @@ def store_business_data(business_data, user_id, access_token):
     # If no businesses were stored, create an unverified business entry from OAuth data
     if not stored_businesses:
         print("\n[DEBUG] No businesses found - creating unverified business record")
-        business_id = f"biz_{user_id}_{int(time.time())}"
+        timestamp = int(time.time())
+        business_id = f"gbp-oauth-{user_id}-{timestamp}"
         
         # Get user info from social account
         from allauth.socialaccount.models import SocialAccount
         try:
             social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
             user_info = social_account.extra_data
-            business_name = user_info.get('name', '').strip() or 'My Business'
+            business_name = user_info.get('name', '').strip() or 'New Business'
             business_email = user_info.get('email', '').strip() or 'pending@verification.com'
         except SocialAccount.DoesNotExist:
-            business_name = 'My Business'
+            business_name = 'New Business'
             business_email = 'pending@verification.com'
             
-        # Create or get existing unverified business
-        business, created = Business.objects.get_or_create(
+        # Always create a new unverified business
+        business = Business.objects.create(
             user_id=user_id,
+            business_id=business_id,
+            business_name=business_name,
+            business_email=business_email,
             is_verified=False,
-            defaults={
-                'business_id': business_id,
-                'business_name': business_name,
-                'business_email': business_email,
-                'is_connected': True,  # Connected via OAuth
-                'email_verification_pending': True,
-                'email_verification_token': secrets.token_urlsafe(32),
-                'address': 'Pending verification',
-                'phone_number': 'Pending verification',
-                'website_url': 'Pending verification',
-                'category': 'Pending verification',
-                'email_settings': {
-                    'enabled': True,
-                    'compliance_alerts': True,
-                    'content_approval': True,
-                    'weekly_summary': True,
-                    'verification_reminders': True
-                },
-                'automation_status': 'Active'
-            }
+            is_connected=True,  # Connected via OAuth
+            email_verification_pending=True,
+            email_verification_token=secrets.token_urlsafe(32),
+            address='Pending verification',
+            phone_number='Pending verification',
+            website_url='Pending verification', 
+            category='Pending verification',
+            email_settings={
+                'enabled': True,
+                'compliance_alerts': True,
+                'content_approval': True,
+                'weekly_summary': True,
+                'verification_reminders': True
+            },
+            automation_status='Active'
         )
         
         # Create notification
