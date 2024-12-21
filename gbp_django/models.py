@@ -4,12 +4,13 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from pgvector.django import VectorField
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, google_id, password=None, **extra_fields):
+    def create_user(self, email, google_id=None, password=None, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
         user = self.model(email=email, google_id=google_id, **extra_fields)
-        user.set_password(password)
+        if password:
+            user.set_password(password)
         user.save(using=self._db)
         # Initialize session state after user is saved
         Session.store_session_state(user_id=user.id, state='initialized')
@@ -39,7 +40,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['google_id']
+    REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.email
