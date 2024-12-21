@@ -128,7 +128,7 @@ def login(request):
             # Check if user needs Google OAuth
             if not user.socialaccount_set.filter(provider='google').exists():
                 print("[DEBUG] User needs Google OAuth, redirecting")
-                return redirect(reverse('google_oauth'))
+                return redirect(reverse('direct_google_oauth'))
 
             print("[DEBUG] Redirecting to dashboard")
             return redirect(reverse('index'))
