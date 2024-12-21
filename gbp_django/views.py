@@ -91,19 +91,21 @@ def login(request):
                 print(f"[DEBUG] Hash iterations: {hash_parts[1]}")
                 print(f"[DEBUG] Salt: {hash_parts[2]}")
                 print(f"[DEBUG] Hash value: {hash_parts[3]}")
+                
+                # Only attempt salt reuse if we have valid hash parts
+                new_hash = make_password(password, salt=hash_parts[2])
+                print("\n[DEBUG] New Hash Generation:")
+                print(f"[DEBUG] New hash with same salt: {new_hash}")
+                new_hash_parts = new_hash.split('$')
+                if len(new_hash_parts) >= 4:
+                    print(f"[DEBUG] New hash value: {new_hash_parts[3]}")
+                    print(f"[DEBUG] Hash comparison: {new_hash_parts[3] == hash_parts[3]}")
             else:
                 print("[DEBUG] Password hash not in standard format")
-            
-            # Debug the authentication process step by step
-            from django.contrib.auth.hashers import check_password, make_password
-            
-            # Generate a new hash with the provided password
-            new_hash = make_password(password, salt=hash_parts[2])
-            print("\n[DEBUG] New Hash Generation:")
-            print(f"[DEBUG] New hash with same salt: {new_hash}")
-            new_hash_parts = new_hash.split('$')
-            print(f"[DEBUG] New hash value: {new_hash_parts[3]}")
-            print(f"[DEBUG] Hash comparison: {new_hash_parts[3] == hash_parts[3]}")
+                # Generate new hash without reusing salt
+                new_hash = make_password(password)
+                print("\n[DEBUG] New Hash Generation (without salt reuse):")
+                print(f"[DEBUG] New hash: {new_hash}")
             
             # Use check_password
             raw_valid = check_password(password, user_obj.password)
