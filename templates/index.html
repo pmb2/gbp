@@ -1259,7 +1259,7 @@
                                                             </div>
                                                         </div>
                                                         <div class="ml-3 bg-green-50 rounded-lg py-2 px-3">
-                                                            <p class="text-sm text-gray-800" id="business-summary-${businessId}">
+                                                            <p class="text-sm text-gray-800" id="business-summary-{{ business.business_id }}">
                                                                 Loading business summary...
                                                             </p>
                                                         </div>
@@ -2307,7 +2307,7 @@
 
         function clearAllMemories() {
             if (confirm('Are you sure you want to clear all memories? This cannot be undone.')) {
-                const businessId = document.getElementById('memoriesModal').dataset.businessId;
+                const businessId = document.querySelector('[data-business-id]').dataset.businessId;
                 fetch(`/api/business/${businessId}/memories/clear/`, {
                     method: 'POST',
                     headers: {
