@@ -806,35 +806,38 @@
                                                         class="relative inline-flex items-center justify-center w-12 h-12 cursor-pointer group">
                                                     <svg class="transform -rotate-90 w-12 h-12">
                                                         <circle class="text-gray-200"
-                                                                stroke-width="3"
+                                                                stroke-width="4"
                                                                 stroke="currentColor"
                                                                 fill="transparent"
-                                                                r="20"
-                                                                cx="24"
-                                                                cy="24"/>
+                                                                r="24"
+                                                                cx="28"
+                                                                cy="28"/>
                                                         <circle class="
                                                             {% if business.compliance_score >= 80 %}text-green-500
                                                             {% elif business.compliance_score >= 50 %}text-yellow-500
                                                             {% else %}text-red-500{% endif %}"
-                                                                stroke-width="3"
-                                                                stroke-dasharray="{{ business.compliance_score|multiply:1.256 }},126"
+                                                                stroke-width="4"
+                                                                stroke-dasharray="{{ business.compliance_score|multiply:1.507 }},151"
                                                                 stroke-linecap="round"
                                                                 stroke="currentColor"
                                                                 fill="transparent"
-                                                                r="20"
-                                                                cx="24"
-                                                                cy="24"/>
+                                                                r="24"
+                                                                cx="28"
+                                                                cy="28"/>
                                                     </svg>
-                                                    <span class="absolute text-xs font-medium">{{ business.compliance_score }}%</span>
-                                                    <span class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
-                                                        Compliance Score
-                                                    </span>
+                                                    <div class="absolute flex flex-col items-center">
+                                                        <span class="text-sm font-bold">{{ business.compliance_score }}%</span>
+                                                        <span class="text-xs text-gray-500">Compliance</span>
+                                                    </div>
+                                                    <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
+                                                        View Compliance Details
+                                                    </div>
                                                 </button>
 
                                                 <!-- SEO Health Circle -->
                                                 <button onclick="showSeoHealthModal('{{ business.business_id }}')"
-                                                        class="relative inline-flex items-center justify-center w-12 h-12 cursor-pointer group">
-                                                    <svg class="transform -rotate-90 w-12 h-12">
+                                                        class="relative inline-flex items-center justify-center w-14 h-14 cursor-pointer group hover:scale-105 transition-transform">
+                                                    <svg class="transform -rotate-90 w-14 h-14">
                                                         <circle class="text-gray-200"
                                                                 stroke-width="3"
                                                                 stroke="currentColor"
@@ -843,22 +846,25 @@
                                                                 cx="24"
                                                                 cy="24"/>
                                                         <circle class="
-                                                            {% if business.seo_health >= 80 %}text-green-500
+                                                            {% if business.seo_health >= 80 %}text-blue-500
                                                             {% elif business.seo_health >= 50 %}text-yellow-500
                                                             {% else %}text-red-500{% endif %}"
-                                                                stroke-width="3"
-                                                                stroke-dasharray="{{ business.seo_health|multiply:1.256 }},126"
+                                                                stroke-width="4"
+                                                                stroke-dasharray="{{ business.seo_health|multiply:1.507 }},151"
                                                                 stroke-linecap="round"
                                                                 stroke="currentColor"
                                                                 fill="transparent"
-                                                                r="20"
-                                                                cx="24"
-                                                                cy="24"/>
+                                                                r="24"
+                                                                cx="28"
+                                                                cy="28"/>
                                                     </svg>
-                                                    <span class="absolute text-xs font-medium">{{ business.seo_health }}%</span>
-                                                    <span class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
-                                                        SEO Health
-                                                    </span>
+                                                    <div class="absolute flex flex-col items-center">
+                                                        <span class="text-sm font-bold">{{ business.seo_health }}%</span>
+                                                        <span class="text-xs text-gray-500">SEO</span>
+                                                    </div>
+                                                    <div class="absolute opacity-0 group-hover:opacity-100 transition-opacity bg-gray-800 text-white text-xs rounded py-1 px-2 -top-8">
+                                                        View SEO Details
+                                                    </div>
                                                 </button>
                                             {% else %}
                                                 <a href="https://business.google.com/"
