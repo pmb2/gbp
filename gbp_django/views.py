@@ -311,6 +311,7 @@ def google_oauth_callback(request):
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
+from .utils.email_service import EmailService
 import json
 from .models import Notification, Business
 from .api.business_management import update_business_details
