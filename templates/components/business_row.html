@@ -1,0 +1,21 @@
+<tr class="expandable-row relative {% if not business.is_verified %}unverified-row opacity-70{% endif %} 
+    transition-all duration-300 hover:shadow-md h-16"
+    style="background: linear-gradient(to right,
+            {% if business.calculate_profile_completion <= 30 %}rgba(239, 68, 68, 0.1){% elif business.calculate_profile_completion <= 70 %}rgba(245, 158, 11, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %}
+            {{ business.calculate_profile_completion }}%,
+            transparent {{ business.calculate_profile_completion }}%)"
+    data-business-id="{{ business.business_id }}"
+    data-verified="{{ business.is_verified }}"
+    data-completion="{{ business.calculate_profile_completion }}"
+    ondrop="handleFileDrop(event, '{{ business.business_id }}')"
+    ondragover="handleDragOver(event)"
+    ondragenter="handleDragEnter(event)"
+    ondragleave="handleDragLeave(event)">
+    
+    {% include 'components/business_row_content.html' with business=business %}
+</tr>
+<tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
+    <td colspan="2">
+        {% include 'components/business_details.html' with business=business %}
+    </td>
+</tr>
