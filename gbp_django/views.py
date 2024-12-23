@@ -731,26 +731,8 @@ def submit_feedback(request):
         message = data.get('message', '')
         user_email = request.user.email if request.user.is_authenticated else 'Anonymous'
 
-        # Construct email
-        subject = f'GBP Automation Pro Feedback - {feedback_type}'
-        email_body = f"""
-New feedback received:
-
-Type: {feedback_type}
-From: {user_email}
-Message:
-{message}
-        """
-
-        # Send email
-        send_mail(
-            subject=subject,
-            message=email_body,
-            from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[settings.FEEDBACK_EMAIL],
-            fail_silently=False,
-        )
-
+        # Forward feedback using email service
+        EmailService.forward_feedback(user_email, feedback_type, message)
         return JsonResponse({'status': 'success'})
     except Exception as e:
         print(f"Error sending feedback: {str(e)}")
