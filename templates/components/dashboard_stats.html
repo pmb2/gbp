@@ -1,0 +1,67 @@
+<div class="flex flex-col items-center justify-center mb-4">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Business Profiles</h2>
+    <div class="flex items-center justify-center space-x-8">
+        <!-- Step Counters -->
+        <div class="flex items-center justify-center space-x-8">
+            <div class="group relative">
+                <div class="flex items-center bg-gradient-to-r from-red-100 to-red-200 rounded-lg px-4 py-2 transition-transform hover:scale-105 shadow-sm">
+                    <div class="w-4 h-4 rounded-full bg-red-500 mr-3 animate-ping"></div>
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-red-700" id="step1-count">{{ dashboard_data.stats.step1_count }}</span>
+                        <span class="text-xs text-red-600">Not Verified</span>
+                    </div>
+                </div>
+                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-red-700 text-white text-xs rounded whitespace-nowrap">
+                    Businesses requiring verification
+                </div>
+            </div>
+            <div class="group relative">
+                <div class="flex items-center bg-gradient-to-r from-amber-100 to-amber-200 rounded-lg px-4 py-2 transition-transform hover:scale-105 shadow-sm">
+                    <div class="w-4 h-4 rounded-full bg-amber-500 mr-3 animate-pulse"></div>
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-yellow-700" id="step2-count">{{ dashboard_data.stats.step2_count }}</span>
+                        <span class="text-xs text-yellow-600">Getting Started</span>
+                    </div>
+                </div>
+                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-yellow-700 text-white text-xs rounded whitespace-nowrap">
+                    Newly added businesses
+                </div>
+            </div>
+            <div class="group relative">
+                <div class="flex items-center bg-gradient-to-r from-blue-100 to-blue-200 rounded-lg px-4 py-2 transition-transform hover:scale-105 shadow-sm">
+                    <div class="w-4 h-4 rounded-full bg-blue-500 mr-3 animate-pulse"></div>
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-blue-700" id="step3-count">{{ dashboard_data.stats.step3_count }}</span>
+                        <span class="text-xs text-blue-600">In Progress</span>
+                    </div>
+                </div>
+                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-blue-700 text-white text-xs rounded whitespace-nowrap">
+                    Actively being updated
+                </div>
+            </div>
+            <div class="group relative">
+                <div class="flex items-center bg-gradient-to-r from-emerald-100 to-emerald-200 rounded-lg px-4 py-2 transition-transform hover:scale-105 shadow-sm">
+                    <div class="w-4 h-4 rounded-full bg-emerald-500 mr-3 animate-pulse"></div>
+                    <div class="flex flex-col">
+                        <span class="text-lg font-bold text-green-700" id="step4-count">{{ dashboard_data.stats.step4_count }}</span>
+                        <span class="text-xs text-green-600">Complete</span>
+                    </div>
+                </div>
+                <div class="hidden group-hover:block absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-green-700 text-white text-xs rounded whitespace-nowrap">
+                    Fully optimized profiles
+                </div>
+            </div>
+        </div>
+        <!-- Total Stats -->
+        <div class="flex items-center space-x-4 border-l pl-4">
+            <div>
+                <span class="text-sm text-gray-500">Total Businesses:</span>
+                <span class="text-sm font-medium ml-1" id="totalBusinessCount">{{ dashboard_data.stats.total_businesses }}</span>
+            </div>
+            <div>
+                <span class="text-sm text-gray-500">Completion Rate:</span>
+                <span class="text-sm font-medium ml-1" id="averageCompletion">{{ dashboard_data.stats.average_completion }}%</span>
+            </div>
+        </div>
+    </div>
+</div>
