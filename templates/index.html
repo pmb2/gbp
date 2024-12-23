@@ -787,12 +787,7 @@
                                             {% if business.is_verified == 'Verified' %}
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                     <span class="mr-1">●</span>
-                                                    Verified via {{ business.verification_method|default:"Google" }}
-                                                </span>
-                                            {% if business.is_verified == 'Verified' %}
-                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <span class="mr-1">●</span>
-                                                    Verified
+                                                    Verified via Google
                                                 </span>
                                             {% elif business.is_connected %}
                                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
@@ -903,16 +898,6 @@
                                     </div>
 
                                         {% if business.is_verified == 'Verified' %}
-                                            <!-- SEO Health -->
-                                            <div class="mt-2">
-                                                <div class="flex items-center justify-between text-sm">
-                                                    <span class="text-gray-600">SEO Health</span>
-                                                    <span class="font-medium text-green-600">92%</span>
-                                                </div>
-                                                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
-                                                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 92%"></div>
-                                                </div>
-                                            </div>
                                         {% endif %}
                                 </div>
                             </td>
