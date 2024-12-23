@@ -1,7 +1,10 @@
-.aider.chat.history.md
-.aider.input.history
-.aider.model.settings.yml
-.aider.tags.cache.v3
+# Ignore all .aider* files
+.aider*
+
+# But do not ignore .aiderignore
+!.aiderignore
+
+# Ignore .env file
 .env
 
 # Ignore dependencies
