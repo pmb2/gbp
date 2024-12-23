@@ -702,9 +702,28 @@
                             <i class="fas fa-filter mr-2"></i>Filter
                         </button>
                         <a href="{% url 'direct_google_oauth' %}"
+                           onclick="return openOAuthPopup(this.href);"
                            class="flex-grow sm:flex-grow-0 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 inline-flex items-center justify-center">
                             <i class="fas fa-plus mr-2"></i>Add Business
                         </a>
+                        <script>
+                            function openOAuthPopup(url) {
+                                const width = 600;
+                                const height = 700;
+                                const left = (window.innerWidth - width) / 2;
+                                const top = (window.innerHeight - height) / 2;
+                                window.open(url, 'oauth_popup', 
+                                    `width=${width},height=${height},left=${left},top=${top}`);
+                                return false;
+                            }
+                            
+                            // Listen for messages from the popup
+                            window.addEventListener('message', function(event) {
+                                if (event.data === 'oauth_complete') {
+                                    window.location.reload();
+                                }
+                            });
+                        </script>
                     </div>
                 </div>
             </div>

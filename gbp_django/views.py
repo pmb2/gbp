@@ -188,6 +188,9 @@ def direct_google_oauth(request):
     except SocialApp.DoesNotExist:
         raise ValueError("Google SocialApp is not configured. Please add it in the admin interface.")
 
+    # Store the action type (login or add_business)
+    request.session['oauth_action'] = 'add_business' if request.user.is_authenticated else 'login'
+
     # Construct OAuth URL
     callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
     scope = ' '.join([
