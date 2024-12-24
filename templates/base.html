@@ -49,8 +49,8 @@
 {% include 'components/seo_health_modal.html' %}
 
 <script>
-    // Business row expansion functionality with detailed logging
-    window.toggleBusinessDetails = function(businessId) {
+    // Make toggleBusinessDetails globally available
+    function toggleBusinessDetails(businessId) {
         console.log('🔄 Toggle called for business:', businessId);
             
         if (!businessId) {
@@ -404,8 +404,7 @@
     }
 
     <script>
-        // Business details toggle functionality
-        function toggleBusinessDetails(businessId) {
+        // Remove duplicate definition
             console.log('🔄 Toggle called for business:', businessId);
             
             if (!businessId) {
