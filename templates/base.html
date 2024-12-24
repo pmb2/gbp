@@ -226,9 +226,19 @@
     function toggleBusinessDetails(businessId) {
         if (!businessId) return;
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
-        if (!row || row.dataset.verified !== 'Verified') {
+        if (row.dataset.verified !== 'Verified') {
             return; // Don't allow expansion for unverified businesses
         }
+
+        // Update the profile completion header with business name
+        const businessName = row.querySelector('.font-medium').textContent.trim();
+        const businessNameHeader = document.getElementById('businessNameHeader');
+        if (businessNameHeader) {
+            businessNameHeader.textContent = businessName + "'s";
+        }
+
+        // Update completion status for this specific business
+        checkProfileStatus(businessId);
 
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
@@ -253,11 +263,12 @@
             detailsRow.style.display = isHidden ? 'table-row' : 'none';
 
             if (arrow && arrowSvg) {
-                arrowSvg.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
                 if (isHidden) {
+                    arrowSvg.style.transform = 'rotate(90deg)';
                     arrowSvg.classList.remove('text-gray-500');
                     arrowSvg.classList.add('text-blue-500');
                 } else {
+                    arrowSvg.style.transform = 'rotate(0deg)';
                     arrowSvg.classList.remove('text-blue-500');
                     arrowSvg.classList.add('text-gray-500');
                 }
@@ -267,6 +278,21 @@
             if (isHidden) {
                 updateBusinessSummary(businessId);
             }
+        }
+    }
+
+    function checkProfileStatus(businessId) {
+        const row = document.querySelector(`[data-business-id="${businessId}"]`);
+        if (!row) return;
+        
+        const completion = parseInt(row.dataset.completion) || 0;
+        const verified = row.dataset.verified === 'Verified';
+        
+        // Update UI based on status
+        if (!verified) {
+            showAlertBanner('Your business profile requires verification. Click here to complete the process.', 'red');
+        } else if (completion < 100) {
+            showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
         }
     }
 
