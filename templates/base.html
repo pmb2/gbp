@@ -11,86 +11,86 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-100">
-    <div class="min-h-screen flex flex-col">
+<div class="min-h-screen flex flex-col">
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden relative">
-            <!-- Mobile Header -->
-            <header class="bg-white shadow-sm md:hidden">
-                <div class="px-4 py-3 flex justify-between items-center">
-                    <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 class="text-lg font-semibold text-gray-800">GBP Automation Pro</h1>
-                </div>
-            </header>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden relative">
+        <!-- Mobile Header -->
+        <header class="bg-white shadow-sm md:hidden">
+            <div class="px-4 py-3 flex justify-between items-center">
+                <button id="mobile-menu-button" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-lg font-semibold text-gray-800">GBP Automation Pro</h1>
+            </div>
+        </header>
 
-            <!-- Main Content Area -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
-                {% block content %}{% endblock %}
-            </main>
-        </div>
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+            {% block content %}{% endblock %}
+        </main>
     </div>
+</div>
 
-    <!-- Mobile Sidebar -->
-    <div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
-        <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
-        <div class="absolute inset-y-0 left-0 w-64 bg-white">
-            {% block mobile_sidebar %}
+<!-- Mobile Sidebar -->
+<div id="mobile-sidebar" class="fixed inset-0 z-40 hidden">
+    <div class="absolute inset-0 bg-gray-600 opacity-75"></div>
+    <div class="absolute inset-y-0 left-0 w-64 bg-white">
+        {% block mobile_sidebar %}
             {{ block.super }}
-            {% endblock %}
-        </div>
+        {% endblock %}
     </div>
+</div>
 
-    {% block extra_body %}{% endblock %}
-    
-    {% include 'components/feedback_button.html' %}
-    {% include 'components/compliance_modal.html' %}
-    {% include 'components/seo_health_modal.html' %}
-    
-    <script>
-        // Automation settings functionality
-        function setAutomation(feature, level, businessId) {
-            // Get all buttons for this feature and business
-            const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-            
-            // Remove active class and background from all buttons for this feature
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
-            
-            // Add active class and background to clicked button
-            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-            if (clickedButton) {
-                clickedButton.classList.add('active');
-                
-                // Add color based on feature
-                switch(feature) {
-                    case 'qa':
-                        clickedButton.classList.add('bg-blue-500');
-                        break;
-                    case 'posts':
-                        clickedButton.classList.add('bg-purple-500');
-                        break;
-                    case 'reviews':
-                        clickedButton.classList.add('bg-green-500');
-                        break;
-                }
-                
-                // Save to database via API
-                fetch(`/api/business/${businessId}/automation/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: JSON.stringify({
-                        feature: feature,
-                        level: level
-                    })
+{% block extra_body %}{% endblock %}
+
+{% include 'components/feedback_button.html' %}
+{% include 'components/compliance_modal.html' %}
+{% include 'components/seo_health_modal.html' %}
+
+<script>
+    // Automation settings functionality
+    function setAutomation(feature, level, businessId) {
+        // Get all buttons for this feature and business
+        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+
+        // Remove active class and background from all buttons for this feature
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
+
+        // Add active class and background to clicked button
+        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+
+            // Add color based on feature
+            switch (feature) {
+                case 'qa':
+                    clickedButton.classList.add('bg-blue-500');
+                    break;
+                case 'posts':
+                    clickedButton.classList.add('bg-purple-500');
+                    break;
+                case 'reviews':
+                    clickedButton.classList.add('bg-green-500');
+                    break;
+            }
+
+            // Save to database via API
+            fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
                 })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -104,62 +104,62 @@
                     console.error('Error:', error);
                     revertButtonState(buttons, clickedButton);
                 });
-            }
         }
+    }
 
-        function revertButtonState(buttons, activeButton) {
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
-            if (activeButton.classList.contains('active')) {
-                activeButton.classList.remove('active');
-            }
+    function revertButtonState(buttons, activeButton) {
+        buttons.forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
+        if (activeButton.classList.contains('active')) {
+            activeButton.classList.remove('active');
         }
+    }
 
 
-        // Automation settings functionality
-        function setAutomation(feature, level, businessId) {
-            // Get all buttons for this feature and business
-            const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-            
-            // Remove active class and background from all buttons for this feature
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
-            
-            // Add active class and background to clicked button
-            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-            if (clickedButton) {
-                clickedButton.classList.add('active');
-                
-                // Add color based on feature
-                switch(feature) {
-                    case 'qa':
-                        clickedButton.classList.add('bg-blue-500');
-                        break;
-                    case 'posts':
-                        clickedButton.classList.add('bg-purple-500');
-                        break;
-                    case 'reviews':
-                        clickedButton.classList.add('bg-green-500');
-                        break;
-                }
-                
-                // Save to database via API
-                fetch(`/api/business/${businessId}/automation/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: JSON.stringify({
-                        feature: feature,
-                        level: level
-                    })
+    // Automation settings functionality
+    function setAutomation(feature, level, businessId) {
+        // Get all buttons for this feature and business
+        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+
+        // Remove active class and background from all buttons for this feature
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
+
+        // Add active class and background to clicked button
+        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+
+            // Add color based on feature
+            switch (feature) {
+                case 'qa':
+                    clickedButton.classList.add('bg-blue-500');
+                    break;
+                case 'posts':
+                    clickedButton.classList.add('bg-purple-500');
+                    break;
+                case 'reviews':
+                    clickedButton.classList.add('bg-green-500');
+                    break;
+            }
+
+            // Save to database via API
+            fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
                 })
+            })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -173,85 +173,85 @@
                     console.error('Error:', error);
                     revertButtonState(buttons, clickedButton);
                 });
+        }
+    }
+
+    // Theme toggle functionality with system preference detection
+    function initTheme() {
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const sunIcon = themeToggle?.querySelector('.sun');
+        const moonIcon = themeToggle?.querySelector('.moon');
+
+        // Check for saved theme preference or default to light
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            if (sunIcon && moonIcon) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        } else {
+            html.classList.remove('dark');
+            if (sunIcon && moonIcon) {
+                moonIcon.classList.remove('hidden');
+                sunIcon.classList.add('hidden');
             }
         }
 
-        // Theme toggle functionality with system preference detection
-        function initTheme() {
-            const themeToggle = document.getElementById('themeToggle');
-            const html = document.documentElement;
-            const sunIcon = themeToggle?.querySelector('.sun');
-            const moonIcon = themeToggle?.querySelector('.moon');
-
-            // Check for saved theme preference or default to light
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                html.classList.add('dark');
-                if (sunIcon && moonIcon) {
-                    sunIcon.classList.remove('hidden');
-                    moonIcon.classList.add('hidden');
-                }
-            } else {
-                html.classList.remove('dark');
-                if (sunIcon && moonIcon) {
-                    moonIcon.classList.remove('hidden');
-                    sunIcon.classList.add('hidden');
-                }
-            }
-
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    if (html.classList.contains('dark')) {
-                        html.classList.remove('dark');
-                        localStorage.theme = 'light';
-                        if (moonIcon && sunIcon) {
-                            moonIcon.classList.remove('hidden');
-                            sunIcon.classList.add('hidden');
-                        }
-                    } else {
-                        html.classList.add('dark');
-                        localStorage.theme = 'dark';
-                        if (sunIcon && moonIcon) {
-                            sunIcon.classList.remove('hidden');
-                            moonIcon.classList.add('hidden');
-                        }
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    localStorage.theme = 'light';
+                    if (moonIcon && sunIcon) {
+                        moonIcon.classList.remove('hidden');
+                        sunIcon.classList.add('hidden');
                     }
-                });
-            }
+                } else {
+                    html.classList.add('dark');
+                    localStorage.theme = 'dark';
+                    if (sunIcon && moonIcon) {
+                        sunIcon.classList.remove('hidden');
+                        moonIcon.classList.add('hidden');
+                    }
+                }
+            });
         }
+    }
 
-        // Initialize theme on page load
-        document.addEventListener('DOMContentLoaded', initTheme);
+    // Initialize theme on page load
+    document.addEventListener('DOMContentLoaded', initTheme);
 
     <script>
         // Sort businesses by completion percentage and urgency
         function sortBusinessRows() {
-            const tbody = document.querySelector('.business-table tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-            
-            rows.sort((a, b) => {
-                const aVerified = a.dataset.verified === 'Verified';
-                const bVerified = b.dataset.verified === 'Verified';
-                const aCompletion = parseInt(a.dataset.completion) || 0;
-                const bCompletion = parseInt(b.dataset.completion) || 0;
-                
-                // Unverified businesses come first
-                if (aVerified !== bVerified) {
-                    return aVerified ? 1 : -1;
-                }
-                
-                // Then sort by completion percentage (ascending)
-                return aCompletion - bCompletion;
-            });
-            
-            // Reorder the rows
-            rows.forEach(row => {
-                tbody.appendChild(row);
-                const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-                if (detailsRow) {
-                    tbody.appendChild(detailsRow);
-                }
-            });
-        }
+        const tbody = document.querySelector('.business-table tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
+
+        rows.sort((a, b) => {
+        const aVerified = a.dataset.verified === 'Verified';
+        const bVerified = b.dataset.verified === 'Verified';
+        const aCompletion = parseInt(a.dataset.completion) || 0;
+        const bCompletion = parseInt(b.dataset.completion) || 0;
+
+        // Unverified businesses come first
+        if (aVerified !== bVerified) {
+        return aVerified ? 1 : -1;
+    }
+
+        // Then sort by completion percentage (ascending)
+        return aCompletion - bCompletion;
+    });
+
+        // Reorder the rows
+        rows.forEach(row => {
+        tbody.appendChild(row);
+        const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+        if (detailsRow) {
+        tbody.appendChild(detailsRow);
+    }
+    });
+    }
 
         // Call sort on page load
         document.addEventListener('DOMContentLoaded', sortBusinessRows);
@@ -261,16 +261,16 @@
         const mobileSidebar = document.getElementById('mobile-sidebar');
 
         if (mobileMenuButton && mobileSidebar) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileSidebar.classList.toggle('hidden');
-            });
+        mobileMenuButton.addEventListener('click', () => {
+            mobileSidebar.classList.toggle('hidden');
+        });
 
-            mobileSidebar.addEventListener('click', (e) => {
-                if (e.target === mobileSidebar) {
-                    mobileSidebar.classList.add('hidden');
-                }
-            });
-        }
-    </script>
+        mobileSidebar.addEventListener('click', (e) => {
+        if (e.target === mobileSidebar) {
+        mobileSidebar.classList.add('hidden');
+    }
+    });
+    }
+</script>
 </body>
 </html>
