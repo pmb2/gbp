@@ -49,30 +49,46 @@
 {% include 'components/seo_health_modal.html' %}
 
 <script>
-    // Business row expansion functionality
+    // Business row expansion functionality with detailed logging
     function toggleBusinessDetails(businessId) {
-        if (!businessId) return;
-            
+        console.log('🔄 Toggle called for business:', businessId);
+        
+        if (!businessId) {
+            console.error('❌ No business ID provided');
+            return;
+        }
+
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
+        console.log('🔍 Found business row:', row);
+        
         if (!row || row.dataset.verified !== 'Verified') {
-            return; // Don't allow expansion for unverified businesses
+            console.log('⚠️ Business not verified or row not found');
+            return;
         }
 
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
+        
+        console.log('📊 Details row:', detailsRow);
+        console.log('➡️ Arrow element:', arrow);
+        console.log('🎯 Arrow SVG:', arrowSvg);
 
         // Update business name in header if it exists
         const businessName = row.querySelector('.font-medium').textContent.trim();
         const businessNameHeader = document.getElementById('businessNameHeader');
         if (businessNameHeader) {
             businessNameHeader.textContent = businessName + "'s";
+            console.log('✏️ Updated header with business name:', businessName);
         }
 
         // Close all other expanded rows first
+        console.log('🔒 Closing other expanded rows...');
         document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
             if (otherRow.id !== `details-${businessId}`) {
+                console.log('📍 Closing row:', otherRow.id);
                 otherRow.style.display = 'none';
+                
                 const otherArrow = document.getElementById(`arrow-${otherRow.id.split('-')[1]}`);
                 if (otherArrow) {
                     const otherSvg = otherArrow.querySelector('svg');
@@ -86,14 +102,19 @@
         // Toggle current row
         if (detailsRow) {
             const isExpanding = detailsRow.style.display === 'none';
+            console.log('📈 Expanding row:', isExpanding);
+            
             detailsRow.style.display = isExpanding ? 'table-row' : 'none';
+            console.log('🔄 Set display to:', detailsRow.style.display);
 
             if (arrow && arrowSvg) {
                 if (isExpanding) {
+                    console.log('↗️ Rotating arrow to expanded state');
                     arrow.style.transform = 'rotate(90deg)';
                     arrowSvg.classList.remove('text-gray-500');
                     arrowSvg.classList.add('text-blue-500');
                 } else {
+                    console.log('↙️ Rotating arrow to collapsed state');
                     arrow.style.transform = 'rotate(0deg)';
                     arrowSvg.classList.remove('text-blue-500');
                     arrowSvg.classList.add('text-gray-500');
@@ -102,16 +123,21 @@
 
             // Update business summary and check profile status when expanding
             if (isExpanding) {
+                console.log('📝 Updating business summary and checking status');
                 updateBusinessSummary(businessId);
                 checkProfileStatus(businessId);
                     
                 // Switch to details tab by default when expanding
+                console.log('🔄 Switching to details tab');
                 switchTab(businessId, 'details');
             }
+        } else {
+            console.error('❌ Details row not found');
         }
 
         // Prevent event bubbling
         event?.stopPropagation();
+        console.log('✅ Toggle complete');
     }
 
     // Automation settings functionality 
