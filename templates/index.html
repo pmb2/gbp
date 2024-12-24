@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
 
-</body>
-</html>
+{% block title %}Dashboard - GBP Automation Pro{% endblock %}
+
+{% block extra_head %}
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <!-- Dashboard Header -->
+    <header class="bg-dark-card shadow-sm px-6 py-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-100">Dashboard</h1>
+            {% include 'components/user_profile.html' %}
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="p-6 max-w-[2000px] mx-auto flex flex-col overflow-hidden">
+        <!-- Header - Hidden until profile is complete -->
+        <div id="dashboardHeader" class="hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Welcome back!</h1>
+                <p class="mt-1 text-sm text-gray-500">Here's what's happening with your businesses.</p>
+            </div>
+            {% include 'components/analytics_overview.html' %}
+        </div>
+
+        <!-- Business Table -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-sm mt-8 w-full">
+            <div class="p-6 overflow-hidden">
+                {% include 'components/dashboard_stats.html' %}
+                {% include 'components/search_controls.html' %}
+                {% include 'components/business_table.html' %}
+            </div>
+        </div>
+    </main>
+
+    <!-- CSRF Token -->
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- Include Modals and Components -->
+    {% include 'components/alert_banner.html' %}
+    {% include 'components/notifications_modal.html' %}
+    {% include 'components/verification_modal.html' %}
+    {% include 'components/verification_prompt_modal.html' %}
+    {% include 'components/memories_modal.html' %}
+{% endblock %}
