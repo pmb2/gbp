@@ -49,7 +49,66 @@
 {% include 'components/seo_health_modal.html' %}
 
 <script>
-    // Automation settings functionality
+    // Business row expansion functionality
+    function toggleBusinessDetails(businessId) {
+        if (!businessId) return;
+            
+        const row = document.querySelector(`[data-business-id="${businessId}"]`);
+        if (!row || row.dataset.verified !== 'Verified') {
+            return; // Don't allow expansion for unverified businesses
+        }
+
+        const detailsRow = document.getElementById(`details-${businessId}`);
+        const arrow = document.getElementById(`arrow-${businessId}`);
+        const arrowSvg = arrow?.querySelector('svg');
+
+        // Update business name in header if it exists
+        const businessName = row.querySelector('.font-medium').textContent.trim();
+        const businessNameHeader = document.getElementById('businessNameHeader');
+        if (businessNameHeader) {
+            businessNameHeader.textContent = businessName + "'s";
+        }
+
+        // Close all other expanded rows
+        document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
+            if (otherRow.id !== `details-${businessId}`) {
+                otherRow.style.display = 'none';
+                const otherArrow = document.getElementById(`arrow-${otherRow.id.split('-')[1]}`);
+                if (otherArrow) {
+                    const otherSvg = otherArrow.querySelector('svg');
+                    otherArrow.style.transform = 'rotate(0deg)';
+                    otherSvg.classList.remove('text-blue-500');
+                    otherSvg.classList.add('text-gray-500');
+                }
+            }
+        });
+
+        // Toggle current row
+        if (detailsRow) {
+            const isExpanding = detailsRow.style.display === 'none';
+            detailsRow.style.display = isExpanding ? 'table-row' : 'none';
+
+            if (arrow && arrowSvg) {
+                if (isExpanding) {
+                    arrowSvg.style.transform = 'rotate(90deg)';
+                    arrowSvg.classList.remove('text-gray-500');
+                    arrowSvg.classList.add('text-blue-500');
+                } else {
+                    arrowSvg.style.transform = 'rotate(0deg)';
+                    arrowSvg.classList.remove('text-blue-500');
+                    arrowSvg.classList.add('text-gray-500');
+                }
+            }
+
+            // Update business summary and check profile status when expanding
+            if (isExpanding) {
+                updateBusinessSummary(businessId);
+                checkProfileStatus(businessId);
+            }
+        }
+    }
+
+    // Automation settings functionality 
     function setAutomation(feature, level, businessId) {
         // Get all buttons for this feature and business
         const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);

@@ -1713,28 +1713,6 @@
             return false; // Placeholder
         }
 
-        function toggleBusinessDetails(businessId) {
-            const row = document.querySelector(`[data-business-id="${businessId}"]`);
-            if (row.dataset.verified !== 'Verified') {
-                return; // Don't allow expansion for unverified businesses
-            }
-
-            const detailsRow = document.getElementById(`details-${businessId}`);
-            if (!detailsRow) return;
-
-            // Close all other expanded rows
-            document.querySelectorAll('.expanded-content').forEach(row => {
-                if (row.id !== `details-${businessId}`) {
-                    row.style.display = 'none';
-                }
-            });
-
-            // Toggle the clicked row
-            detailsRow.style.display = detailsRow.style.display === 'none' ? 'table-row' : 'none';
-
-            // Prevent event bubbling
-            event.stopPropagation();
-        }
 
         function editBusiness(businessId) {
             // Prevent row expansion when clicking edit
@@ -1911,56 +1889,6 @@
         </div>
     </div>
 
-    <script>
-        function toggleBusinessDetails(businessId) {
-            if (!businessId) return;
-            const row = document.querySelector(`[data-business-id="${businessId}"]`);
-            if (row.dataset.verified !== 'Verified') {
-                return; // Don't allow expansion for unverified businesses
-            }
-
-            // Update the profile completion header with business name
-            const businessName = row.querySelector('.font-medium').textContent.trim();
-            document.getElementById('businessNameHeader').textContent = businessName + "'s";
-
-            // Update completion status for this specific business
-            checkProfileStatus(businessId);
-
-            const detailsRow = document.getElementById(`details-${businessId}`);
-            const arrow = document.getElementById(`arrow-${businessId}`);
-            const arrowSvg = arrow?.querySelector('svg');
-
-            // Close all other rows first
-            document.querySelectorAll('[id^="details-"]').forEach(row => {
-                if (row.id !== `details-${businessId}`) {
-                    row.style.display = 'none';
-                    const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
-                    if (otherArrow) {
-                        const otherSvg = otherArrow.querySelector('svg');
-                        otherArrow.style.transform = 'rotate(0deg)';
-                        otherSvg.classList.remove('text-blue-500');
-                        otherSvg.classList.add('text-gray-500');
-                    }
-                }
-            });
-
-            if (detailsRow) {
-                const isHidden = detailsRow.style.display === 'none';
-                detailsRow.style.display = isHidden ? 'table-row' : 'none';
-
-                if (arrow && arrowSvg) {
-                    if (isHidden) {
-                        arrowSvg.style.transform = 'rotate(90deg)';
-                        arrowSvg.classList.remove('text-gray-500');
-                        arrowSvg.classList.add('text-blue-500');
-                    } else {
-                        arrowSvg.style.transform = 'rotate(0deg)';
-                        arrowSvg.classList.remove('text-blue-500');
-                        arrowSvg.classList.add('text-gray-500');
-                    }
-                }
-            }
-        }
 
         function editBusiness(businessId) {
             event.stopPropagation();
