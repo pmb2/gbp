@@ -50,9 +50,9 @@
 
 <script>
     // Business row expansion functionality with detailed logging
-    function toggleBusinessDetails(businessId) {
+    window.toggleBusinessDetails = function(businessId) {
         console.log('🔄 Toggle called for business:', businessId);
-        
+            
         if (!businessId) {
             console.error('❌ No business ID provided');
             return;
@@ -60,36 +60,47 @@
 
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         console.log('🔍 Found business row:', row);
-        
-        if (!row || row.dataset.verified !== 'Verified') {
-            console.log('⚠️ Business not verified or row not found');
+            
+        if (!row) {
+            console.error('❌ Business row not found');
+            return;
+        }
+
+        if (row.dataset.verified !== 'Verified') {
+            console.log('⚠️ Business not verified');
             return;
         }
 
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
-        
+            
         console.log('📊 Details row:', detailsRow);
         console.log('➡️ Arrow element:', arrow);
         console.log('🎯 Arrow SVG:', arrowSvg);
 
+        if (!detailsRow) {
+            console.error('❌ Details row not found');
+            return;
+        }
+
         // Update business name in header if it exists
-        const businessName = row.querySelector('.font-medium').textContent.trim();
+        const businessName = row.querySelector('.font-medium')?.textContent.trim();
         const businessNameHeader = document.getElementById('businessNameHeader');
-        if (businessNameHeader) {
+        if (businessNameHeader && businessName) {
             businessNameHeader.textContent = businessName + "'s";
             console.log('✏️ Updated header with business name:', businessName);
         }
 
         // Close all other expanded rows first
         console.log('🔒 Closing other expanded rows...');
-        document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
+        document.querySelectorAll('.expanded-content').forEach(otherRow => {
             if (otherRow.id !== `details-${businessId}`) {
                 console.log('📍 Closing row:', otherRow.id);
                 otherRow.style.display = 'none';
-                
-                const otherArrow = document.getElementById(`arrow-${otherRow.id.split('-')[1]}`);
+                    
+                const otherId = otherRow.id.split('-')[1];
+                const otherArrow = document.getElementById(`arrow-${otherId}`);
                 if (otherArrow) {
                     const otherSvg = otherArrow.querySelector('svg');
                     otherArrow.style.transform = 'rotate(0deg)';
@@ -100,45 +111,49 @@
         });
 
         // Toggle current row
-        if (detailsRow) {
-            const isExpanding = detailsRow.style.display === 'none';
-            console.log('📈 Expanding row:', isExpanding);
+        const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
+        console.log('📈 Expanding row:', isExpanding);
             
-            detailsRow.style.display = isExpanding ? 'table-row' : 'none';
-            console.log('🔄 Set display to:', detailsRow.style.display);
+        detailsRow.style.display = isExpanding ? 'table-row' : 'none';
+        console.log('🔄 Set display to:', detailsRow.style.display);
 
-            if (arrow && arrowSvg) {
-                if (isExpanding) {
-                    console.log('↗️ Rotating arrow to expanded state');
-                    arrow.style.transform = 'rotate(90deg)';
-                    arrowSvg.classList.remove('text-gray-500');
-                    arrowSvg.classList.add('text-blue-500');
-                } else {
-                    console.log('↙️ Rotating arrow to collapsed state');
-                    arrow.style.transform = 'rotate(0deg)';
-                    arrowSvg.classList.remove('text-blue-500');
-                    arrowSvg.classList.add('text-gray-500');
-                }
-            }
-
-            // Update business summary and check profile status when expanding
+        if (arrow && arrowSvg) {
             if (isExpanding) {
-                console.log('📝 Updating business summary and checking status');
+                console.log('↗️ Rotating arrow to expanded state');
+                arrow.style.transform = 'rotate(90deg)';
+                arrowSvg.classList.remove('text-gray-500');
+                arrowSvg.classList.add('text-blue-500');
+            } else {
+                console.log('↙️ Rotating arrow to collapsed state');
+                arrow.style.transform = 'rotate(0deg)';
+                arrowSvg.classList.remove('text-blue-500');
+                arrowSvg.classList.add('text-gray-500');
+            }
+        }
+
+        // Update business summary and check profile status when expanding
+        if (isExpanding) {
+            console.log('📝 Updating business summary and checking status');
+            if (typeof updateBusinessSummary === 'function') {
                 updateBusinessSummary(businessId);
+            }
+            if (typeof checkProfileStatus === 'function') {
                 checkProfileStatus(businessId);
+            }
                     
-                // Switch to details tab by default when expanding
-                console.log('🔄 Switching to details tab');
+            // Switch to details tab by default when expanding
+            console.log('🔄 Switching to details tab');
+            if (typeof switchTab === 'function') {
                 switchTab(businessId, 'details');
             }
-        } else {
-            console.error('❌ Details row not found');
         }
 
         // Prevent event bubbling
-        event?.stopPropagation();
+        if (event) {
+            event.stopPropagation();
+        }
         console.log('✅ Toggle complete');
-    }
+    };
 
     // Automation settings functionality 
     function setAutomation(feature, level, businessId) {
