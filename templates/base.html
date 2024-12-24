@@ -384,10 +384,11 @@
             }
 
             // Close all other expanded rows first
-            document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
+            document.querySelectorAll('.expanded-content').forEach(otherRow => {
                 if (otherRow.id !== `details-${businessId}`) {
                     otherRow.style.display = 'none';
-                    const otherArrow = document.getElementById(`arrow-${otherRow.id.split('-')[1]}`);
+                    const otherId = otherRow.id.split('-')[1];
+                    const otherArrow = document.getElementById(`arrow-${otherId}`);
                     if (otherArrow) {
                         const otherSvg = otherArrow.querySelector('svg');
                         otherSvg.style.transform = 'rotate(0deg)';
@@ -403,21 +404,23 @@
                 detailsRow.style.display = isExpanding ? 'table-row' : 'none';
 
                 if (arrow && arrowSvg) {
+                    arrowSvg.style.transform = isExpanding ? 'rotate(90deg)' : 'rotate(0deg)';
                     if (isExpanding) {
-                        arrowSvg.style.transform = 'rotate(90deg)';
                         arrowSvg.classList.remove('text-gray-500');
                         arrowSvg.classList.add('text-blue-500');
+                        
+                        // Update business summary and switch to details tab
+                        updateBusinessSummary(businessId);
+                        switchTab(businessId, 'details');
                     } else {
-                        arrowSvg.style.transform = 'rotate(0deg)';
                         arrowSvg.classList.remove('text-blue-500');
                         arrowSvg.classList.add('text-gray-500');
                     }
                 }
+            }
 
-                // Update business summary and check profile status when expanding
-                if (isExpanding) {
-                    updateBusinessSummary(businessId);
-                    checkProfileStatus(businessId);
+            // Prevent event bubbling
+            event?.stopPropagation();
                     
                     // Switch to details tab by default when expanding
                     switchTab(businessId, 'details');
