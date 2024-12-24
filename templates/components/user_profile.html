@@ -16,14 +16,22 @@
     </div>
 
     <!-- User Profile Dropdown -->
-    <div class="relative">
-        <div class="cursor-pointer" onclick="toggleUserMenu()">
+    <div class="relative" x-data="{ open: false }">
+        <div class="cursor-pointer" @click="open = !open">
             <img src="{% if user.profile_picture_url %}{{ user.profile_picture_url }}{% else %}https://ui-avatars.com/api/?name={{ user.email|urlencode }}{% endif %}"
                  alt="Profile"
                  class="h-8 w-8 rounded-full">
         </div>
         <!-- Dropdown Menu -->
-        <div id="userMenu" class="absolute right-0 transform -translate-x-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-50">
+        <div x-show="open" 
+             @click.away="open = false"
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="transform opacity-0 scale-95"
+             x-transition:enter-end="transform opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="transform opacity-100 scale-100"
+             x-transition:leave-end="transform opacity-0 scale-95"
+             class="absolute right-0 transform -translate-x-full mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
             <div class="px-4 py-2 text-sm text-gray-700 border-b truncate">
                 {{ user.email }}
             </div>
