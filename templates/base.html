@@ -222,6 +222,54 @@
     // Initialize theme on page load
     document.addEventListener('DOMContentLoaded', initTheme);
 
+    // Business details toggle functionality
+    function toggleBusinessDetails(businessId) {
+        if (!businessId) return;
+        const row = document.querySelector(`[data-business-id="${businessId}"]`);
+        if (!row || row.dataset.verified !== 'Verified') {
+            return; // Don't allow expansion for unverified businesses
+        }
+
+        const detailsRow = document.getElementById(`details-${businessId}`);
+        const arrow = document.getElementById(`arrow-${businessId}`);
+        const arrowSvg = arrow?.querySelector('svg');
+
+        // Close all other rows first
+        document.querySelectorAll('[id^="details-"]').forEach(row => {
+            if (row.id !== `details-${businessId}`) {
+                row.style.display = 'none';
+                const otherArrow = document.getElementById(`arrow-${row.id.split('-')[1]}`);
+                if (otherArrow) {
+                    const otherSvg = otherArrow.querySelector('svg');
+                    otherArrow.style.transform = 'rotate(0deg)';
+                    otherSvg.classList.remove('text-blue-500');
+                    otherSvg.classList.add('text-gray-500');
+                }
+            }
+        });
+
+        if (detailsRow) {
+            const isHidden = detailsRow.style.display === 'none';
+            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+
+            if (arrow && arrowSvg) {
+                arrowSvg.style.transform = isHidden ? 'rotate(90deg)' : 'rotate(0deg)';
+                if (isHidden) {
+                    arrowSvg.classList.remove('text-gray-500');
+                    arrowSvg.classList.add('text-blue-500');
+                } else {
+                    arrowSvg.classList.remove('text-blue-500');
+                    arrowSvg.classList.add('text-gray-500');
+                }
+            }
+
+            // If opening, update business summary in knowledge base tab
+            if (isHidden) {
+                updateBusinessSummary(businessId);
+            }
+        }
+    }
+
     <script>
         // Sort businesses by completion percentage and urgency
         function sortBusinessRows() {
