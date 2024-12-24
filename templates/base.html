@@ -69,7 +69,7 @@
             businessNameHeader.textContent = businessName + "'s";
         }
 
-        // Close all other expanded rows
+        // Close all other expanded rows first
         document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
             if (otherRow.id !== `details-${businessId}`) {
                 otherRow.style.display = 'none';
@@ -90,11 +90,11 @@
 
             if (arrow && arrowSvg) {
                 if (isExpanding) {
-                    arrowSvg.style.transform = 'rotate(90deg)';
+                    arrow.style.transform = 'rotate(90deg)';
                     arrowSvg.classList.remove('text-gray-500');
                     arrowSvg.classList.add('text-blue-500');
                 } else {
-                    arrowSvg.style.transform = 'rotate(0deg)';
+                    arrow.style.transform = 'rotate(0deg)';
                     arrowSvg.classList.remove('text-blue-500');
                     arrowSvg.classList.add('text-gray-500');
                 }
@@ -104,8 +104,14 @@
             if (isExpanding) {
                 updateBusinessSummary(businessId);
                 checkProfileStatus(businessId);
+                    
+                // Switch to details tab by default when expanding
+                switchTab(businessId, 'details');
             }
         }
+
+        // Prevent event bubbling
+        event?.stopPropagation();
     }
 
     // Automation settings functionality 
