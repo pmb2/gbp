@@ -1,6 +1,5 @@
-<tr class="expandable-row relative {% if not business.is_verified %}unverified-row opacity-70{% endif %}"
+<tr class="expandable-row relative {% if not business.is_verified %}unverified-row opacity-70{% endif %} transition-all duration-300 hover:shadow-md h-16 cursor-pointer"
     onload="console.log('📄 business_row.html: Loading business row for:', '{{ business.business_id }}')"
-    transition-all duration-300 hover:shadow-md h-16 cursor-pointer"
     style="background: linear-gradient(to right,
             {% if business.calculate_profile_completion <= 30 %}rgba(239, 68, 68, 0.1){% elif business.calculate_profile_completion <= 70 %}rgba(245, 158, 11, 0.1){% else %}rgba(16, 185, 129, 0.1){% endif %}
             {{ business.calculate_profile_completion }}%,
