@@ -49,9 +49,11 @@
 {% include 'components/seo_health_modal.html' %}
 
 <script>
+    console.log('🌟 Initializing base.html script');
+    
     // Define toggleBusinessDetails in the global scope
     window.toggleBusinessDetails = function(businessId) {
-        console.log('🔄 Toggle called for business:', businessId);
+        console.log('🔄 base.html: Toggle called for business:', businessId);
         
         if (!businessId) {
             console.error('❌ No business ID provided');

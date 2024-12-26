@@ -1,5 +1,7 @@
+<script>console.log('📋 business_table.html: Initializing business table');</script>
 {% if dashboard_data.businesses %}
     <div class="overflow-x-auto overflow-y-hidden">
+    <script>console.log('📋 business_table.html: Loading', '{{ dashboard_data.businesses|length }}', 'businesses');</script>
         <table class="divide-y divide-gray-200 w-full">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
