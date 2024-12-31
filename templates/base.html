@@ -67,11 +67,7 @@
             console.error('❌ Business row not found');
             return;
         }
-
-        if (row.dataset.verified !== 'true') {
-            console.log('⚠️ Business not verified');
-            return;
-        }
+        
 
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
