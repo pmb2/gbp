@@ -73,11 +73,6 @@
             return;
         }
 
-        if (row.dataset.verified !== 'true') {
-            console.log('⚠️ Business not verified');
-            return;
-        }
-
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
