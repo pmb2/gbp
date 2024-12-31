@@ -157,11 +157,13 @@
         }
         
         // Call sortBusinessRows after DOM is fully loaded
+        console.log('Calling sortBusinessRows from DOMContentLoaded');
         sortBusinessRows();
     });
     
     // Sort business rows
     function sortBusinessRows() {
+        console.log('sortBusinessRows called');
         const tbody = document.querySelector('.business-table tbody');
         if (!tbody) {
             console.error("❌ tbody element not found. Cannot sort business rows.");
