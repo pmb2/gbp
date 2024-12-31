@@ -755,30 +755,14 @@
                             ondrop="handleFileDrop(event, '{{ business.business_id }}')"
                             ondragover="handleDragOver(event)"
                             ondragenter="handleDragEnter(event)"
-                            ondragleave="handleDragLeave(event)">
-                            <td class="px-6 py-4 relative">
-                                <div class="flex items-center">
-                                    <div class="absolute -top-3 left-0 p-1 text-xs font-medium rounded-br
-                                        {% if business.calculate_profile_completion <= 30 %}bg-red-600 text-white
-                                        {% elif business.calculate_profile_completion <= 70 %}bg-yellow-600 text-white
-                                        {% else %}bg-green-600 text-white{% endif %}">
-                                        {{ business.calculate_profile_completion }}%
-                                    </div>
-                                    {% if business.is_verified == 'Verified' %}
-                                        <div class="mr-2 cursor-pointer"
-                                             id="arrow-{{ business.business_id }}"
-                                             onclick="toggleBusinessDetails('{{ business.business_id }}')">
-                                            <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-all duration-200 transform"
-                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                      d="M9 5l7 7-7 7"/>
-                                            </svg>
-                                        </div>
-                                    {% endif %}
-                                    <div class="font-medium text-gray-900">{{ business.business_name }}</div>
-                                </div>
-                            </td>
-                            <td class="w-1/2">
+                            ondragleave="handleDragLeave(event)"
+                            onclick="toggleBusinessDetails('{{ business.business_id }}', event)"
+                            data-verified="{% if business.is_verified %}true{% else %}false{% endif %}">
+                            
+    {% include 'components/business_row_content.html' with business=business %}
+</tr>
+<tr id="details-{{ business.business_id }}" class="expanded-content" style="display: none;">
+    <td colspan="2">
                                 <div class="flex flex-col space-y-2">
                                     <!-- Status Overview -->
                                     <div class="grid grid-cols-2 gap-4">
