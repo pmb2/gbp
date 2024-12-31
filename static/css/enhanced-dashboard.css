@@ -151,9 +151,8 @@
 }
 
 .expanded-content {
-  background: #f8fafc;
-  padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  background-color: #f8fafc;
+  transition: all 0.3s ease-in-out;
 }
 
 /* Unverified Business Row */
