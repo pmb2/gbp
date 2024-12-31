@@ -9,7 +9,7 @@
         {% if business.is_verified == 'Verified' %}
             <div class="mr-2 cursor-pointer"
                  id="arrow-{{ business.business_id }}"
-                 onclick="toggleBusinessDetails('{{ business.business_id }}')">
+                 onclick="toggleBusinessDetails('{{ business.business_id }}', event)">
                 <svg class="w-5 h-5 text-gray-500 hover:text-blue-500 transition-all duration-200 transform"
                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
