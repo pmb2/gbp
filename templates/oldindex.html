@@ -750,14 +750,14 @@
                                     {{ business.calculate_profile_completion }}%,
                                     transparent {{ business.calculate_profile_completion }}%)"
                             data-business-id="{{ business.business_id }}"
-                            data-verified="{{ business.is_verified }}"
+                            data-verified="{% if business.is_verified %}true{% else %}false{% endif %}"
                             data-completion="{{ business.calculate_profile_completion }}"
                             ondrop="handleFileDrop(event, '{{ business.business_id }}')"
                             ondragover="handleDragOver(event)"
                             ondragenter="handleDragEnter(event)"
                             ondragleave="handleDragLeave(event)"
                             onclick="toggleBusinessDetails('{{ business.business_id }}', event)"
-                            data-verified="{% if business.is_verified %}true{% else %}false{% endif %}">
+                            >
                             
     {% include 'components/business_row_content.html' with business=business %}
 </tr>
