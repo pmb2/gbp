@@ -11,7 +11,8 @@
     ondragover="handleDragOver(event)"
     ondragenter="handleDragEnter(event)"
     ondragleave="handleDragLeave(event)"
-    onclick="toggleBusinessDetails('{{ business.business_id }}')">
+    onclick="toggleBusinessDetails('{{ business.business_id }}')"
+    data-verified="{% if business.is_verified %}true{% else %}false{% endif %}">
     
     {% include 'components/business_row_content.html' with business=business %}
 </tr>

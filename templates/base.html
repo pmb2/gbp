@@ -155,7 +155,36 @@
         } else {
             console.error('❌ Function not found in global scope');
         }
+        
+        // Call sortBusinessRows after DOM is fully loaded
+        sortBusinessRows();
     });
+    
+    // Sort business rows
+    function sortBusinessRows() {
+        const tbody = document.querySelector('.business-table tbody');
+        if (!tbody) {
+            console.error("❌ tbody element not found. Cannot sort business rows.");
+            return;
+        }
+        const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
+        
+        rows.sort((a, b) => {
+            const aVerified = a.dataset.verified === 'true';
+            const bVerified = b.dataset.verified === 'true';
+            const aCompletion = parseInt(a.dataset.completion) || 0;
+            const bCompletion = parseInt(b.dataset.completion) || 0;
+            
+            if (aVerified !== bVerified) return aVerified ? 1 : -1;
+            return aCompletion - bCompletion;
+        });
+        
+        rows.forEach(row => {
+            tbody.appendChild(row);
+            const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+            if (detailsRow) tbody.appendChild(detailsRow);
+        });
+    }
 
     // Automation settings functionality 
     function setAutomation(feature, level, businessId) {
