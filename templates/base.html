@@ -62,17 +62,21 @@
 
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         console.log('🔍 Found business row:', row);
-        
+            
         if (!row) {
             console.error('❌ Business row not found');
             return;
         }
-        
+
+        if (row.dataset.verified !== 'true') {
+            console.log('⚠️ Business not verified');
+            return;
+        }
 
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
-        
+            
         console.log('📊 Details row:', detailsRow);
         console.log('➡️ Arrow element:', arrow);
         console.log('🎯 Arrow SVG:', arrowSvg);
