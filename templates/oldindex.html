@@ -278,6 +278,19 @@
             transition: opacity 0.2s ease;
         }
 
+        .automation-label {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            margin-top: 0.5rem;
+            white-space: nowrap;
+            font-size: 0.75rem;
+            color: #6b7280;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
         .automation-dot:hover .automation-label {
             opacity: 1;
         }
@@ -1731,6 +1744,74 @@
             const modal = document.getElementById('verificationPromptModal');
             if (event.target === modal) {
                 modal.classList.add('hidden');
+            }
+        }
+
+        // Automation settings functionality
+        function setAutomation(feature, level, businessId) {
+            // Get all buttons for this feature and business
+            const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+
+            // Remove active class and background from all buttons for this feature
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                btn.classList.add('bg-white');
+            });
+
+            // Add active class and background to clicked button
+            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+
+                // Add color based on feature
+                switch (feature) {
+                    case 'qa':
+                        clickedButton.classList.add('bg-blue-500');
+                        break;
+                    case 'posts':
+                        clickedButton.classList.add('bg-purple-500');
+                        break;
+                    case 'reviews':
+                        clickedButton.classList.add('bg-green-500');
+                        break;
+                }
+
+                // Save to database via API
+                fetch(`/api/business/${businessId}/automation/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        feature: feature,
+                        level: level
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log(`Successfully updated ${feature} automation to ${level}`);
+                        } else {
+                            console.error('Failed to update automation settings');
+                            revertButtonState(buttons, clickedButton);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        revertButtonState(buttons, clickedButton);
+                    });
+            }
+        }
+
+        function revertButtonState(buttons, activeButton) {
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                btn.classList.add('bg-white');
+            });
+            if (activeButton.classList.contains('active')) {
+                activeButton.classList.remove('active');
             }
         }
     </script>
