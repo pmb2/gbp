@@ -50,16 +50,16 @@
 
 <script>
     console.log('🌟 Initializing base.html script');
-    
+
     // Define toggleBusinessDetails in the global scope
-    window.toggleBusinessDetails = function(businessId, event) {
+    window.toggleBusinessDetails = function (businessId, event) {
         console.log('🔄 base.html: Toggle called for business:', businessId);
-        
+
         if (event) {
             event.stopPropagation();
             console.log('🛑 Event propagation stopped');
         }
-        
+
         if (!businessId) {
             console.error('❌ No business ID provided');
             return;
@@ -67,7 +67,7 @@
 
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         console.log('🔍 Found business row:', row);
-        
+
         if (!row) {
             console.error('❌ Business row not found');
             return;
@@ -76,7 +76,7 @@
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
-        
+
         console.log('📊 Details row:', detailsRow);
         console.log('➡️ Arrow element:', arrow);
         console.log('🎯 Arrow SVG:', arrowSvg);
@@ -100,7 +100,7 @@
             if (otherRow.id !== `details-${businessId}`) {
                 console.log('📍 Closing row:', otherRow.id);
                 otherRow.style.display = 'none';
-                
+
                 const otherId = otherRow.id.split('-')[1];
                 const otherArrow = document.getElementById(`arrow-${otherId}`);
                 if (otherArrow) {
@@ -115,7 +115,7 @@
         // Toggle current row
         const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
         console.log('📈 Expanding row:', isExpanding);
-        
+
         detailsRow.style.display = isExpanding ? 'table-row' : 'none';
         console.log('🔄 Set display to:', detailsRow.style.display);
 
@@ -125,7 +125,7 @@
                 arrow.style.transform = 'rotate(90deg)';
                 arrowSvg.classList.remove('text-gray-500');
                 arrowSvg.classList.add('text-blue-500');
-                
+
                 // Update business summary and switch to details tab
                 console.log('📝 Updating business summary');
                 UpdateBusinessSummary(businessId);
@@ -146,38 +146,38 @@
         }
         console.log('✅ Toggle complete');
     };
-    
+
     // Define UpdateBusinessSummary in the global scope
-    window.UpdateBusinessSummary = function(businessId) {
+    window.UpdateBusinessSummary = function (businessId) {
         const summaryElement = document.getElementById(`business-summary-${businessId}`);
         const business = document.querySelector(`[data-business-id="${businessId}"]`);
-        
+
         if (!business) return;
-        
+
         const businessName = business.querySelector('.font-medium').textContent;
         const completion = business.dataset.completion;
         const verified = business.dataset.verified === 'true';
-        
+
         let summary = `Here's what I know about ${businessName}:\n\n`;
         summary += `• Profile Status: ${verified ? 'Verified' : 'Not Verified'}\n`;
         summary += `• Profile Completion: ${completion}%\n`;
-        
+
         // Add automation settings if available
         const qaStatus = document.querySelector(`[data-feature="qa"][data-position].active`);
         const postsStatus = document.querySelector(`[data-feature="posts"][data-position].active`);
         const reviewsStatus = document.querySelector(`[data-feature="reviews"][data-position].active`);
-        
+
         if (qaStatus) summary += `• Q&A Automation: ${qaStatus.dataset.position}\n`;
         if (postsStatus) summary += `• Posts Automation: ${postsStatus.dataset.position}\n`;
         if (reviewsStatus) summary += `• Reviews Automation: ${reviewsStatus.dataset.position}\n`;
-        
+
         summary += "\nYou can ask me questions about your business profile, automation settings, or upload documents to enhance my knowledge.";
-        
+
         summaryElement.textContent = summary;
     }
-    
+
     // Define SwitchTab in the global scope
-    window.SwitchTab = function(businessId, tabName) {
+    window.SwitchTab = function (businessId, tabName) {
         // Update tab buttons
         document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
             tab.classList.remove('bg-white', 'text-blue-600');
@@ -192,25 +192,25 @@
             content.classList.add('hidden');
         });
         document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
-        
+
         // Update business summary when switching to knowledge tab
         if (tabName === 'knowledge') {
             UpdateBusinessSummary(businessId);
         }
     }
-    
+
     // Make sure the function is available after DOM loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         console.log('🌟 toggleBusinessDetails function initialized');
         if (typeof window.toggleBusinessDetails === 'function') {
             console.log('✅ Function is properly defined in global scope');
         } else {
             console.error('❌ Function not found in global scope');
         }
-        
+
         // Call sortBusinessRows after DOM is fully loaded
         console.log('Calling sortBusinessRows from DOMContentLoaded');
-        
+
         // Sort business rows
         function sortBusinessRows() {
             console.log('sortBusinessRows called');
@@ -220,191 +220,24 @@
                 return;
             }
             const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-            
+
             rows.sort((a, b) => {
                 const aVerified = a.dataset.verified === 'true';
                 const bVerified = b.dataset.verified === 'true';
                 const aCompletion = parseInt(a.dataset.completion) || 0;
                 const bCompletion = parseInt(b.dataset.completion) || 0;
-                
+
                 if (aVerified !== bVerified) return aVerified ? 1 : -1;
                 return aCompletion - bCompletion;
             });
-            
+
             rows.forEach(row => {
                 tbody.appendChild(row);
                 const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
                 if (detailsRow) tbody.appendChild(detailsRow);
             });
         }
-        
-        sortBusinessRows();
-    });
-</script>
-        
-        if (event) {
-            event.stopPropagation();
-            console.log('🛑 Event propagation stopped');
-        }
-        
-        if (!businessId) {
-            console.error('❌ No business ID provided');
-            return;
-        }
 
-        const row = document.querySelector(`[data-business-id="${businessId}"]`);
-        console.log('🔍 Found business row:', row);
-            
-        if (!row) {
-            console.error('❌ Business row not found');
-            return;
-        }
-
-        const detailsRow = document.getElementById(`details-${businessId}`);
-        const arrow = document.getElementById(`arrow-${businessId}`);
-        const arrowSvg = arrow?.querySelector('svg');
-            
-        console.log('📊 Details row:', detailsRow);
-        console.log('➡️ Arrow element:', arrow);
-        console.log('🎯 Arrow SVG:', arrowSvg);
-
-        if (!detailsRow) {
-            console.error('❌ Details row not found');
-            return;
-        }
-
-        // Update business name in header if it exists
-        const businessName = row.querySelector('.font-medium')?.textContent.trim();
-        const businessNameHeader = document.getElementById('businessNameHeader');
-        if (businessNameHeader && businessName) {
-            businessNameHeader.textContent = businessName + "'s";
-            console.log('✏️ Updated header with business name:', businessName);
-        }
-
-        // Close all other expanded rows first
-        console.log('🔒 Closing other expanded rows...');
-        document.querySelectorAll('.expanded-content').forEach(otherRow => {
-            if (otherRow.id !== `details-${businessId}`) {
-                console.log('📍 Closing row:', otherRow.id);
-                otherRow.style.display = 'none';
-                
-                const otherId = otherRow.id.split('-')[1];
-                const otherArrow = document.getElementById(`arrow-${otherId}`);
-                if (otherArrow) {
-                    const otherSvg = otherArrow.querySelector('svg');
-                    otherArrow.style.transform = 'rotate(0deg)';
-                    otherSvg.classList.remove('text-blue-500');
-                    otherSvg.classList.add('text-gray-500');
-                }
-            }
-        });
-
-        // Toggle current row
-        const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
-        console.log('📈 Expanding row:', isExpanding);
-        
-        detailsRow.style.display = isExpanding ? 'table-row' : 'none';
-        console.log('🔄 Set display to:', detailsRow.style.display);
-
-        if (arrow && arrowSvg) {
-            if (isExpanding) {
-                console.log('↗️ Rotating arrow to expanded state');
-                arrow.style.transform = 'rotate(90deg)';
-                arrowSvg.classList.remove('text-gray-500');
-                arrowSvg.classList.add('text-blue-500');
-                
-                // Update business summary and switch to details tab
-                console.log('📝 Updating business summary');
-                updateBusinessSummary(businessId);
-                console.log('🔄 Switching to details tab');
-                switchTab(businessId, 'details');
-            } else {
-                console.log('↙️ Rotating arrow to collapsed state');
-                arrow.style.transform = 'rotate(0deg)';
-                arrowSvg.classList.remove('text-blue-500');
-                arrowSvg.classList.add('text-gray-500');
-            }
-        }
-
-        // Prevent event bubbling
-        if (event) {
-            event.stopPropagation();
-            console.log('🛑 Event propagation stopped');
-        }
-        console.log('✅ Toggle complete');
-    };
-
-    // Make sure the function is available after DOM loads
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🌟 toggleBusinessDetails function initialized');
-        if (typeof window.toggleBusinessDetails === 'function') {
-            console.log('✅ Function is properly defined in global scope');
-        } else {
-            console.error('❌ Function not found in global scope');
-        }
-        
-        // Call sortBusinessRows after DOM is fully loaded
-        console.log('Calling sortBusinessRows from DOMContentLoaded');
-        
-        // Sort business rows
-        function sortBusinessRows() {
-            console.log('sortBusinessRows called');
-            const tbody = document.querySelector('.business-table tbody');
-            if (!tbody) {
-                console.error("❌ tbody element not found. Cannot sort business rows.");
-                return;
-            }
-            const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-            
-            rows.sort((a, b) => {
-                const aVerified = a.dataset.verified === 'true';
-                const bVerified = b.dataset.verified === 'true';
-                const aCompletion = parseInt(a.dataset.completion) || 0;
-                const bCompletion = parseInt(b.dataset.completion) || 0;
-                
-                if (aVerified !== bVerified) return aVerified ? 1 : -1;
-                return aCompletion - bCompletion;
-            });
-            
-            rows.forEach(row => {
-                tbody.appendChild(row);
-                const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-                if (detailsRow) tbody.appendChild(detailsRow);
-            });
-        }
-        
-    });
-    
-    // Call sortBusinessRows after DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        
-        // Sort business rows
-        function sortBusinessRows() {
-            console.log('sortBusinessRows called');
-            const tbody = document.querySelector('.business-table tbody');
-            if (!tbody) {
-                console.error("❌ tbody element not found. Cannot sort business rows.");
-                return;
-            }
-            const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-            
-            rows.sort((a, b) => {
-                const aVerified = a.dataset.verified === 'true';
-                const bVerified = b.dataset.verified === 'true';
-                const aCompletion = parseInt(a.dataset.completion) || 0;
-                const bCompletion = parseInt(b.dataset.completion) || 0;
-                
-                if (aVerified !== bVerified) return aVerified ? 1 : -1;
-                return aCompletion - bCompletion;
-            });
-            
-            rows.forEach(row => {
-                tbody.appendChild(row);
-                const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-                if (detailsRow) tbody.appendChild(detailsRow);
-            });
-        }
-        
         sortBusinessRows();
     });
 
@@ -584,7 +417,7 @@
     // Business details toggle functionality
     function toggleBusinessDetails(businessId) {
         if (!businessId) return;
-        
+
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
@@ -644,66 +477,66 @@
     function checkProfileStatus(businessId) {
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         if (!row) return;
-        
+
         const completion = parseInt(row.dataset.completion) || 0;
         const verified = row.dataset.verified === 'Verified';
-        
+
         // Update UI based on status
         if (!verified) {
             showAlertBanner('Your business profile requires verification. Click here to complete the process.', 'red');
         } else if (completion < 100) {
             showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
         }
-        
-        }
 
-        // Sort businesses by completion percentage and urgency
-        function sortBusinessRows() {
+    }
+
+    // Sort businesses by completion percentage and urgency
+    function sortBusinessRows() {
         const tbody = document.querySelector('.business-table tbody');
         const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
 
         rows.sort((a, b) => {
-        const aVerified = a.dataset.verified === 'Verified';
-        const bVerified = b.dataset.verified === 'Verified';
-        const aCompletion = parseInt(a.dataset.completion) || 0;
-        const bCompletion = parseInt(b.dataset.completion) || 0;
+            const aVerified = a.dataset.verified === 'Verified';
+            const bVerified = b.dataset.verified === 'Verified';
+            const aCompletion = parseInt(a.dataset.completion) || 0;
+            const bCompletion = parseInt(b.dataset.completion) || 0;
 
-        // Unverified businesses come first
-        if (aVerified !== bVerified) {
-        return aVerified ? 1 : -1;
-    }
+            // Unverified businesses come first
+            if (aVerified !== bVerified) {
+                return aVerified ? 1 : -1;
+            }
 
-        // Then sort by completion percentage (ascending)
-        return aCompletion - bCompletion;
-    });
+            // Then sort by completion percentage (ascending)
+            return aCompletion - bCompletion;
+        });
 
         // Reorder the rows
         rows.forEach(row => {
-        tbody.appendChild(row);
-        const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-        if (detailsRow) {
-        tbody.appendChild(detailsRow);
+            tbody.appendChild(row);
+            const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+            if (detailsRow) {
+                tbody.appendChild(detailsRow);
+            }
+        });
     }
-    });
-    }
 
-        // Call sort on page load
-        document.addEventListener('DOMContentLoaded', sortBusinessRows);
+    // Call sort on page load
+    document.addEventListener('DOMContentLoaded', sortBusinessRows);
 
-        // Mobile menu functionality
-        const mobileMenuButton = document.getElementById('mobile-menu-button');
-        const mobileSidebar = document.getElementById('mobile-sidebar');
+    // Mobile menu functionality
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileSidebar = document.getElementById('mobile-sidebar');
 
-        if (mobileMenuButton && mobileSidebar) {
+    if (mobileMenuButton && mobileSidebar) {
         mobileMenuButton.addEventListener('click', () => {
             mobileSidebar.classList.toggle('hidden');
         });
 
         mobileSidebar.addEventListener('click', (e) => {
-        if (e.target === mobileSidebar) {
-        mobileSidebar.classList.add('hidden');
-    }
-    });
+            if (e.target === mobileSidebar) {
+                mobileSidebar.classList.add('hidden');
+            }
+        });
     }
 </script>
 </body>
