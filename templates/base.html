@@ -155,7 +155,7 @@
         console.log('✅ Toggle complete');
     };
 
-    // Define UpdateBusinessSummary in the global scope
+    // Define UpdateBusinessSummary in the global scope (for use in business_details.html)
     window.UpdateBusinessSummary = function (businessId) {
         const summaryElement = document.getElementById(`business-summary-${businessId}`);
         const business = document.querySelector(`[data-business-id="${businessId}"]`);
@@ -184,7 +184,7 @@
         summaryElement.textContent = summary;
     }
 
-    // Define SwitchTab in the global scope
+    // Define SwitchTab in the global scope (for use in business_details.html)
     window.SwitchTab = function (businessId, tabName) {
         // Update tab buttons
         document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
@@ -201,7 +201,13 @@
         });
         document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
 
-        // Update business summary when switching to knowledge tab
+        // Update tab contents
+        document.querySelectorAll(`[id$="-content-${businessId}"]`).forEach(content => {
+            content.classList.add('hidden');
+        });
+        document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
+        
+        // Update business summary when switching to knowledge tab (for use in business_details.html)
         if (tabName === 'knowledge') {
             UpdateBusinessSummary(businessId);
         }
