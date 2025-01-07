@@ -59,6 +59,10 @@
 <script>
     console.log('🌟 Initializing base.html script');
 
+    function closeAlertBanner() {
+        document.getElementById('alertBanner').classList.add('hidden');
+    }
+
     // Define toggleBusinessDetails in the global scope
     window.toggleBusinessDetails = function (businessId, event) {
         console.log('🔄 base.html: Toggle called for business:', businessId);
