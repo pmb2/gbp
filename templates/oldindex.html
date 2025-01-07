@@ -900,7 +900,7 @@
                             <td colspan="2">
                                 <!-- Modern Browser-like Tabs -->
                                 <div class="bg-gray-100 rounded-t-lg p-2 flex space-x-1">
-                                    <button onclick="switchTab('{{ business.business_id }}', 'details')"
+                                    <button onclick="SwitchTab('{{ business.business_id }}', 'details')"
                                             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
                                             id="details-tab-{{ business.business_id }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -909,7 +909,7 @@
                                         </svg>
                                         <span>Business Details</span>
                                     </button>
-                                    <button onclick="switchTab('{{ business.business_id }}', 'knowledge')"
+                                    <button onclick="SwitchTab('{{ business.business_id }}', 'knowledge')"
                                             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
                                             id="knowledge-tab-{{ business.business_id }}">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
