@@ -6,6 +6,8 @@
   --dark: #1f2937;
   --light: #ffffff;
   --gray: #6b7280;
+  --sidebar-width: 200px;
+  --sidebar-mobile-width: 250px;
 }
 
 * {
