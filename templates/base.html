@@ -25,6 +25,14 @@
             </div>
         </header>
 
+        <!-- Desktop Header -->
+        <header class="bg-dark-card shadow-sm px-6 py-4 hidden md:flex">
+            <div class="flex justify-between items-center w-full">
+                <h1 class="text-2xl font-bold text-gray-100">Dashboard</h1>
+                {% include 'components/user_profile.html' %}
+            </div>
+        </header>
+
         <!-- Main Content Area -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
             {% block content %}{% endblock %}
@@ -720,6 +728,21 @@
         });
         if (activeButton.classList.contains('active')) {
             activeButton.classList.remove('active');
+        }
+    }
+
+    function toggleNotificationsModal() {
+        const modal = document.getElementById('notificationsModal');
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) {
+            loadNotifications();
+        }
+    }
+
+    function toggleUserMenu() {
+        const userMenu = document.getElementById('userMenu');
+        if (userMenu) {
+            userMenu.style.display = userMenu.style.display === 'none' ? 'block' : 'none';
         }
     }
 </script>
