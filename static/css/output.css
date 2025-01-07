@@ -1627,6 +1627,45 @@ img, video {
     transition-duration: .15s
 }
 
+/* Modern Tab Styles */
+.tab-button {
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    background: transparent;
+}
+
+.tab-button:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.tab-button:focus {
+    outline: none;
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: #3B82F6;
+}
+
+.tab-button.active {
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button svg {
+    transition: transform 0.2s ease-in-out;
+}
+
+.tab-button:hover svg {
+    transform: scale(1.1);
+}
+
+.tab-content {
+    transition: all 0.3s ease-in-out;
+}
+
+.tab-content.hidden {
+    display: none;
+}
+
 .transition-all {
     transition-property: all;
     transition-timing-function: cubic-bezier(.4, 0, .2, 1);

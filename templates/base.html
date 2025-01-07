@@ -548,6 +548,180 @@
             }
         });
     }
+
+    // Define toggleEditMode in the global scope
+    window.toggleEditMode = function (businessId) {
+        const viewMode = document.getElementById(`view-mode-${businessId}`);
+        const editMode = document.getElementById(`edit-mode-${businessId}`);
+        const editIcon = document.getElementById(`edit-icon-${businessId}`);
+
+        if (editMode.classList.contains('hidden')) {
+            // Switch to edit mode
+            viewMode.classList.add('hidden');
+            editMode.classList.remove('hidden');
+            editIcon.textContent = '💾';  // Change to save icon
+        } else {
+            // Save changes
+            saveBusinessDetails(businessId);
+            viewMode.classList.remove('hidden');
+            editMode.classList.add('hidden');
+            editIcon.textContent = '✏️';  // Change back to edit icon
+        }
+    }
+
+    // Define saveBusinessDetails in the global scope
+    window.saveBusinessDetails = async function (businessId) {
+        try {
+            const data = {
+                csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value,
+                business_name: document.getElementById(`business-name-${businessId}`).value.trim(),
+                address: document.getElementById(`address-${businessId}`).value.trim(),
+                phone: document.getElementById(`phone-${businessId}`).value.trim(),
+                website: document.getElementById(`website-${businessId}`).value.trim(),
+                category: document.getElementById(`category-${businessId}`).value.trim()
+            };
+
+            // Validate required fields
+            const missingFields = Object.entries(data)
+                .filter(([_, value]) => !value)
+                .map(([key]) => key.replace('_', ' '));
+
+            if (missingFields.length > 0) {
+                alert(`Please fill in all required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/business/${businessId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': data.csrfmiddlewaretoken
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to update business details');
+                }
+            } catch (error) {
+                console.error('Error updating business details:', error);
+                const response = await error.response?.json();
+
+                if (response?.status === 'verification_required') {
+                    // Show verification modal
+                    const modal = document.getElementById('verificationPromptModal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                    }
+                } else {
+                    // Show error in a more user-friendly way
+                    const alertBanner = document.getElementById('alertBanner');
+                    const alertMessage = document.getElementById('alertMessage');
+                    if (alertBanner && alertMessage) {
+                        alertMessage.textContent = response?.message || 'Failed to update business details. Please try again.';
+                        alertBanner.classList.remove('hidden');
+                    }
+                }
+                return;
+            }
+
+            // Update the view mode with new values
+            const viewMode = document.getElementById(`view-mode-${businessId}`);
+            viewMode.querySelector(':nth-child(1) span:last-child').textContent = data.business_name;
+            viewMode.querySelector(':nth-child(2) span:last-child').textContent = data.address;
+            viewMode.querySelector(':nth-child(3) span:last-child').textContent = data.phone;
+            viewMode.querySelector(':nth-child(4) span:last-child').textContent = data.website;
+            viewMode.querySelector(':nth-child(5) span:last-child').textContent = data.category;
+
+            // Show success message
+            alert('Business details updated successfully!');
+
+        } catch (error) {
+            console.error('Error updating business details:', error);
+            alert(error.message || 'Failed to update business details. Please try again.');
+        }
+    }
+
+    // Automation settings functionality
+    function setAutomation(feature, level, businessId) {
+        // Get all buttons for this feature and business
+        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+
+        // Remove active class and background from all buttons for this feature
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
+
+        // Add active class and background to clicked button
+        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+        if (clickedButton) {
+            clickedButton.classList.add('active');
+
+            // Add color based on feature
+            switch (feature) {
+                case 'qa':
+                    clickedButton.classList.add('bg-blue-500');
+                    break;
+                case 'posts':
+                    clickedButton.classList.add('bg-purple-500');
+                    break;
+                case 'reviews':
+                    clickedButton.classList.add('bg-green-500');
+                    break;
+            }
+
+            // Save to database via API
+            fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Fetch failed with status:', response.status);
+                        return response.json().then(err => {
+                            console.error('Error details:', err);
+                            revertButtonState(buttons, clickedButton);
+                            throw new Error('Network response was not ok.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.status === 'success') {
+                        console.log(`Successfully updated ${feature} automation to ${level}`);
+                    } else {
+                        console.error('Failed to update automation settings');
+                        revertButtonState(buttons, clickedButton);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    revertButtonState(buttons, clickedButton);
+                });
+        }
+    }
+
+    function revertButtonState(buttons, activeButton) {
+        buttons.forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
+        if (activeButton.classList.contains('active')) {
+            activeButton.classList.remove('active');
+        }
+    }
 </script>
 </body>
 </html>

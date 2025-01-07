@@ -113,5 +113,120 @@
     <!-- Knowledge Base Tab -->
     <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
         {% include 'components/knowledge_base.html' with business=business %}
+<script>
+    console.log('🔍 business_details.html: Loading details for business:', '{{ business.business_id }}');
+</script>
+
+<!-- Modern Browser-like Tabs -->
+<div class="bg-gray-100 rounded-t-lg p-2 flex space-x-1">
+    <button onclick="switchTab('{{ business.business_id }}', 'details')"
+            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
+            id="details-tab-{{ business.business_id }}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span>Business Details</span>
+    </button>
+    <button onclick="switchTab('{{ business.business_id }}', 'knowledge')"
+            class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
+            id="knowledge-tab-{{ business.business_id }}">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+        <span>Knowledge Base</span>
+    </button>
+</div>
+
+<!-- Tab Contents -->
+<div class="p-4">
+    <!-- Business Details & Settings Tab -->
+    <div class="tab-content active" id="details-content-{{ business.business_id }}">
+        <div class="grid grid-cols-2 gap-6">
+            <!-- Business Details Section -->
+            <div>
+                <div class="space-y-3" id="business-details-{{ business.business_id }}">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium text-gray-900">Business Details</h3>
+                        <button onclick="toggleEditMode('{{ business.business_id }}')"
+                                class="text-gray-600 hover:text-gray-900">
+                            <span id="edit-icon-{{ business.business_id }}">✏️</span>
+                        </button>
+                    </div>
+                    <!-- View Mode -->
+                    <div class="view-mode" id="view-mode-{{ business.business_id }}">
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Business Name:</span>
+                            <span class="text-gray-900">{{ business.business_name }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Address:</span>
+                            <span class="text-gray-900">{{ business.address }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Phone:</span>
+                            <span class="text-gray-900">{{ business.phone_number }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Website:</span>
+                            <span class="text-gray-900">{{ business.website_url }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">Category:</span>
+                            <span class="text-gray-900">{{ business.category }}</span>
+                        </div>
+                    </div>
+                    <!-- Edit Mode -->
+                    <div class="edit-mode hidden" id="edit-mode-{{ business.business_id }}">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <label class="text-gray-500">Business Name:</label>
+                                <input type="text" value="{{ business.business_name }}"
+                                       class="border rounded px-2 py-1 w-2/3"
+                                       id="business-name-{{ business.business_id }}">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-gray-500">Address:</label>
+                                <input type="text" value="{{ business.address }}"
+                                       class="border rounded px-2 py-1 w-2/3"
+                                       id="address-{{ business.business_id }}">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-gray-500">Phone:</label>
+                                <input type="text" value="{{ business.phone_number }}"
+                                       class="border rounded px-2 py-1 w-2/3"
+                                       id="phone-{{ business.business_id }}">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-gray-500">Website:</label>
+                                <input type="text" value="{{ business.website_url }}"
+                                       class="border rounded px-2 py-1 w-2/3"
+                                       id="website-{{ business.business_id }}">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-gray-500">Category:</label>
+                                <input type="text" value="{{ business.category }}"
+                                       class="border rounded px-2 py-1 w-2/3"
+                                       id="category-{{ business.business_id }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Automation Settings Section -->
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <h3 class="text-lg font-medium text-gray-900 mb-6">Automation Settings</h3>
+                <div class="space-y-6">
+                    {% include 'components/automation_controls.html' with business=business %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Knowledge Base Tab -->
+    <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}">
+        {% include 'components/knowledge_base.html' with business=business %}
     </div>
 </div>
