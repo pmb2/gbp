@@ -225,20 +225,30 @@
             btn.classList.add('bg-white');
         });
 
-        // Add active class and background to clicked button
+        // Add active class and background to clicked button immediately
         const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
         if (clickedButton) {
-            clickedButton.classList.add('active');
+            // Remove active class and colors from all buttons in this feature group
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                btn.classList.add('bg-white');
+            });
 
-            // Add color based on feature
+            // Add active class and color to clicked button
+            clickedButton.classList.add('active');
+                
+            // Add color based on feature immediately
             switch (feature) {
                 case 'qa':
+                    clickedButton.classList.remove('bg-white');
                     clickedButton.classList.add('bg-blue-500');
                     break;
                 case 'posts':
+                    clickedButton.classList.remove('bg-white');
                     clickedButton.classList.add('bg-purple-500');
                     break;
                 case 'reviews':
+                    clickedButton.classList.remove('bg-white');
                     clickedButton.classList.add('bg-green-500');
                     break;
             }
