@@ -28,7 +28,7 @@ function previewFile(businessId, fileId) {
             modal.classList.remove('hidden');
         })
         .catch(error => {
-            showErrorMessage('Error loading file preview');
+            showAlertBanner('Error loading file preview');
             console.error('Error:', error);
         });
 }

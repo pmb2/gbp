@@ -34,4 +34,6 @@ urlpatterns = [
          views.chat_message, name='chat_message'),
     path('api/business/<str:business_id>/knowledge/',
          views.add_knowledge, name='add_knowledge'),
+    path('api/business/<str:business_id>/files/<int:file_id>/preview/',
+         views.preview_file, name='preview_file'),
 ]

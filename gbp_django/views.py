@@ -827,6 +827,19 @@ from .utils.file_processor import store_file_content, process_folder
 
 @login_required
 @require_http_methods(["POST"])
+def preview_file(request, business_id, file_id):
+    """Preview file content"""
+    try:
+        faq = FAQ.objects.get(id=file_id, business__business_id=business_id)
+        return JsonResponse({
+            'name': faq.file_path.split('/')[-1] if faq.file_path else 'Unknown',
+            'content': faq.answer
+        })
+    except FAQ.DoesNotExist:
+        return JsonResponse({
+            'error': 'File not found'
+        }, status=404)
+
 def add_knowledge(request, business_id):
     """Add new knowledge to the business knowledge base with enhanced error handling"""
     if request.method == 'POST':
