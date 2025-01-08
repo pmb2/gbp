@@ -595,8 +595,13 @@ def bulk_upload_businesses(request):
                 website_url=row['Website'],
                 category=row['Category'],
                 email_verification_pending=True,
-                email_verification_token=secrets.token_urlsafe(32)
+                email_verification_token=secrets.token_urlsafe(32),
+                embedding=None  # Initialize embedding as null
             )
+
+            # Generate embedding for business profile
+            from .utils.embeddings import update_business_embedding
+            update_business_embedding(business)
 
             # Send verification email
             send_verification_email(business)
@@ -609,6 +614,7 @@ def bulk_upload_businesses(request):
         })
 
     except Exception as e:
+        print(f"Error in bulk upload: {str(e)}")
         return JsonResponse({
             'status': 'error',
             'error': str(e)
