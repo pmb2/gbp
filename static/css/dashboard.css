@@ -233,7 +233,7 @@ body {
 /* Dropdown menu positioning */
 .dropdown-menu {
   right: auto;
-  left: -150px;
+  left: -50px;
   min-width: 200px;
 }
 
