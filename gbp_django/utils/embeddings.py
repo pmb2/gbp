@@ -50,13 +50,32 @@ def generate_embedding(text: str) -> Optional[List[float]]:
         return None
 
 def generate_response(query: str, context: str, chat_history: List[Dict[str, str]] = None) -> str:
-    """Generate response using Groq's LLaMA API with chat history"""
+    """Generate response using Groq's LLaMA API with chat history and memory summaries"""
     try:
-        # Format chat history if provided
-        formatted_history = ""
+        # Format chat history and summarize memories
+        formatted_history = []
+        memory_summary = []
+        
         if chat_history:
-            for msg in chat_history[-5:]:  # Only use last 5 messages for context
-                formatted_history += f"{msg['role']}: {msg['content']}\n"
+            # Group messages by topic and summarize
+            current_topic = []
+            for msg in chat_history[-10:]:  # Look at last 10 messages
+                current_topic.append(msg['content'])
+                if len(current_topic) >= 3:  # Summarize every 3 messages
+                    summary = f"• Previous discussion about: {' '.join(current_topic)[:100]}..."
+                    memory_summary.append(summary)
+                    current_topic = []
+            
+            # Add remaining messages
+            if current_topic:
+                summary = f"• Recent exchange about: {' '.join(current_topic)[:100]}..."
+                memory_summary.append(summary)
+            
+            # Format recent messages
+            formatted_history = [
+                {'role': m['role'], 'content': m['content']} 
+                for m in chat_history[-5:]  # Keep last 5 messages verbatim
+            ]
 
         system_prompt = (
             "You are an AI assistant for a business automation platform. "
@@ -64,27 +83,30 @@ def generate_response(query: str, context: str, chat_history: List[Dict[str, str
             "Use the provided context to give accurate, professional responses. "
             "If uncertain, acknowledge the limitations of your knowledge.\n\n"
             f"Business Context: {context}\n\n"
-            f"Previous Conversation:\n{formatted_history}\n"
-            "Instructions: Provide a helpful response based on the context and chat history."
+            f"Memory Summaries:\n" + "\n".join(memory_summary) + "\n\n"
+            "Instructions: Provide a helpful response based on the context and history."
         )
+
+        # Prepare messages array
+        messages = [{'role': 'system', 'content': system_prompt}]
+        if formatted_history:
+            messages.extend(formatted_history)
+        messages.append({'role': 'user', 'content': query})
         
+        # Make API call with proper headers
         response = requests.post(
             'https://api.groq.com/v1/chat/completions',
+            headers={
+                'Authorization': f'Bearer {settings.GROQ_API_KEY}',
+                'Content-Type': 'application/json'
+            },
             json={
                 'model': 'llama-3.3-70b-versatile',
-                'messages': [
-                    {'role': 'system', 'content': system_prompt},
-                    *([{'role': m['role'], 'content': m['content']} for m in chat_history] if chat_history else []),
-                    {'role': 'user', 'content': query}
-                ],
+                'messages': messages,
                 'temperature': 0.7,
                 'max_tokens': 1000,
                 'top_p': 0.9,
                 'stream': False
-            },
-            headers={
-                'Authorization': f'Bearer {settings.GROQ_API_KEY}',
-                'Content-Type': 'application/json'
             },
             timeout=30
         )
