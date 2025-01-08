@@ -105,7 +105,7 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 8, min_simi
                 print(f"Answer length: {len(faq.answer)} chars")
                 print(f"Semantic similarity: {cosine_sim:.3f}")
                 print(f"Structural similarity: {l2_sim:.3f}")
-                print(f"Length penalty: {length_penalty:.3f}")
+                print(f"Length bonus: {length_bonus:.3f}")
                 print(f"Final score: {combined_score:.3f}")
                 
                 results.append({
