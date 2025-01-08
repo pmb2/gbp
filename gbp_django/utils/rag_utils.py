@@ -5,67 +5,100 @@ from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
-def search_knowledge_base(query: str, business_id: str, top_k: int = 3, min_similarity: float = 0.7) -> List[Dict[str, Any]]:
+def search_knowledge_base(query: str, business_id: str, top_k: int = 5, min_similarity: float = 0.6) -> List[Dict[str, Any]]:
     """Enhanced knowledge base search with metadata and multiple similarity metrics"""
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
+    print(f"[DEBUG] Minimum similarity threshold: {min_similarity}")
     
-    # Generate embedding for query
-    query_embedding = generate_embedding(query)
+    # Generate embedding for query with retries
+    attempts = 3
+    query_embedding = None
+    
+    for attempt in range(attempts):
+        query_embedding = generate_embedding(query)
+        if query_embedding:
+            print(f"[DEBUG] Successfully generated query embedding on attempt {attempt + 1}")
+            break
+        print(f"[WARNING] Failed to generate embedding, attempt {attempt + 1}/{attempts}")
+    
     if not query_embedding:
-        print("[ERROR] Failed to generate query embedding")
+        print("[ERROR] Failed to generate query embedding after all attempts")
         return []
         
     try:
-        # Get business first to validate it exists
-        business = Business.objects.get(business_id=business_id)
+        # Get business and validate existence
+        try:
+            business = Business.objects.get(business_id=business_id)
+            print(f"[DEBUG] Found business: {business.business_name}")
+        except Business.DoesNotExist:
+            print(f"[ERROR] Business not found with ID: {business_id}")
+            return []
         
-        # Get related FAQs using both cosine and L2 distance
+        # Get related FAQs using multiple similarity metrics
+        print("[DEBUG] Querying knowledge base with vector similarity search...")
         faqs = FAQ.objects.filter(
-            business=business,  # Use business object instead of business_id
-            deleted_at__isnull=True,  # Exclude deleted documents
-            embedding__isnull=False  # Ensure embedding exists
+            business=business,
+            deleted_at__isnull=True,
+            embedding__isnull=False
         ).annotate(
             cosine_similarity=CosineDistance('embedding', query_embedding),
             l2_distance=L2Distance('embedding', query_embedding)
-        ).order_by('cosine_similarity')[:top_k * 2]  # Get more candidates for reranking
+        ).order_by('cosine_similarity')[:top_k * 3]  # Get more candidates for comprehensive reranking
         
-        print(f"[DEBUG] Found {faqs.count()} candidate FAQs")
+        print(f"[DEBUG] Retrieved {faqs.count()} initial candidate FAQs")
         
         results = []
         for faq in faqs:
-            # Calculate multiple similarity scores
-            cosine_sim = 1 - float(faq.cosine_similarity)  # Convert distance to similarity
-            l2_sim = 1 / (1 + float(faq.l2_distance))  # Normalize L2 distance to 0-1
+            # Calculate comprehensive similarity scores
+            cosine_sim = 1 - float(faq.cosine_similarity)
+            l2_sim = 1 / (1 + float(faq.l2_distance))
             
-            # Enhanced scoring with weighted combination
-            combined_score = (cosine_sim * 0.6) + (l2_sim * 0.4)
-            
-            # Apply length normalization
+            # Enhanced scoring with multiple factors
             text_length = len(faq.question) + len(faq.answer)
             length_penalty = min(1.0, 1000 / max(500, text_length))
-            final_score = combined_score * length_penalty
             
-            if final_score >= min_similarity:
-                print(f"[DEBUG] FAQ: {faq.question[:50]}...")
-                print(f"[DEBUG] Cosine Similarity: {cosine_sim:.3f}")
-                print(f"[DEBUG] L2 Similarity: {l2_sim:.3f}")
-                print(f"[DEBUG] Final Score: {final_score:.3f}")
+            # Semantic relevance weight (cosine similarity)
+            semantic_weight = 0.7
+            # Structural similarity weight (L2 distance)
+            structural_weight = 0.3
+            
+            # Calculate weighted combined score
+            combined_score = (
+                (cosine_sim * semantic_weight) + 
+                (l2_sim * structural_weight)
+            ) * length_penalty
+            
+            # Apply additional relevance boosting
+            if any(term.lower() in faq.question.lower() for term in query.split()):
+                combined_score *= 1.2  # Boost exact term matches
+            
+            if combined_score >= min_similarity:
+                print(f"\n[DEBUG] Found relevant FAQ:")
+                print(f"Question: {faq.question[:100]}...")
+                print(f"Answer length: {len(faq.answer)} chars")
+                print(f"Semantic similarity: {cosine_sim:.3f}")
+                print(f"Structural similarity: {l2_sim:.3f}")
+                print(f"Length penalty: {length_penalty:.3f}")
+                print(f"Final score: {combined_score:.3f}")
                 
                 results.append({
                     'question': faq.question,
                     'answer': faq.answer,
-                    'similarity': final_score,
+                    'similarity': combined_score,
                     'metadata': {
-                        'cosine_similarity': cosine_sim,
-                        'l2_similarity': l2_sim,
+                        'cosine_similarity': f"{cosine_sim:.3f}",
+                        'l2_similarity': f"{l2_sim:.3f}",
                         'file_type': faq.file_type,
                         'created_at': faq.created_at.isoformat(),
                         'source': faq.file_path.split('/')[-1] if faq.file_path else 'Direct Input',
                         'length': text_length,
-                        'confidence': f"{final_score:.1%}"
+                        'confidence': f"{combined_score:.1%}",
+                        'relevance_boost': 'Yes' if combined_score > min_similarity * 1.2 else 'No'
                     }
                 })
+            else:
+                print(f"[DEBUG] Skipping FAQ (score too low: {combined_score:.3f})")
         
         # Return top K results after reranking
         return sorted(results, key=lambda x: x['similarity'], reverse=True)[:top_k]
@@ -74,24 +107,35 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 3, min_simi
         print(f"[ERROR] Failed to search knowledge base: {str(e)}")
         return []
 
-def get_relevant_context(query: str, business_id: str, min_similarity: float = 0.7) -> str:
-    """Get relevant context from knowledge base with enhanced formatting"""
+def get_relevant_context(query: str, business_id: str, min_similarity: float = 0.6) -> str:
+    """Get relevant context from knowledge base with enhanced formatting and metadata"""
+    print(f"\n[DEBUG] Getting relevant context for query: {query}")
     results = search_knowledge_base(query, business_id, min_similarity=min_similarity)
+    
     if not results:
+        print("[DEBUG] No relevant context found in knowledge base")
         return ""
     
-    # Build context with metadata and confidence scores
+    print(f"[DEBUG] Building context from {len(results)} relevant results")
+    
+    # Build comprehensive context with detailed metadata
     context_parts = []
-    for result in results:
+    for i, result in enumerate(results, 1):
         metadata = result['metadata']
-        confidence = metadata['confidence']
-        source = metadata['source']
         
+        # Format context with rich metadata
         context_parts.append(
-            f"[Source: {source} | Confidence: {confidence}]\n"
-            f"Q: {result['question']}\n"
-            f"A: {result['answer']}\n"
-            f"---"
+            f"[Context Block {i}]\n"
+            f"Source: {metadata['source']}\n"
+            f"Confidence: {metadata['confidence']}\n"
+            f"Semantic Similarity: {metadata['cosine_similarity']}\n"
+            f"Structural Match: {metadata['l2_similarity']}\n"
+            f"Relevance Boost: {metadata['relevance_boost']}\n"
+            f"Created: {metadata['created_at']}\n"
+            f"Length: {metadata['length']} chars\n"
+            f"\nQuestion: {result['question']}\n"
+            f"Answer: {result['answer']}\n"
+            f"{'='*50}\n"
         )
     
     if not context_parts:
