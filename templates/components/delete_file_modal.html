@@ -14,11 +14,11 @@
                 </p>
             </div>
             <div class="mt-5 flex justify-center space-x-4">
-                <button onclick="confirmFileDelete()" 
+                <button onclick="handleDeleteConfirm()" 
                         class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
                     Delete
                 </button>
-                <button onclick="closeDeleteFileModal()"
+                <button onclick="handleDeleteCancel()"
                         class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                     Cancel
                 </button>
@@ -28,25 +28,24 @@
 </div>
 
 <script>
-let currentFileId = null;
-let currentBusinessId = null;
+let deleteModalState = {
+    fileId: null,
+    businessId: null
+};
 
 function showDeleteFileModal(businessId, fileId) {
-    currentFileId = fileId;
-    currentBusinessId = businessId;
+    deleteModalState.fileId = fileId;
+    deleteModalState.businessId = businessId;
     document.getElementById('deleteFileModal').classList.remove('hidden');
 }
 
-function closeDeleteFileModal() {
+function handleDeleteCancel() {
     document.getElementById('deleteFileModal').classList.add('hidden');
-    currentFileId = null;
-    currentBusinessId = null;
+    deleteModalState = { fileId: null, businessId: null };
 }
 
-function confirmFileDelete() {
-    const modal = document.getElementById('deleteFileModal');
-    const businessId = modal.dataset.businessId;
-    const fileId = modal.dataset.fileId;
+function handleDeleteConfirm() {
+    const { businessId, fileId } = deleteModalState;
     
     if (!fileId || !businessId) {
         console.error('Missing file or business ID');
@@ -67,8 +66,6 @@ function confirmFileDelete() {
             if (fileItem) {
                 fileItem.remove();
             }
-            closeDeleteFileModal();
-            showAlertBanner('File deleted successfully', 'success');
             
             // Update empty state if no files remain
             if (data.remaining_files === 0) {
@@ -77,10 +74,9 @@ function confirmFileDelete() {
                     fileList.innerHTML = '<p class="text-gray-500 text-center">No files uploaded yet</p>';
                 }
             }
-                if (files.length === 0) {
-                    fileList.innerHTML = '<p class="text-gray-500 text-center">No files uploaded yet</p>';
-                }
-            }
+            
+            handleDeleteCancel(); // Close modal and reset state
+            showAlertBanner('File deleted successfully', 'success');
         } else {
             showAlertBanner('Error deleting file');
         }
@@ -92,9 +88,9 @@ function confirmFileDelete() {
 }
 
 // Close modal when clicking outside
-document.getElementById('deleteFileModal')?.addEventListener('click', function(event) {
+document.getElementById('deleteFileModal').addEventListener('click', function(event) {
     if (event.target === this) {
-        closeDeleteFileModal();
+        handleDeleteCancel();
     }
 });
 </script>
