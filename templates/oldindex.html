@@ -275,16 +275,19 @@
             font-size: 0.75rem;
             color: #6b7280;
             pointer-events: none;
-            display: none;
+            opacity: 0;
+            visibility: hidden;
             background: white;
             padding: 2px 6px;
             border-radius: 4px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             z-index: 10;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
         }
 
         .automation-dot:hover .automation-label {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Action buttons */
