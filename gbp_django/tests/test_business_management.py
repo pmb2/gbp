@@ -85,3 +85,42 @@ class BusinessManagementTests(TestCase):
         self.assertEqual(updated.id, existing.id)
         self.assertEqual(updated.business_name, 'Test Business')
         self.assertEqual(updated.business_email, 'test@example.com')
+        
+    def test_bulk_upload_businesses(self):
+        """Test bulk upload of businesses from CSV"""
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        import csv
+        import io
+        
+        # Create test CSV content
+        csv_content = io.StringIO()
+        writer = csv.writer(csv_content)
+        writer.writerow(['Business Name', 'Email', 'Address', 'Phone', 'Website', 'Category'])
+        writer.writerow(['Test Biz 1', 'test1@example.com', '123 Test St', '555-0101', 'test1.com', 'Test Cat 1'])
+        writer.writerow(['Test Biz 2', 'test2@example.com', '456 Test Ave', '555-0102', 'test2.com', 'Test Cat 2'])
+        
+        # Create file object
+        csv_file = SimpleUploadedFile(
+            'test.csv',
+            csv_content.getvalue().encode('utf-8'),
+            content_type='text/csv'
+        )
+        
+        # Call bulk upload view
+        from django.test import Client
+        client = Client()
+        client.force_login(self.user)
+        response = client.post('/api/business/bulk-upload/', {'file': csv_file})
+        
+        # Check response
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(data['processed'], 2)
+        
+        # Verify businesses were created
+        self.assertEqual(Business.objects.count(), 2)
+        biz1 = Business.objects.get(business_name='Test Biz 1')
+        self.assertEqual(biz1.business_email, 'test1@example.com')
+        biz2 = Business.objects.get(business_name='Test Biz 2')
+        self.assertEqual(biz2.business_email, 'test2@example.com')
