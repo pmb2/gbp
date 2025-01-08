@@ -7,20 +7,35 @@ from typing import List, Dict, Any, Optional, Tuple
 def generate_embedding(text: str) -> Optional[List[float]]:
     """Generate embeddings using Ollama's local API"""
     try:
-        # Ensure text is properly formatted
+        # Ensure text is properly formatted and chunked if needed
         text = text.strip().replace('\n', ' ')
+        
+        # If text is too long, take first 8000 chars to avoid token limits
+        if len(text) > 8000:
+            text = text[:8000]
         
         response = requests.post(
             'http://localhost:11434/api/embeddings',
             json={
-                'model': 'mxbai-embed-large',
+                'model': 'nomic-embed-text',  # Switch to nomic model which gives 1536 dims
                 'prompt': text,
-                'options': {'temperature': 0}  # Deterministic embeddings
+                'options': {
+                    'temperature': 0,  # Deterministic embeddings
+                    'num_ctx': 8192    # Increase context window
+                }
             },
-            timeout=10  # Add timeout
+            timeout=30  # Increased timeout for longer texts
         )
         response.raise_for_status()
-        return response.json()['embedding']
+        
+        embedding = response.json()['embedding']
+        
+        # Validate embedding dimensions
+        if len(embedding) != 1536:
+            print(f"[WARNING] Invalid embedding dimensions: got {len(embedding)}, expected 1536")
+            return None
+            
+        return embedding
     except requests.exceptions.RequestException as e:
         print(f"Network error generating embedding: {str(e)}")
         return None
