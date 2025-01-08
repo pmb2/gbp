@@ -120,6 +120,23 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
         except Business.DoesNotExist:
             print(f"[ERROR] No business found with ID: {business_id}")
             return "Business not found"
+
+        # Store chat history as embeddings
+        if chat_history:
+            print("[DEBUG] Processing chat history for embeddings...")
+            for msg in chat_history:
+                try:
+                    # Create FAQ entry for each message pair
+                    if msg['role'] == 'user':
+                        question = msg['content']
+                        # Find corresponding assistant response
+                        idx = chat_history.index(msg)
+                        if idx + 1 < len(chat_history) and chat_history[idx + 1]['role'] == 'assistant':
+                            answer = chat_history[idx + 1]['content']
+                            add_to_knowledge_base(business_id, question, answer)
+                            print(f"[DEBUG] Added Q&A to knowledge base: Q: {question[:50]}...")
+                except Exception as e:
+                    print(f"[WARNING] Failed to add chat history to knowledge base: {str(e)}")
         
         # Build comprehensive business context
         business_context = (
@@ -136,17 +153,17 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             f"• Reviews: {business.reviews_automation}\n"
             f"• Q&A: {business.qa_automation}\n"
         )
-        
-        # Get relevant contexts with enhanced metadata
+
+        # Get relevant knowledge base entries
+        print("[DEBUG] Searching knowledge base for relevant context...")
         faq_results = search_knowledge_base(query, business_id, top_k=5)
         
-        # Build context from relevant documents with confidence levels
-        doc_contexts = []
+        knowledge_context = []
         if faq_results:
+            print(f"[DEBUG] Found {len(faq_results)} relevant knowledge base entries")
             for result in faq_results:
-                metadata = result['metadata']
-                confidence = float(metadata['confidence'].strip('%')) / 100
-                source = metadata['source']
+                confidence = float(result['metadata']['confidence'].strip('%')) / 100
+                source = result['metadata']['source']
                 
                 if confidence >= 0.8:
                     prefix = "🟢 [High Confidence]"
@@ -155,20 +172,40 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
                 else:
                     prefix = "🔴 [Low Confidence]"
                     
-                doc_contexts.append(
+                entry = (
                     f"{prefix} Source: {source}\n"
                     f"Q: {result['question']}\n"
                     f"A: {result['answer']}\n"
                     f"---"
                 )
+                knowledge_context.append(entry)
+                print(f"[DEBUG] Added context from {source} with confidence {confidence:.2%}")
+        else:
+            print("[DEBUG] No relevant knowledge base entries found")
         
-        # Combine all contexts
+        # Combine all contexts with clear sections
         full_context = (
             f"{business_context}\n\n"
-            f"📚 Relevant Information:\n"
+            f"📚 Knowledge Base Context:\n"
             f"{'-' * 40}\n"
-            f"{'\n'.join(doc_contexts) if doc_contexts else 'No specific documentation found for this query.'}"
+            f"{'\n'.join(knowledge_context) if knowledge_context else 'No specific documentation found for this query.'}\n\n"
+            f"💬 Recent Chat Context:\n"
+            f"{'-' * 40}\n"
         )
+
+        # Add recent chat context
+        if chat_history:
+            recent_chats = chat_history[-5:]  # Get last 5 exchanges
+            chat_context = []
+            for msg in recent_chats:
+                prefix = "👤 User:" if msg['role'] == 'user' else "🤖 Assistant:"
+                chat_context.append(f"{prefix} {msg['content']}")
+            full_context += '\n'.join(chat_context)
+        else:
+            full_context += "No previous chat history.\n"
+
+        print("[DEBUG] Final context length:", len(full_context))
+        print("[DEBUG] Context sections:", full_context.count('---'))
         
         # Generate response using chat history
         response = generate_response(query, full_context, chat_history)
