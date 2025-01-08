@@ -23,7 +23,7 @@ from .api.business_management import (
     get_business_accounts, store_business_data, update_business_details
 )
 from .models import (
-    Business, User, Notification, Post, BusinessAttribute, QandA, Review
+    Business, User, Notification, Post, BusinessAttribute, QandA, Review, FAQ
 )
 from .utils.email_service import EmailService
 from .utils.file_processor import store_file_content, process_folder
