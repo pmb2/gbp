@@ -143,12 +143,13 @@
                 </div>
             </div>
             <div class="border-t p-4">
-                <form onsubmit="sendMessage(event, '{{ business.business_id }}')" class="flex space-x-2">
-                    <label for="chat-input-{{ business.business_id }}"></label><input type="text"
-                                                                                      id="chat-input-{{ business.business_id }}"
-                                                                                      class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                                                      placeholder="Type your message...">
-                    <button type="submit"
+                <form onsubmit="handleChatSubmit(event, '{{ business.business_id }}')" class="flex space-x-2">
+                    <label for="chat-input-{{ business.business_id }}"></label>
+                    <input type="text"
+                           id="chat-input-{{ business.business_id }}"
+                           class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Type your message...">
+                    <button type="submit" 
                             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                         Send
                     </button>
