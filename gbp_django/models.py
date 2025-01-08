@@ -197,6 +197,7 @@ class FAQ(models.Model):
     file_path = models.CharField(max_length=255, null=True, blank=True)
     file_type = models.CharField(max_length=50, null=True, blank=True)
     file_size = models.IntegerField(null=True, blank=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
