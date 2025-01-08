@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 import numpy as np
 from django.db.models import Q
-from pgvector.django import CosineDistance
+from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
