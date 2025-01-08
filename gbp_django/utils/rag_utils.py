@@ -6,7 +6,7 @@ from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
 def search_knowledge_base(query: str, business_id: str, top_k: int = 3) -> List[Dict[str, Any]]:
-    """Search knowledge base using vector similarity"""
+    """Enhanced knowledge base search with metadata and multiple similarity metrics"""
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
     
@@ -17,29 +17,46 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 3) -> List[
         return []
         
     try:
-        # Get business and related FAQs using vector similarity
+        # Get business and related FAQs using both cosine and L2 distance
         faqs = FAQ.objects.filter(
-            business_id=business_id
+            business_id=business_id,
+            deleted_at__isnull=True  # Exclude deleted documents
         ).annotate(
-            similarity=CosineDistance('embedding', query_embedding)
+            cosine_similarity=CosineDistance('embedding', query_embedding),
+            l2_distance=L2Distance('embedding', query_embedding)
         ).filter(
             embedding__isnull=False
-        ).order_by('similarity')[:top_k]
+        ).order_by('cosine_similarity')[:top_k]
         
         print(f"[DEBUG] Found {faqs.count()} relevant FAQs")
         
         results = []
         for faq in faqs:
-            similarity = float(faq.similarity)
-            print(f"[DEBUG] FAQ: {faq.question[:50]}... Similarity: {1 - similarity:.3f}")
+            cosine_sim = 1 - float(faq.cosine_similarity)  # Convert distance to similarity
+            l2_sim = 1 / (1 + float(faq.l2_distance))  # Normalize L2 distance to 0-1
+            
+            # Calculate combined similarity score
+            combined_score = (cosine_sim * 0.7) + (l2_sim * 0.3)
+            
+            print(f"[DEBUG] FAQ: {faq.question[:50]}...")
+            print(f"[DEBUG] Cosine Similarity: {cosine_sim:.3f}")
+            print(f"[DEBUG] L2 Similarity: {l2_sim:.3f}")
+            print(f"[DEBUG] Combined Score: {combined_score:.3f}")
             
             results.append({
                 'question': faq.question,
                 'answer': faq.answer,
-                'similarity': 1 - similarity  # Convert distance to similarity
+                'similarity': combined_score,
+                'metadata': {
+                    'cosine_similarity': cosine_sim,
+                    'l2_similarity': l2_sim,
+                    'file_type': faq.file_type,
+                    'created_at': faq.created_at.isoformat(),
+                    'source': faq.file_path.split('/')[-1] if faq.file_path else 'Direct Input'
+                }
             })
         
-        return results
+        return sorted(results, key=lambda x: x['similarity'], reverse=True)
         
     except Exception as e:
         print(f"[ERROR] Failed to search knowledge base: {str(e)}")
@@ -66,30 +83,66 @@ def get_relevant_context(query: str, business_id: str, min_similarity: float = 0
     return context
 
 def answer_question(query: str, business_id: str) -> str:
-    """Generate answer using RAG"""
+    """Generate answer using enhanced RAG with multiple knowledge sources"""
     try:
-        # Get business info for additional context
+        # Get business info
         business = Business.objects.get(business_id=business_id)
+        
+        # Build comprehensive business context
         business_context = (
-            f"Business Name: {business.business_name}\n"
+            f"Business Profile:\n"
+            f"Name: {business.business_name}\n"
             f"Category: {business.category}\n"
             f"Location: {business.address}\n"
+            f"Website: {business.website_url}\n"
+            f"Phone: {business.phone_number}\n"
+            f"Verification Status: {'Verified' if business.is_verified else 'Not Verified'}\n"
+            f"Profile Completion: {business.calculate_profile_completion()}%\n"
+            f"\nAutomation Settings:\n"
+            f"Posts: {business.posts_automation}\n"
+            f"Reviews: {business.reviews_automation}\n"
+            f"Q&A: {business.qa_automation}\n"
         )
         
-        # Get relevant FAQ context
-        faq_context = get_relevant_context(query, business_id)
+        # Get relevant contexts with similarity scores
+        faq_results = search_knowledge_base(query, business_id, top_k=5)
         
-        # Combine contexts
-        full_context = f"{business_context}\n\nRelevant Information:\n{faq_context}"
-        
-        if not faq_context:
-            return (
-                "I don't have enough specific information to answer that question. "
-                "However, I can help you with general inquiries about the business."
+        if not faq_results:
+            # No relevant documents found - use general business context
+            system_prompt = (
+                "You are an AI assistant for a business. "
+                "While I don't have specific documentation about this topic, "
+                "I can help with general business information and questions.\n\n"
+                f"Business Context:\n{business_context}"
             )
+            return generate_response(query, system_prompt)
+            
+        # Build context from relevant documents
+        doc_contexts = []
+        for result in faq_results:
+            similarity = result['similarity']
+            if similarity >= 0.7:  # High relevance
+                doc_contexts.append(f"[High Relevance] {result['question']}\n{result['answer']}")
+            elif similarity >= 0.5:  # Moderate relevance
+                doc_contexts.append(f"[Related] {result['question']}\n{result['answer']}")
+                
+        # Combine all contexts
+        full_context = (
+            f"{business_context}\n\n"
+            f"Relevant Information:\n"
+            f"{'-' * 40}\n"
+            f"{'\n'.join(doc_contexts)}"
+        )
         
-        # Generate response using combined context
-        response = generate_response(query, full_context)
+        # Generate response with enhanced context
+        system_prompt = (
+            "You are an AI assistant for a business. Use the following context to provide "
+            "accurate and helpful responses. If you're not completely sure about something, "
+            "acknowledge the uncertainty while providing the best available information.\n\n"
+            f"Context:\n{full_context}"
+        )
+        
+        response = generate_response(query, system_prompt)
         return response
         
     except Business.DoesNotExist:

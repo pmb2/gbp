@@ -271,20 +271,35 @@ function formatFileSize(bytes) {
         const completion = business.dataset.completion;
         const verified = business.dataset.verified === 'true';
 
-        let summary = `Here's what I know about ${businessName}:\n\n`;
-        summary += `• Profile Status: ${verified ? 'Verified' : 'Not Verified'}\n`;
-        summary += `• Profile Completion: ${completion}%\n`;
+        let summary = `I'm your AI assistant for ${businessName}. Here's what I know:\n\n`;
+        
+        // Business Status
+        summary += `📊 Profile Status:\n`;
+        summary += `• Verification: ${verified ? '✅ Verified' : '⚠️ Not Verified'}\n`;
+        summary += `• Completion: ${completion}% complete\n`;
 
-        // Add automation settings if available
+        // Automation Settings
+        summary += `\n🤖 Automation Settings:\n`;
         const qaStatus = document.querySelector(`[data-feature="qa"][data-position].active`);
         const postsStatus = document.querySelector(`[data-feature="posts"][data-position].active`);
         const reviewsStatus = document.querySelector(`[data-feature="reviews"][data-position].active`);
 
-        if (qaStatus) summary += `• Q&A Automation: ${qaStatus.dataset.position}\n`;
-        if (postsStatus) summary += `• Posts Automation: ${postsStatus.dataset.position}\n`;
-        if (reviewsStatus) summary += `• Reviews Automation: ${reviewsStatus.dataset.position}\n`;
+        if (qaStatus) summary += `• Q&A Responses: ${qaStatus.dataset.position}\n`;
+        if (postsStatus) summary += `• Posts Creation: ${postsStatus.dataset.position}\n`;
+        if (reviewsStatus) summary += `• Review Management: ${reviewsStatus.dataset.position}\n`;
 
-        summary += "\nYou can ask me questions about your business profile, automation settings, or upload documents to enhance my knowledge.";
+        // Knowledge Base Status
+        summary += `\n📚 Knowledge Base:\n`;
+        const fileList = document.getElementById(`file-list-${businessId}`);
+        const fileCount = fileList ? fileList.querySelectorAll('.file-item:not([data-deleted="true"])').length : 0;
+        summary += `• ${fileCount} documents uploaded\n`;
+        
+        summary += `\nI can help you with:\n`;
+        summary += `• Answering questions about your business profile\n`;
+        summary += `• Explaining automation settings and their impact\n`;
+        summary += `• Analyzing uploaded documents and business data\n`;
+        summary += `• Providing insights and recommendations\n\n`;
+        summary += `Feel free to ask me anything!`;
 
         summaryElement.textContent = summary;
     }
