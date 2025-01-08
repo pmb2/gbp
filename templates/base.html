@@ -890,6 +890,8 @@ function formatFileSize(bytes) {
         if (!row || !detailsRow) return;
 
         if (row.dataset.verified !== 'Verified') {
+            // Open Google Business Profile signup in new tab
+            window.open('https://www.google.com/intl/en_us/business/', '_blank');
             return; // Don't allow expansion for unverified businesses
         }
 
