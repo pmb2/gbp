@@ -50,7 +50,7 @@
             </div>
             <div id="file-list-{{ business.business_id }}" class="space-y-2 mb-4 max-h-[300px] overflow-y-auto">
                 {% for faq in business.faqs.all %}
-                    {% if faq.file_path %}
+                    {% if faq.file_path and not faq.deleted_at %}
                         <div class="file-item flex items-center justify-between p-2 hover:bg-gray-100 rounded group" data-file-id="{{ faq.id }}">
                             <div class="flex items-center space-x-2 flex-grow">
                                 <i class="fas fa-file text-gray-400 file-icon"></i>

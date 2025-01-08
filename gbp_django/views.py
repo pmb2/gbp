@@ -846,11 +846,15 @@ def preview_file(request, business_id, file_id):
             from django.utils import timezone
             faq.deleted_at = timezone.now()
             faq.save()
-            return JsonResponse({'status': 'success'})
+            return JsonResponse({
+                'status': 'success',
+                'message': 'File deleted successfully'
+            })
             
     except FAQ.DoesNotExist:
         return JsonResponse({
-            'error': 'File not found'
+            'status': 'error',
+            'message': 'File not found'
         }, status=404)
 
 def add_knowledge(request, business_id):

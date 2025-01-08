@@ -52,14 +52,16 @@ function confirmFileDelete() {
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
         }
     })
-    .then(response => {
-        if (response.ok) {
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
             // Remove the file item from the list
             const fileItem = document.querySelector(`[data-file-id="${currentFileId}"]`);
             if (fileItem) {
                 fileItem.remove();
             }
             closeDeleteFileModal();
+            showAlertBanner('File deleted successfully', 'success');
         } else {
             showAlertBanner('Error deleting file');
         }
