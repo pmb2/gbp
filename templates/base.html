@@ -363,32 +363,33 @@ function formatFileSize(bytes) {
         const completion = business.dataset.completion;
         const verified = business.dataset.verified === 'true';
 
-        let summary = `Welcome! I'm your AI assistant for ${businessName}.\n\n`;
-        summary += `🏢 Business Overview:\n`;
-        summary += `• Name: ${businessName}\n`;
-        summary += `• Status: ${verified ? '✅ Verified Business' : '⚠️ Pending Verification'}\n`;
-        summary += `• Profile Completion: ${completion}%\n\n`;
-
-        summary += `⚙️ Current Settings:\n`;
-        const qaStatus = document.querySelector(`[data-feature="qa"][data-position].active`);
-        const postsStatus = document.querySelector(`[data-feature="posts"][data-position].active`);
-        const reviewsStatus = document.querySelector(`[data-feature="reviews"][data-position].active`);
-
-        summary += `• Q&A Management: ${qaStatus ? qaStatus.dataset.position.charAt(0).toUpperCase() + qaStatus.dataset.position.slice(1) : 'Not set'}\n`;
-        summary += `• Content Creation: ${postsStatus ? postsStatus.dataset.position.charAt(0).toUpperCase() + postsStatus.dataset.position.slice(1) : 'Not set'}\n`;
-        summary += `• Review Responses: ${reviewsStatus ? reviewsStatus.dataset.position.charAt(0).toUpperCase() + reviewsStatus.dataset.position.slice(1) : 'Not set'}\n\n`;
-
-        summary += `📚 Knowledge Base Status:\n`;
+        let summary = `👋 Welcome! I'm your AI assistant for ${businessName}.\n\n`;
+        
+        // Get knowledge base stats
         const fileList = document.getElementById(`file-list-${businessId}`);
         const fileCount = fileList ? fileList.querySelectorAll('.file-item:not([data-deleted="true"])').length : 0;
-        summary += `• ${fileCount} document${fileCount !== 1 ? 's' : ''} available for reference\n\n`;
         
-        summary += `I can assist you with:\n`;
-        summary += `• Managing your business profile and settings\n`;
-        summary += `• Optimizing your automation strategy\n`;
-        summary += `• Analyzing business data and trends\n`;
-        summary += `• Providing actionable recommendations\n\n`;
-        summary += `How can I help you today with ${businessName}?`;
+        // Get FAQ count from database
+        const faqCount = document.querySelector(`[data-faq-count="${businessId}"]`)?.dataset.count || 0;
+        
+        summary += `📚 Knowledge Base Overview:\n`;
+        if (fileCount > 0 || faqCount > 0) {
+            if (fileCount > 0) {
+                summary += `• ${fileCount} uploaded document${fileCount !== 1 ? 's' : ''}\n`;
+            }
+            if (faqCount > 0) {
+                summary += `• ${faqCount} FAQ entr${faqCount !== 1 ? 'ies' : 'y'}\n`;
+            }
+            summary += `\nI've analyzed these materials and can help answer questions about ${businessName}'s operations, policies, and services.\n\n`;
+        } else {
+            summary += `No documents or FAQs have been added yet. You can upload business materials to help me better assist you with ${businessName}.\n\n`;
+        }
+        
+        summary += `💡 How can I help you with ${businessName} today? Feel free to ask about:\n`;
+        summary += `• Business information and policies\n`;
+        summary += `• Customer service scenarios\n`;
+        summary += `• Marketing and promotional strategies\n`;
+        summary += `• Performance insights and recommendations`;
 
         summaryElement.textContent = summary;
     }
