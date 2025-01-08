@@ -70,11 +70,7 @@ class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
     id = models.BigAutoField(primary_key=True)
-    business_id = models.CharField(max_length=255, unique=True, null=True)  # Business identifier
-    google_business_id = models.CharField(max_length=255, null=True, blank=True)  # ID from Google OAuth
-    google_account_id = models.CharField(max_length=255, null=True, blank=True)  # Google account ID
-    google_location_id = models.CharField(max_length=255, null=True, blank=True)  # Location ID from Google
-    google_email = models.EmailField(max_length=255, null=True, blank=True)  # Gmail from OAuth
+    business_id = models.CharField(max_length=255, unique=True)
     business_email = models.EmailField(max_length=255)
     email_verification_token = models.CharField(max_length=100, null=True, blank=True)
     email_verification_pending = models.BooleanField(default=True)
