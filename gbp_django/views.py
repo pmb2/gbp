@@ -828,49 +828,99 @@ from .utils.file_processor import store_file_content, process_folder
 @login_required
 @require_http_methods(["POST"])
 def add_knowledge(request, business_id):
-    """Add new knowledge to the business knowledge base"""
+    """Add new knowledge to the business knowledge base with enhanced error handling"""
     if request.method == 'POST':
         try:
-            # Check if business exists and is verified
-            business = Business.objects.get(business_id=business_id)
+            # Validate business ownership and status
+            try:
+                business = Business.objects.get(business_id=business_id, user=request.user)
+            except Business.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Business not found or access denied'
+                }, status=404)
+
             if not business.is_verified:
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Business must be verified to upload files'
                 }, status=403)
 
-            results = []
+            # Validate file upload
+            if 'files[]' not in request.FILES:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No files were uploaded'
+                }, status=400)
+
             files = request.FILES.getlist('files[]')
+            if not files:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Empty file list'
+                }, status=400)
+
+            # Process files with detailed error tracking
+            results = []
+            errors = []
             
             for file in files:
                 try:
+                    # Validate filename
+                    if not file.name:
+                        raise ValueError("Invalid filename")
+
                     # Handle folder upload
                     if hasattr(file, 'content_type') and file.content_type == 'application/x-directory':
-                        folder_results = process_folder(business_id, file.temporary_file_path())
-                        results.extend(folder_results)
+                        try:
+                            folder_results = process_folder(business_id, file.temporary_file_path())
+                            results.extend(folder_results)
+                        except Exception as e:
+                            errors.append({
+                                'file': file.name,
+                                'error': f"Folder processing failed: {str(e)}"
+                            })
+                            continue
                     else:
                         # Handle single file
-                        result = store_file_content(business_id, file, file.name)
-                        results.append(result)
+                        try:
+                            result = store_file_content(business_id, file, file.name)
+                            results.append(result)
+                        except ValueError as e:
+                            errors.append({
+                                'file': file.name,
+                                'error': str(e)
+                            })
+                        except Exception as e:
+                            errors.append({
+                                'file': file.name,
+                                'error': f"Unexpected error: {str(e)}"
+                            })
+                            continue
+
                 except Exception as e:
-                    print(f"Error processing file {file.name}: {str(e)}")
+                    errors.append({
+                        'file': getattr(file, 'name', 'unknown'),
+                        'error': f"File processing failed: {str(e)}"
+                    })
                     continue
 
-            return JsonResponse({
-                'status': 'success',
-                'message': f'Successfully processed {len(results)} files',
+            # Return response with both results and errors
+            response_data = {
+                'status': 'success' if results else 'error',
+                'message': f'Processed {len(results)} files' + (f' with {len(errors)} errors' if errors else ''),
                 'files': results
-            })
+            }
+            
+            if errors:
+                response_data['errors'] = errors
 
-        except Business.DoesNotExist:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Business not found'
-            }, status=404)
+            return JsonResponse(response_data)
+
         except Exception as e:
             return JsonResponse({
                 'status': 'error',
-                'message': str(e)
+                'message': f'Server error: {str(e)}'
             }, status=500)
 
     return JsonResponse({

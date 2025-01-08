@@ -39,55 +39,103 @@ def process_markdown(content: bytes) -> str:
     return content.decode('utf-8', errors='ignore')
 
 def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[str, Any]:
-    """Store file content and generate embeddings"""
+    """Store file content and generate embeddings with extensive error handling"""
     try:
-        # Read file content
-        content = file_obj.read()
-        mime_type = get_file_mime_type(content)
-
-        # Process based on mime type
-        if mime_type == 'text/plain':
-            text_content = process_text_file(content)
-        elif mime_type == 'application/pdf':
-            text_content = process_pdf(content)
-        elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-            text_content = process_docx(content)
-        elif mime_type == 'text/markdown':
-            text_content = process_markdown(content)
-        else:
-            raise ValueError(f"Unsupported file type: {mime_type}")
-
-        # Generate embedding
-        embedding = generate_embedding(text_content)
-        if not embedding:
-            raise ValueError("Failed to generate embedding")
-
-        # Store in database
-        business = Business.objects.get(business_id=business_id)
+        # Validate file size (10MB limit)
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+        file_obj.seek(0, 2)  # Seek to end
+        file_size = file_obj.tell()
+        file_obj.seek(0)  # Reset to beginning
         
-        # Store file in storage
-        file_path = f'knowledge_base/{business_id}/{filename}'
-        saved_path = default_storage.save(file_path, ContentFile(content))
+        if file_size > MAX_FILE_SIZE:
+            raise ValueError(f"File size exceeds limit of {MAX_FILE_SIZE/1024/1024}MB")
 
-        # Create FAQ entry
-        faq = FAQ.objects.create(
-            business=business,
-            question=f"Content from file: {filename}",
-            answer=text_content,
-            embedding=embedding
-        )
+        # Read file content with timeout
+        try:
+            content = file_obj.read()
+        except Exception as e:
+            raise IOError(f"Failed to read file content: {str(e)}")
+
+        # Validate file type
+        try:
+            mime_type = get_file_mime_type(content)
+        except Exception as e:
+            raise ValueError(f"Failed to determine file type: {str(e)}")
+
+        # Process content based on mime type
+        try:
+            if mime_type == 'text/plain':
+                text_content = process_text_file(content)
+            elif mime_type == 'application/pdf':
+                text_content = process_pdf(content)
+            elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+                text_content = process_docx(content)
+            elif mime_type == 'text/markdown':
+                text_content = process_markdown(content)
+            else:
+                raise ValueError(f"Unsupported file type: {mime_type}")
+        except Exception as e:
+            raise ValueError(f"Failed to process file content: {str(e)}")
+
+        # Validate text content
+        if not text_content or len(text_content.strip()) == 0:
+            raise ValueError("Extracted text content is empty")
+
+        # Generate embedding with validation
+        try:
+            embedding = generate_embedding(text_content)
+            if not embedding:
+                raise ValueError("Failed to generate embedding")
+            if len(embedding) != 1536:  # Validate embedding dimensions
+                raise ValueError(f"Invalid embedding dimensions: expected 1536, got {len(embedding)}")
+        except Exception as e:
+            raise ValueError(f"Embedding generation failed: {str(e)}")
+
+        # Verify business exists
+        try:
+            business = Business.objects.get(business_id=business_id)
+        except Business.DoesNotExist:
+            raise ValueError(f"Business with ID {business_id} not found")
+
+        # Store file safely
+        try:
+            file_path = f'knowledge_base/{business_id}/{filename}'
+            saved_path = default_storage.save(file_path, ContentFile(content))
+        except Exception as e:
+            raise IOError(f"Failed to store file: {str(e)}")
+
+        # Create FAQ entry with file metadata
+        try:
+            faq = FAQ.objects.create(
+                business=business,
+                question=f"Content from file: {filename}",
+                answer=text_content,
+                embedding=embedding,
+                file_path=saved_path,
+                file_type=mime_type,
+                file_size=file_size
+            )
+        except Exception as e:
+            # Cleanup stored file if FAQ creation fails
+            default_storage.delete(saved_path)
+            raise ValueError(f"Failed to create FAQ entry: {str(e)}")
 
         return {
             'id': faq.id,
             'name': filename,
-            'size': len(content),
+            'size': file_size,
             'type': mime_type,
             'path': saved_path
         }
 
-    except Exception as e:
+    except (ValueError, IOError) as e:
+        # Log specific error types
         print(f"Error processing file {filename}: {str(e)}")
         raise
+    except Exception as e:
+        # Log unexpected errors
+        print(f"Unexpected error processing file {filename}: {str(e)}")
+        raise ValueError(f"Unexpected error: {str(e)}")
 
 def process_folder(business_id: str, folder_path: str) -> List[Dict[str, Any]]:
     """Process all files in a folder"""
