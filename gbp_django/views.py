@@ -844,11 +844,20 @@ def preview_file(request, business_id, file_id):
             })
         elif request.method == "DELETE":
             from django.utils import timezone
+            from django.utils import timezone
             faq.deleted_at = timezone.now()
-            faq.save()
+            faq.save(update_fields=['deleted_at'])
+            
+            # Count remaining files
+            remaining_files = FAQ.objects.filter(
+                business__business_id=business_id,
+                deleted_at__isnull=True
+            ).count()
+            
             return JsonResponse({
                 'status': 'success',
-                'message': 'File deleted successfully'
+                'message': 'File deleted successfully',
+                'remaining_files': remaining_files
             })
             
     except FAQ.DoesNotExist:

@@ -62,6 +62,15 @@ function confirmFileDelete() {
             }
             closeDeleteFileModal();
             showAlertBanner('File deleted successfully', 'success');
+            
+            // Refresh the file list
+            const fileList = document.getElementById(`file-list-${currentBusinessId}`);
+            if (fileList) {
+                const files = Array.from(fileList.children).filter(item => !item.classList.contains('deleted'));
+                if (files.length === 0) {
+                    fileList.innerHTML = '<p class="text-gray-500 text-center">No files uploaded yet</p>';
+                }
+            }
         } else {
             showAlertBanner('Error deleting file');
         }
