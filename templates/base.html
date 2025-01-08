@@ -354,14 +354,31 @@ function formatFileSize(bytes) {
 
     // Define UpdateBusinessSummary in the global scope (for use in business_details.html)
     window.UpdateBusinessSummary = function (businessId) {
+        console.log('[DEBUG] UpdateBusinessSummary called for business ID:', businessId);
+        
         const summaryElement = document.getElementById(`business-summary-${businessId}`);
         const business = document.querySelector(`[data-business-id="${businessId}"]`);
 
-        if (!business) return;
+        if (!business) {
+            console.error('[ERROR] Business element not found');
+            return;
+        }
 
-        const businessName = business.querySelector('.font-medium').textContent;
+        const businessNameElement = business.querySelector('.font-medium');
+        if (!businessNameElement) {
+            console.error('[ERROR] Business name element not found');
+            return;
+        }
+
+        const businessName = businessNameElement.textContent.trim();
         const completion = business.dataset.completion;
         const verified = business.dataset.verified === 'true';
+
+        console.log('[DEBUG] Business details:', {
+            businessName,
+            completion,
+            verified
+        });
 
         let summary = `👋 Welcome! I'm your AI assistant for ${businessName}.\n\n`;
         
