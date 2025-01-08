@@ -879,7 +879,7 @@ function formatFileSize(bytes) {
     document.addEventListener('DOMContentLoaded', initTheme);
 
     // Business details toggle functionality
-    function toggleBusinessDetails(businessId) {
+    function toggleBusinessDetails(businessId, event) {
         if (!businessId) return;
 
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
@@ -889,7 +889,8 @@ function formatFileSize(bytes) {
 
         if (!row || !detailsRow) return;
 
-        if (row.dataset.verified !== 'Verified') {
+        // If unverified and clicked directly (not from another function)
+        if (row.dataset.verified !== 'Verified' && event) {
             // Open Google Business Profile signup in new tab
             window.open('https://www.google.com/intl/en_us/business/', '_blank');
             return; // Don't allow expansion for unverified businesses
