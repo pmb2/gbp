@@ -842,7 +842,8 @@ def preview_file(request, business_id, file_id):
                 'name': faq.file_path.split('/')[-1] if faq.file_path else 'Unknown',
                 'content': faq.answer
             })
-        else:  # DELETE
+        elif request.method == "DELETE":
+            from django.utils import timezone
             faq.deleted_at = timezone.now()
             faq.save()
             return JsonResponse({'status': 'success'})
