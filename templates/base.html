@@ -35,6 +35,62 @@
 
 {% block extra_body %}{% endblock %}
 
+<script>
+function handleDragOver(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = 'copy';
+    event.currentTarget.classList.add('drag-over');
+}
+
+function handleDragEnter(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.add('drag-over');
+}
+
+function handleDragLeave(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.remove('drag-over');
+}
+
+function handleFileDrop(event, businessId) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.classList.remove('drag-over');
+
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('files[]', files[i]);
+        }
+
+        fetch(`/api/business/${businessId}/knowledge/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Files uploaded successfully!');
+                // Refresh file list if needed
+            } else {
+                alert('Error uploading files: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error uploading files');
+        });
+    }
+}
+</script>
+
 {% include 'components/feedback_button.html' %}
 {% include 'components/compliance_modal.html' %}
 {% include 'components/seo_health_modal.html' %}
