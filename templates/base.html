@@ -464,21 +464,19 @@ function formatFileSize(bytes) {
 
         // Add active class and color to clicked button
         clickedButton.classList.add('active');
-
-        // Add color based on feature
-        switch (feature) {
-            case 'qa':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-blue-500');
-                break;
-            case 'posts':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-purple-500');
-                break;
-            case 'reviews':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-green-500');
-                break;
+ 
+        // Add color based on feature using if/else if/else
+        if (feature === 'qa') {
+            clickedButton.classList.remove('bg-white');
+            clickedButton.classList.add('bg-blue-500');
+        } else if (feature === 'posts') {
+            clickedButton.classList.remove('bg-white');
+            clickedButton.classList.add('bg-purple-500');
+        } else if (feature === 'reviews') {
+            clickedButton.classList.remove('bg-white');
+            clickedButton.classList.add('bg-green-500');
+        } else {
+            console.error('Invalid feature:', feature);
         }
 
         // Save to database via API
