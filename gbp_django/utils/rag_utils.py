@@ -5,25 +5,29 @@ from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
-def search_knowledge_base(query: str, business_id: str, top_k: int = 5, min_similarity: float = 0.6) -> List[Dict[str, Any]]:
-    """Enhanced knowledge base search with metadata and multiple similarity metrics"""
+def search_knowledge_base(query: str, business_id: str, top_k: int = 8, min_similarity: float = 0.4) -> List[Dict[str, Any]]:
+    """Enhanced knowledge base search with comprehensive similarity scoring and metadata"""
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
     print(f"[DEBUG] Minimum similarity threshold: {min_similarity}")
     
-    # Generate embedding for query with retries
-    attempts = 3
-    query_embedding = None
+    # Generate multiple query embeddings with different prompts
+    query_embeddings = []
+    prompts = [
+        query,  # Original query
+        f"Information about: {query}",  # Broader context
+        f"Details regarding: {query}",  # Alternative phrasing
+        f"Find content related to: {query}"  # Semantic search
+    ]
     
-    for attempt in range(attempts):
-        query_embedding = generate_embedding(query)
-        if query_embedding:
-            print(f"[DEBUG] Successfully generated query embedding on attempt {attempt + 1}")
-            break
-        print(f"[WARNING] Failed to generate embedding, attempt {attempt + 1}/{attempts}")
+    for prompt in prompts:
+        embedding = generate_embedding(prompt)
+        if embedding:
+            query_embeddings.append(embedding)
+            print(f"[DEBUG] Generated embedding for prompt: {prompt[:50]}...")
     
-    if not query_embedding:
-        print("[ERROR] Failed to generate query embedding after all attempts")
+    if not query_embeddings:
+        print("[ERROR] Failed to generate any query embeddings")
         return []
         
     try:
@@ -35,43 +39,65 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 5, min_simi
             print(f"[ERROR] Business not found with ID: {business_id}")
             return []
         
-        # Get related FAQs using multiple similarity metrics
-        print("[DEBUG] Querying knowledge base with vector similarity search...")
-        faqs = FAQ.objects.filter(
-            business=business,
-            deleted_at__isnull=True,
-            embedding__isnull=False
-        ).annotate(
-            cosine_similarity=CosineDistance('embedding', query_embedding),
-            l2_distance=L2Distance('embedding', query_embedding)
-        ).order_by('cosine_similarity')[:top_k * 3]  # Get more candidates for comprehensive reranking
+        # Get related FAQs using multiple similarity metrics and embeddings
+        print("[DEBUG] Querying knowledge base with enhanced vector similarity search...")
+        all_results = []
         
-        print(f"[DEBUG] Retrieved {faqs.count()} initial candidate FAQs")
+        for query_embedding in query_embeddings:
+            faqs = FAQ.objects.filter(
+                business=business,
+                deleted_at__isnull=True,
+                embedding__isnull=False
+            ).annotate(
+                cosine_similarity=CosineDistance('embedding', query_embedding),
+                l2_distance=L2Distance('embedding', query_embedding)
+            ).order_by('cosine_similarity')[:top_k * 2]
+            
+            all_results.extend(faqs)
+        
+        print(f"[DEBUG] Retrieved {len(all_results)} total candidate FAQs")
+        
+        # Deduplicate results while keeping highest scores
+        seen_ids = set()
+        unique_results = []
+        for faq in all_results:
+            if faq.id not in seen_ids:
+                seen_ids.add(faq.id)
+                unique_results.append(faq)
         
         results = []
-        for faq in faqs:
-            # Calculate comprehensive similarity scores
+        for faq in unique_results:
+            # Calculate enhanced similarity scores
             cosine_sim = 1 - float(faq.cosine_similarity)
             l2_sim = 1 / (1 + float(faq.l2_distance))
             
-            # Enhanced scoring with multiple factors
+            # Content-based scoring factors
             text_length = len(faq.question) + len(faq.answer)
-            length_penalty = min(1.0, 1000 / max(500, text_length))
+            length_bonus = min(1.2, max(0.8, text_length / 1000))  # Favor longer, more detailed content
             
-            # Semantic relevance weight (cosine similarity)
-            semantic_weight = 0.7
-            # Structural similarity weight (L2 distance)
-            structural_weight = 0.3
+            # Term matching score
+            query_terms = set(query.lower().split())
+            content_terms = set((faq.question + " " + faq.answer).lower().split())
+            term_overlap = len(query_terms & content_terms) / len(query_terms) if query_terms else 0
             
-            # Calculate weighted combined score
+            # Semantic relevance weights
+            semantic_weight = 0.5  # Cosine similarity
+            structural_weight = 0.3  # L2 distance
+            term_weight = 0.2  # Term matching
+            
+            # Calculate comprehensive score
             combined_score = (
-                (cosine_sim * semantic_weight) + 
-                (l2_sim * structural_weight)
-            ) * length_penalty
+                (cosine_sim * semantic_weight) +
+                (l2_sim * structural_weight) +
+                (term_overlap * term_weight)
+            ) * length_bonus
             
             # Apply additional relevance boosting
             if any(term.lower() in faq.question.lower() for term in query.split()):
-                combined_score *= 1.2  # Boost exact term matches
+                combined_score *= 1.3  # Higher boost for question matches
+            
+            if any(term.lower() in faq.answer.lower() for term in query.split()):
+                combined_score *= 1.2  # Boost for answer matches
             
             if combined_score >= min_similarity:
                 print(f"\n[DEBUG] Found relevant FAQ:")
