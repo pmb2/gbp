@@ -535,11 +535,30 @@ def bulk_upload_businesses(request):
         # Process CSV/Excel file
         if file.name.endswith('.csv'):
             import csv
-            decoded_file = file.read().decode('utf-8').splitlines()
-            reader = csv.DictReader(decoded_file)
+            file_content = file.read()
+            if file_content is None:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'Empty or invalid file uploaded'
+                }, status=400)
+            
+            try:
+                decoded_file = file_content.decode('utf-8').splitlines()
+                reader = csv.DictReader(decoded_file)
+            except UnicodeDecodeError:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': 'Invalid CSV file encoding. Please ensure the file is UTF-8 encoded.'
+                }, status=400)
         else:
-            import pandas as pd
-            reader = pd.read_excel(file).to_dict('records')
+            try:
+                import pandas as pd
+                reader = pd.read_excel(file).to_dict('records')
+            except Exception as e:
+                return JsonResponse({
+                    'status': 'error',
+                    'error': f'Error reading Excel file: {str(e)}'
+                }, status=400)
 
         processed = 0
         for row in reader:
