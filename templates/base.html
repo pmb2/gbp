@@ -517,16 +517,6 @@ function formatFileSize(bytes) {
         }
     }
 
-    function revertButtonState(buttons, activeButton) {
-        buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-        if (activeButton.classList.contains('active')) {
-            activeButton.classList.remove('active');
-        }
-    }
-
     // Initialize functions when DOM loads
     document.addEventListener('DOMContentLoaded', function () {
         console.log('🌟 Initializing dashboard functions');
