@@ -733,13 +733,23 @@ function formatFileSize(bytes) {
 
     // Automation settings functionality
     function setAutomation(feature, level, businessId) {
-        // Get all buttons for this feature and business
+        console.log('[DEBUG] setAutomation called:', { feature, level, businessId });
+        
         const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
 
-        // Remove active class and background from all buttons for this feature
+        if (!clickedButton) {
+            console.error('[ERROR] Clicked button not found');
+            return;
+        }
+
+        // Show loading state
+        clickedButton.style.opacity = '0.5';
+        clickedButton.style.pointerEvents = 'none';
+
+        // Remove active class and colors from all buttons
         buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
             btn.classList.add('bg-white');
         });
 
