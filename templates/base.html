@@ -548,47 +548,83 @@ function formatFileSize(bytes) {
         }
     }
 
-    // Make sure the function is available after DOM loads
+    // Initialize functions when DOM loads
     document.addEventListener('DOMContentLoaded', function () {
-        console.log('🌟 toggleBusinessDetails function initialized');
-        if (typeof window.toggleBusinessDetails === 'function') {
-            console.log('✅ Function is properly defined in global scope');
-        } else {
-            console.error('❌ Function not found in global scope');
-        }
-
-        // Call sortBusinessRows after DOM is fully loaded
+        console.log('🌟 Initializing dashboard functions');
+        
+        // Initialize business row sorting
         function sortBusinessRows() {
-            console.log('sortBusinessRows called');
+            console.log('📊 Sorting business rows...');
             const tbody = document.querySelector('.business-table tbody');
-            if (tbody) {
-                const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-
-                rows.sort((a, b) => {
-                    const aVerified = a.dataset.verified === 'true';
-                    const bVerified = b.dataset.verified === 'true';
-                    const aCompletion = parseInt(a.dataset.completion) || 0;
-                    const bCompletion = parseInt(b.dataset.completion) || 0;
-
-                    if (aVerified !== bVerified) return aVerified ? 1 : -1;
-                    return aCompletion - bCompletion;
-                });
-
-                rows.forEach(row => {
-                    tbody.appendChild(row);
-                    const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-                    if (detailsRow) tbody.appendChild(detailsRow);
-                });
-            } else {
-                console.error("❌ tbody element not found. Cannot sort business rows.");
+            if (!tbody) {
+                console.error('❌ Business table not found');
+                return;
             }
+
+            const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
+            rows.sort((a, b) => {
+                const aVerified = a.dataset.verified === 'true';
+                const bVerified = b.dataset.verified === 'true';
+                const aCompletion = parseInt(a.dataset.completion) || 0;
+                const bCompletion = parseInt(b.dataset.completion) || 0;
+
+                if (aVerified !== bVerified) return aVerified ? 1 : -1;
+                return aCompletion - bCompletion;
+            });
+
+            rows.forEach(row => {
+                tbody.appendChild(row);
+                const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+                if (detailsRow) tbody.appendChild(detailsRow);
+            });
+            
+            console.log('✅ Business rows sorted successfully');
         }
 
-        // Call sortBusinessRows after DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', sortBusinessRows);
-    });
+        // Initialize business details toggle
+        window.toggleBusinessDetails = function(businessId, event) {
+            if (event) event.stopPropagation();
+            if (!businessId) {
+                console.error('❌ No business ID provided');
+                return;
+            }
 
+            const row = document.querySelector(`[data-business-id="${businessId}"]`);
+            const detailsRow = document.getElementById(`details-${businessId}`);
+            
+            if (!row || !detailsRow) {
+                console.error('❌ Required elements not found');
+                return;
+            }
+
+            // Handle unverified businesses
+            if (row.dataset.verified !== 'true' && event) {
+                showVerificationPromptModal();
+                return;
+            }
+
+            // Close other expanded rows
+            document.querySelectorAll('.expanded-content').forEach(otherRow => {
+                if (otherRow.id !== `details-${businessId}`) {
+                    otherRow.style.display = 'none';
+                }
+            });
+
+            // Toggle current row
+            const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
+            detailsRow.style.display = isExpanding ? 'table-row' : 'none';
+
+            // Update business summary if expanding
+            if (isExpanding) {
+                UpdateBusinessSummary(businessId);
+                SwitchTab(businessId, 'details');
+            }
+        };
+
+        // Run initial sort
         sortBusinessRows();
+        
+        console.log('✅ Dashboard initialization complete');
     });
 
     // Automation settings functionality 
