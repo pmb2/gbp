@@ -44,9 +44,16 @@ function closeDeleteFileModal() {
 }
 
 function confirmFileDelete() {
-    if (!currentFileId || !currentBusinessId) return;
+    const modal = document.getElementById('deleteFileModal');
+    const businessId = modal.dataset.businessId;
+    const fileId = modal.dataset.fileId;
     
-    fetch(`/api/business/${currentBusinessId}/files/${currentFileId}/preview/`, {
+    if (!fileId || !businessId) {
+        console.error('Missing file or business ID');
+        return;
+    }
+    
+    fetch(`/api/business/${businessId}/files/${fileId}/preview/`, {
         method: 'DELETE',
         headers: {
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -56,17 +63,20 @@ function confirmFileDelete() {
     .then(data => {
         if (data.status === 'success') {
             // Remove the file item from the list
-            const fileItem = document.querySelector(`[data-file-id="${currentFileId}"]`);
+            const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
             if (fileItem) {
                 fileItem.remove();
             }
             closeDeleteFileModal();
             showAlertBanner('File deleted successfully', 'success');
             
-            // Refresh the file list
-            const fileList = document.getElementById(`file-list-${currentBusinessId}`);
-            if (fileList) {
-                const files = Array.from(fileList.children).filter(item => !item.classList.contains('deleted'));
+            // Update empty state if no files remain
+            if (data.remaining_files === 0) {
+                const fileList = document.getElementById(`file-list-${businessId}`);
+                if (fileList) {
+                    fileList.innerHTML = '<p class="text-gray-500 text-center">No files uploaded yet</p>';
+                }
+            }
                 if (files.length === 0) {
                     fileList.innerHTML = '<p class="text-gray-500 text-center">No files uploaded yet</p>';
                 }
