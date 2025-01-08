@@ -24,13 +24,36 @@ function previewFile(businessId, fileId) {
         .then(response => response.json())
         .then(data => {
             fileName.textContent = data.name;
-            contentArea.innerHTML = `<pre class="whitespace-pre-wrap p-4">${data.content}</pre>`;
+            contentArea.innerHTML = `
+                <pre class="whitespace-pre-wrap p-4">${data.content}</pre>
+                <div class="flex justify-end mt-4">
+                    <button onclick="showDeleteFileModal('${businessId}', ${fileId})" 
+                            class="text-red-600 hover:text-red-700 font-medium">
+                        Delete File
+                    </button>
+                </div>
+            `;
             modal.classList.remove('hidden');
         })
         .catch(error => {
             showAlertBanner('Error loading file preview');
             console.error('Error:', error);
         });
+}
+
+function showDeleteFileModal(businessId, fileId) {
+    // Close the preview modal first
+    closeFilePreview();
+    
+    // Show the delete confirmation modal
+    const deleteModal = document.getElementById('deleteFileModal');
+    if (deleteModal) {
+        deleteModal.classList.remove('hidden');
+        
+        // Store the IDs for use in confirmFileDelete
+        deleteModal.dataset.businessId = businessId;
+        deleteModal.dataset.fileId = fileId;
+    }
 }
 
 function closeFilePreview() {
