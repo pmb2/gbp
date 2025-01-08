@@ -98,13 +98,13 @@ def get_relevant_context(query: str, business_id: str, min_similarity: float = 0
     print(f"[DEBUG] Generated context length: {len(context)}")
     return context
 
-def answer_question(query: str, business_id: str) -> str:
-    """Generate answer using enhanced RAG with multiple knowledge sources and improved prompting"""
+def answer_question(query: str, business_id: str, chat_history: List[Dict[str, str]] = None) -> str:
+    """Generate answer using enhanced RAG with chat history and memory"""
     try:
         # Get business info
         business = Business.objects.get(business_id=business_id)
         
-        # Build comprehensive business context with emojis for better readability
+        # Build comprehensive business context
         business_context = (
             f"🏢 Business Profile:\n"
             f"• Name: {business.business_name}\n"
@@ -123,60 +123,45 @@ def answer_question(query: str, business_id: str) -> str:
         # Get relevant contexts with enhanced metadata
         faq_results = search_knowledge_base(query, business_id, top_k=5)
         
-        if not faq_results:
-            # No relevant documents found - use general business context with clear disclaimer
-            system_prompt = (
-                "You are an AI assistant for a business. Be helpful while clearly indicating "
-                "when you're providing general information versus specific business details.\n\n"
-                "Note: For this question, I don't have specific documentation, but I can help "
-                "based on the general business information available.\n\n"
-                f"Business Context:\n{business_context}"
-            )
-            return generate_response(query, system_prompt)
-            
         # Build context from relevant documents with confidence levels
         doc_contexts = []
-        for result in faq_results:
-            metadata = result['metadata']
-            confidence = float(metadata['confidence'].strip('%')) / 100
-            source = metadata['source']
-            
-            if confidence >= 0.8:  # High confidence
-                prefix = "🟢 [High Confidence]"
-            elif confidence >= 0.6:  # Medium confidence
-                prefix = "🟡 [Moderate Confidence]"
-            else:  # Low confidence
-                prefix = "🔴 [Low Confidence]"
+        if faq_results:
+            for result in faq_results:
+                metadata = result['metadata']
+                confidence = float(metadata['confidence'].strip('%')) / 100
+                source = metadata['source']
                 
-            doc_contexts.append(
-                f"{prefix} Source: {source}\n"
-                f"Q: {result['question']}\n"
-                f"A: {result['answer']}\n"
-                f"---"
-            )
-                
-        # Combine all contexts with clear sections
+                if confidence >= 0.8:
+                    prefix = "🟢 [High Confidence]"
+                elif confidence >= 0.6:
+                    prefix = "🟡 [Moderate Confidence]"
+                else:
+                    prefix = "🔴 [Low Confidence]"
+                    
+                doc_contexts.append(
+                    f"{prefix} Source: {source}\n"
+                    f"Q: {result['question']}\n"
+                    f"A: {result['answer']}\n"
+                    f"---"
+                )
+        
+        # Combine all contexts
         full_context = (
             f"{business_context}\n\n"
             f"📚 Relevant Information:\n"
             f"{'-' * 40}\n"
-            f"{'\n'.join(doc_contexts)}"
+            f"{'\n'.join(doc_contexts) if doc_contexts else 'No specific documentation found for this query.'}"
         )
         
-        # Generate response with enhanced prompt
-        system_prompt = (
-            "You are an AI assistant for a business. Follow these guidelines:\n"
-            "1. Use the provided context to give accurate, helpful responses\n"
-            "2. Clearly indicate confidence levels when citing information\n"
-            "3. If uncertain, acknowledge it and explain your reasoning\n"
-            "4. Prioritize high-confidence sources but consider all relevant context\n"
-            "5. Keep responses professional but conversational\n\n"
-            f"Context:\n{full_context}"
-        )
+        # Generate response using chat history
+        response = generate_response(query, full_context, chat_history)
         
-        response = generate_response(query, system_prompt)
+        # Store the interaction in chat history
+        if chat_history is not None:
+            chat_history.append({'role': 'user', 'content': query})
+            chat_history.append({'role': 'assistant', 'content': response})
         
-        # Add source attribution footer if relevant documents were found
+        # Add source attribution if relevant documents were found
         if doc_contexts:
             response += "\n\n[Response based on business documentation and profile information]"
         

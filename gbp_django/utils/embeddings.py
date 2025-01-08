@@ -49,33 +49,47 @@ def generate_embedding(text: str) -> Optional[List[float]]:
         print(f"Error generating embedding: {str(e)}")
         return None
 
-def generate_response(query: str, context: str) -> str:
-    """Generate response using Groq's API"""
+def generate_response(query: str, context: str, chat_history: List[Dict[str, str]] = None) -> str:
+    """Generate response using Groq's LLaMA API with chat history"""
     try:
+        # Format chat history if provided
+        formatted_history = ""
+        if chat_history:
+            for msg in chat_history[-5:]:  # Only use last 5 messages for context
+                formatted_history += f"{msg['role']}: {msg['content']}\n"
+
         system_prompt = (
-            "You are a helpful AI assistant for a business. "
-            "Use the provided context to answer questions accurately and professionally. "
-            "If you're not sure about something, say so rather than making assumptions.\n\n"
-            f"Context: {context}\n\n"
-            "Instructions: Answer the user's question based on the above context."
+            "You are an AI assistant for a business automation platform. "
+            "You have access to the business's profile information, documents, and chat history. "
+            "Use the provided context to give accurate, professional responses. "
+            "If uncertain, acknowledge the limitations of your knowledge.\n\n"
+            f"Business Context: {context}\n\n"
+            f"Previous Conversation:\n{formatted_history}\n"
+            "Instructions: Provide a helpful response based on the context and chat history."
         )
         
         response = requests.post(
-            'https://api.groq.com/v1/completions',
+            'https://api.groq.com/v1/chat/completions',
             json={
-                'model': 'llama3',
-                'prompt': query,
-                'system_prompt': system_prompt,
+                'model': 'llama-3.3-70b-versatile',
+                'messages': [
+                    {'role': 'system', 'content': system_prompt},
+                    *([{'role': m['role'], 'content': m['content']} for m in chat_history] if chat_history else []),
+                    {'role': 'user', 'content': query}
+                ],
                 'temperature': 0.7,
-                'max_tokens': 500,
+                'max_tokens': 1000,
                 'top_p': 0.9,
-                'stop': ['User:', 'Assistant:']
+                'stream': False
             },
-            headers={'Authorization': f'Bearer {settings.GROQ_API_KEY}'},
-            timeout=15
+            headers={
+                'Authorization': f'Bearer {settings.GROQ_API_KEY}',
+                'Content-Type': 'application/json'
+            },
+            timeout=30
         )
         response.raise_for_status()
-        return response.json()['choices'][0]['text'].strip()
+        return response.json()['choices'][0]['message']['content'].strip()
     except requests.exceptions.RequestException as e:
         print(f"Network error generating response: {str(e)}")
         return "I apologize, but I'm experiencing connectivity issues. Please try again in a moment."
