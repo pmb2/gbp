@@ -581,9 +581,14 @@ function formatFileSize(bytes) {
             console.log('✅ Business rows sorted successfully');
         }
 
-        // Initialize business details toggle
+        // Initialize business details toggle with enhanced arrow handling
         window.toggleBusinessDetails = function(businessId, event) {
-            if (event) event.stopPropagation();
+            console.log('🔄 Toggling business details:', businessId);
+            
+            if (event) {
+                event.stopPropagation();
+            }
+            
             if (!businessId) {
                 console.error('❌ No business ID provided');
                 return;
@@ -591,6 +596,7 @@ function formatFileSize(bytes) {
 
             const row = document.querySelector(`[data-business-id="${businessId}"]`);
             const detailsRow = document.getElementById(`details-${businessId}`);
+            const arrow = document.getElementById(`arrow-${businessId}`);
             
             if (!row || !detailsRow) {
                 console.error('❌ Required elements not found');
@@ -603,16 +609,46 @@ function formatFileSize(bytes) {
                 return;
             }
 
-            // Close other expanded rows
+            // Close other expanded rows first
             document.querySelectorAll('.expanded-content').forEach(otherRow => {
                 if (otherRow.id !== `details-${businessId}`) {
                     otherRow.style.display = 'none';
+                    
+                    // Reset other arrows
+                    const otherId = otherRow.id.split('-')[1];
+                    const otherArrow = document.getElementById(`arrow-${otherId}`);
+                    if (otherArrow) {
+                        otherArrow.style.transform = 'rotate(0deg)';
+                        const otherSvg = otherArrow.querySelector('svg');
+                        if (otherSvg) {
+                            otherSvg.classList.remove('text-blue-500');
+                            otherSvg.classList.add('text-gray-500');
+                        }
+                    }
                 }
             });
 
             // Toggle current row
             const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
             detailsRow.style.display = isExpanding ? 'table-row' : 'none';
+
+            // Update arrow
+            if (arrow) {
+                const arrowSvg = arrow.querySelector('svg');
+                if (isExpanding) {
+                    arrow.style.transform = 'rotate(90deg)';
+                    if (arrowSvg) {
+                        arrowSvg.classList.remove('text-gray-500');
+                        arrowSvg.classList.add('text-blue-500');
+                    }
+                } else {
+                    arrow.style.transform = 'rotate(0deg)';
+                    if (arrowSvg) {
+                        arrowSvg.classList.remove('text-blue-500');
+                        arrowSvg.classList.add('text-gray-500');
+                    }
+                }
+            }
 
             // Update business summary if expanding
             if (isExpanding) {
