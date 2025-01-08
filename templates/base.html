@@ -946,20 +946,27 @@ function formatFileSize(bytes) {
 
     // Business details toggle functionality
     function toggleBusinessDetails(businessId, event) {
-        if (!businessId) return;
+        console.log('🔄 Toggling business details:', businessId);
+        
+        if (!businessId) {
+            console.error('❌ No business ID provided');
+            return;
+        }
 
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
         const detailsRow = document.getElementById(`details-${businessId}`);
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
 
-        if (!row || !detailsRow) return;
+        if (!row || !detailsRow) {
+            console.error('❌ Required elements not found');
+            return;
+        }
 
-        // If unverified and clicked directly (not from another function)
-        if (row.dataset.verified !== 'Verified' && event) {
-            // Open Google Business Profile signup in new tab
-            window.open('https://www.google.com/intl/en_us/business/', '_blank');
-            return; // Don't allow expansion for unverified businesses
+        // Handle unverified businesses
+        if (row.dataset.verified === 'Not Verified' && event) {
+            showVerificationPromptModal();
+            return;
         }
 
         // Update business name in header if it exists
