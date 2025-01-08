@@ -62,10 +62,25 @@ function handleFileDrop(event, businessId) {
 
     const files = event.dataTransfer.files;
     if (files.length > 0) {
+        // First expand the row and switch to knowledge tab
+        toggleBusinessDetails(businessId);
+        SwitchTab(businessId, 'knowledge');
+
         const formData = new FormData();
         for (let i = 0; i < files.length; i++) {
             formData.append('files[]', files[i]);
         }
+
+        // Show upload progress
+        const progressDiv = document.createElement('div');
+        progressDiv.className = 'upload-progress active';
+        progressDiv.innerHTML = `
+            <div class="mb-2">Uploading files...</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" style="width: 0%"></div>
+            </div>
+        `;
+        document.body.appendChild(progressDiv);
 
         fetch(`/api/business/${businessId}/knowledge/`, {
             method: 'POST',
@@ -77,17 +92,46 @@ function handleFileDrop(event, businessId) {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                alert('Files uploaded successfully!');
-                // Refresh file list if needed
+                // Update file list in knowledge base tab
+                updateFileList(businessId, data.files);
+                progressDiv.remove();
             } else {
-                alert('Error uploading files: ' + data.message);
+                progressDiv.remove();
+                showAlertBanner('Error uploading files: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error uploading files');
+            progressDiv.remove();
+            showAlertBanner('Error uploading files', 'error');
         });
     }
+}
+
+function updateFileList(businessId, files) {
+    const fileList = document.getElementById(`file-list-${businessId}`);
+    if (!fileList) return;
+
+    files.forEach(file => {
+        const template = document.getElementById('file-item-template');
+        const fileItem = template.content.cloneNode(true);
+        
+        // Update file item content
+        fileItem.querySelector('.filename').textContent = file.name;
+        fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
+        fileItem.querySelector('.file-item').dataset.fileId = file.id;
+        
+        // Add to list
+        fileList.appendChild(fileItem);
+    });
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 </script>
 

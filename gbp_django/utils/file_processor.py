@@ -83,11 +83,16 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Generate embedding with validation
         try:
+            # Generate and validate embedding
             embedding = generate_embedding(text_content)
             if not embedding:
                 raise ValueError("Failed to generate embedding")
-            if len(embedding) != 1536:  # Validate embedding dimensions
-                raise ValueError(f"Invalid embedding dimensions: expected 1536, got {len(embedding)}")
+            if len(embedding) != 1536:
+                # Retry once with text chunking
+                chunks = [text_content[i:i+512] for i in range(0, len(text_content), 512)]
+                embedding = generate_embedding(chunks[0])  # Use first chunk
+                if not embedding or len(embedding) != 1536:
+                    raise ValueError(f"Invalid embedding dimensions: expected 1536, got {len(embedding) if embedding else 0}")
         except Exception as e:
             raise ValueError(f"Embedding generation failed: {str(e)}")
 
