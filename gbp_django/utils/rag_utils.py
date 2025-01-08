@@ -216,7 +216,7 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             chat_history.append({'role': 'assistant', 'content': response})
         
         # Add source attribution if relevant documents were found
-        if doc_contexts:
+        if knowledge_context:
             response += "\n\n[Response based on business documentation and profile information]"
         
         return response
