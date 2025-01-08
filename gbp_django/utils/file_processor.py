@@ -1,7 +1,8 @@
 import os
 import magic
 import docx
-from pdf2text import pdf_to_text
+import PyPDF2
+import io
 import json
 from typing import Dict, Any, List, Optional
 from django.core.files.storage import default_storage
@@ -26,8 +27,12 @@ def process_docx(content: bytes) -> str:
 
 def process_pdf(content: bytes) -> str:
     """Process PDF files"""
-    import io
-    return pdf_to_text(io.BytesIO(content))
+    pdf_file = io.BytesIO(content)
+    reader = PyPDF2.PdfReader(pdf_file)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text() + "\n"
+    return text
 
 def process_markdown(content: bytes) -> str:
     """Process markdown files"""

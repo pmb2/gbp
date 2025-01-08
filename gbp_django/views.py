@@ -1,14 +1,32 @@
-import requests
-import time
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from datetime import datetime, timedelta
-import secrets
-from django.utils import timezone
-from django.core.mail import send_mail
-from django.template.loader import render_to_string
-from django.contrib import messages
+from datetime import timedelta
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth import (
+    login as auth_login, authenticate, logout
+)
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils import timezone
+import requests
+import secrets
+
+from allauth.socialaccount import providers
+from allauth.socialaccount.models import SocialApp
+from allauth.utils import build_absolute_uri
+
+from .api.authentication import get_access_token, get_user_info
+from .api.business_management import (
+    get_business_accounts, store_business_data, update_business_details
+)
+from .models import (
+    Business, User, Notification, Post, BusinessAttribute, QandA, Review
+)
+from .utils.email_service import EmailService
+from .utils.file_processor import store_file_content, process_folder
 from .utils.rag_utils import answer_question, add_to_knowledge_base
 
 
