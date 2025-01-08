@@ -363,35 +363,32 @@ function formatFileSize(bytes) {
         const completion = business.dataset.completion;
         const verified = business.dataset.verified === 'true';
 
-        let summary = `I'm your AI assistant for ${businessName}. Here's what I know:\n\n`;
-        
-        // Business Status
-        summary += `📊 Profile Status:\n`;
-        summary += `• Verification: ${verified ? '✅ Verified' : '⚠️ Not Verified'}\n`;
-        summary += `• Completion: ${completion}% complete\n`;
+        let summary = `Welcome! I'm your AI assistant for ${businessName}.\n\n`;
+        summary += `🏢 Business Overview:\n`;
+        summary += `• Name: ${businessName}\n`;
+        summary += `• Status: ${verified ? '✅ Verified Business' : '⚠️ Pending Verification'}\n`;
+        summary += `• Profile Completion: ${completion}%\n\n`;
 
-        // Automation Settings
-        summary += `\n🤖 Automation Settings:\n`;
+        summary += `⚙️ Current Settings:\n`;
         const qaStatus = document.querySelector(`[data-feature="qa"][data-position].active`);
         const postsStatus = document.querySelector(`[data-feature="posts"][data-position].active`);
         const reviewsStatus = document.querySelector(`[data-feature="reviews"][data-position].active`);
 
-        if (qaStatus) summary += `• Q&A Responses: ${qaStatus.dataset.position}\n`;
-        if (postsStatus) summary += `• Posts Creation: ${postsStatus.dataset.position}\n`;
-        if (reviewsStatus) summary += `• Review Management: ${reviewsStatus.dataset.position}\n`;
+        summary += `• Q&A Management: ${qaStatus ? qaStatus.dataset.position.charAt(0).toUpperCase() + qaStatus.dataset.position.slice(1) : 'Not set'}\n`;
+        summary += `• Content Creation: ${postsStatus ? postsStatus.dataset.position.charAt(0).toUpperCase() + postsStatus.dataset.position.slice(1) : 'Not set'}\n`;
+        summary += `• Review Responses: ${reviewsStatus ? reviewsStatus.dataset.position.charAt(0).toUpperCase() + reviewsStatus.dataset.position.slice(1) : 'Not set'}\n\n`;
 
-        // Knowledge Base Status
-        summary += `\n📚 Knowledge Base:\n`;
+        summary += `📚 Knowledge Base Status:\n`;
         const fileList = document.getElementById(`file-list-${businessId}`);
         const fileCount = fileList ? fileList.querySelectorAll('.file-item:not([data-deleted="true"])').length : 0;
-        summary += `• ${fileCount} documents uploaded\n`;
+        summary += `• ${fileCount} document${fileCount !== 1 ? 's' : ''} available for reference\n\n`;
         
-        summary += `\nI can help you with:\n`;
-        summary += `• Answering questions about your business profile\n`;
-        summary += `• Explaining automation settings and their impact\n`;
-        summary += `• Analyzing uploaded documents and business data\n`;
-        summary += `• Providing insights and recommendations\n\n`;
-        summary += `Feel free to ask me anything!`;
+        summary += `I can assist you with:\n`;
+        summary += `• Managing your business profile and settings\n`;
+        summary += `• Optimizing your automation strategy\n`;
+        summary += `• Analyzing business data and trends\n`;
+        summary += `• Providing actionable recommendations\n\n`;
+        summary += `How can I help you today with ${businessName}?`;
 
         summaryElement.textContent = summary;
     }
