@@ -799,10 +799,10 @@ def chat_message(request, business_id):
         }, status=500)
 
 
-@login_required
-@require_http_methods(["POST"])
 from .utils.file_processor import store_file_content, process_folder
 
+@login_required
+@require_http_methods(["POST"])
 def add_knowledge(request, business_id):
     """Add new knowledge to the business knowledge base"""
     if request.method == 'POST':
