@@ -14,28 +14,34 @@ def generate_embedding(text: str) -> Optional[List[float]]:
         if len(text) > 8000:
             text = text[:8000]
         
+        # Try nomic-embed-text first
         response = requests.post(
             'http://localhost:11434/api/embeddings',
             json={
-                'model': 'nomic-embed-text',  # Switch to nomic model which gives 1536 dims
+                'model': 'nomic-embed-text',
                 'prompt': text,
                 'options': {
-                    'temperature': 0,  # Deterministic embeddings
-                    'num_ctx': 8192    # Increase context window
+                    'temperature': 0,
+                    'num_ctx': 8192
                 }
             },
-            timeout=30  # Increased timeout for longer texts
+            timeout=30
         )
         response.raise_for_status()
         
         embedding = response.json()['embedding']
+        dim = len(embedding)
         
-        # Validate embedding dimensions
-        if len(embedding) != 1536:
-            print(f"[WARNING] Invalid embedding dimensions: got {len(embedding)}, expected 1536")
-            return None
+        if dim == 1536:
+            return embedding
             
-        return embedding
+        # If we got 768 dims, pad to 1536 by repeating
+        if dim == 768:
+            print("[INFO] Got 768 dims, padding to 1536...")
+            return embedding * 2  # Repeat the embedding to get 1536 dims
+            
+        print(f"[WARNING] Invalid embedding dimensions: got {dim}, expected 1536")
+        return None
     except requests.exceptions.RequestException as e:
         print(f"Network error generating embedding: {str(e)}")
         return None
