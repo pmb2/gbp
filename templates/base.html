@@ -1173,43 +1173,6 @@ function formatFileSize(bytes) {
         }
     }
 
-    // Remove duplicate setAutomation function
-            fetch(`/api/business/${businessId}/automation/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    feature: feature,
-                    level: level
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Fetch failed with status:', response.status);
-                        return response.json().then(err => {
-                            console.error('Error details:', err);
-                            revertButtonState(buttons, clickedButton);
-                            throw new Error('Network response was not ok.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log(`Successfully updated ${feature} automation to ${level}`);
-                    } else {
-                        console.error('Failed to update automation settings');
-                        revertButtonState(buttons, clickedButton);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    revertButtonState(buttons, clickedButton);
-                });
-        }
-    }
 
     function revertButtonState(buttons, activeButton) {
         buttons.forEach(btn => {
