@@ -17,9 +17,12 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 3, min_simi
         return []
         
     try:
-        # Get business and related FAQs using both cosine and L2 distance
+        # Get business first to validate it exists
+        business = Business.objects.get(business_id=business_id)
+        
+        # Get related FAQs using both cosine and L2 distance
         faqs = FAQ.objects.filter(
-            business_id=business_id,
+            business=business,  # Use business object instead of business_id
             deleted_at__isnull=True,  # Exclude deleted documents
             embedding__isnull=False  # Ensure embedding exists
         ).annotate(

@@ -52,6 +52,8 @@ def generate_embedding(text: str) -> Optional[List[float]]:
 def generate_response(query: str, context: str, chat_history: List[Dict[str, str]] = None) -> str:
     """Generate response using Groq's LLaMA API with chat history and memory summaries"""
     try:
+        from groq import Groq
+        
         # Format chat history and summarize memories
         formatted_history = []
         memory_summary = []
@@ -93,25 +95,20 @@ def generate_response(query: str, context: str, chat_history: List[Dict[str, str
             messages.extend(formatted_history)
         messages.append({'role': 'user', 'content': query})
         
-        # Make API call with proper headers
-        response = requests.post(
-            'https://api.groq.com/v1/chat/completions',
-            headers={
-                'Authorization': f'Bearer {settings.GROQ_API_KEY}',
-                'Content-Type': 'application/json'
-            },
-            json={
-                'model': 'llama-3.3-70b-versatile',
-                'messages': messages,
-                'temperature': 0.7,
-                'max_tokens': 1000,
-                'top_p': 0.9,
-                'stream': False
-            },
-            timeout=30
+        # Initialize Groq client
+        client = Groq(api_key=settings.GROQ_API_KEY)
+        
+        # Make API call using official client
+        chat_completion = client.chat.completions.create(
+            messages=messages,
+            model="llama-3.3-70b-versatile",
+            temperature=0.7,
+            max_tokens=1000,
+            top_p=0.9,
+            stream=False
         )
-        response.raise_for_status()
-        return response.json()['choices'][0]['message']['content'].strip()
+        
+        return chat_completion.choices[0].message.content.strip()
     except requests.exceptions.RequestException as e:
         print(f"Network error generating response: {str(e)}")
         return "I apologize, but I'm experiencing connectivity issues. Please try again in a moment."
