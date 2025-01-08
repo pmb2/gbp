@@ -101,8 +101,22 @@ def get_relevant_context(query: str, business_id: str, min_similarity: float = 0
 def answer_question(query: str, business_id: str, chat_history: List[Dict[str, str]] = None) -> str:
     """Generate answer using enhanced RAG with chat history and memory"""
     try:
+        print("\n[DEBUG] answer_question called with:")
+        print(f"[DEBUG] Query: {query}")
+        print(f"[DEBUG] Business ID: {business_id}")
+        print(f"[DEBUG] Chat history length: {len(chat_history) if chat_history else 0}")
+
         # Get business info
-        business = Business.objects.get(business_id=business_id)
+        try:
+            business = Business.objects.get(business_id=business_id)
+            print(f"[DEBUG] Found business:")
+            print(f"[DEBUG] - ID: {business.id}")
+            print(f"[DEBUG] - Business ID: {business.business_id}")
+            print(f"[DEBUG] - Name: {business.business_name}")
+            print(f"[DEBUG] - User ID: {business.user_id}")
+        except Business.DoesNotExist:
+            print(f"[ERROR] No business found with ID: {business_id}")
+            return "Business not found"
         
         # Build comprehensive business context
         business_context = (

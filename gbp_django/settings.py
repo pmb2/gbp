@@ -115,6 +115,9 @@ DEFAULT_FROM_EMAIL = 'GBP Automation Pro <gbp.automation.pro@gmail.com>'
 FEEDBACK_EMAIL = 'gbp.automation.pro@gmail.com'
 SUPPORT_EMAIL_SUBJECT_PREFIX = '[SUPPORT/FEEDBACK]'
 
+# AI/ML Configuration
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')  # Add this to your .env file
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
