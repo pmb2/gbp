@@ -749,7 +749,7 @@ def submit_feedback(request):
 @login_required
 @require_http_methods(["POST"])
 def chat_message(request, business_id):
-    """Handle chat messages using RAG"""
+    """Handle chat messages and file uploads using RAG"""
     try:
         data = json.loads(request.body)
         message = data.get('message')
@@ -782,8 +782,58 @@ def chat_message(request, business_id):
 
 @login_required
 @require_http_methods(["POST"])
+from .utils.file_processor import store_file_content, process_folder
+
 def add_knowledge(request, business_id):
     """Add new knowledge to the business knowledge base"""
+    if request.method == 'POST':
+        try:
+            # Check if business exists and is verified
+            business = Business.objects.get(business_id=business_id)
+            if not business.is_verified:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Business must be verified to upload files'
+                }, status=403)
+
+            results = []
+            files = request.FILES.getlist('files[]')
+            
+            for file in files:
+                try:
+                    # Handle folder upload
+                    if hasattr(file, 'content_type') and file.content_type == 'application/x-directory':
+                        folder_results = process_folder(business_id, file.temporary_file_path())
+                        results.extend(folder_results)
+                    else:
+                        # Handle single file
+                        result = store_file_content(business_id, file, file.name)
+                        results.append(result)
+                except Exception as e:
+                    print(f"Error processing file {file.name}: {str(e)}")
+                    continue
+
+            return JsonResponse({
+                'status': 'success',
+                'message': f'Successfully processed {len(results)} files',
+                'files': results
+            })
+
+        except Business.DoesNotExist:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Business not found'
+            }, status=404)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Method not allowed'
+    }, status=405)
     try:
         data = json.loads(request.body)
         question = data.get('question')
