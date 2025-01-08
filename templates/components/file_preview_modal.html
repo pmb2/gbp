@@ -1,0 +1,46 @@
+<div id="filePreviewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="relative top-20 mx-auto p-6 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-900" id="previewFileName"></h3>
+            <button onclick="closeFilePreview()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="max-h-[70vh] overflow-y-auto" id="previewContent">
+            <!-- File content will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+function previewFile(businessId, fileId) {
+    const modal = document.getElementById('filePreviewModal');
+    const contentArea = document.getElementById('previewContent');
+    const fileName = document.getElementById('previewFileName');
+    
+    fetch(`/api/business/${businessId}/files/${fileId}/preview/`)
+        .then(response => response.json())
+        .then(data => {
+            fileName.textContent = data.name;
+            contentArea.innerHTML = `<pre class="whitespace-pre-wrap p-4">${data.content}</pre>`;
+            modal.classList.remove('hidden');
+        })
+        .catch(error => {
+            showErrorMessage('Error loading file preview');
+            console.error('Error:', error);
+        });
+}
+
+function closeFilePreview() {
+    document.getElementById('filePreviewModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('filePreviewModal').addEventListener('click', function(event) {
+    if (event.target === this) {
+        closeFilePreview();
+    }
+});
+</script>
