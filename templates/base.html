@@ -371,16 +371,13 @@
     function setAutomation(feature, level, businessId) {
         // Get all buttons for this feature and business
         const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-
-        // Remove active class and background from all buttons for this feature
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-
-        // Add active class and background to clicked button immediately
         const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+        
+        if (!clickedButton) return;
+
+        // Show loading state
+        clickedButton.style.opacity = '0.5';
+        clickedButton.style.pointerEvents = 'none';
         if (clickedButton) {
             // Remove active class and colors from all buttons in this feature group
             buttons.forEach(btn => {
@@ -576,10 +573,39 @@
                 .then(data => {
                     if (data.status === 'success') {
                         console.log(`Successfully updated ${feature} automation to ${level}`);
+                    
+                        // Remove active class and background from all buttons
+                        buttons.forEach(btn => {
+                            btn.classList.remove('active');
+                            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
+                            btn.classList.add('bg-white');
+                        });
+
+                        // Add active class and color to clicked button
+                        clickedButton.classList.add('active');
+                        switch (feature) {
+                            case 'qa':
+                                clickedButton.classList.remove('bg-white');
+                                clickedButton.classList.add('bg-blue-500');
+                                break;
+                            case 'posts':
+                                clickedButton.classList.remove('bg-white');
+                                clickedButton.classList.add('bg-purple-500');
+                                break;
+                            case 'reviews':
+                                clickedButton.classList.remove('bg-white');
+                                clickedButton.classList.add('bg-green-500');
+                                break;
+                        }
                     } else {
                         console.error('Failed to update automation settings');
                         revertButtonState(buttons, clickedButton);
                     }
+                })
+                .finally(() => {
+                    // Reset loading state
+                    clickedButton.style.opacity = '';
+                    clickedButton.style.pointerEvents = '';
                 })
                 .catch(error => {
                     console.error('Error:', error);
