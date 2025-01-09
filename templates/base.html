@@ -354,6 +354,8 @@
                 console.error('Button not found:', {feature, level, businessId});
                 return;
             }
+            
+            try {
         clickedButton.style.opacity = '0.5';
         clickedButton.style.pointerEvents = 'none';
 
@@ -417,6 +419,10 @@
                 clickedButton.style.opacity = '';
                 clickedButton.style.pointerEvents = '';
             });
+        } catch (error) {
+            console.error('Error in setAutomation:', error);
+            showAlertBanner('Failed to update automation settings');
+        }
     }
 
     function revertButtonState(buttons, activeButton) {

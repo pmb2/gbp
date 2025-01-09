@@ -996,6 +996,26 @@ def add_knowledge(request, business_id):
         }, status=500)
 
 
+from .api.memories import get_memories
+
+def get_business_memories(request, business_id):
+    """Get memories/chat history for a business"""
+    try:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+            
+        # Verify business ownership
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        
+        # Get memories
+        memories_data = get_memories(business_id)
+        return JsonResponse(memories_data)
+        
+    except Business.DoesNotExist:
+        return JsonResponse({'error': 'Business not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 def root_view(request):
     """
     Root view that handles the base URL '/'.
