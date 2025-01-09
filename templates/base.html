@@ -627,10 +627,48 @@
         } else if (completion < 100) {
             showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
         }
-
-
     }
 
+    async function setAutomation(feature, level, businessId) {
+        try {
+            const response = await fetch(`/api/business/${businessId}/automation/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    feature: feature,
+                    level: level
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update automation settings');
+            }
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                // Update UI to reflect new automation level
+                const dots = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+                dots.forEach(dot => {
+                    const position = dot.dataset.position;
+                    if (position === level) {
+                        dot.classList.add('active', 'bg-blue-500');
+                        dot.classList.remove('bg-white');
+                    } else {
+                        dot.classList.remove('active', 'bg-blue-500');
+                        dot.classList.add('bg-white');
+                    }
+                });
+            } else {
+                throw new Error(data.message || 'Failed to update automation settings');
+            }
+        } catch (error) {
+            console.error('Error updating automation:', error);
+            showAlertBanner(error.message || 'Failed to update automation settings');
+        }
+    }
 
 </script>
 
