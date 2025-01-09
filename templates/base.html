@@ -649,16 +649,30 @@
 
             const data = await response.json();
             if (data.status === 'success') {
-                // Update UI to reflect new automation level
+                // Update UI to reflect new automation level with feature-specific colors
                 const dots = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
                 dots.forEach(dot => {
                     const position = dot.dataset.position;
                     if (position === level) {
-                        dot.classList.add('active', 'bg-blue-500');
+                        // Use feature-specific color classes
+                        const colorClasses = {
+                            'qa': ['bg-blue-600', 'border-blue-600'],
+                            'posts': ['bg-purple-600', 'border-purple-600'],
+                            'reviews': ['bg-green-600', 'border-green-600']
+                        };
+                        
+                        dot.classList.add('active', ...colorClasses[feature]);
                         dot.classList.remove('bg-white');
+                        
+                        // Show tooltip on hover
+                        dot.title = `${feature.charAt(0).toUpperCase() + feature.slice(1)} Automation: ${level.charAt(0).toUpperCase() + level.slice(1)}`;
                     } else {
-                        dot.classList.remove('active', 'bg-blue-500');
+                        dot.classList.remove('active', 'bg-blue-600', 'bg-purple-600', 'bg-green-600', 
+                                           'border-blue-600', 'border-purple-600', 'border-green-600');
                         dot.classList.add('bg-white');
+                        
+                        // Clear tooltip
+                        dot.title = '';
                     }
                 });
             } else {
