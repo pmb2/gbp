@@ -12,23 +12,23 @@
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="setAutomation('qa', 'manual', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'manual' %}active bg-blue-500{% else %}bg-white{% endif %} border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'manual' %}active bg-blue-600{% else %}bg-white{% endif %} border-2 border-blue-600 transition-all duration-200 hover:scale-110 hover:border-blue-700"
                     data-position="manual"
                     data-feature="qa"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Manual</span>
             </button>
-            <div class="w-6 h-0.5 bg-blue-300"></div>
+            <div class="w-6 h-0.5 bg-blue-200"></div>
             <button onclick="setAutomation('qa', 'approval', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'approval' %}active bg-blue-500{% else %}bg-white{% endif %} border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'approval' %}active bg-blue-600{% else %}bg-white{% endif %} border-2 border-blue-600 transition-all duration-200 hover:scale-110 hover:border-blue-700"
                     data-position="approval"
                     data-feature="qa"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Approval</span>
             </button>
-            <div class="w-6 h-0.5 bg-blue-300"></div>
+            <div class="w-6 h-0.5 bg-blue-200"></div>
             <button onclick="setAutomation('qa', 'auto', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'auto' %}active bg-blue-500{% else %}bg-white{% endif %} border-2 border-blue-500 transition-all duration-200 hover:scale-110 hover:border-blue-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.qa_automation == 'auto' %}active bg-blue-600{% else %}bg-white{% endif %} border-2 border-blue-600 transition-all duration-200 hover:scale-110 hover:border-blue-700"
                     data-position="auto"
                     data-feature="qa"
                     data-business="{{ business.business_id }}">
@@ -49,23 +49,23 @@
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="setAutomation('posts', 'manual', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'manual' %}active bg-purple-500{% else %}bg-white{% endif %} border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'manual' %}active bg-purple-600{% else %}bg-white{% endif %} border-2 border-purple-600 transition-all duration-200 hover:scale-110 hover:border-purple-700"
                     data-position="manual"
                     data-feature="posts"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Manual</span>
             </button>
-            <div class="w-6 h-0.5 bg-purple-300"></div>
+            <div class="w-6 h-0.5 bg-purple-200"></div>
             <button onclick="setAutomation('posts', 'approval', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'approval' %}active bg-purple-500{% else %}bg-white{% endif %} border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'approval' %}active bg-purple-600{% else %}bg-white{% endif %} border-2 border-purple-600 transition-all duration-200 hover:scale-110 hover:border-purple-700"
                     data-position="approval"
                     data-feature="posts"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Approval</span>
             </button>
-            <div class="w-6 h-0.5 bg-purple-300"></div>
+            <div class="w-6 h-0.5 bg-purple-200"></div>
             <button onclick="setAutomation('posts', 'auto', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'auto' %}active bg-purple-500{% else %}bg-white{% endif %} border-2 border-purple-500 transition-all duration-200 hover:scale-110 hover:border-purple-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.posts_automation == 'auto' %}active bg-purple-600{% else %}bg-white{% endif %} border-2 border-purple-600 transition-all duration-200 hover:scale-110 hover:border-purple-700"
                     data-position="auto"
                     data-feature="posts"
                     data-business="{{ business.business_id }}">
@@ -86,23 +86,23 @@
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="setAutomation('reviews', 'manual', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'manual' %}active bg-green-500{% else %}bg-white{% endif %} border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'manual' %}active bg-green-600{% else %}bg-white{% endif %} border-2 border-green-600 transition-all duration-200 hover:scale-110 hover:border-green-700"
                     data-position="manual"
                     data-feature="reviews"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Manual</span>
             </button>
-            <div class="w-6 h-0.5 bg-green-300"></div>
+            <div class="w-6 h-0.5 bg-green-200"></div>
             <button onclick="setAutomation('reviews', 'approval', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'approval' %}active bg-green-500{% else %}bg-white{% endif %} border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'approval' %}active bg-green-600{% else %}bg-white{% endif %} border-2 border-green-600 transition-all duration-200 hover:scale-110 hover:border-green-700"
                     data-position="approval"
                     data-feature="reviews"
                     data-business="{{ business.business_id }}">
                 <span class="automation-label">Approval</span>
             </button>
-            <div class="w-6 h-0.5 bg-green-300"></div>
+            <div class="w-6 h-0.5 bg-green-200"></div>
             <button onclick="setAutomation('reviews', 'auto', '{{ business.business_id }}')"
-                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'auto' %}active bg-green-500{% else %}bg-white{% endif %} border-2 border-green-500 transition-all duration-200 hover:scale-110 hover:border-green-600"
+                    class="automation-dot w-4 h-4 rounded-full {% if business.reviews_automation == 'auto' %}active bg-green-600{% else %}bg-white{% endif %} border-2 border-green-600 transition-all duration-200 hover:scale-110 hover:border-green-700"
                     data-position="auto"
                     data-feature="reviews"
                     data-business="{{ business.business_id }}">
