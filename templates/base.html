@@ -346,10 +346,14 @@
 
     // --- Automation Settings Functionality ---
     function setAutomation(feature, level, businessId) {
-        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
+        try {
+            const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
+            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
 
-        if (!clickedButton) return;
+            if (!clickedButton) {
+                console.error('Button not found:', {feature, level, businessId});
+                return;
+            }
         clickedButton.style.opacity = '0.5';
         clickedButton.style.pointerEvents = 'none';
 
@@ -574,7 +578,15 @@
 
     function loadNotifications() {
         fetch('/api/notifications/')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json().catch(e => {
+                    console.error('JSON Parse Error:', e);
+                    throw new Error('Invalid JSON response');
+                });
+            })
             .then(data => {
                 const notificationsList = document.getElementById('notificationsList');
                 notificationsList.innerHTML = '';
@@ -653,7 +665,8 @@
 
     // Sort businesses by completion percentage and urgency
     function sortBusinessRows() {
-        const tbody = document.querySelector('.business-table tbody');
+        const tbody = document.querySelector('tbody');
+        if (!tbody) return;
         const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
         rows.sort((a, b) => {
             const aVerified = a.dataset.verified === 'Verified';
