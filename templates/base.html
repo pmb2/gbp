@@ -344,87 +344,6 @@
     };
 
 
-    // --- Automation Settings Functionality ---
-    function setAutomation(feature, level, businessId) {
-        try {
-            const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-            const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-
-            if (!clickedButton) {
-                console.error('Button not found:', {feature, level, businessId});
-                return;
-            }
-            
-            try {
-        clickedButton.style.opacity = '0.5';
-        clickedButton.style.pointerEvents = 'none';
-
-
-        buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-
-        clickedButton.classList.add('active');
-
-        switch (feature) {
-            case 'qa':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-blue-500');
-                break;
-            case 'posts':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-purple-500');
-                break;
-            case 'reviews':
-                clickedButton.classList.remove('bg-white');
-                clickedButton.classList.add('bg-green-500');
-                break;
-        }
-
-
-        fetch(`/api/business/${businessId}/automation/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({
-                feature: feature,
-                level: level
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Fetch failed with status:', response.status);
-                    return response.json().then(err => {
-                        console.error('Error details:', err);
-                        revertButtonState(buttons, clickedButton);
-                        throw new Error('Network response was not ok.');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status !== 'success') {
-                    console.error('Failed to update automation settings');
-                    revertButtonState(buttons, clickedButton);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                revertButtonState(buttons, clickedButton);
-            })
-            .finally(() => {
-                clickedButton.style.opacity = '';
-                clickedButton.style.pointerEvents = '';
-            });
-        } catch (error) {
-            console.error('Error in setAutomation:', error);
-            showAlertBanner('Failed to update automation settings');
-        }
-    }
-
     function revertButtonState(buttons, activeButton) {
         buttons.forEach(btn => {
             btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
@@ -709,7 +628,7 @@
             showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
         }
 
-    }
+
     }
 
 
