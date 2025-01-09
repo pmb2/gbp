@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>{% block title %}GBP Automation Pro{% endblock %}</title>
-   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-   <link rel="stylesheet" href="{% static 'css/output.css' %}">
-   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GBP Automation Pro{% endblock %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-100">
@@ -37,166 +37,138 @@
 {% block extra_body %}{% endblock %}
 
 <script>
-function showAlertBanner(message, type = 'error') {
-    const banner = document.getElementById('alertBanner');
-    const messageEl = document.getElementById('alertMessage');
-    
-    if (banner && messageEl) {
-        messageEl.textContent = message;
-        banner.classList.remove('hidden');
-        
-        // Auto-hide after 5 seconds
-        setTimeout(() => {
-            banner.classList.add('hidden');
-        }, 5000);
-    }
-}
-
-function handleDragOver(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.dataTransfer.dropEffect = 'copy';
-    event.currentTarget.classList.add('drag-over');
-}
-
-function handleDragEnter(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.classList.add('drag-over');
-}
-
-function handleDragLeave(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.classList.remove('drag-over');
-}
-
-function handleFileDrop(event, businessId) {
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.classList.remove('drag-over');
-
-    const files = event.dataTransfer.files;
-    if (files.length > 0) {
-        // First expand the row and switch to knowledge tab
-        toggleBusinessDetails(businessId);
-        SwitchTab(businessId, 'knowledge');
-
-        const formData = new FormData();
-        for (let i = 0; i < files.length; i++) {
-            formData.append('files[]', files[i]);
+    // --- Utility Functions ---
+    function showAlertBanner(message, type = 'error') {
+        const banner = document.getElementById('alertBanner');
+        const messageEl = document.getElementById('alertMessage');
+        if (banner && messageEl) {
+            messageEl.textContent = message;
+            banner.classList.remove('hidden');
+            setTimeout(() => banner.classList.add('hidden'), 5000);
         }
+    }
 
-        // Show upload progress
-        const progressDiv = document.createElement('div');
-        progressDiv.className = 'upload-progress active';
-        progressDiv.innerHTML = `
-            <div class="mb-2">Uploading files...</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" style="width: 0%"></div>
-            </div>
-        `;
-        document.body.appendChild(progressDiv);
+    function handleDragOver(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.dataTransfer.dropEffect = 'copy';
+        event.currentTarget.classList.add('drag-over');
+    }
 
-        fetch(`/api/business/${businessId}/knowledge/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Update file list in knowledge base tab
-                updateFileList(businessId, data.files);
-                progressDiv.remove();
-            } else {
-                progressDiv.remove();
-                showAlertBanner('Error uploading files: ' + data.message, 'error');
+    function handleDragEnter(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.classList.remove('drag-over');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+
+    // --- File Upload Functionality ---
+    function handleFileDrop(event, businessId) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.currentTarget.classList.remove('drag-over');
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+            toggleBusinessDetails(businessId);
+            SwitchTab(businessId, 'knowledge');
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            progressDiv.remove();
-            showAlertBanner('Error uploading files', 'error');
+
+            // Show upload progress
+            const progressDiv = document.createElement('div');
+            progressDiv.className = 'upload-progress active';
+            progressDiv.innerHTML = `
+                    <div class="mb-2">Uploading files...</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                `;
+            document.body.appendChild(progressDiv);
+
+            fetch(`/api/business/${businessId}/knowledge/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    progressDiv.remove();
+                    if (data.status === 'success') {
+                        updateFileList(businessId, data.files);
+                    } else {
+                        showAlertBanner('Error uploading files: ' + data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    progressDiv.remove();
+                    showAlertBanner('Error uploading files', 'error');
+                });
+        }
+    }
+
+    function updateFileList(businessId, files) {
+        const fileList = document.getElementById(`file-list-${businessId}`);
+        if (!fileList) return;
+
+        files.forEach(file => {
+            const template = document.getElementById('file-item-template');
+            const fileItem = template.content.cloneNode(true);
+            fileItem.querySelector('.filename').textContent = file.name;
+            fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
+            fileItem.querySelector('.file-item').dataset.fileId = file.id;
+            fileList.appendChild(fileItem);
         });
     }
-}
 
-function updateFileList(businessId, files) {
-    const fileList = document.getElementById(`file-list-${businessId}`);
-    if (!fileList) return;
-
-    files.forEach(file => {
-        const template = document.getElementById('file-item-template');
-        const fileItem = template.content.cloneNode(true);
-        
-        // Update file item content
-        fileItem.querySelector('.filename').textContent = file.name;
-        fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
-        fileItem.querySelector('.file-item').dataset.fileId = file.id;
-        
-        // Add to list
-        fileList.appendChild(fileItem);
-    });
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-</script>
-
-{% include 'components/feedback_button.html' %}
-{% include 'components/compliance_modal.html' %}
-{% include 'components/seo_health_modal.html' %}
-{% include 'components/file_preview_modal.html' %}
-{% include 'components/delete_file_modal.html' %}
-
-<script>
-    console.log('🌟 Initializing base.html script');
-
-    function closeAlertBanner() {
-        document.getElementById('alertBanner').classList.add('hidden');
-    }
-
+    // --- Chat Functionality ---
     async function handleChatSubmit(event, businessId) {
         event.preventDefault();
-        event.stopPropagation();  // Prevent event from bubbling up
-        
+        event.stopPropagation();
+
         const input = document.getElementById(`chat-input-${businessId}`);
         const message = input.value.trim();
-        
         if (!message) return;
-        
-        // Add user message to chat
+
         const chatMessages = document.getElementById(`chat-messages-${businessId}`);
-        const userMessageHtml = `
-            <div class="flex items-start justify-end mb-4">
-                <div class="ml-3 bg-blue-100 rounded-lg py-2 px-3">
-                    <p class="text-sm text-gray-800">${message}</p>
-                </div>
-                <div class="flex-shrink-0 ml-3">
-                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
+        chatMessages.insertAdjacentHTML('beforeend', `
+                <div class="flex items-start justify-end mb-4">
+                    <div class="ml-3 bg-blue-100 rounded-lg py-2 px-3">
+                        <p class="text-sm text-gray-800">${message}</p>
+                    </div>
+                    <div class="flex-shrink-0 ml-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
-        chatMessages.insertAdjacentHTML('beforeend', userMessageHtml);
-        
-        // Clear input
+            `);
         input.value = '';
-        
-        try {
-            // Show loading indicator
-            const loadingHtml = `
+
+        // Show loading indicator
+        const loadingHtml = `
                 <div class="flex items-start loading-message">
                     <div class="flex-shrink-0">
                         <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center animate-pulse">
@@ -210,71 +182,60 @@ function formatFileSize(bytes) {
                     </div>
                 </div>
             `;
-            chatMessages.insertAdjacentHTML('beforeend', loadingHtml);
-            
-            // Send message to backend
+        chatMessages.insertAdjacentHTML('beforeend', loadingHtml);
+
+
+        try {
             const response = await fetch(`/api/business/${businessId}/chat/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
-                body: JSON.stringify({ message })
+                body: JSON.stringify({message})
             });
-            
+
             if (!response.ok) throw new Error('Failed to send message');
-            
             const data = await response.json();
-            
-            // Remove loading message
+
             const loadingMessage = chatMessages.querySelector('.loading-message');
             if (loadingMessage) loadingMessage.remove();
-            
-            // Add AI response
-            const aiResponseHtml = `
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
+
+            chatMessages.insertAdjacentHTML('beforeend', `
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-3 bg-green-50 rounded-lg py-2 px-3">
+                            <p class="text-sm text-gray-800 whitespace-pre-wrap">${data.response}</p>
                         </div>
                     </div>
-                    <div class="ml-3 bg-green-50 rounded-lg py-2 px-3">
-                        <p class="text-sm text-gray-800 whitespace-pre-wrap">${data.response}</p>
-                    </div>
-                </div>
-            `;
-            chatMessages.insertAdjacentHTML('beforeend', aiResponseHtml);
-            
-            // Scroll to bottom
+                 `);
             chatMessages.scrollTop = chatMessages.scrollHeight;
-            
+
         } catch (error) {
             console.error('Chat error:', error);
             showAlertBanner('Failed to send message. Please try again.');
         }
     }
 
-    // Define toggleBusinessDetails in the global scope
+    // --- Business Details & Tab Functionality ---
     window.toggleBusinessDetails = function (businessId, event) {
-        console.log('🔄 base.html: Toggle called for business:', businessId);
-
         if (event) {
             event.stopPropagation();
-            console.log('🛑 Event propagation stopped');
         }
 
         if (!businessId) {
-            console.error('❌ No business ID provided');
+            console.error('No business ID provided');
             return;
         }
-
         const row = document.querySelector(`[data-business-id="${businessId}"]`);
-        console.log('🔍 Found business row:', row);
-
         if (!row) {
-            console.error('❌ Business row not found');
+            console.error('Business row not found');
             return;
         }
 
@@ -282,30 +243,21 @@ function formatFileSize(bytes) {
         const arrow = document.getElementById(`arrow-${businessId}`);
         const arrowSvg = arrow?.querySelector('svg');
 
-        console.log('📊 Details row:', detailsRow);
-        console.log('➡️ Arrow element:', arrow);
-        console.log('🎯 Arrow SVG:', arrowSvg);
-
         if (!detailsRow) {
-            console.error('❌ Details row not found');
+            console.error('Details row not found');
             return;
         }
 
-        // Update business name in header if it exists
+
         const businessName = row.querySelector('.font-medium')?.textContent.trim();
         const businessNameHeader = document.getElementById('businessNameHeader');
         if (businessNameHeader && businessName) {
             businessNameHeader.textContent = businessName + "'s";
-            console.log('✏️ Updated header with business name:', businessName);
         }
 
-        // Close all other expanded rows first
-        console.log('🔒 Closing other expanded rows...');
         document.querySelectorAll('.expanded-content').forEach(otherRow => {
             if (otherRow.id !== `details-${businessId}`) {
-                console.log('📍 Closing row:', otherRow.id);
                 otherRow.style.display = 'none';
-
                 const otherId = otherRow.id.split('-')[1];
                 const otherArrow = document.getElementById(`arrow-${otherId}`);
                 if (otherArrow) {
@@ -317,62 +269,40 @@ function formatFileSize(bytes) {
             }
         });
 
-        // Toggle current row
-        const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
-        console.log('📈 Expanding row:', isExpanding);
 
+        const isExpanding = detailsRow.style.display === 'none' || !detailsRow.style.display;
         detailsRow.style.display = isExpanding ? 'table-row' : 'none';
-        console.log('🔄 Set display to:', detailsRow.style.display);
+
 
         if (arrow && arrowSvg) {
             if (isExpanding) {
-                console.log('↗️ Rotating arrow to expanded state');
                 arrow.style.transform = 'rotate(90deg)';
                 arrowSvg.classList.remove('text-gray-500');
                 arrowSvg.classList.add('text-blue-500');
-
-                // Update business summary and switch to details tab
-                console.log('📝 Updating business summary');
                 UpdateBusinessSummary(businessId);
-                console.log('🔄 Switching to details tab');
                 SwitchTab(businessId, 'details');
             } else {
-                console.log('↙️ Rotating arrow to collapsed state');
                 arrow.style.transform = 'rotate(0deg)';
                 arrowSvg.classList.remove('text-blue-500');
                 arrowSvg.classList.add('text-gray-500');
             }
         }
-
-        // Prevent event bubbling
-        if (event) {
-            event.stopPropagation();
-            console.log('🛑 Event propagation stopped');
-        }
-        console.log('✅ Toggle complete');
     };
 
-    // Define UpdateBusinessSummary in the global scope (for use in business_details.html)
     window.UpdateBusinessSummary = function (businessId) {
         const summaryElement = document.getElementById(`business-summary-${businessId}`);
         const business = document.querySelector(`[data-business-id="${businessId}"]`);
-
         if (!business) return;
 
         const businessName = business.querySelector('.font-medium').textContent;
-        const completion = business.dataset.completion;
-        const verified = business.dataset.verified === 'true';
-
-        let summary = `👋 Welcome! I'm your AI assistant for ${businessName}.\n\n`;
-        
-        // Get knowledge base stats
         const fileList = document.getElementById(`file-list-${businessId}`);
         const fileCount = fileList ? fileList.querySelectorAll('.file-item:not([data-deleted="true"])').length : 0;
-        
-        // Get FAQ count from database
         const faqCount = document.querySelector(`[data-faq-count="${businessId}"]`)?.dataset.count || 0;
-        
+
+
+        let summary = `👋 Welcome! I'm your AI assistant for ${businessName}.\n\n`;
         summary += `📚 Knowledge Base Overview:\n`;
+
         if (fileCount > 0 || faqCount > 0) {
             if (fileCount > 0) {
                 summary += `• ${fileCount} uploaded document${fileCount !== 1 ? 's' : ''}\n`;
@@ -384,19 +314,18 @@ function formatFileSize(bytes) {
         } else {
             summary += `No documents or FAQs have been added yet. You can upload business materials to help me better assist you with ${businessName}.\n\n`;
         }
-        
+
         summary += `💡 How can I help you with ${businessName} today? Feel free to ask about:\n`;
         summary += `• Business information and policies\n`;
         summary += `• Customer service scenarios\n`;
         summary += `• Marketing and promotional strategies\n`;
         summary += `• Performance insights and recommendations`;
 
+
         summaryElement.textContent = summary;
     }
 
-    // Define SwitchTab in the global scope (for use in business_details.html)
     window.SwitchTab = function (businessId, tabName) {
-        // Update tab buttons
         document.querySelectorAll(`[id$="-tab-${businessId}"]`).forEach(tab => {
             tab.classList.remove('bg-white', 'text-blue-600');
             tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
@@ -405,98 +334,60 @@ function formatFileSize(bytes) {
         activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
         activeTab.classList.add('bg-white', 'text-blue-600');
 
-        // Update tab contents
         document.querySelectorAll(`[id$="-content-${businessId}"]`).forEach(content => {
             content.classList.add('hidden');
         });
         document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
-
-        // Update tab contents
-        document.querySelectorAll(`[id$="-content-${businessId}"]`).forEach(content => {
-            content.classList.add('hidden');
-        });
-        document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
-
-        // Update business summary when switching to knowledge tab (for use in business_details.html)
         if (tabName === 'knowledge') {
             UpdateBusinessSummary(businessId);
         }
-    }
+    };
 
-    // Automation settings functionality
+
+    // --- Automation Settings Functionality ---
     function setAutomation(feature, level, businessId) {
-        // Get all buttons for this feature and business
         const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
         const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
 
         if (!clickedButton) return;
-
-        // Show loading state
         clickedButton.style.opacity = '0.5';
         clickedButton.style.pointerEvents = 'none';
-        if (clickedButton) {
-            // Remove active class and colors from all buttons in this feature group
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
 
-            // Add active class and color to clicked button
-            clickedButton.classList.add('active');
 
-            // Add color based on feature immediately
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
+        buttons.forEach(btn => {
+            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
+            btn.classList.add('bg-white');
+        });
 
-            // Remove active class and colors from all buttons in this feature group first
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
+        clickedButton.classList.add('active');
 
-            // Add active class and color to clicked button immediately
-            clickedButton.classList.add('active');
+        switch (feature) {
+            case 'qa':
+                clickedButton.classList.remove('bg-white');
+                clickedButton.classList.add('bg-blue-500');
+                break;
+            case 'posts':
+                clickedButton.classList.remove('bg-white');
+                clickedButton.classList.add('bg-purple-500');
+                break;
+            case 'reviews':
+                clickedButton.classList.remove('bg-white');
+                clickedButton.classList.add('bg-green-500');
+                break;
+        }
 
-            // Add color based on feature immediately
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
 
-            // Save to database via API
-            fetch(`/api/business/${businessId}/automation/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    feature: feature,
-                    level: level
-                })
+        fetch(`/api/business/${businessId}/automation/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                feature: feature,
+                level: level
             })
+        })
             .then(response => {
                 if (!response.ok) {
                     console.error('Fetch failed with status:', response.status);
@@ -517,308 +408,11 @@ function formatFileSize(bytes) {
             .catch(error => {
                 console.error('Error:', error);
                 revertButtonState(buttons, clickedButton);
-            });
-        }
-    }
-
-    function revertButtonState(buttons, activeButton) {
-        buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-        if (activeButton.classList.contains('active')) {
-            activeButton.classList.remove('active');
-        }
-    }
-
-    // Make sure the function is available after DOM loads
-    document.addEventListener('DOMContentLoaded', function () {
-        console.log('🌟 toggleBusinessDetails function initialized');
-        if (typeof window.toggleBusinessDetails === 'function') {
-            console.log('✅ Function is properly defined in global scope');
-        } else {
-            console.error('❌ Function not found in global scope');
-        }
-
-        // Call sortBusinessRows after DOM is fully loaded
-        function sortBusinessRows() {
-            console.log('sortBusinessRows called');
-            const tbody = document.querySelector('.business-table tbody');
-            if (tbody) {
-                const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-
-                rows.sort((a, b) => {
-                    const aVerified = a.dataset.verified === 'true';
-                    const bVerified = b.dataset.verified === 'true';
-                    const aCompletion = parseInt(a.dataset.completion) || 0;
-                    const bCompletion = parseInt(b.dataset.completion) || 0;
-
-                    if (aVerified !== bVerified) return aVerified ? 1 : -1;
-                    return aCompletion - bCompletion;
-                });
-
-                rows.forEach(row => {
-                    tbody.appendChild(row);
-                    const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-                    if (detailsRow) tbody.appendChild(detailsRow);
-                });
-            } else {
-                console.error("❌ tbody element not found. Cannot sort business rows.");
-            }
-        }
-
-        // Call sortBusinessRows after DOM is fully loaded
-        document.addEventListener('DOMContentLoaded', sortBusinessRows);
-    });
-
-        sortBusinessRows();
-    });
-
-    // Automation settings functionality 
-    function setAutomation(feature, level, businessId) {
-        // Get all buttons for this feature and business
-        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-
-        if (!clickedButton) return;
-
-        // Show loading state
-        clickedButton.style.opacity = '0.5';
-        clickedButton.style.pointerEvents = 'none';
-        if (clickedButton) {
-            // Remove active class and colors from all buttons in this feature group
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
-
-            // Add active class and color to clicked button
-            clickedButton.classList.add('active');
-
-            // Add color based on feature immediately
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
-
-            // Remove active class and colors from all buttons in this feature group first
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
-            });
-
-            // Add active class and color to clicked button immediately
-            clickedButton.classList.add('active');
-
-            // Add color based on feature immediately
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
-
-            // Save to database via API
-            fetch(`/api/business/${businessId}/automation/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    feature: feature,
-                    level: level
-                })
             })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Fetch failed with status:', response.status);
-                        return response.json().then(err => {
-                            console.error('Error details:', err);
-                            revertButtonState(buttons, clickedButton);
-                            throw new Error('Network response was not ok.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log(`Successfully updated ${feature} automation to ${level}`);
-
-                        // Remove active class and background from all buttons
-                        buttons.forEach(btn => {
-                            btn.classList.remove('active');
-                            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                            btn.classList.add('bg-white');
-                        });
-
-                        // Add active class and color to clicked button
-                        clickedButton.classList.add('active');
-                        switch (feature) {
-                            case 'qa':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-blue-500');
-                                break;
-                            case 'posts':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-purple-500');
-                                break;
-                            case 'reviews':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-green-500');
-                                break;
-                        }
-                    } else {
-                        console.error('Failed to update automation settings');
-                        revertButtonState(buttons, clickedButton);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    revertButtonState(buttons, clickedButton);
-                })
-                .finally(() => {
-                    // Reset loading state
-                    clickedButton.style.opacity = '';
-                    clickedButton.style.pointerEvents = '';
-                });
-        }
-    }
-
-    function revertButtonState(buttons, activeButton) {
-        buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-        if (activeButton.classList.contains('active')) {
-            activeButton.classList.remove('active');
-        }
-    }
-
-
-    // Automation settings functionality
-    function setAutomation(feature, level, businessId) {
-        // Get all buttons for this feature and business
-        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-
-        // Remove active class and background from all buttons for this feature
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-
-        // Add active class and background to clicked button immediately
-        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-        if (clickedButton) {
-            // Remove active class and colors from all buttons in this feature group
-            buttons.forEach(btn => {
-                btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                btn.classList.add('bg-white');
+            .finally(() => {
+                clickedButton.style.opacity = '';
+                clickedButton.style.pointerEvents = '';
             });
-
-            // Add active class and color to clicked button
-            clickedButton.classList.add('active');
-
-            // Add color based on feature immediately
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.remove('bg-white');
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
-
-            // Save to database via API
-            fetch(`/api/business/${businessId}/automation/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    feature: feature,
-                    level: level
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Fetch failed with status:', response.status);
-                        return response.json().then(err => {
-                            console.error('Error details:', err);
-                            revertButtonState(buttons, clickedButton);
-                            throw new Error('Network response was not ok.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log(`Successfully updated ${feature} automation to ${level}`);
-
-                        // Remove active class and background from all buttons
-                        buttons.forEach(btn => {
-                            btn.classList.remove('active');
-                            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-                            btn.classList.add('bg-white');
-                        });
-
-                        // Add active class and color to clicked button
-                        clickedButton.classList.add('active');
-                        switch (feature) {
-                            case 'qa':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-blue-500');
-                                break;
-                            case 'posts':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-purple-500');
-                                break;
-                            case 'reviews':
-                                clickedButton.classList.remove('bg-white');
-                                clickedButton.classList.add('bg-green-500');
-                                break;
-                        }
-                    } else {
-                        console.error('Failed to update automation settings');
-                        revertButtonState(buttons, clickedButton);
-                    }
-                })
-                .finally(() => {
-                    // Reset loading state
-                    clickedButton.style.opacity = '';
-                    clickedButton.style.pointerEvents = '';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    revertButtonState(buttons, clickedButton);
-                });
-        }
     }
 
     function revertButtonState(buttons, activeButton) {
@@ -831,16 +425,13 @@ function formatFileSize(bytes) {
         }
     }
 
-    // Chat functionality
 
-    // Theme toggle functionality with system preference detection
+    // --- Theme Toggle Functionality ---
     function initTheme() {
         const themeToggle = document.getElementById('themeToggle');
         const html = document.documentElement;
         const sunIcon = themeToggle?.querySelector('.sun');
         const moonIcon = themeToggle?.querySelector('.moon');
-
-        // Check for saved theme preference or default to light
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             html.classList.add('dark');
             if (sunIcon && moonIcon) {
@@ -854,7 +445,6 @@ function formatFileSize(bytes) {
                 sunIcon.classList.add('hidden');
             }
         }
-
         if (themeToggle) {
             themeToggle.addEventListener('click', () => {
                 if (html.classList.contains('dark')) {
@@ -876,158 +466,23 @@ function formatFileSize(bytes) {
         }
     }
 
-    // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', initTheme);
-
-    // Business details toggle functionality
-    function toggleBusinessDetails(businessId, event) {
-        if (!businessId) return;
-
-        const row = document.querySelector(`[data-business-id="${businessId}"]`);
-        const detailsRow = document.getElementById(`details-${businessId}`);
-        const arrow = document.getElementById(`arrow-${businessId}`);
-        const arrowSvg = arrow?.querySelector('svg');
-
-        if (!row || !detailsRow) return;
-
-        // If unverified and clicked directly (not from another function)
-        if (row.dataset.verified !== 'Verified' && event) {
-            // Open Google Business Profile signup in new tab
-            window.open('https://www.google.com/intl/en_us/business/', '_blank');
-            return; // Don't allow expansion for unverified businesses
-        }
-
-        // Update business name in header if it exists
-        const businessName = row.querySelector('.font-medium').textContent.trim();
-        const businessNameHeader = document.getElementById('businessNameHeader');
-        if (businessNameHeader) {
-            businessNameHeader.textContent = businessName + "'s";
-        }
-
-        // Close all other expanded rows
-        document.querySelectorAll('[id^="details-"]').forEach(otherRow => {
-            if (otherRow.id !== `details-${businessId}`) {
-                otherRow.style.display = 'none';
-                const otherArrow = document.getElementById(`arrow-${otherRow.id.split('-')[1]}`);
-                if (otherArrow) {
-                    const otherSvg = otherArrow.querySelector('svg');
-                    otherArrow.style.transform = 'rotate(0deg)';
-                    otherSvg.classList.remove('text-blue-500');
-                    otherSvg.classList.add('text-gray-500');
-                }
-            }
-        });
-
-        // Toggle current row
-        const isExpanding = detailsRow.style.display === 'none';
-        detailsRow.style.display = isExpanding ? 'table-row' : 'none';
-
-        // Update arrow
-        if (arrow && arrowSvg) {
-            if (isExpanding) {
-                arrow.style.transform = 'rotate(90deg)';
-                arrowSvg.classList.remove('text-gray-500');
-                arrowSvg.classList.add('text-blue-500');
-            } else {
-                arrow.style.transform = 'rotate(0deg)';
-                arrowSvg.classList.remove('text-blue-500');
-                arrowSvg.classList.add('text-gray-500');
-            }
-        }
-
-        // Update business summary if expanding
-        if (isExpanding) {
-            updateBusinessSummary(businessId);
-            checkProfileStatus(businessId);
-        }
-    }
-
-    function checkProfileStatus(businessId) {
-        const row = document.querySelector(`[data-business-id="${businessId}"]`);
-        if (!row) return;
-
-        const completion = parseInt(row.dataset.completion) || 0;
-        const verified = row.dataset.verified === 'Verified';
-
-        // Update UI based on status
-        if (!verified) {
-            showAlertBanner('Your business profile requires verification. Click here to complete the process.', 'red');
-        } else if (completion < 100) {
-            showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
-        }
-
-    }
-
-    // Sort businesses by completion percentage and urgency
-    function sortBusinessRows() {
-        const tbody = document.querySelector('.business-table tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
-
-        rows.sort((a, b) => {
-            const aVerified = a.dataset.verified === 'Verified';
-            const bVerified = b.dataset.verified === 'Verified';
-            const aCompletion = parseInt(a.dataset.completion) || 0;
-            const bCompletion = parseInt(b.dataset.completion) || 0;
-
-            // Unverified businesses come first
-            if (aVerified !== bVerified) {
-                return aVerified ? 1 : -1;
-            }
-
-            // Then sort by completion percentage (ascending)
-            return aCompletion - bCompletion;
-        });
-
-        // Reorder the rows
-        rows.forEach(row => {
-            tbody.appendChild(row);
-            const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
-            if (detailsRow) {
-                tbody.appendChild(detailsRow);
-            }
-        });
-    }
-
-    // Call sort on page load
-    document.addEventListener('DOMContentLoaded', sortBusinessRows);
-
-    // Mobile menu functionality
-    const mobileMenuButton = document.getElementById('mobile-menu-button');
-    const mobileSidebar = document.getElementById('mobile-sidebar');
-
-    if (mobileMenuButton && mobileSidebar) {
-        mobileMenuButton.addEventListener('click', () => {
-            mobileSidebar.classList.toggle('hidden');
-        });
-
-        mobileSidebar.addEventListener('click', (e) => {
-            if (e.target === mobileSidebar) {
-                mobileSidebar.classList.add('hidden');
-            }
-        });
-    }
-
-    // Define toggleEditMode in the global scope
+    // --- Edit Business Details Functionality ---
     window.toggleEditMode = function (businessId) {
         const viewMode = document.getElementById(`view-mode-${businessId}`);
         const editMode = document.getElementById(`edit-mode-${businessId}`);
         const editIcon = document.getElementById(`edit-icon-${businessId}`);
-
         if (editMode.classList.contains('hidden')) {
-            // Switch to edit mode
             viewMode.classList.add('hidden');
             editMode.classList.remove('hidden');
-            editIcon.textContent = '💾';  // Change to save icon
+            editIcon.textContent = '💾';
         } else {
-            // Save changes
             saveBusinessDetails(businessId);
             viewMode.classList.remove('hidden');
             editMode.classList.add('hidden');
-            editIcon.textContent = '✏️';  // Change back to edit icon
+            editIcon.textContent = '✏️';
         }
     }
 
-    // Define saveBusinessDetails in the global scope
     window.saveBusinessDetails = async function (businessId) {
         try {
             const data = {
@@ -1039,7 +494,6 @@ function formatFileSize(bytes) {
                 category: document.getElementById(`category-${businessId}`).value.trim()
             };
 
-            // Validate required fields
             const missingFields = Object.entries(data)
                 .filter(([_, value]) => !value)
                 .map(([key]) => key.replace('_', ' '));
@@ -1069,13 +523,11 @@ function formatFileSize(bytes) {
                 const response = await error.response?.json();
 
                 if (response?.status === 'verification_required') {
-                    // Show verification modal
                     const modal = document.getElementById('verificationPromptModal');
                     if (modal) {
                         modal.classList.remove('hidden');
                     }
                 } else {
-                    // Show error in a more user-friendly way
                     const alertBanner = document.getElementById('alertBanner');
                     const alertMessage = document.getElementById('alertMessage');
                     if (alertBanner && alertMessage) {
@@ -1085,8 +537,6 @@ function formatFileSize(bytes) {
                 }
                 return;
             }
-
-            // Update the view mode with new values
             const viewMode = document.getElementById(`view-mode-${businessId}`);
             viewMode.querySelector(':nth-child(1) span:last-child').textContent = data.business_name;
             viewMode.querySelector(':nth-child(2) span:last-child').textContent = data.address;
@@ -1094,7 +544,6 @@ function formatFileSize(bytes) {
             viewMode.querySelector(':nth-child(4) span:last-child').textContent = data.website;
             viewMode.querySelector(':nth-child(5) span:last-child').textContent = data.category;
 
-            // Show success message
             alert('Business details updated successfully!');
 
         } catch (error) {
@@ -1103,84 +552,7 @@ function formatFileSize(bytes) {
         }
     }
 
-    // Automation settings functionality
-    function setAutomation(feature, level, businessId) {
-        // Get all buttons for this feature and business
-        const buttons = document.querySelectorAll(`[data-feature="${feature}"][data-business="${businessId}"]`);
-
-        // Remove active class and background from all buttons for this feature
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.remove('bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-
-        // Add active class and background to clicked button
-        const clickedButton = document.querySelector(`[data-feature="${feature}"][data-position="${level}"][data-business="${businessId}"]`);
-        if (clickedButton) {
-            clickedButton.classList.add('active');
-
-            // Add color based on feature
-            switch (feature) {
-                case 'qa':
-                    clickedButton.classList.add('bg-blue-500');
-                    break;
-                case 'posts':
-                    clickedButton.classList.add('bg-purple-500');
-                    break;
-                case 'reviews':
-                    clickedButton.classList.add('bg-green-500');
-                    break;
-            }
-
-            // Save to database via API
-            fetch(`/api/business/${businessId}/automation/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({
-                    feature: feature,
-                    level: level
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('Fetch failed with status:', response.status);
-                        return response.json().then(err => {
-                            console.error('Error details:', err);
-                            revertButtonState(buttons, clickedButton);
-                            throw new Error('Network response was not ok.');
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.status === 'success') {
-                        console.log(`Successfully updated ${feature} automation to ${level}`);
-                    } else {
-                        console.error('Failed to update automation settings');
-                        revertButtonState(buttons, clickedButton);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    revertButtonState(buttons, clickedButton);
-                });
-        }
-    }
-
-    function revertButtonState(buttons, activeButton) {
-        buttons.forEach(btn => {
-            btn.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500');
-            btn.classList.add('bg-white');
-        });
-        if (activeButton.classList.contains('active')) {
-            activeButton.classList.remove('active');
-        }
-    }
-
+    // --- Notifications Functionality ---
     function toggleNotificationsModal() {
         const modal = document.getElementById('notificationsModal');
         modal.classList.toggle('hidden');
@@ -1206,7 +578,6 @@ function formatFileSize(bytes) {
             .then(data => {
                 const notificationsList = document.getElementById('notificationsList');
                 notificationsList.innerHTML = '';
-
                 data.notifications.forEach(notification => {
                     const notificationEl = createNotificationElement(notification);
                     notificationsList.appendChild(notificationEl);
@@ -1218,18 +589,18 @@ function formatFileSize(bytes) {
         const div = document.createElement('div');
         div.className = 'p-4 bg-white border rounded-lg shadow-sm';
         div.innerHTML = `
-            <div class="flex justify-between items-start">
-                <div>
-                    <h4 class="font-medium text-gray-900">${notification.message}</h4>
-                    <p class="text-sm text-gray-500">${notification.timeAgo}</p>
-                </div>
-                <button onclick="dismissNotification(${notification.id})" class="text-gray-400 hover:text-gray-500">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                    </svg>
-                </button>
-            </div>
-        `;
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${notification.message}</h4>
+                         <p class="text-sm text-gray-500">${notification.timeAgo}</p>
+                     </div>
+                    <button onclick="dismissNotification(${notification.id})" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                        </svg>
+                     </button>
+                 </div>
+            `;
         return div;
     }
 
@@ -1256,6 +627,78 @@ function formatFileSize(bytes) {
             }
         }
     }
+
+    // --- Initialization & Event Listeners ---
+    document.addEventListener('DOMContentLoaded', () => {
+        initTheme();
+        sortBusinessRows();
+
+        // Mobile menu functionality
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+
+        if (mobileMenuButton && mobileSidebar) {
+            mobileMenuButton.addEventListener('click', () => {
+                mobileSidebar.classList.toggle('hidden');
+            });
+
+            mobileSidebar.addEventListener('click', (e) => {
+                if (e.target === mobileSidebar) {
+                    mobileSidebar.classList.add('hidden');
+                }
+            });
+        }
+
+    });
+
+    // Sort businesses by completion percentage and urgency
+    function sortBusinessRows() {
+        const tbody = document.querySelector('.business-table tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr.expandable-row'));
+        rows.sort((a, b) => {
+            const aVerified = a.dataset.verified === 'Verified';
+            const bVerified = b.dataset.verified === 'Verified';
+            const aCompletion = parseInt(a.dataset.completion) || 0;
+            const bCompletion = parseInt(b.dataset.completion) || 0;
+
+            if (aVerified !== bVerified) {
+                return aVerified ? 1 : -1;
+            }
+
+            return aCompletion - bCompletion;
+        });
+
+        rows.forEach(row => {
+            tbody.appendChild(row);
+            const detailsRow = document.getElementById(`details-${row.dataset.businessId}`);
+            if (detailsRow) {
+                tbody.appendChild(detailsRow);
+            }
+        });
+    }
+
+    function checkProfileStatus(businessId) {
+        const row = document.querySelector(`[data-business-id="${businessId}"]`);
+        if (!row) return;
+
+        const completion = parseInt(row.dataset.completion) || 0;
+        const verified = row.dataset.verified === 'Verified';
+
+        if (!verified) {
+            showAlertBanner('Your business profile requires verification. Click here to complete the process.', 'red');
+        } else if (completion < 100) {
+            showAlertBanner('Your business profile is missing important information. Click here to update.', 'orange');
+        }
+
+    }
+
+
 </script>
+
+{% include 'components/feedback_button.html' %}
+{% include 'components/compliance_modal.html' %}
+{% include 'components/seo_health_modal.html' %}
+{% include 'components/file_preview_modal.html' %}
+{% include 'components/delete_file_modal.html' %}
 </body>
 </html>
