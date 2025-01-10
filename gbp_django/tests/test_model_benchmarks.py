@@ -1,8 +1,8 @@
 import time
 import unittest
 from django.test import TestCase
-+from django.db import connections, OperationalError
-+from django.core.management import call_command
+from django.db import connections, OperationalError
+from django.core.management import call_command
 from django.conf import settings
 from gbp_django.utils.model_interface import GroqModel, OllamaModel
 
