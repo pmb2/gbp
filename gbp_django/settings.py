@@ -116,7 +116,8 @@ FEEDBACK_EMAIL = 'gbp.automation.pro@gmail.com'
 SUPPORT_EMAIL_SUBJECT_PREFIX = '[SUPPORT/FEEDBACK]'
 
 # AI/ML Configuration
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')  # Add this to your .env file
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+LLM_MODEL = os.getenv('LLM_MODEL', 'groq')  # 'groq' or 'ollama'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
