@@ -1,7 +1,7 @@
 import time
 import unittest
 from django.test import TestCase
-from django.db import connections, OperationalError
+from django.db import connections, OperationalError, ProgrammingError
 from django.core.management import call_command
 from django.conf import settings
 from gbp_django.utils.model_interface import GroqModel, OllamaModel
@@ -15,6 +15,16 @@ class ModelBenchmarkTests(TestCase):
             cursor.execute(f"SELECT 1 FROM pg_database WHERE datname='{database_name}'")
             return bool(cursor.fetchone())
         except OperationalError:
+            return False
+
+    def _extension_exists(self, extension_name):
+        """Check if a database extension exists."""
+        connection = connections['default']
+        cursor = connection.cursor()
+        try:
+            cursor.execute(f"SELECT 1 FROM pg_extension WHERE extname='{extension_name}'")
+            return bool(cursor.fetchone())
+        except ProgrammingError:
             return False
 
     def setUp(self):
@@ -40,10 +50,17 @@ class ModelBenchmarkTests(TestCase):
         # Check if the test database exists, and if so, skip creation
         test_db_name = connections['default'].settings_dict['NAME']
         if self._database_exists(test_db_name):
-            print(f"Test database '{test_db_name}' already exists. Skipping creation.")
+            print(f"Test database '{test_db_name}' already exists. Skipping creation and extension install.")
         else:
             call_command('test', verbosity=0)
-        
+
+        # Install the vector extension if it doesn't exist
+        if not self._extension_exists('vector'):
+            connection = connections['default']
+            cursor = connection.cursor()
+            cursor.execute("CREATE EXTENSION vector;")
+            connection.commit()
+            
     def test_response_generation_benchmark(self):
         results = {}
         
