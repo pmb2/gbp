@@ -656,9 +656,9 @@
                     if (position === level) {
                         // Use feature-specific color classes
                         const colorClasses = {
-                            'qa': ['bg-blue-600', 'border-blue-600'],
-                            'posts': ['bg-purple-600', 'border-purple-600'],
-                            'reviews': ['bg-green-600', 'border-green-600']
+                            'qa': ['bg-blue-500', 'border-blue-500'],
+                            'posts': ['bg-purple-500', 'border-purple-500'],
+                            'reviews': ['bg-green-500', 'border-green-500']
                         };
 
                         dot.classList.add('active', ...colorClasses[feature]);
@@ -667,8 +667,8 @@
                         // Show tooltip on hover
                         dot.title = `${feature.charAt(0).toUpperCase() + feature.slice(1)} Automation: ${level.charAt(0).toUpperCase() + level.slice(1)}`;
                     } else {
-                        dot.classList.remove('active', 'bg-blue-600', 'bg-purple-600', 'bg-green-600',
-                            'border-blue-600', 'border-purple-600', 'border-green-600');
+                        dot.classList.remove('active', 'bg-blue-500', 'bg-purple-500', 'bg-green-500',
+                            'border-blue-500', 'border-purple-500', 'border-green-500');
                         dot.classList.add('bg-white');
 
                         // Clear tooltip
