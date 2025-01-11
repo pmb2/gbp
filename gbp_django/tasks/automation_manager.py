@@ -3,6 +3,7 @@ from django.conf import settings
 from ..models import Business, Task
 from ..utils.email_service import EmailService
 
+
 class AutomationManager:
     def __init__(self, business):
         self.business = business
@@ -12,7 +13,7 @@ class AutomationManager:
     def handle_task(self, task_type, content):
         """Handle task based on automation settings"""
         automation_level = self._get_automation_level(task_type)
-        
+
         if automation_level == 'manual':
             self._create_notification(task_type, content)
         elif automation_level == 'approval':
@@ -28,6 +29,8 @@ class AutomationManager:
             return self.business.reviews_automation
         elif task_type == 'qa':
             return self.business.qa_automation
+        elif task_type == 'account_status':
+            return 'auto'  # Assume account status checks are always automatic
         return 'manual'  # Default to manual
 
     def _create_notification(self, task_type, content):
@@ -49,7 +52,7 @@ class AutomationManager:
                 hours=self.preferences.get('auto_approve_hours', 24)
             )
         )
-        
+
         self.email_service.send_content_approval(
             self.business,
             task_type,
@@ -66,14 +69,16 @@ class AutomationManager:
             status='completed',
             executed_at=datetime.now()
         )
-        
+
         if task_type == 'post':
             self._create_post(content)
         elif task_type == 'review':
             self._respond_to_review(content)
         elif task_type == 'qa':
             self._answer_question(content)
-            
+        elif task_type == 'account_status':
+            self._check_account_status()
+
         self._send_execution_report(task)
 
     def _send_execution_report(self, task):
@@ -88,7 +93,7 @@ class AutomationManager:
     def check_compliance(self):
         """Check business profile compliance"""
         issues = []
-        
+
         # Check profile completeness
         completion = self.business.calculate_profile_completion()
         if completion < 100:
@@ -113,6 +118,27 @@ class AutomationManager:
                 issues
             )
 
+    def monitor_reviews(self):
+        """Monitor and respond to reviews"""
+        new_reviews = self.business.get_new_reviews()
+        for review in new_reviews:
+            self._execute_task('review', review)
+
+    def monitor_questions(self):
+        """Monitor and answer new Q&A"""
+        new_questions = self.business.get_new_questions()
+        for question in new_questions:
+            self._execute_task('qa', question)
+
+    def _check_account_status(self):
+        """Check account status and alert if necessary"""
+        status = self.business.get_account_status()
+        if status != 'active':
+            self.email_service.send_compliance_alert(
+                self.business,
+                [f"Account status: {status}"]
+            )
+
     def generate_weekly_report(self):
         """Generate and send weekly performance report"""
         report_data = {
@@ -122,7 +148,7 @@ class AutomationManager:
             'qa_stats': self._get_qa_stats(),
             'compliance_score': self.business.compliance_score
         }
-        
+
         self.email_service.send_weekly_report(
             self.business,
             report_data

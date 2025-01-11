@@ -776,7 +776,7 @@ def submit_feedback(request):
         data = json.loads(request.body)
         feedback_type = data.get('type', 'Not specified')
         message = data.get('message', '')
-        user_email = request.user.email if request.user.is_authenticated else 'Anonymous'
+        user_email = request.user.email if request.user.is_authenticated else 'GBP Automation Pro support'
 
         # Forward feedback using email service
         EmailService.forward_feedback(user_email, feedback_type, message)

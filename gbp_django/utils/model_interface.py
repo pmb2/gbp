@@ -105,7 +105,7 @@ class OllamaModel(LLMInterface):
             response = requests.post(
                 f"{self.base_url}/chat",
                 json={
-                    "model": "phi",
+                    "model": "phi4",
                     "messages": messages,
                     "stream": False
                 }

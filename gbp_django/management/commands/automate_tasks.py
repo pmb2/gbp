@@ -1,25 +1,16 @@
 from django.core.management.base import BaseCommand
-from gbp_django.models import Business
-from gbp_django.utils.google_oauth import upload_photo, generate_post, update_qa, respond_to_reviews
+from gbp_django.tasks.tasks import automate_all_business_tasks
+
 
 class Command(BaseCommand):
-    help = 'Automate tasks like photo uploads, post creation, and review responses.'
+    help = 'Trigger automation tasks for all businesses.'
 
     def handle(self, *args, **kwargs):
-        businesses = Business.objects.all()
-        for business in businesses:
-            self.stdout.write(f"Processing business: {business.business_name}")
+        self.stdout.write("Starting automation tasks for all businesses...")
 
-            # Automate photo uploads
-            upload_photo(business)
+        # Trigger Celery task for all business automation
+        result = automate_all_business_tasks.delay()
 
-            # Generate and schedule posts
-            generate_post(business)
-
-            # Update Q&A
-            update_qa(business)
-
-            # Respond to reviews
-            respond_to_reviews(business)
-
-        self.stdout.write(self.style.SUCCESS('Successfully automated tasks for all businesses.'))
+        # Log task ID and success
+        self.stdout.write(f"Task ID: {result.id}")
+        self.stdout.write(self.style.SUCCESS('Automation tasks successfully triggered.'))
