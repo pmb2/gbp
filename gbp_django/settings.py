@@ -8,15 +8,16 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'your-secret-key'
+SECRET_KEY = 'T0PS3CR3TSH1T'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['gbp.backus.agency', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['138.197.95.73', 'gbp.backus.agency', 'localhost']
 
-# CSRF Settings
-CSRF_TRUSTED_ORIGINS = ['https://gbp.backus.agency']
+CSRF_TRUSTED_ORIGINS = [
+    'https://gbp.backus.agency',
+]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -82,12 +83,12 @@ WSGI_APPLICATION = 'gbp_django.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gbp-flask',
-        'USER': 'postgres',
-        'PASSWORD': 'o2pmbDB!',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': os.getenv('DATABASE_ENGINE'),
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD'),
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -119,7 +120,8 @@ FEEDBACK_EMAIL = 'gbp.automation.pro@gmail.com'
 SUPPORT_EMAIL_SUBJECT_PREFIX = '[SUPPORT/FEEDBACK]'
 
 # AI/ML Configuration
-GROQ_API_KEY = os.getenv('GROQ_API_KEY')  # Add this to your .env file
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+LLM_MODEL = os.getenv('LLM_MODEL', 'groq')  # 'groq' or 'ollama'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -138,7 +140,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.getenv('CLIENT_SECRET'),
             'key': ''
         },
-        'OAUTH_CALLBACK_URL': 'https://gbp.backus.agency/google/callback/'
+        'REDIRECT_URI': 'https://gbp.backus.agency/google/callback/'
     }
 }
 
@@ -148,18 +150,18 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-SITE_ID = 3
+SITE_ID = 4
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Add this line
 MEDIA_ROOT = BASE_DIR / "media"
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/gbp/static'
+STATICFILES_DIRS = []
 
 # Site URL for email verification links
-SITE_URL = 'https://gbp.backus.agency'  # Production URL
+SITE_URL = 'https://gbp.backus.agency'
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
