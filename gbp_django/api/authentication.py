@@ -26,6 +26,7 @@ def refresh_access_token(refresh_token, client_id, client_secret):
     response = requests.post(url, data=payload)
     response.raise_for_status()
     return response.json()
+
 def get_user_info(access_token):
     from django.contrib.sessions.backends.db import SessionStore
     url = "https://openidconnect.googleapis.com/v1/userinfo"
