@@ -213,6 +213,16 @@ def store_business_data(business_data, user_id, access_token):
                     'compliance_score': calculate_compliance_score(location),
                     'last_post_date': location.get('profile', {}).get('lastPostDate'),
                     'next_update_date': calculate_next_update(location)
+                        'enabled': True,
+                        'compliance_alerts': True,
+                        'content_approval': True,
+                        'weekly_summary': True,
+                        'verification_reminders': True
+                    },
+                    'automation_status': 'Active',
+                    'compliance_score': calculate_compliance_score(location),
+                    'last_post_date': location.get('profile', {}).get('lastPostDate'),
+                    'next_update_date': calculate_next_update(location)
                 })
 
                 # Store additional attributes
