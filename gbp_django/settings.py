@@ -13,7 +13,7 @@ SECRET_KEY = 'your-secret-key'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gbp.backus.agency', 'localhost', '127.0.0.1']
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
