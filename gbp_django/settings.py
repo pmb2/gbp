@@ -8,12 +8,16 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'your-secret-key'
+SECRET_KEY = 'T0PS3CR3TSH1T'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['138.197.95.73','gbp.backus.agency', 'localhost']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://gbp.backus.agency',
+]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
@@ -135,7 +139,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.getenv('CLIENT_ID'),
             'secret': os.getenv('CLIENT_SECRET'),
             'key': ''
-        }
+        },
+        'REDIRECT_URI': 'https://gbp.backus.agency/google/callback/'
     }
 }
 
@@ -149,14 +154,14 @@ SITE_ID = 3
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
-STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Add this line
 MEDIA_ROOT = BASE_DIR / "media"
+STATIC_URL = '/static/'
+STATIC_ROOT = '/var/www/gbp/static'
+STATICFILES_DIRS = []
 
 # Site URL for email verification links
-SITE_URL = 'http://localhost:8000'  # Change this in production
+SITE_URL = 'https://gbp.backus.agency'
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_VERIFICATION = 'none'

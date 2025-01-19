@@ -210,7 +210,8 @@ def direct_google_oauth(request):
     request.session['oauth_action'] = 'add_business' if request.user.is_authenticated else 'login'
 
     # Construct OAuth URL
-    callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
+    # callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
+    callback_url = 'https://gbp.backus.agency/google/callback/'
     scope = ' '.join([
         'openid',
         'https://www.googleapis.com/auth/business.manage',
@@ -239,36 +240,42 @@ def direct_google_oauth(request):
 
 
 def google_oauth_callback(request):
-    """Handle the callback from Google OAuth"""
     try:
         print("\n[DEBUG] Starting Google OAuth callback...")
 
+        # Extract parameters
         code = request.GET.get('code')
         state = request.GET.get('state')
         stored_state = request.session.get('oauth_state')
 
-        # Validate the OAuth state and authorization code
+        # Validate state
         if not code or not state or state != stored_state:
             print("[ERROR] OAuth validation failed")
             messages.error(request, 'Invalid OAuth state or missing code.')
             return redirect('login')
 
-        # Get tokens using the authorization code
-        from allauth.socialaccount.models import SocialApp
-        google_app = SocialApp.objects.get(provider='google')
+        # Get Google SocialApp credentials
+        try:
+            google_app = SocialApp.objects.get(provider='google')
+        except SocialApp.DoesNotExist:
+            print("[ERROR] Google SocialApp is not configured.")
+            messages.error(request, "Google integration is not configured. Please contact support.")
+            return redirect('login')
 
+        # Exchange the authorization code for tokens
         tokens = get_access_token(
-            code,
-            google_app.client_id,
-            google_app.secret,
-            request.build_absolute_uri(reverse('google_oauth_callback'))
+            code=code,
+            client_id=google_app.client_id,
+            client_secret=google_app.secret,
+            redirect_uri='https://gbp.backus.agency/google/callback/'
         )
 
         access_token = tokens.get('access_token')
         refresh_token = tokens.get('refresh_token')
 
         if not access_token:
-            messages.error(request, 'Failed to get access token.')
+            print("[ERROR] Failed to retrieve access token.")
+            messages.error(request, 'Failed to retrieve access token from Google.')
             return redirect('login')
 
         # Fetch user info from Google
@@ -291,43 +298,20 @@ def google_oauth_callback(request):
         user.profile_picture_url = user_info.get('picture')
         user.google_access_token = access_token
         user.google_refresh_token = refresh_token
-        user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        user.google_token_expiry = now() + timedelta(seconds=tokens.get('expires_in', 3600))
         user.save()
 
-        # Log in the user
+        # Log the user in
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
 
-        # Fetch and store business data
-        print("[INFO] Fetching business accounts...")
-        business_data = get_business_accounts(access_token)
-        stored_businesses = store_business_data(business_data, user.id, access_token)
-
-        if stored_businesses:
-            print(f"[INFO] Stored {len(stored_businesses)} business(es).")
-            messages.success(request, f"Successfully linked {len(stored_businesses)} business(es).")
-        else:
-            print("[WARNING] No businesses found; creating placeholder.")
-            messages.warning(request, "No businesses were found. A placeholder has been created.")
-
-        # Clean up session flags
-        request.session['google_token'] = access_token
-        if refresh_token:
-            request.session['refresh_token'] = refresh_token
-        request.session.pop('oauth_state', None)
-
+        messages.success(request, "Successfully authenticated with Google!")
         return redirect('index')
 
-    except SocialApp.DoesNotExist:
-        print("[ERROR] Google SocialApp is not configured.")
-        messages.error(request, "Google integration is not configured. Please contact support.")
-        return redirect('login')
-
     except Exception as e:
-        print(f"[ERROR] OAuth callback error: {e}")
+        print(f"[ERROR] OAuth callback error: {str(e)}")
         messages.error(request, "An error occurred during authentication. Please try again.")
         return redirect('login')
-
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods

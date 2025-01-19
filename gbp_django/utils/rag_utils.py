@@ -258,7 +258,7 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             f"{business_context}\n\n"
             f"📚 Knowledge Base Context:\n"
             f"{'-' * 40}\n"
-            f"{'\n'.join(knowledge_context) if knowledge_context else 'No specific documentation found for this query.'}\n\n"
+            f"{''.join(knowledge_context) if knowledge_context else 'No specific documentation found for this query.'}\n\n"
             f"💬 Recent Chat Context:\n"
             f"{'-' * 40}\n"
         )

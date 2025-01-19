@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from pgvector.django import VectorField
 
 class UserManager(BaseUserManager):
@@ -15,13 +15,13 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, google_id, password=None, **extra_fields):
+    def create_superuser(self, email, google_id=None, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
         return self.create_user(email, google_id, password, **extra_fields)
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     google_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -31,7 +31,6 @@ class User(AbstractBaseUser):
     google_token_expiry = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
@@ -44,6 +43,18 @@ class User(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+
+    def has_perm(self, perm, obj=None):
+        """
+        Returns True if the user has the specified permission.
+        """
+        return True
+
+    def has_module_perms(self, app_label):
+        """
+        Returns True if the user has permissions for the given app.
+        """
+        return True
 
 class Session(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -65,7 +76,7 @@ class Session(models.Model):
         except Session.DoesNotExist:
             return None
 
-#
+
 class Business(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     business_name = models.CharField(max_length=255)
