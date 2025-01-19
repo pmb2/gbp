@@ -158,6 +158,14 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
+    # Get the Google email from the user's social account
+    from allauth.socialaccount.models import SocialAccount
+    try:
+        social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+        google_email = social_account.extra_data.get('email')
+    except SocialAccount.DoesNotExist:
+        google_email = None
+
     # Process each account from Google API
     for account in accounts:
         try:
@@ -187,8 +195,34 @@ def store_business_data(business_data, user_id, access_token):
                     'website_url': location.get('websiteUrl', 'Pending'),
                     'category': location.get('primaryCategory', {}).get('displayName', 'Pending'),
                     'is_verified': location.get('locationState', {}).get('isVerified', False),
-                    'description': location.get('profile', {}).get('description', '')
+                    'description': location.get('profile', {}).get('description', ''),
+                    'google_email': google_email,
+                    'email_verification_pending': True,
+                    'email_verification_token': secrets.token_urlsafe(32),
+                    'email_settings': {
+                        'enabled': True,
+                        'compliance_alerts': True,
+                        'content_approval': True,
+                        'weekly_summary': True,
+                        'verification_reminders': True
+                    },
+                    'automation_status': 'Active',
+                    'compliance_score': calculate_compliance_score(location),
+                    'last_post_date': location.get('profile', {}).get('lastPostDate'),
+                    'next_update_date': calculate_next_update(location)
                 })
+
+                # Store additional attributes
+                attributes = {
+                    'opening_hours': location.get('regularHours', {}),
+                    'special_hours': location.get('specialHours', {}),
+                    'service_area': location.get('serviceArea', {}),
+                    'labels': location.get('labels', []),
+                    'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                    'business_type': location.get('metadata', {}).get('businessType', ''),
+                    'year_established': location.get('metadata', {}).get('yearEstablished', ''),
+                    'employee_count': location.get('metadata', {}).get('employeeCount', '')
+                }
             else:
                 # No locations found - store with pending values
                 business_details.update({
