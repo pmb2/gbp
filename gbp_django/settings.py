@@ -137,7 +137,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.getenv('CLIENT_ID'),
             'secret': os.getenv('CLIENT_SECRET'),
             'key': ''
-        }
+        },
+        'OAUTH_CALLBACK_URL': 'https://gbp.backus.agency/google/callback/'
     }
 }
 
@@ -158,7 +159,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"  # Add this line
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Site URL for email verification links
-SITE_URL = 'http://localhost:8000'  # Change this in production
+SITE_URL = 'https://gbp.backus.agency'  # Production URL
 
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
