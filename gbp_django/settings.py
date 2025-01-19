@@ -15,6 +15,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['gbp.backus.agency', 'localhost', '127.0.0.1']
 
+# CSRF Settings
+CSRF_TRUSTED_ORIGINS = ['https://gbp.backus.agency']
+
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 AUTHENTICATION_BACKENDS = [
