@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import login_required
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.root_view, name='root'),
@@ -39,3 +40,7 @@ urlpatterns = [
     path('api/business/<str:business_id>/memories/',
          views.get_business_memories, name='get_memories'),
 ]
+
+# Append static file URLs if DEBUG is True
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
