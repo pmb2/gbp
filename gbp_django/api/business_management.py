@@ -158,13 +158,15 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
 
-    # Get the Google email from the user's social account
+    # Get the Google email and account info from the user's social account
     from allauth.socialaccount.models import SocialAccount
     try:
         social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
         google_email = social_account.extra_data.get('email')
+        google_account_id = social_account.uid
     except SocialAccount.DoesNotExist:
         google_email = None
+        google_account_id = None
 
     # Process each account from Google API
     for account in accounts:
@@ -241,21 +243,30 @@ def store_business_data(business_data, user_id, access_token):
             except SocialAccount.DoesNotExist:
                 google_email = None
 
-            # Try to find existing business by Google email first
+            # Try to find existing business using multiple identifiers
             existing_business = None
-            if google_email:
+            
+            # Check by Google account ID first (most reliable)
+            if google_account_id:
+                existing_business = Business.objects.filter(
+                    google_account_id=google_account_id
+                ).first()
+            
+            # If not found, try by Google email
+            if not existing_business and google_email:
                 existing_business = Business.objects.filter(
                     google_email=google_email
                 ).first()
-
-            # If not found by email, try Google account ID as fallback
-            if not existing_business:
+                
+            # Finally try by business location ID if available
+            if not existing_business and business_details.get('google_location_id'):
                 existing_business = Business.objects.filter(
-                    google_account_id=business_details['google_account_id']
+                    google_location_id=business_details['google_location_id']
                 ).first()
 
-            # Add Google email to business details
+            # Add Google identifiers to business details
             business_details['google_email'] = google_email
+            business_details['google_account_id'] = google_account_id
             
             if existing_business:
                 # Update existing business
@@ -264,10 +275,32 @@ def store_business_data(business_data, user_id, access_token):
                 existing_business.save()
                 business = existing_business
                 created = False
+                
+                # Update business attributes
+                if 'attributes' in locals():
+                    for key, value in attributes.items():
+                        if value:  # Only store non-empty attributes
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key=key,
+                                defaults={
+                                    'value': json.dumps(value) if isinstance(value, (dict, list)) else str(value)
+                                }
+                            )
             else:
                 # Create new business
                 business = Business.objects.create(**business_details)
                 created = True
+                
+                # Store initial business attributes
+                if 'attributes' in locals():
+                    for key, value in attributes.items():
+                        if value:  # Only store non-empty attributes
+                            BusinessAttribute.objects.create(
+                                business=business,
+                                key=key,
+                                value=json.dumps(value) if isinstance(value, (dict, list)) else str(value)
+                            )
             
             stored_businesses.append(business)
             print(f"[INFO] {'Created' if created else 'Updated'} business: {business.business_name}")
