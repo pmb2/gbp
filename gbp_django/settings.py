@@ -17,7 +17,11 @@ ALLOWED_HOSTS = ['138.197.95.73', 'gbp.backus.agency', 'localhost']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://gbp.backus.agency',
+    'http://138.197.95.73',
 ]
+
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
