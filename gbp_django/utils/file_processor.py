@@ -324,7 +324,8 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         file_type=mime_type,
                         file_size=file_size,
                         chunk_index=idx,
-                        total_chunks=total_chunks
+                        total_chunks=total_chunks,
+                        id=f"{business_id}-{int(time.time())}-{idx}"  # Ensure unique ID per chunk
                     )
                     faqs.append(faq)
                 except Exception as chunk_error:

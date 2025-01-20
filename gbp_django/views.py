@@ -956,9 +956,17 @@ def get_memories(request, business_id):
         }, status=500)
 
 def preview_file(request, business_id, file_id):
-    """Preview or delete file content"""
+    """Preview or delete file content with enhanced error handling"""
     try:
-        faq = FAQ.objects.get(
+        # Validate file_id
+        if not file_id or file_id == 'null':
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid file ID'
+            }, status=400)
+
+        # Get FAQ with related business
+        faq = FAQ.objects.select_related('business').get(
             id=file_id,
             business__business_id=business_id,
             business__user=request.user,
@@ -966,10 +974,18 @@ def preview_file(request, business_id, file_id):
         )
         
         if request.method == "GET":
-            return JsonResponse({
-                'name': faq.file_path.split('/')[-1] if faq.file_path else 'Unknown',
-                'content': faq.answer
-            })
+            response_data = {
+                'status': 'success',
+                'file': {
+                    'id': faq.id,
+                    'name': faq.file_path.split('/')[-1] if faq.file_path else 'Unknown',
+                    'content': faq.answer,
+                    'type': faq.file_type,
+                    'created_at': faq.created_at.isoformat(),
+                    'size': faq.file_size if hasattr(faq, 'file_size') else None
+                }
+            }
+            return JsonResponse(response_data)
         elif request.method == "DELETE":
             from django.utils import timezone
             from django.utils import timezone
