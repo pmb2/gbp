@@ -132,13 +132,13 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         # Generate embedding with validation
         try:
             print("\nStarting content preprocessing...")
-                
+            
             # Clean and normalize text content
             text_content = text_content.replace('\r', '\n')
             text_content = text_content.replace('\t', ' ')
             text_content = '\n'.join(line.strip() for line in text_content.split('\n'))
             text_content = '\n'.join(filter(None, text_content.split('\n')))  # Remove empty lines
-                
+            
             if not text_content.strip():
                 raise ValueError("Text content is empty after cleaning")
                     
@@ -239,10 +239,15 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                             'embedding': embedding
                         })
                         print(f"Successfully generated embedding for chunk {idx + 1}")
-                    
-                except Exception as e:
-                    print(f"Error processing chunk {idx + 1}: {str(e)}")
-                    continue
+                        break  # Exit retry loop on success
+                        
+                    except Exception as e:
+                        print(f"Error processing chunk {idx + 1}: {str(e)}")
+                        retry_count += 1
+                        if retry_count >= max_retries:
+                            print(f"Max retries reached for chunk {idx + 1}")
+                            break
+                        continue
             
             if not embeddings:
                 error_msg = "Failed to generate embeddings.\n"
