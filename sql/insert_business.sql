@@ -19,7 +19,8 @@ INSERT INTO gbp_django_business (
     created_at,
     updated_at,
     user_id,
-    verification_status
+    verification_status,
+    verification_method
 ) VALUES (
     'Test Business',
     'test-business-1',
@@ -41,5 +42,6 @@ INSERT INTO gbp_django_business (
     NOW(),
     NOW(),
     1,
-    'UNVERIFIED'
+    'UNVERIFIED',
+    'NONE'
 );
