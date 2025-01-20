@@ -239,12 +239,12 @@ def store_business_data(business_data, user_id, access_token):
             # Get the Google email from the user's social account
             from allauth.socialaccount.models import SocialAccount
             try:
-                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')                
                 google_email = social_account.extra_data.get('email')
             except SocialAccount.DoesNotExist:
                 google_email = None
 
-            # Try to find existing business using multiple identifiers
+            # Try to find existing business using multiple identifiers, prioritizing google_account_id
             existing_business = None
             
             # Check by Google account ID first (most reliable)
@@ -263,10 +263,10 @@ def store_business_data(business_data, user_id, access_token):
             if not existing_business and business_details.get('google_location_id'):
                 existing_business = Business.objects.filter(
                     google_location_id=business_details['google_location_id']
-                ).first()
+                ).first()            
 
-            # Add Google identifiers to business details
-            business_details['google_email'] = google_email
+            # Add Google identifiers to business details, even if they are None
+            business_details['google_email'] = google_email            
             business_details['google_account_id'] = google_account_id
             
             if existing_business:
@@ -280,13 +280,13 @@ def store_business_data(business_data, user_id, access_token):
                 # Update business attributes
                 if 'attributes' in locals():
                     for key, value in attributes.items():
-                        if value:  # Only store non-empty attributes
+                        if value is not None:  # Only store non-null attributes
                             BusinessAttribute.objects.update_or_create(
                                 business=business,
                                 key=key,
                                 defaults={
                                     'value': json.dumps(value) if isinstance(value, (dict, list)) else str(value)
-                                }
+                                }                                
                             )
             else:
                 # Create new business
@@ -295,11 +295,11 @@ def store_business_data(business_data, user_id, access_token):
                 
                 # Store initial business attributes
                 if 'attributes' in locals():
-                    for key, value in attributes.items():
-                        if value:  # Only store non-empty attributes
+                    for key, value in attributes.items():                        
+                        if value is not None:  # Only store non-null attributes
                             BusinessAttribute.objects.create(
                                 business=business,
-                                key=key,
+                                key=key,                                
                                 value=json.dumps(value) if isinstance(value, (dict, list)) else str(value)
                             )
             
@@ -316,56 +316,61 @@ def store_business_data(business_data, user_id, access_token):
         timestamp = int(time.time())
         business_id = f"gbp-oauth-{user_id}-{timestamp}"
         
-        # Get user info from social account
+        # Get user info from social account if available
         from allauth.socialaccount.models import SocialAccount
         try:
             social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
             user_info = social_account.extra_data
             business_name = user_info.get('name', '').strip() or 'New Business'
             business_email = user_info.get('email', '').strip() or 'pending@verification.com'
-        except SocialAccount.DoesNotExist:
-            business_name = 'New Business'
-            business_email = 'pending@verification.com'
-            
-        # Always create a new unverified business
-        business = Business.objects.create(
-            user_id=user_id,
-            business_id=business_id,
-            business_name=business_name,
-            business_email=business_email,
-            is_verified=False,
-            is_connected=True,  # Connected via OAuth
-            email_verification_pending=True,
-            email_verification_token=secrets.token_urlsafe(32),
-            address='Pending verification',
-            phone_number='Pending verification',
-            website_url='Pending verification', 
-            category='Pending verification',
-            email_settings={
-                'enabled': True,
-                'compliance_alerts': True,
-                'content_approval': True,
-                'weekly_summary': True,
-                'verification_reminders': True
-            },
-            automation_status='Active'
-        )
-        
-        # Create notification
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        try:
-            user = User.objects.get(id=user_id)
-            Notification.objects.create(
-                user=user,
-                message="Please complete your business profile to get started.",
-                notification_type="PROFILE_COMPLETION"
-            )
-        except Exception as e:
-            print(f"[WARNING] Failed to create notification: {str(e)}")
-        
-        stored_businesses = [business]
-        return stored_businesses
++            google_email = user_info.get('email', '').strip()
++            google_account_id = social_account.uid
++
++        except SocialAccount.DoesNotExist:
++            business_name = 'New Business'
++            business_email = 'pending@verification.com'
++            
++        # Always create a new unverified business
++        business = Business.objects.create(
++            user_id=user_id,
++            business_id=business_id,
++            google_email=google_email,
++            google_account_id=google_account_id,
++            business_name=business_name,
++            business_email=business_email,
++            is_verified=False,
++            is_connected=True,  # Connected via OAuth
++            email_verification_pending=True,
++            email_verification_token=secrets.token_urlsafe(32),
++            address='Pending verification',
++            phone_number='Pending verification',
++            website_url='Pending verification', 
++            category='Pending verification',
++            email_settings={
++                'enabled': True,
++                'compliance_alerts': True,
++                'content_approval': True,
++                'weekly_summary': True,
++                'verification_reminders': True
++            },
++            automation_status='Active'
++        )
++        
++        # Create notification
++        from django.contrib.auth import get_user_model
++        User = get_user_model()
++        try:
++            user = User.objects.get(id=user_id)
++            Notification.objects.create(
++                user=user,
++                message="Please complete your business profile to get started.",
++                notification_type="PROFILE_COMPLETION"
++            )
++        except Exception as e:
++            print(f"[WARNING] Failed to create notification: {str(e)}")
++        
++        stored_businesses = [business]        
++        return stored_businesses
 
     # Process each account's business data
     
