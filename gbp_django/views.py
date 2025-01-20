@@ -240,17 +240,21 @@ def direct_google_oauth(request):
 
 
 def google_oauth_callback(request):
-    """Handle Google OAuth callback with enhanced business data sync"""
+    """Handle Google OAuth callback with robust error handling and business sync"""
     try:
         print("\n[DEBUG] Starting Google OAuth callback...")
         print(f"[DEBUG] Request method: {request.method}")
         print(f"[DEBUG] Query params: {dict(request.GET)}")
+        print(f"[DEBUG] Session data: {dict(request.session)}")
 
-        # Extract and validate parameters
+        # Extract and validate parameters with detailed logging
         code = request.GET.get('code')
         state = request.GET.get('state')
         stored_state = request.session.get('oauth_state')
         oauth_action = request.session.get('oauth_action', 'login')
+        
+        # Track request flow
+        request.session['oauth_flow'] = 'started'
 
         print(f"[DEBUG] OAuth action: {oauth_action}")
         print(f"[DEBUG] State validation: received={state}, stored={stored_state}")

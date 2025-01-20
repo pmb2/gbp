@@ -154,13 +154,23 @@ from ..models import Business
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
-    """Store business data from Google API response"""
+    """Store business data with enhanced validation and error handling"""
     print("\n[DEBUG] Starting business data storage...")
-    print(f"[DEBUG] Raw business data received: {business_data}")
+    print(f"[DEBUG] User ID: {user_id}")
+    print(f"[DEBUG] Access token present: {bool(access_token)}")
+    print(f"[DEBUG] Raw business data: {json.dumps(business_data, indent=2)}")
 
     stored_businesses = []
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
+
+    # Validate user exists
+    try:
+        user = User.objects.get(id=user_id)
+        print(f"[DEBUG] Found user: {user.email}")
+    except User.DoesNotExist:
+        print(f"[ERROR] User {user_id} not found")
+        raise ValueError(f"Invalid user ID: {user_id}")
 
     # Get Google account info
     try:

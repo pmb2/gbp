@@ -83,6 +83,28 @@ class Business(models.Model):
     id = models.BigAutoField(primary_key=True)
     business_id = models.CharField(max_length=255, unique=True, default='unverified')
     google_account_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    verification_status = models.CharField(
+        max_length=50,
+        choices=[
+            ('UNVERIFIED', 'Unverified'),
+            ('PENDING', 'Verification Pending'),
+            ('VERIFIED', 'Verified'),
+            ('SUSPENDED', 'Suspended'),
+        ],
+        default='UNVERIFIED'
+    )
+    verification_method = models.CharField(
+        max_length=50,
+        choices=[
+            ('NONE', 'None'),
+            ('EMAIL', 'Email'),
+            ('PHONE', 'Phone'),
+            ('POSTCARD', 'Postcard'),
+            ('OTHER', 'Other'),
+        ],
+        default='NONE'
+    )
+    last_verification_attempt = models.DateTimeField(null=True, blank=True)
     business_email = models.EmailField(max_length=255, default='pending@verification.com')
     email_verification_token = models.CharField(max_length=100, null=True, blank=True)
     email_verification_pending = models.BooleanField(default=True)
