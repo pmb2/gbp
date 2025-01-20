@@ -138,6 +138,7 @@ class OllamaModel(LLMInterface):
             return "I apologize, but I'm unable to generate a response at the moment."
     
     def generate_embedding(self, text: str) -> Optional[List[float]]:
+        """Generate embeddings with better error handling and automatic fallback"""
         try:
             text = text.strip().replace('\n', ' ')
             
@@ -145,33 +146,46 @@ class OllamaModel(LLMInterface):
             if len(text) > 8000:
                 text = text[:8000]
             
-            response = requests.post(
-                f"{self.base_url}/embeddings",
-                json={
-                    "model": "nomic-embed-text",
-                    "prompt": text,
-                    "options": {
-                        "temperature": 0,
-                        "num_ctx": 8192
-                    }
-                }
-            )
-            response.raise_for_status()
-            
-            embedding = response.json()['embedding']
-            
-            # Handle different embedding dimensions
-            if len(embedding) == 1536:
-                return embedding
-            elif len(embedding) == 768:
-                return embedding * 2  # Repeat to get 1536 dims
-            else:
-                print(f"[WARNING] Invalid embedding dimensions: {len(embedding)}")
-                return None
+            try:
+                # Try to connect to Ollama with a short timeout
+                response = requests.post(
+                    f"{self.base_url}/embeddings",
+                    json={
+                        "model": "nomic-embed-text",
+                        "prompt": text,
+                        "options": {
+                            "temperature": 0,
+                            "num_ctx": 8192
+                        }
+                    },
+                    timeout=2  # Short timeout to fail fast if Ollama is down
+                )
+                response.raise_for_status()
+                
+                embedding = response.json()['embedding']
+                
+                # Handle different embedding dimensions
+                if len(embedding) == 1536:
+                    return embedding
+                elif len(embedding) == 768:
+                    return embedding * 2  # Repeat to get 1536 dims
+                else:
+                    print(f"[WARNING] Invalid embedding dimensions: {len(embedding)}")
+                    raise ValueError("Invalid embedding dimensions")
+                    
+            except (requests.exceptions.ConnectionError, 
+                    requests.exceptions.Timeout) as e:
+                print(f"Ollama service unavailable, falling back to Groq: {str(e)}")
+                raise  # Re-raise to trigger fallback
+                
+            except Exception as e:
+                print(f"Error with Ollama embedding: {str(e)}")
+                raise  # Re-raise to trigger fallback
                 
         except Exception as e:
-            print(f"Error generating embedding with Ollama: {str(e)}")
-            return None
+            # Fall back to Groq for embeddings
+            print(f"Falling back to Groq for embeddings: {str(e)}")
+            return GroqModel().generate_embedding(text)
 
 def get_llm_model() -> LLMInterface:
     """Factory function to get the configured LLM model"""
