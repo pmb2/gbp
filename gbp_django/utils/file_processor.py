@@ -312,29 +312,38 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         # Create FAQ entries for each chunk with file metadata
         try:
             faqs = []
+            total_chunks = len(embeddings)
             for idx, chunk_data in enumerate(embeddings):
-                faq = FAQ.objects.create(
-                    business=business,
-                    question=f"Content from {filename} (Part {idx + 1}/{len(embeddings)})",
-                    answer=chunk_data['text'],
-                    embedding=chunk_data['embedding'],
-                    file_path=saved_path,
-                    file_type=mime_type,
-                    file_size=file_size,
-                    chunk_index=idx
-                )
-                faqs.append(faq)
+                try:
+                    faq = FAQ.objects.create(
+                        business=business,
+                        question=f"Content from {filename} (Part {idx + 1}/{total_chunks})",
+                        answer=chunk_data['text'],
+                        embedding=chunk_data['embedding'],
+                        file_path=saved_path,
+                        file_type=mime_type,
+                        file_size=file_size,
+                        chunk_index=idx,
+                        total_chunks=total_chunks
+                    )
+                    faqs.append(faq)
+                except Exception as chunk_error:
+                    print(f"Error creating FAQ for chunk {idx}: {str(chunk_error)}")
+                    continue
         except Exception as e:
             # Cleanup stored file if FAQ creation fails
             default_storage.delete(saved_path)
             raise ValueError(f"Failed to create FAQ entry: {str(e)}")
 
+        # Return summary of processed file
         return {
-            'id': faq.id,
+            'id': faqs[-1].id if faqs else None,
             'name': filename,
             'size': file_size,
             'type': mime_type,
-            'path': saved_path
+            'path': saved_path,
+            'chunks_processed': len(faqs),
+            'total_chunks': len(embeddings)
         }
 
     except (ValueError, IOError) as e:
