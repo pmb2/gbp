@@ -209,9 +209,11 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     current_length += para_length
             
             # Add final chunk if it meets minimum size
-            if len(current_chunk.strip()) >= MIN_CHUNK_SIZE:
-                chunks.append(current_chunk.strip())
-                print(f"Created final chunk of {len(current_chunk)} characters")
+            if current_chunk:
+                final_chunk = ' '.join(current_chunk)
+                if len(final_chunk) >= MIN_CHUNK_SIZE:
+                    chunks.append(final_chunk)
+                    print(f"Created final chunk of {len(final_chunk)} characters")
             
             print(f"Created {len(chunks)} chunks for processing")
             
