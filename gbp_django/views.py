@@ -298,7 +298,7 @@ def google_oauth_callback(request):
         user.profile_picture_url = user_info.get('picture')
         user.google_access_token = access_token
         user.google_refresh_token = refresh_token
-        user.google_token_expiry = now() + timedelta(seconds=tokens.get('expires_in', 3600))
+        user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
         user.save()
 
         # Log the user in

@@ -7,6 +7,7 @@ import json
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.sessions.backends.db import SessionStore
+from django.core.exceptions import ObjectDoesNotExist
 from allauth.socialaccount.models import SocialAccount
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.utils.cache import cache_on_arguments
@@ -14,6 +15,7 @@ from gbp_django.models import (
     Business, Post, BusinessAttribute,
     QandA, Review, Notification
 )
+from gbp_django.utils.logging_utils import log_api_request
 
 def create_business_location(access_token, account_id, location_data):
     """Create a new business location."""
@@ -299,6 +301,7 @@ def get_locations(access_token, account_id):
         "Content-Type": "application/json"
     }
     try:
+        log_api_request(None, account_id, 'get_locations', 'Fetching location data')
         response = requests.get(url, headers=headers)
         response.raise_for_status()
 
@@ -306,18 +309,39 @@ def get_locations(access_token, account_id):
         locations_data = response.json()
         if 'locations' in locations_data:
             for location in locations_data['locations']:
-                verification_url = f"https://mybusinessverifications.googleapis.com/v1/{location['name']}/verification"
-                verification_response = requests.get(verification_url, headers=headers)
-                if verification_response.ok:
-                    verification_data = verification_response.json()
-                    location['verification_state'] = verification_data.get('state', 'UNVERIFIED')
-                    location['verification_method'] = verification_data.get('method', 'NONE')
+                try:
+                    verification_url = f"https://mybusinessverifications.googleapis.com/v1/{location['name']}/verification"
+                    verification_response = requests.get(verification_url, headers=headers)
+                    if verification_response.ok:
+                        verification_data = verification_response.json()
+                        location['verification_state'] = verification_data.get('state', 'UNVERIFIED')
+                        location['verification_method'] = verification_data.get('method', 'NONE')
+                    else:
+                        log_api_request(None, account_id, 'get_locations', 
+                                      f"Verification check failed: {verification_response.status_code}", 
+                                      status='warning')
+                except Exception as ve:
+                    log_api_request(None, account_id, 'get_locations',
+                                  f"Verification check error: {str(ve)}", 
+                                  status='error')
+                    location['verification_state'] = 'UNVERIFIED'
+                    location['verification_method'] = 'NONE'
 
+        log_api_request(None, account_id, 'get_locations', 
+                       f"Successfully fetched {len(locations_data.get('locations', []))} locations")
         return locations_data
+
     except requests.exceptions.RequestException as e:
-        print(f"Error fetching location data: {str(e)}")
+        error_details = None
         if hasattr(e.response, 'json'):
-            print(f"API Error details: {e.response.json()}")
+            try:
+                error_details = e.response.json()
+            except:
+                error_details = str(e)
+                
+        log_api_request(None, account_id, 'get_locations',
+                       f"Error fetching location data: {error_details}",
+                       status='error')
         return {"locations": []}
 def calculate_compliance_score(location_data):
     """Calculate compliance score based on profile completeness"""
