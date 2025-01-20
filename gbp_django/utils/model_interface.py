@@ -45,6 +45,52 @@ class GroqModel(LLMInterface):
             logger.error(f"Error generating embedding: {str(e)}")
             return None
         
+    def _prepare_messages(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> List[Dict[str, str]]:
+        """Prepare messages array for LLM input"""
+        # Format chat history and summarize memories
+        memory_summary = []
+        formatted_history = []
+        
+        if chat_history:
+            # Group messages by topic and summarize
+            current_topic = []
+            for msg in chat_history[-10:]:  # Look at last 10 messages
+                current_topic.append(msg['content'])
+                if len(current_topic) >= 3:  # Summarize every 3 messages
+                    summary = f"• Previous discussion about: {' '.join(current_topic)[:100]}..."
+                    memory_summary.append(summary)
+                    current_topic = []
+            
+            # Add remaining messages
+            if current_topic:
+                summary = f"• Recent exchange about: {' '.join(current_topic)[:100]}..."
+                memory_summary.append(summary)
+            
+            # Format recent messages
+            formatted_history = [
+                {'role': m['role'], 'content': m['content']} 
+                for m in chat_history[-5:]  # Keep last 5 messages verbatim
+            ]
+
+        # Create system prompt with context and memory summaries
+        system_prompt = (
+            "You are an AI assistant for a business automation platform. "
+            "You have access to the business's profile information, documents, and chat history. "
+            "Use the provided context to give accurate, professional responses. "
+            "If uncertain, acknowledge the limitations of your knowledge.\n\n"
+            f"Business Context: {context}\n\n"
+            f"Memory Summaries:\n" + "\n".join(memory_summary) + "\n\n"
+            "Instructions: Provide a helpful response based on the context and history."
+        )
+
+        # Prepare messages array
+        messages = [{'role': 'system', 'content': system_prompt}]
+        if formatted_history:
+            messages.extend(formatted_history)
+        messages.append({'role': 'user', 'content': query})
+        
+        return messages
+
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
             # First try Groq
