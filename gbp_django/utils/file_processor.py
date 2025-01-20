@@ -207,38 +207,38 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                 retry_count = 0
                 while retry_count < max_retries:
                     try:
-                    print(f"\nProcessing chunk {idx + 1}/{len(chunks)}")
-                    print(f"Chunk length: {len(chunk)} characters")
-                    print(f"Chunk preview: {chunk[:100]}...")
-                    
-                    embedding = generate_embedding(chunk)
-                    
-                    if embedding is None:
-                        print(f"Warning: Embedding generation returned None for chunk {idx + 1}")
-                        print(f"Chunk content: {chunk[:500]}...")
-                        print("Retrying with cleaned content...")
-                        # Try cleaning the content and retry
-                        cleaned_chunk = ' '.join(chunk.split())  # Remove extra whitespace
-                        embedding = generate_embedding(cleaned_chunk)
+                        print(f"\nProcessing chunk {idx + 1}/{len(chunks)}")
+                        print(f"Chunk length: {len(chunk)} characters")
+                        print(f"Chunk preview: {chunk[:100]}...")
+                        
+                        embedding = generate_embedding(chunk)
+                        
                         if embedding is None:
-                            print("Retry failed - skipping chunk")
-                            continue
-                    
-                    if len(embedding) != 1536:
-                        print(f"Warning: Invalid embedding dimensions for chunk {idx + 1}: {len(embedding)}")
-                        print("Attempting to pad/truncate embedding...")
-                        if len(embedding) < 1536:
-                            # Pad with zeros
-                            embedding.extend([0.0] * (1536 - len(embedding)))
-                        else:
-                            # Truncate to 1536
-                            embedding = embedding[:1536]
-                    
-                    embeddings.append({
-                        'text': chunk,
-                        'embedding': embedding
-                    })
-                    print(f"Successfully generated embedding for chunk {idx + 1}")
+                            print(f"Warning: Embedding generation returned None for chunk {idx + 1}")
+                            print(f"Chunk content: {chunk[:500]}...")
+                            print("Retrying with cleaned content...")
+                            # Try cleaning the content and retry
+                            cleaned_chunk = ' '.join(chunk.split())  # Remove extra whitespace
+                            embedding = generate_embedding(cleaned_chunk)
+                            if embedding is None:
+                                print("Retry failed - skipping chunk")
+                                continue
+                        
+                        if len(embedding) != 1536:
+                            print(f"Warning: Invalid embedding dimensions for chunk {idx + 1}: {len(embedding)}")
+                            print("Attempting to pad/truncate embedding...")
+                            if len(embedding) < 1536:
+                                # Pad with zeros
+                                embedding.extend([0.0] * (1536 - len(embedding)))
+                            else:
+                                # Truncate to 1536
+                                embedding = embedding[:1536]
+                        
+                        embeddings.append({
+                            'text': chunk,
+                            'embedding': embedding
+                        })
+                        print(f"Successfully generated embedding for chunk {idx + 1}")
                     
                 except Exception as e:
                     print(f"Error processing chunk {idx + 1}: {str(e)}")
