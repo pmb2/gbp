@@ -5,7 +5,7 @@ from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
-def search_knowledge_base(query: str, business_id: str, top_k: int = 15, min_similarity: float = 0.25) -> List[Dict[str, Any]]:
+def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_similarity: float = 0.20) -> List[Dict[str, Any]]:
     """Enhanced knowledge base search with comprehensive similarity scoring and metadata"""
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
@@ -71,12 +71,16 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 15, min_sim
             cosine_sim = 1 - float(faq.cosine_similarity)
             l2_sim = 1 / (1 + float(faq.l2_distance))
             
-            # Content-based scoring with chunk awareness
+            # Enhanced content-based scoring with improved chunk awareness
             text_length = len(faq.answer)
+            
+            # Dynamic chunk position scoring
             chunk_position_bonus = 1.0
             if hasattr(faq, 'chunk_index'):
-                # Slight boost for first chunks of documents
-                chunk_position_bonus = 1.1 if faq.chunk_index == 0 else 1.0
+                if faq.chunk_index == 0:
+                    chunk_position_bonus = 1.2  # Higher boost for document starts
+                elif hasattr(faq, 'total_chunks') and faq.chunk_index == faq.total_chunks - 1:
+                    chunk_position_bonus = 1.1  # Slight boost for document conclusions
                 
             # Adjusted length bonus to better handle chunks
             length_bonus = min(1.1, max(0.9, text_length / 500)) * chunk_position_bonus

@@ -144,9 +144,10 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     
             print(f"Cleaned text content length: {len(text_content)} characters")
                 
-            # Enhanced content chunking with optimized sizes
-            MAX_CHUNK_SIZE = 1500  # Increased for better context
-            MIN_CHUNK_SIZE = 100   # Increased for more meaningful chunks
+            # Enhanced content chunking with optimized sizes for RAG
+            MAX_CHUNK_SIZE = 2000  # Optimized for LLM context window
+            MIN_CHUNK_SIZE = 200   # Ensure meaningful semantic chunks
+            OVERLAP_SIZE = 100     # Add overlap between chunks for context continuity
             chunks = []
             
             # Enhanced text preprocessing
@@ -174,20 +175,32 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             print(f"Total content length: {len(text_content)} characters")
             print(f"Found {len(paragraphs)} paragraphs")
             
+            # Improved chunking with overlap and semantic boundaries
             current_chunk = []
             current_length = 0
+            last_overlap = ""
             
             for para in paragraphs:
                 para_length = len(para)
                 
-                # Start new chunk if current would exceed max size
+                # Check if adding this paragraph would exceed max size
                 if current_length + para_length > MAX_CHUNK_SIZE:
                     if current_chunk and sum(len(p) for p in current_chunk) >= MIN_CHUNK_SIZE:
+                        # Add overlap from previous chunk if available
+                        if last_overlap:
+                            current_chunk.insert(0, last_overlap)
+                        
                         chunk_text = ' '.join(current_chunk)
                         chunks.append(chunk_text)
                         print(f"Created chunk of {len(chunk_text)} characters")
-                    current_chunk = [para]
-                    current_length = para_length
+                        
+                        # Store last part of current chunk for overlap
+                        overlap_text = ' '.join(current_chunk[-2:]) if len(current_chunk) > 1 else current_chunk[-1]
+                        last_overlap = overlap_text[-OVERLAP_SIZE:] if len(overlap_text) > OVERLAP_SIZE else overlap_text
+                        
+                    # Start new chunk with overlap
+                    current_chunk = [last_overlap, para] if last_overlap else [para]
+                    current_length = len(last_overlap) + para_length if last_overlap else para_length
                 else:
                     current_chunk.append(para)
                     current_length += para_length
