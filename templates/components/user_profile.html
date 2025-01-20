@@ -7,7 +7,7 @@
              class="h-8 w-8 rounded-full">
         <span class="text-gray-100 font-medium hidden md:block">{{ user.email }}</span>
     </button>
-    <div id="userMenu" style="right: -221px;" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-md hidden">
+    <div id="userMenu" class="absolute right-0 mt-2 w-48 bg-white border rounded-lg shadow-md hidden" style="display: none;">
         <a href="{% url 'logout' %}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">Logout</a>
     </div>
 </div>
