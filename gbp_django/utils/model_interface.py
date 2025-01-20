@@ -2,8 +2,12 @@ from abc import ABC, abstractmethod
 import time
 from typing import List, Dict, Optional
 import requests
+import openai
 from django.conf import settings
 from groq import Groq
+import logging
+
+logger = logging.getLogger(__name__)
 
 class LLMInterface(ABC):
     @abstractmethod
@@ -17,6 +21,7 @@ class LLMInterface(ABC):
 class GroqModel(LLMInterface):
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
+        self.model_name = "llama-3.3-70b-versatile"
         
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
@@ -61,27 +66,28 @@ class GroqModel(LLMInterface):
                 messages.extend(formatted_history)
             messages.append({'role': 'user', 'content': query})
             
+            start_time = time.time()
             chat_completion = self.client.chat.completions.create(
                 messages=messages,
-                model="llama-3.3-70b-versatile",
+                model=self.model_name,
                 temperature=0.7,
                 max_tokens=1000,
                 top_p=0.9,
                 stream=False
             )
+            latency = time.time() - start_time
             
+            logger.info(f"Groq response generated in {latency:.2f}s using {self.model_name}")
             return chat_completion.choices[0].message.content.strip()
         except Exception as e:
-            print(f"Error generating response with Groq: {str(e)}")
-            return "I apologize, but I'm unable to generate a response at the moment."
-            
-    def generate_embedding(self, text: str) -> Optional[List[float]]:
-        # Groq doesn't support embeddings yet, fallback to Ollama
-        return OllamaModel().generate_embedding(text)
+            logger.error(f"Error generating response with Groq: {str(e)}")
+            return None  # Return None to trigger fallback
 
 class OllamaModel(LLMInterface):
     def __init__(self):
         self.base_url = "http://localhost:11434/api"
+        self.embedding_model = "nomic-embed-text"
+        self.llm_model = "phi4"
         
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
@@ -102,21 +108,25 @@ class OllamaModel(LLMInterface):
                     
             messages.append({"role": "user", "content": query})
             
+            start_time = time.time()
             response = requests.post(
                 f"{self.base_url}/chat",
                 json={
-                    "model": "phi4",
+                    "model": self.llm_model,
                     "messages": messages,
                     "stream": False
-                }
+                },
+                timeout=30
             )
             response.raise_for_status()
+            latency = time.time() - start_time
             
+            logger.info(f"Ollama response generated in {latency:.2f}s using {self.llm_model}")
             return response.json()["message"]["content"].strip()
             
         except Exception as e:
-            print(f"Error generating response with Ollama: {str(e)}")
-            return "I apologize, but I'm unable to generate a response at the moment."
+            logger.error(f"Error generating response with Ollama: {str(e)}")
+            return None
     
     def generate_embedding(self, text: str) -> Optional[List[float]]:
         try:
@@ -126,20 +136,25 @@ class OllamaModel(LLMInterface):
             if len(text) > 8000:
                 text = text[:8000]
             
+            start_time = time.time()
             response = requests.post(
                 f"{self.base_url}/embeddings",
                 json={
-                    "model": "nomic-embed-text",
+                    "model": self.embedding_model,
                     "prompt": text,
                     "options": {
                         "temperature": 0,
                         "num_ctx": 8192
                     }
-                }
+                },
+                timeout=30
             )
             response.raise_for_status()
             
             embedding = response.json()['embedding']
+            latency = time.time() - start_time
+            
+            logger.info(f"Ollama embedding generated in {latency:.2f}s using {self.embedding_model}")
             
             # Handle different embedding dimensions
             if len(embedding) == 1536:
@@ -147,16 +162,100 @@ class OllamaModel(LLMInterface):
             elif len(embedding) == 768:
                 return embedding * 2  # Repeat to get 1536 dims
             else:
-                print(f"[WARNING] Invalid embedding dimensions: {len(embedding)}")
+                logger.warning(f"Invalid embedding dimensions: {len(embedding)}")
                 return None
                 
         except Exception as e:
-            print(f"Error generating embedding with Ollama: {str(e)}")
+            logger.error(f"Error generating embedding with Ollama: {str(e)}")
+            return None
+
+class OpenAIModel(LLMInterface):
+    def __init__(self):
+        self.embedding_model = "text-embedding-3-small"
+        self.llm_model = "gpt-3.5-turbo"
+        openai.api_key = settings.OPENAI_API_KEY
+        
+    def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
+        try:
+            messages = [{"role": "system", "content": context}]
+            
+            if chat_history:
+                for msg in chat_history[-5:]:  # Last 5 messages
+                    messages.append({"role": msg["role"], "content": msg["content"]})
+                    
+            messages.append({"role": "user", "content": query})
+            
+            start_time = time.time()
+            response = openai.ChatCompletion.create(
+                model=self.llm_model,
+                messages=messages,
+                temperature=0.7,
+                max_tokens=1000
+            )
+            latency = time.time() - start_time
+            
+            logger.info(f"OpenAI response generated in {latency:.2f}s using {self.llm_model}")
+            return response.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating response with OpenAI: {str(e)}")
+            return None
+    
+    def generate_embedding(self, text: str) -> Optional[List[float]]:
+        try:
+            text = text.strip().replace('\n', ' ')
+            
+            # If text is too long, take first 8000 chars
+            if len(text) > 8000:
+                text = text[:8000]
+            
+            start_time = time.time()
+            response = openai.Embedding.create(
+                input=text,
+                model=self.embedding_model
+            )
+            latency = time.time() - start_time
+            
+            logger.info(f"OpenAI embedding generated in {latency:.2f}s using {self.embedding_model}")
+            return response['data'][0]['embedding']
+                
+        except Exception as e:
+            logger.error(f"Error generating embedding with OpenAI: {str(e)}")
             return None
 
 def get_llm_model() -> LLMInterface:
-    """Factory function to get the configured LLM model"""
-    model_name = getattr(settings, 'LLM_MODEL', 'groq')
-    if model_name == 'ollama':
-        return OllamaModel()
-    return GroqModel()  # Default to Groq
+    """Factory function to get the configured LLM model with fallback"""
+    try:
+        # Try Groq first
+        if settings.GROQ_API_KEY:
+            return GroqModel()
+    except Exception as e:
+        logger.warning(f"Failed to initialize Groq: {str(e)}")
+    
+    # Fallback to Ollama
+    try:
+        if settings.OLLAMA_ENABLED:
+            return OllamaModel()
+    except Exception as e:
+        logger.warning(f"Failed to initialize Ollama: {str(e)}")
+    
+    # Final fallback to OpenAI
+    if settings.OPENAI_API_KEY:
+        return OpenAIModel()
+    
+    raise ValueError("No valid LLM configuration found")
+
+def get_embedding_model() -> LLMInterface:
+    """Factory function to get the configured embedding model with fallback"""
+    try:
+        # Try Ollama first
+        if settings.OLLAMA_ENABLED:
+            return OllamaModel()
+    except Exception as e:
+        logger.warning(f"Failed to initialize Ollama for embeddings: {str(e)}")
+    
+    # Fallback to OpenAI
+    if settings.OPENAI_API_KEY:
+        return OpenAIModel()
+    
+    raise ValueError("No valid embedding configuration found")
