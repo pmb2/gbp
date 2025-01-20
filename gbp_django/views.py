@@ -240,29 +240,41 @@ def direct_google_oauth(request):
 
 
 def google_oauth_callback(request):
+    """Handle Google OAuth callback with enhanced business data sync"""
     try:
         print("\n[DEBUG] Starting Google OAuth callback...")
+        print(f"[DEBUG] Request method: {request.method}")
+        print(f"[DEBUG] Query params: {dict(request.GET)}")
 
         # Extract and validate parameters
         code = request.GET.get('code')
         state = request.GET.get('state')
         stored_state = request.session.get('oauth_state')
+        oauth_action = request.session.get('oauth_action', 'login')
+
+        print(f"[DEBUG] OAuth action: {oauth_action}")
+        print(f"[DEBUG] State validation: received={state}, stored={stored_state}")
 
         if not code or not state or state != stored_state:
             print("[ERROR] OAuth validation failed")
+            print(f"[DEBUG] Code present: {bool(code)}")
+            print(f"[DEBUG] State present: {bool(state)}")
+            print(f"[DEBUG] State match: {state == stored_state}")
             messages.error(request, 'Invalid OAuth state or missing code.')
             return redirect('login')
 
         # Get Google SocialApp credentials
         try:
             google_app = SocialApp.objects.get(provider='google')
+            print("[DEBUG] Found Google SocialApp configuration")
         except SocialApp.DoesNotExist:
-            print("[ERROR] Google SocialApp is not configured.")
+            print("[ERROR] Google SocialApp is not configured")
             messages.error(request, "Google integration is not configured. Please contact support.")
             return redirect('login')
 
         # Exchange code for tokens
         try:
+            print("[DEBUG] Exchanging authorization code for tokens...")
             tokens = get_access_token(
                 code=code,
                 client_id=google_app.client_id,
@@ -272,6 +284,12 @@ def google_oauth_callback(request):
             
             access_token = tokens.get('access_token')
             refresh_token = tokens.get('refresh_token')
+            expires_in = tokens.get('expires_in', 3600)
+
+            print(f"[DEBUG] Token exchange successful")
+            print(f"[DEBUG] Access token received: {bool(access_token)}")
+            print(f"[DEBUG] Refresh token received: {bool(refresh_token)}")
+            print(f"[DEBUG] Token expires in: {expires_in} seconds")
 
             if not access_token:
                 raise ValueError("No access token received")
@@ -283,13 +301,19 @@ def google_oauth_callback(request):
 
         # Fetch and validate user info
         try:
+            print("[DEBUG] Fetching user info from Google...")
             user_info = get_user_info(access_token)
+            
             if not user_info or not user_info.get('email'):
                 raise ValueError("Invalid user info received")
                 
             google_email = user_info['email']
             google_id = user_info['sub']
-            print(f"[DEBUG] Fetched Google user info: {google_email}")
+            
+            print(f"[DEBUG] User info retrieved successfully:")
+            print(f"[DEBUG] Email: {google_email}")
+            print(f"[DEBUG] Google ID: {google_id}")
+            print(f"[DEBUG] Name: {user_info.get('name')}")
             
         except Exception as e:
             print(f"[ERROR] Failed to get user info: {str(e)}")
@@ -298,6 +322,7 @@ def google_oauth_callback(request):
 
         # Find or create user
         try:
+            print(f"[DEBUG] Looking up user with email: {google_email}")
             user, created = User.objects.get_or_create(
                 email=google_email,
                 defaults={
@@ -306,13 +331,14 @@ def google_oauth_callback(request):
                     'profile_picture_url': user_info.get('picture'),
                 }
             )
-            print(f"[DEBUG] {'Created' if created else 'Found'} user: {google_email}")
+            print(f"[DEBUG] User {'created' if created else 'found'}: {user.email}")
             
             # Update user credentials
             user.google_access_token = access_token
             user.google_refresh_token = refresh_token
-            user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+            user.google_token_expiry = timezone.now() + timedelta(seconds=expires_in)
             user.save()
+            print("[DEBUG] Updated user OAuth credentials")
             
         except Exception as e:
             print(f"[ERROR] User creation/update failed: {str(e)}")
@@ -321,32 +347,64 @@ def google_oauth_callback(request):
 
         # Fetch and store business data
         try:
-            print("[DEBUG] Fetching business accounts...")
+            print("\n[DEBUG] Starting business data sync...")
+            print(f"[DEBUG] User ID: {user.id}")
+            
+            # Get existing businesses for user
+            existing_businesses = Business.objects.filter(user=user)
+            print(f"[DEBUG] Found {existing_businesses.count()} existing businesses")
+            
+            # Fetch current business data from Google
+            print("[DEBUG] Fetching business accounts from Google...")
             business_data = get_business_accounts(access_token)
             
             if business_data and business_data.get('accounts'):
-                print(f"[DEBUG] Found {len(business_data['accounts'])} business accounts")
-                stored_businesses = store_business_data(business_data, user.id, access_token)
-                print(f"[DEBUG] Stored {len(stored_businesses)} businesses")
+                accounts = business_data['accounts']
+                print(f"[DEBUG] Found {len(accounts)} business accounts:")
+                for account in accounts:
+                    print(f"[DEBUG] - {account.get('accountName')} ({account.get('name')})")
                 
-                # Create welcome notification for new businesses
-                if stored_businesses:
+                # Store/update business data
+                stored_businesses = store_business_data(business_data, user.id, access_token)
+                print(f"[DEBUG] Processed {len(stored_businesses)} businesses")
+                
+                # Identify new businesses
+                new_businesses = [b for b in stored_businesses 
+                                if not existing_businesses.filter(business_id=b.business_id).exists()]
+                
+                if new_businesses:
+                    print(f"[DEBUG] Added {len(new_businesses)} new businesses:")
+                    for business in new_businesses:
+                        print(f"[DEBUG] - {business.business_name} ({business.business_id})")
+                    
+                    # Create welcome notification
                     Notification.objects.create(
                         user=user,
-                        message=f"Successfully connected {len(stored_businesses)} business(es).",
+                        message=f"Successfully connected {len(new_businesses)} new business(es).",
                         read=False
                     )
+                else:
+                    print("[DEBUG] No new businesses added")
+                    
             else:
-                print("[DEBUG] No business accounts found")
+                print("[DEBUG] No business accounts found in Google API response")
+                if oauth_action == 'add_business':
+                    messages.warning(request, 'No business accounts found in your Google profile.')
                 
         except Exception as e:
             print(f"[ERROR] Business data sync failed: {str(e)}")
-            # Don't redirect - continue with login even if business sync fails
-            messages.warning(request, 'Connected to Google, but failed to sync business data. Please try reconnecting later.')
+            if oauth_action == 'add_business':
+                messages.error(request, 'Failed to sync business data. Please try again.')
+            else:
+                messages.warning(request, 'Connected to Google, but failed to sync business data.')
 
         # Complete authentication
         auth_login(request, user)
-        print(f"[DEBUG] User logged in: {user.email}")
+        print(f"[DEBUG] User logged in successfully: {user.email}")
+        
+        # Clear OAuth session data
+        request.session.pop('oauth_state', None)
+        request.session.pop('oauth_action', None)
         
         messages.success(request, "Successfully authenticated with Google!")
         return redirect('index')
