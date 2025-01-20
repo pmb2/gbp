@@ -168,3 +168,5 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OLLAMA_ENABLED = True  # Set to False if Ollama is not available
