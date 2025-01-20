@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import login_required
 from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,9 +11,9 @@ urlpatterns = [
     path('dashboard/', login_required(views.index), name='index'),
     path('accounts/', include('allauth.urls')),
     path('login/', views.login, name='login'),
+    path('google/callback/', views.google_oauth_callback, name='google_oauth_callback'),
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),
-    path('google/callback/', views.google_oauth_callback, name='google_oauth_callback'),
     path('google/auth/', views.direct_google_oauth, name='direct_google_oauth'),
     path('api/business/<str:business_id>/verification-status/', 
          views.get_verification_status, name='verification_status'),
@@ -39,3 +41,7 @@ urlpatterns = [
     path('api/business/<str:business_id>/memories/',
          views.get_memories, name='get_memories'),
 ]
+
+# Append static file URLs if DEBUG is True
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

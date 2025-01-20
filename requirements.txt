@@ -1,0 +1,45 @@
+# Web Framework
+Django>=4.2.0
+django
+django-allauth>=0.54.0
+django-extensions
+django-allauth
+
+# Database
+psycopg2-binary
+pgvector
+
+# API & OAuth
+requests>=2.31.0
+python-dotenv>=1.0.0
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+groq>=0.3.0
+PyJWT
+cryptography
+groq
+
+# File Processing
+python-magic>=0.4.27
+python-docx>=0.8.11
+PyPDF2
+
+# Task Queue
+celery>=5.3.0
+django-celery-beat>=2.5.0
+redis>=5.0.0
+
+# Testing
+pytest>=7.4.0
+pytest-django>=4.5.2
+requests
+python-magic
+
+# Development
+black>=23.7.0
+flake8>=6.1.0
+isort>=5.12.0
+
+# Frontend
+django-tailwind>=3.6.0
+python-docx
