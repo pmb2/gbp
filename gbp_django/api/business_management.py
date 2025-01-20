@@ -392,7 +392,7 @@ def store_business_data(business_data, user_id, access_token):
             phone_number='Pending verification',
             website_url='Pending verification',
             category='Pending verification',
-            email_settings='{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
+            email_settings={'enabled': True, 'compliance_alerts': True, 'content_approval': True, 'weekly_summary': True, 'verification_reminders': True},
             automation_status='Active'
         )
         
@@ -410,7 +410,7 @@ def store_business_data(business_data, user_id, access_token):
             # Get locations for this account
             locations = get_locations(access_token, account['name'])
             
-            if locations.get('locations'):
+            if locations and locations.get('locations'):
                 for location in locations['locations']:
                     # Extract business details with enhanced data
                     business_details = {
@@ -425,7 +425,7 @@ def store_business_data(business_data, user_id, access_token):
                         'is_verified': location.get('locationState', {}).get('isVerified', False),
                         'email_verification_pending': True,
                         'email_verification_token': secrets.token_urlsafe(32),
-                        'email_settings': '{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
+                        'email_settings': {'enabled': True, 'compliance_alerts': True, 'content_approval': True, 'weekly_summary': True, 'verification_reminders': True},
                         'automation_status': 'Active',
                         'description': location.get('profile', {}).get('description', '')
                     }
@@ -456,6 +456,16 @@ def store_business_data(business_data, user_id, access_token):
                         'next_update_date': calculate_next_update(location)
                     }
                 )
+                
+                # Update business attributes
+                if 'attributes' in locals():
+                    for key, value in attributes.items():
+                        if value is not None:  # Only store non-null attributes
+                            BusinessAttribute.objects.update_or_create(
+                                business=business,
+                                key=key,
+                                defaults={'value': json.dumps(value) if isinstance(value, (dict, list)) else str(value)}
+                            )
                 
                 stored_businesses.append(business)
                 print(f"[INFO] Successfully stored/updated business: {business.business_name}")
