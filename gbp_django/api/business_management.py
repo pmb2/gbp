@@ -1,17 +1,18 @@
 import os
-import random
+from datetime import datetime, timedelta
 import requests
 import time
 import secrets
 import json
 from django.conf import settings
-from ..models import Business, Notification
+from django.utils import timezone
 from django.contrib.sessions.backends.db import SessionStore
+from allauth.socialaccount.models import SocialAccount
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.utils.cache import cache_on_arguments
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
-    QandA, Review
+    QandA, Review, Notification
 )
 
 def create_business_location(access_token, account_id, location_data):
