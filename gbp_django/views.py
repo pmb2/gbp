@@ -854,10 +854,11 @@ def submit_feedback(request):
 @login_required
 @require_http_methods(["POST"])
 def chat_message(request, business_id):
-    """Handle chat messages and file uploads using RAG"""
+    """Handle chat messages with enhanced context and error handling"""
     try:
         data = json.loads(request.body)
         message = data.get('message')
+        chat_history = data.get('history', [])
 
         if not message:
             return JsonResponse({
@@ -865,12 +866,42 @@ def chat_message(request, business_id):
                 'message': 'No message provided'
             }, status=400)
 
-        # Get response using RAG
-        response = answer_question(message, business_id)
+        # Get business context
+        business = Business.objects.get(business_id=business_id)
+        if not business:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Business not found'
+            }, status=404)
+
+        # Get LLM model
+        model = get_llm_model()
+        
+        # Get response using RAG with chat history
+        response = answer_question(
+            query=message,
+            business_id=business_id,
+            chat_history=chat_history
+        )
+
+        # Store interaction in FAQ for future context
+        try:
+            add_to_knowledge_base(
+                business_id=business_id,
+                question=message,
+                answer=response
+            )
+        except Exception as e:
+            print(f"Failed to store chat interaction: {str(e)}")
 
         return JsonResponse({
             'status': 'success',
-            'response': response
+            'response': response,
+            'metadata': {
+                'model': model.__class__.__name__,
+                'business_name': business.business_name,
+                'timestamp': timezone.now().isoformat()
+            }
         })
 
     except Business.DoesNotExist:

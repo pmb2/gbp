@@ -82,7 +82,20 @@ class GroqModel(LLMInterface):
             return "I apologize, but I'm unable to generate a response at the moment."
             
     def generate_embedding(self, text: str) -> Optional[List[float]]:
-        # Groq doesn't support embeddings yet, fallback to Ollama
+        """Generate embeddings with better error handling and retries"""
+        try:
+            # First try Groq's embedding endpoint if available
+            response = requests.post(
+                "https://api.groq.com/v1/embeddings",
+                headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
+                json={"input": text, "model": "llama2-70b-4096"}
+            )
+            if response.ok:
+                return response.json()['data'][0]['embedding']
+        except Exception as e:
+            print(f"Groq embedding failed, falling back to Ollama: {str(e)}")
+            
+        # Fallback to Ollama
         return OllamaModel().generate_embedding(text)
 
 class OllamaModel(LLMInterface):

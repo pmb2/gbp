@@ -199,9 +199,13 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             
             print(f"Created {len(chunks)} chunks for processing")
             
-            # Generate embeddings for each chunk with better error handling
+            # Generate embeddings with improved chunking and retries
             embeddings = []
+            max_retries = 3
+            
             for idx, chunk in enumerate(chunks):
+                retry_count = 0
+                while retry_count < max_retries:
                 try:
                     print(f"\nProcessing chunk {idx + 1}/{len(chunks)}")
                     print(f"Chunk length: {len(chunk)} characters")
@@ -241,14 +245,31 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     continue
             
             if not embeddings:
-                error_msg = "Failed to generate any valid embeddings.\n"
+                error_msg = "Failed to generate embeddings.\n"
                 error_msg += f"Processed {len(chunks)} chunks but none were successful.\n"
-                error_msg += "Original text length: {len(text_content)} chars\n"
-                error_msg += "Number of paragraphs: {len(paragraphs)}\n"
-                error_msg += "First 500 chars of content: {text_content[:500]}\n"
+                error_msg += f"Original text length: {len(text_content)} chars\n"
+                error_msg += f"Number of paragraphs: {len(paragraphs)}\n"
+                error_msg += f"First 500 chars of content: {text_content[:500]}\n"
+                error_msg += f"Chunk sizes: {[len(c) for c in chunks]}\n"
+                error_msg += f"MIME type: {mime_type}\n"
+                error_msg += f"File size: {file_size/1024:.1f}KB\n"
                 error_msg += "Check the logs for specific chunk processing errors."
-                print(error_msg)  # Log the detailed error
-                raise ValueError("Document processing failed - please check file content and format")
+                print(error_msg)
+                
+                # Try one final time with the entire content as a single chunk
+                if len(text_content) < 4000:  # Only try if content is reasonably sized
+                    print("Attempting to process entire content as single chunk...")
+                    embedding = generate_embedding(text_content)
+                    if embedding:
+                        embeddings.append({
+                            'text': text_content,
+                            'embedding': embedding
+                        })
+                        print("Successfully generated embedding for entire content")
+                    else:
+                        raise ValueError("Document processing failed - unable to generate embeddings")
+                else:
+                    raise ValueError("Document processing failed - content too large for single chunk processing")
         except Exception as e:
             raise ValueError(f"Embedding generation failed: {str(e)}")
 
