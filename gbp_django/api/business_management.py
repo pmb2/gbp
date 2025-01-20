@@ -76,17 +76,18 @@ def delete_location(access_token, account_id, location_id):
 
 @cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
-    print("\n🔄 Starting business accounts fetch...")
+    print("\n🔄 Starting Google Business Profile accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
     retries = 3
-    print(f"🌐 Request details:")
+    print(f"🌐 API Request details:")
     print(f"  • URL: {url}")
     print(f"  • Headers: {list(headers.keys())}")
     print(f"  • Max retries: {retries}")
+    print(f"  • Access token (first 10 chars): {access_token[:10]}...")
 
     for attempt in range(retries):
         try:
@@ -98,10 +99,22 @@ def get_business_accounts(access_token):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
+            
             if not data or not data.get('accounts'):
-                print("[WARNING] No business accounts found")
-                # Return empty accounts list but don't fail
+                print("\n⚠️ [WARNING] No business accounts found in API response")
+                print("📝 Raw API response:")
+                print(data)
                 return {"accounts": []}
+            
+            print("\n✅ Successfully retrieved business accounts!")
+            print(f"📊 Found {len(data.get('accounts', []))} business accounts:")
+            for idx, account in enumerate(data['accounts'], 1):
+                print(f"\n📍 Account {idx}:")
+                print(f"  • Name: {account.get('accountName', 'Unknown')}")
+                print(f"  • ID: {account.get('name', 'Unknown')}")
+                print(f"  • Type: {account.get('type', 'Unknown')}")
+                print(f"  • Role: {account.get('role', 'Unknown')}")
+            
             return data
         except requests.exceptions.HTTPError as e:
             if response.status_code == 401:

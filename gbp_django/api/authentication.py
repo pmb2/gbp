@@ -3,6 +3,7 @@ import requests
 from django.conf import settings
 
 def get_access_token(auth_code, client_id, client_secret, redirect_uri):
+    print("\n🔑 Starting OAuth token exchange...")
     url = "https://oauth2.googleapis.com/token"
     payload = {
         "code": auth_code,
@@ -11,9 +12,22 @@ def get_access_token(auth_code, client_id, client_secret, redirect_uri):
         "redirect_uri": redirect_uri,
         "grant_type": "authorization_code"
     }
+    print(f"📡 Making token request to: {url}")
+    print(f"🔐 Using client_id: {client_id[:8]}...")
+    print(f"🔄 Redirect URI: {redirect_uri}")
+    
     response = requests.post(url, data=payload)
     response.raise_for_status()
-    return response.json()
+    token_data = response.json()
+    
+    print("✅ Token exchange successful!")
+    print(f"📦 Received tokens:")
+    print(f"  • Access token length: {len(token_data.get('access_token', ''))}")
+    print(f"  • Refresh token present: {'refresh_token' in token_data}")
+    print(f"  • Token type: {token_data.get('token_type')}")
+    print(f"  • Expires in: {token_data.get('expires_in')} seconds")
+    
+    return token_data
 
 def refresh_access_token(refresh_token, client_id, client_secret):
     url = "https://oauth2.googleapis.com/token"
@@ -27,13 +41,25 @@ def refresh_access_token(refresh_token, client_id, client_secret):
     response.raise_for_status()
     return response.json()
 def get_user_info(access_token):
+    print("\n👤 Fetching Google user info...")
     from django.contrib.sessions.backends.db import SessionStore
     url = "https://openidconnect.googleapis.com/v1/userinfo"
     headers = {"Authorization": f"Bearer {access_token}"}
+    
+    print(f"📡 Making userinfo request to: {url}")
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        return response.json()
+        user_data = response.json()
+        
+        print("✅ User info retrieved successfully!")
+        print(f"📦 User details:")
+        print(f"  • Email: {user_data.get('email')}")
+        print(f"  • Name: {user_data.get('name')}")
+        print(f"  • Google ID: {user_data.get('sub')}")
+        print(f"  • Picture URL: {user_data.get('picture', 'None')}")
+        
+        return user_data
     except requests.exceptions.HTTPError as e:
         if response.status_code == 401:
             # Token expired, refresh token
