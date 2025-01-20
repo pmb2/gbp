@@ -324,8 +324,26 @@ def google_oauth_callback(request):
         # Fetch and store business data
         print("\n🏢 Starting business data collection...")
         print("🔍 Fetching business accounts from Google API...")
+        
+        # First get the accounts list
         business_data = get_business_accounts(access_token)
-        print("✅ API call successful")
+        print("✅ Initial API call successful")
+        
+        # Then get detailed location data for each account
+        if business_data and business_data.get('accounts'):
+            for account in business_data['accounts']:
+                print(f"\n📍 Fetching locations for account: {account.get('accountName')}")
+                locations = get_locations(access_token, account['name'])
+                if locations and locations.get('locations'):
+                    account['locations'] = locations['locations']
+                    print(f"✅ Found {len(locations['locations'])} location(s)")
+                    for location in locations['locations']:
+                        print(f"  • Location: {location.get('locationName')}")
+                        print(f"  • Address: {location.get('address', {}).get('formattedAddress')}")
+                        print(f"  • Phone: {location.get('primaryPhone')}")
+                else:
+                    account['locations'] = []
+                    print("⚠️ No locations found for this account")
         
         if business_data and business_data.get('accounts'):
             accounts = business_data['accounts']
@@ -712,15 +730,18 @@ def index(request):
         print(f"Website: {business.website_url}")
         print(f"Category: {business.category}")
 
-    # Calculate profile completion for each business
+    # Calculate profile completion and counts once for each business
+    processed_businesses = []
     for business in businesses:
-        business.profile_completion = business.calculate_profile_completion()
-
-        # Set counts
-        business.posts_count = business.post_set.count()
-        business.photos_count = business.businessattribute_set.filter(key='photo').count()
-        business.qanda_count = business.qanda_set.count()
-        business.reviews_count = business.review_set.count()
+        if not hasattr(business, '_processed'):
+            business.profile_completion = business.calculate_profile_completion()
+            business.posts_count = business.post_set.count()
+            business.photos_count = business.businessattribute_set.filter(key='photo').count()
+            business.qanda_count = business.qanda_set.count()
+            business.reviews_count = business.review_set.count()
+            business._processed = True
+        processed_businesses.append(business)
+    businesses = processed_businesses
 
     # Calculate business statistics
     stats = {

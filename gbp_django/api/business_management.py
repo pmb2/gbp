@@ -202,12 +202,11 @@ def store_business_data(business_data, user_id, access_token):
                 'is_connected': True  # Mark as connected via OAuth
             }
 
-            # Get locations for this account
-            locations = get_locations(access_token, account['name'])
-            
-            if locations.get('locations'):
+            # Get locations from the account data
+            locations = account.get('locations', [])
+            if locations:
                 # Use first location's details
-                location = locations['locations'][0]
+                location = locations[0]
                 business_details.update({
                     'google_location_id': location['name'],
                     'address': location.get('address', {}).get('formattedAddress', 'Pending'),
