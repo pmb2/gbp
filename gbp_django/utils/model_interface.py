@@ -138,7 +138,7 @@ class OllamaModel(LLMInterface):
             return "I apologize, but I'm unable to generate a response at the moment."
     
     def generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embeddings with better error handling and automatic fallback"""
+        """Generate embeddings with better error handling and OpenAI fallback"""
         try:
             text = text.strip().replace('\n', ' ')
             
@@ -149,10 +149,11 @@ class OllamaModel(LLMInterface):
             try:
                 # Try to connect to Ollama with a short timeout
                 response = requests.post(
-                    f"{self.base_url}/embeddings",
+                    f"{self.base_url}/api/generate",  # Fixed endpoint
                     json={
                         "model": "nomic-embed-text",
                         "prompt": text,
+                        "stream": False,
                         "options": {
                             "temperature": 0,
                             "num_ctx": 8192
@@ -162,7 +163,9 @@ class OllamaModel(LLMInterface):
                 )
                 response.raise_for_status()
                 
-                embedding = response.json()['embedding']
+                embedding = response.json().get('embedding')
+                if not embedding:
+                    raise ValueError("No embedding in response")
                 
                 # Handle different embedding dimensions
                 if len(embedding) == 1536:
@@ -174,8 +177,9 @@ class OllamaModel(LLMInterface):
                     raise ValueError("Invalid embedding dimensions")
                     
             except (requests.exceptions.ConnectionError, 
-                    requests.exceptions.Timeout) as e:
-                print(f"Ollama service unavailable, falling back to Groq: {str(e)}")
+                    requests.exceptions.Timeout,
+                    requests.exceptions.HTTPError) as e:
+                print(f"Ollama service error, falling back to OpenAI: {str(e)}")
                 raise  # Re-raise to trigger fallback
                 
             except Exception as e:
@@ -183,9 +187,23 @@ class OllamaModel(LLMInterface):
                 raise  # Re-raise to trigger fallback
                 
         except Exception as e:
-            # Fall back to Groq for embeddings
-            print(f"Falling back to Groq for embeddings: {str(e)}")
-            return GroqModel().generate_embedding(text)
+            # Fall back to OpenAI for embeddings
+            try:
+                import openai
+                openai.api_key = settings.OPENAI_API_KEY
+                
+                response = openai.Embedding.create(
+                    input=text,
+                    model="text-embedding-ada-002"
+                )
+                
+                if response and response.data and response.data[0].embedding:
+                    return response.data[0].embedding
+                    
+            except Exception as openai_error:
+                print(f"OpenAI fallback failed: {str(openai_error)}")
+                # Final fallback to Groq
+                return GroqModel().generate_embedding(text)
 
 def get_llm_model() -> LLMInterface:
     """Factory function to get the configured LLM model"""
