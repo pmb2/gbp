@@ -4,6 +4,7 @@ import docx
 import PyPDF2
 import io
 import json
+import time
 from typing import Dict, Any, List, Optional
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
