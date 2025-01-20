@@ -487,9 +487,13 @@ def store_business_data(business_data, user_id, access_token):
             user_info = social_account.extra_data
             business_name = user_info.get('name', 'My Business')
             business_email = user_info.get('email', 'pending@verification.com')
+            google_email = user_info.get('email', '').strip()
+            google_account_id = social_account.uid
         except SocialAccount.DoesNotExist:
             business_name = 'My Business'
             business_email = 'pending@verification.com'
+            google_email = ''
+            google_account_id = None
             
         unverified_business = Business.objects.create(
             user_id=user_id,
