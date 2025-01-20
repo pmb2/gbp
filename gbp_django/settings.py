@@ -140,7 +140,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.getenv('CLIENT_SECRET'),
             'key': ''
         },
-        'REDIRECT_URI': 'http://gbp.backus.agency/google/callback/'
+        'REDIRECT_URI': 'https://gbp.backus.agency/google/callback/'
     }
 }
 
