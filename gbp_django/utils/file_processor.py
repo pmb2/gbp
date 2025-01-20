@@ -144,35 +144,53 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     
             print(f"Cleaned text content length: {len(text_content)} characters")
                 
-            # Enhanced content chunking with better text handling
-            MAX_CHUNK_SIZE = 1000  # Reduced for more reliable embedding
-            MIN_CHUNK_SIZE = 50    # Reduced minimum size
+            # Enhanced content chunking with optimized sizes
+            MAX_CHUNK_SIZE = 1500  # Increased for better context
+            MIN_CHUNK_SIZE = 100   # Increased for more meaningful chunks
             chunks = []
             
-            # Clean and normalize text first
-            text_content = text_content.replace('\r\n', '\n').strip()
-            paragraphs = [p.strip() for p in text_content.split('\n\n') if p.strip()]
+            # Enhanced text preprocessing
+            text_content = text_content.replace('\r\n', '\n').replace('\r', '\n')
+            
+            # Split on multiple newlines while preserving structure
+            paragraphs = []
+            current_para = []
+            
+            for line in text_content.split('\n'):
+                line = line.strip()
+                if line:
+                    current_para.append(line)
+                elif current_para:
+                    paragraphs.append(' '.join(current_para))
+                    current_para = []
+                    
+            if current_para:
+                paragraphs.append(' '.join(current_para))
+                
+            # Filter out any remaining empty paragraphs
+            paragraphs = [p for p in paragraphs if p.strip()]
             
             print(f"\nStarting content chunking:")
             print(f"Total content length: {len(text_content)} characters")
             print(f"Found {len(paragraphs)} paragraphs")
             
-            current_chunk = ""
+            current_chunk = []
+            current_length = 0
             
             for para in paragraphs:
-                # Skip empty paragraphs
-                if not para.strip():
-                    continue
-                    
-                # If adding this paragraph would exceed max size
-                if len(current_chunk) + len(para) > MAX_CHUNK_SIZE:
-                    # Save current chunk if it meets minimum size
-                    if len(current_chunk.strip()) >= MIN_CHUNK_SIZE:
-                        chunks.append(current_chunk.strip())
-                        print(f"Created chunk of {len(current_chunk)} characters")
-                    current_chunk = para + "\n\n"
+                para_length = len(para)
+                
+                # Start new chunk if current would exceed max size
+                if current_length + para_length > MAX_CHUNK_SIZE:
+                    if current_chunk and sum(len(p) for p in current_chunk) >= MIN_CHUNK_SIZE:
+                        chunk_text = ' '.join(current_chunk)
+                        chunks.append(chunk_text)
+                        print(f"Created chunk of {len(chunk_text)} characters")
+                    current_chunk = [para]
+                    current_length = para_length
                 else:
-                    current_chunk += para + "\n\n"
+                    current_chunk.append(para)
+                    current_length += para_length
             
             # Add final chunk if it meets minimum size
             if len(current_chunk.strip()) >= MIN_CHUNK_SIZE:

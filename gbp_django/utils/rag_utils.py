@@ -5,7 +5,7 @@ from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ
 from .embeddings import generate_embedding, generate_response
 
-def search_knowledge_base(query: str, business_id: str, top_k: int = 12, min_similarity: float = 0.35) -> List[Dict[str, Any]]:
+def search_knowledge_base(query: str, business_id: str, top_k: int = 15, min_similarity: float = 0.25) -> List[Dict[str, Any]]:
     """Enhanced knowledge base search with comprehensive similarity scoring and metadata"""
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
