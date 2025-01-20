@@ -36,4 +36,6 @@ urlpatterns = [
          views.add_knowledge, name='add_knowledge'),
     path('api/business/<str:business_id>/files/<int:file_id>/preview/',
          views.preview_file, name='preview_file'),
+    path('api/business/<str:business_id>/memories/',
+         views.get_memories, name='get_memories'),
 ]

@@ -827,6 +827,39 @@ from .utils.file_processor import store_file_content, process_folder
 
 @login_required
 @require_http_methods(["GET", "DELETE"])
+def get_memories(request, business_id):
+    """Get chat memories for a business"""
+    try:
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        
+        # Get recent chat interactions from FAQ table
+        memories = FAQ.objects.filter(
+            business=business,
+            deleted_at__isnull=True
+        ).order_by('-created_at')[:10]
+        
+        memory_list = [{
+            'id': memory.id,
+            'content': f"Q: {memory.question}\nA: {memory.answer}",
+            'created_at': memory.created_at.isoformat()
+        } for memory in memories]
+        
+        return JsonResponse({
+            'status': 'success',
+            'memories': memory_list
+        })
+        
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error', 
+            'message': str(e)
+        }, status=500)
+
 def preview_file(request, business_id, file_id):
     """Preview or delete file content"""
     try:
