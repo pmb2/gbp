@@ -20,10 +20,41 @@ def process_text_file(content: bytes) -> str:
     return content.decode('utf-8', errors='ignore')
 
 def process_docx(content: bytes) -> str:
-    """Process .docx files"""
+    """Process .docx files with enhanced error handling"""
     import io
-    doc = docx.Document(io.BytesIO(content))
-    return '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+    try:
+        doc = docx.Document(io.BytesIO(content))
+        
+        # Process paragraphs with better formatting
+        text_parts = []
+        for paragraph in doc.paragraphs:
+            text = paragraph.text.strip()
+            if text:  # Only add non-empty paragraphs
+                text_parts.append(text)
+                
+        # Process tables if present
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = ' | '.join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if row_text:
+                    text_parts.append(row_text)
+                    
+        # Join with double newlines for better separation
+        processed_text = '\n\n'.join(text_parts)
+        
+        if not processed_text.strip():
+            raise ValueError("No readable text content found in DOCX file")
+            
+        print(f"Successfully processed DOCX content:")
+        print(f"Found {len(text_parts)} content blocks")
+        print(f"Total text length: {len(processed_text)} characters")
+        
+        return processed_text
+        
+    except Exception as e:
+        error_msg = f"DOCX processing failed: {str(e)}\n"
+        error_msg += "This might be due to corrupt file format or unsupported DOCX features"
+        raise ValueError(error_msg)
 
 def process_pdf(content: bytes) -> str:
     """Process PDF files"""
@@ -100,9 +131,22 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Generate embedding with validation
         try:
+            print("\nStarting content preprocessing...")
+                
+            # Clean and normalize text content
+            text_content = text_content.replace('\r', '\n')
+            text_content = text_content.replace('\t', ' ')
+            text_content = '\n'.join(line.strip() for line in text_content.split('\n'))
+            text_content = '\n'.join(filter(None, text_content.split('\n')))  # Remove empty lines
+                
+            if not text_content.strip():
+                raise ValueError("Text content is empty after cleaning")
+                    
+            print(f"Cleaned text content length: {len(text_content)} characters")
+                
             # Enhanced content chunking with better text handling
-            MAX_CHUNK_SIZE = 1500  # Increased for better context
-            MIN_CHUNK_SIZE = 100   # Minimum size to process
+            MAX_CHUNK_SIZE = 1000  # Reduced for more reliable embedding
+            MIN_CHUNK_SIZE = 50    # Reduced minimum size
             chunks = []
             
             # Clean and normalize text first
