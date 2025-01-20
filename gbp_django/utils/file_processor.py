@@ -134,10 +134,13 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             print("\nStarting content preprocessing...")
             
             # Clean and normalize text content
-            text_content = text_content.replace('\r', '\n')
-            text_content = text_content.replace('\t', ' ')
-            text_content = '\n'.join(line.strip() for line in text_content.split('\n'))
-            text_content = '\n'.join(filter(None, text_content.split('\n')))  # Remove empty lines
+            if isinstance(text_content, str):
+                text_content = text_content.replace('\r', '\n')
+                text_content = text_content.replace('\t', ' ')
+                text_content = '\n'.join(line.strip() for line in text_content.split('\n'))
+                text_content = '\n'.join(filter(None, text_content.split('\n')))  # Remove empty lines
+            else:
+                raise ValueError("Processed content is not a string")
             
             if not text_content.strip():
                 raise ValueError("Text content is empty after cleaning")
