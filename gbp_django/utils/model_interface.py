@@ -23,6 +23,18 @@ class GroqModel(LLMInterface):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
         self.model_name = "llama-3.3-70b-versatile"
         
+    def generate_embedding(self, text: str) -> Optional[List[float]]:
+        """Generate embeddings using Groq's API"""
+        try:
+            # Groq doesn't have native embedding support, so we'll use OpenAI as fallback
+            if settings.OPENAI_API_KEY:
+                openai_model = OpenAIModel()
+                return openai_model.generate_embedding(text)
+            return None
+        except Exception as e:
+            logger.error(f"Error generating embedding with Groq fallback: {str(e)}")
+            return None
+        
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
             # Format chat history and summarize memories
