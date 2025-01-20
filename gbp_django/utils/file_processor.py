@@ -206,7 +206,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             for idx, chunk in enumerate(chunks):
                 retry_count = 0
                 while retry_count < max_retries:
-                try:
+                    try:
                     print(f"\nProcessing chunk {idx + 1}/{len(chunks)}")
                     print(f"Chunk length: {len(chunk)} characters")
                     print(f"Chunk preview: {chunk[:100]}...")

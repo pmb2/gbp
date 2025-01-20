@@ -28,6 +28,7 @@ from .models import (
 from .utils.email_service import EmailService
 from .utils.file_processor import store_file_content, process_folder
 from .utils.rag_utils import answer_question, add_to_knowledge_base
+from .utils.model_interface import get_llm_model
 
 
 def send_verification_email(business):
