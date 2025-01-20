@@ -237,16 +237,31 @@ def store_business_data(business_data, user_id, access_token):
                 # Update existing business
                 for key, value in business_details.items():
                     setattr(existing_business, key, value)
+                existing_business.is_verified = location.get('verification_state') == 'VERIFIED'
+                existing_business.is_connected = True
+                existing_business.google_location_id = location.get('name', '')
+                existing_business.compliance_score = calculate_compliance_score(location)
+                existing_business.automation_status = 'Active'
+                existing_business.last_post_date = location.get('profile', {}).get('lastPostDate')
+                existing_business.next_update_date = calculate_next_update(location)
+                existing_business.user_id = user_id  # Ensure correct user association
                 existing_business.save()
                 business = existing_business
-                created = False
+                print(f"✅ Updated existing business: {business.business_name}")
             else:
                 # Create new business
-                business = Business.objects.create(**business_details)
-                created = True
-            
-            stored_businesses.append(business)
-            print(f"[INFO] {'Created' if created else 'Updated'} business: {business.business_name}")
+                business = Business.objects.create(
+                    **business_details,
+                    is_verified=location.get('verification_state') == 'VERIFIED',
+                    is_connected=True,
+                    google_location_id=location.get('name', ''),
+                    compliance_score=calculate_compliance_score(location),
+                    automation_status='Active',
+                    last_post_date=location.get('profile', {}).get('lastPostDate'),
+                    next_update_date=calculate_next_update(location),
+                    user_id=user_id
+                )
+                print(f"🆕 Created new business: {business.business_name}")
 
         except Exception as e:
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")

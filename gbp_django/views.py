@@ -241,7 +241,7 @@ def direct_google_oauth(request):
 def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
     try:
-        print("\n[DEBUG] Starting Google OAuth callback...")
+        print("\n🔄 Starting Google OAuth callback...")
 
         code = request.GET.get('code')
         state = request.GET.get('state')
@@ -299,16 +299,24 @@ def google_oauth_callback(request):
         print(f"[DEBUG] User logged in: {user.email}")
 
         # Fetch and store business data
-        print("[INFO] Fetching business accounts...")
+        print("🔍 Fetching business accounts from Google API...")
         business_data = get_business_accounts(access_token)
-        stored_businesses = store_business_data(business_data, user.id, access_token)
-
-        if stored_businesses:
-            print(f"[INFO] Stored {len(stored_businesses)} business(es).")
-            messages.success(request, f"Successfully linked {len(stored_businesses)} business(es).")
+        
+        if business_data and business_data.get('accounts'):
+            print(f"📊 Found {len(business_data['accounts'])} business accounts")
+            stored_businesses = store_business_data(business_data, user.id, access_token)
+            
+            if stored_businesses:
+                print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
+                for business in stored_businesses:
+                    print(f"  • {business.business_name} ({business.business_id})")
+                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+            else:
+                print("⚠️ No businesses were stored")
+                messages.warning(request, "No businesses were found to import")
         else:
-            print("[WARNING] No businesses found; creating placeholder.")
-            messages.warning(request, "No businesses were found. A placeholder has been created.")
+            print("⚠️ No business accounts found in Google API response")
+            messages.warning(request, "No businesses were found in your Google account")
 
         # Clean up session flags
         request.session['google_token'] = access_token
