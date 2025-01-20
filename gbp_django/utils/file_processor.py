@@ -62,20 +62,37 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         except Exception as e:
             raise ValueError(f"Failed to determine file type: {str(e)}")
 
-        # Process content based on mime type
+        # Process content based on mime type with enhanced error handling
         try:
+            print(f"\nProcessing file content:")
+            print(f"MIME type: {mime_type}")
+            print(f"File size: {file_size/1024:.1f}KB")
+            
             if mime_type == 'text/plain':
                 text_content = process_text_file(content)
             elif mime_type == 'application/pdf':
                 text_content = process_pdf(content)
-            elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+            elif mime_type in [
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/msword'
+            ]:
                 text_content = process_docx(content)
             elif mime_type == 'text/markdown':
                 text_content = process_markdown(content)
             else:
                 raise ValueError(f"Unsupported file type: {mime_type}")
+                
+            print(f"Successfully extracted text content")
+            print(f"Extracted text length: {len(text_content)} characters")
+            print(f"Text preview: {text_content[:200]}...")
+            
         except Exception as e:
-            raise ValueError(f"Failed to process file content: {str(e)}")
+            error_msg = f"Failed to process file content: {str(e)}\n"
+            error_msg += f"File: {filename}\n"
+            error_msg += f"MIME type: {mime_type}\n"
+            error_msg += f"Size: {file_size/1024:.1f}KB"
+            print(f"ERROR: {error_msg}")
+            raise ValueError(error_msg)
 
         # Validate text content
         if not text_content or len(text_content.strip()) == 0:
@@ -83,39 +100,76 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Generate embedding with validation
         try:
-            # Split content into manageable chunks
-            MAX_CHUNK_SIZE = 1000  # Characters per chunk
+            # Enhanced content chunking with better text handling
+            MAX_CHUNK_SIZE = 1500  # Increased for better context
+            MIN_CHUNK_SIZE = 100   # Minimum size to process
             chunks = []
             
-            # Split by paragraphs first
-            paragraphs = text_content.split('\n\n')
+            # Clean and normalize text first
+            text_content = text_content.replace('\r\n', '\n').strip()
+            paragraphs = [p.strip() for p in text_content.split('\n\n') if p.strip()]
+            
+            print(f"\nStarting content chunking:")
+            print(f"Total content length: {len(text_content)} characters")
+            print(f"Found {len(paragraphs)} paragraphs")
+            
             current_chunk = ""
             
             for para in paragraphs:
-                if len(current_chunk) + len(para) <= MAX_CHUNK_SIZE:
-                    current_chunk += para + "\n\n"
-                else:
-                    if current_chunk:
+                # Skip empty paragraphs
+                if not para.strip():
+                    continue
+                    
+                # If adding this paragraph would exceed max size
+                if len(current_chunk) + len(para) > MAX_CHUNK_SIZE:
+                    # Save current chunk if it meets minimum size
+                    if len(current_chunk.strip()) >= MIN_CHUNK_SIZE:
                         chunks.append(current_chunk.strip())
+                        print(f"Created chunk of {len(current_chunk)} characters")
                     current_chunk = para + "\n\n"
+                else:
+                    current_chunk += para + "\n\n"
             
-            if current_chunk:
+            # Add final chunk if it meets minimum size
+            if len(current_chunk.strip()) >= MIN_CHUNK_SIZE:
                 chunks.append(current_chunk.strip())
+                print(f"Created final chunk of {len(current_chunk)} characters")
             
-            # Generate embeddings for each chunk
+            print(f"Created {len(chunks)} chunks for processing")
+            
+            # Generate embeddings for each chunk with better error handling
             embeddings = []
-            for chunk in chunks:
-                embedding = generate_embedding(chunk)
-                if embedding and len(embedding) == 1536:
+            for idx, chunk in enumerate(chunks):
+                try:
+                    print(f"\nProcessing chunk {idx + 1}/{len(chunks)}")
+                    print(f"Chunk length: {len(chunk)} characters")
+                    print(f"Chunk preview: {chunk[:100]}...")
+                    
+                    embedding = generate_embedding(chunk)
+                    
+                    if embedding is None:
+                        print(f"Warning: Embedding generation returned None for chunk {idx + 1}")
+                        continue
+                        
+                    if len(embedding) != 1536:
+                        print(f"Warning: Invalid embedding dimensions for chunk {idx + 1}: {len(embedding)}")
+                        continue
+                    
                     embeddings.append({
                         'text': chunk,
                         'embedding': embedding
                     })
-                else:
-                    print(f"Warning: Failed to generate valid embedding for chunk")
+                    print(f"Successfully generated embedding for chunk {idx + 1}")
+                    
+                except Exception as e:
+                    print(f"Error processing chunk {idx + 1}: {str(e)}")
+                    continue
             
             if not embeddings:
-                raise ValueError("Failed to generate any valid embeddings")
+                error_msg = "Failed to generate any valid embeddings. "
+                error_msg += f"Processed {len(chunks)} chunks but none were successful. "
+                error_msg += "Check the logs for specific chunk processing errors."
+                raise ValueError(error_msg)
         except Exception as e:
             raise ValueError(f"Embedding generation failed: {str(e)}")
 
