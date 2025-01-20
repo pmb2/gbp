@@ -324,19 +324,19 @@ def google_oauth_callback(request):
         # Fetch and store business data
         print("\n🏢 Starting business data collection...")
         print("🔍 Fetching business accounts from Google API...")
-        try:
-            business_data = get_business_accounts(access_token)
-            print("✅ API call successful")
-            
-            if business_data and business_data.get('accounts'):
-                accounts = business_data['accounts']
-                print(f"📊 Found {len(accounts)} business accounts:")
-                for idx, account in enumerate(accounts, 1):
-                    print(f"\n📍 Account {idx}:")
-                    print(f"  • Name: {account.get('accountName', 'Unknown')}")
-                    print(f"  • ID: {account.get('name', 'Unknown')}")
-                    print(f"  • Type: {account.get('type', 'Unknown')}")
-                    print(f"  • Role: {account.get('role', 'Unknown')}")
+        business_data = get_business_accounts(access_token)
+        print("✅ API call successful")
+        
+        if business_data and business_data.get('accounts'):
+            accounts = business_data['accounts']
+            print(f"📊 Found {len(accounts)} business accounts:")
+            for idx, account in enumerate(accounts, 1):
+                print(f"\n📍 Account {idx}:")
+                print(f"  • Name: {account.get('accountName', 'Unknown')}")
+                print(f"  • ID: {account.get('name', 'Unknown')}")
+                print(f"  • Type: {account.get('type', 'Unknown')}")
+                print(f"  • Role: {account.get('role', 'Unknown')}")
+                
             stored_businesses = store_business_data(business_data, user.id, access_token)
             
             if stored_businesses:
