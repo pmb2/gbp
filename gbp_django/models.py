@@ -195,6 +195,7 @@ class FAQ(models.Model):
     answer = models.TextField()
     embedding = VectorField(dimensions=1536)
     file_path = models.CharField(max_length=255, null=True, blank=True)
+    faq_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
     file_type = models.CharField(max_length=50, null=True, blank=True)
     file_size = models.IntegerField(null=True, blank=True)
     deleted_at = models.DateTimeField(null=True, blank=True)

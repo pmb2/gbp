@@ -4,6 +4,7 @@ import docx
 import PyPDF2
 import io
 import json
+import uuid
 import time
 from typing import Dict, Any, List, Optional
 from django.core.files.storage import default_storage
@@ -326,7 +327,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         file_size=file_size,
                         chunk_index=idx,
                         total_chunks=total_chunks,
-                        id=f"{business_id}-{int(time.time())}-{idx}"  # Ensure unique ID per chunk
+                        faq_id=str(uuid.uuid4()) # Generate unique ID
                     )
                     faqs.append(faq)
                 except Exception as chunk_error:
