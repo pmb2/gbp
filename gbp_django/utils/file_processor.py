@@ -39,7 +39,7 @@ def process_markdown(content: bytes) -> str:
     return content.decode('utf-8', errors='ignore')
 
 def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[str, Any]:
-    """Store file content and generate embeddings with extensive error handling"""
+    """Store file content and generate embeddings with extensive error handling and chunking"""
     try:
         # Validate file size (10MB limit)
         MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -83,16 +83,39 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Generate embedding with validation
         try:
-            # Generate and validate embedding
-            embedding = generate_embedding(text_content)
-            if not embedding:
-                raise ValueError("Failed to generate embedding")
-            if len(embedding) != 1536:
-                # Retry once with text chunking
-                chunks = [text_content[i:i+512] for i in range(0, len(text_content), 512)]
-                embedding = generate_embedding(chunks[0])  # Use first chunk
-                if not embedding or len(embedding) != 1536:
-                    raise ValueError(f"Invalid embedding dimensions: expected 1536, got {len(embedding) if embedding else 0}")
+            # Split content into manageable chunks
+            MAX_CHUNK_SIZE = 1000  # Characters per chunk
+            chunks = []
+            
+            # Split by paragraphs first
+            paragraphs = text_content.split('\n\n')
+            current_chunk = ""
+            
+            for para in paragraphs:
+                if len(current_chunk) + len(para) <= MAX_CHUNK_SIZE:
+                    current_chunk += para + "\n\n"
+                else:
+                    if current_chunk:
+                        chunks.append(current_chunk.strip())
+                    current_chunk = para + "\n\n"
+            
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+            
+            # Generate embeddings for each chunk
+            embeddings = []
+            for chunk in chunks:
+                embedding = generate_embedding(chunk)
+                if embedding and len(embedding) == 1536:
+                    embeddings.append({
+                        'text': chunk,
+                        'embedding': embedding
+                    })
+                else:
+                    print(f"Warning: Failed to generate valid embedding for chunk")
+            
+            if not embeddings:
+                raise ValueError("Failed to generate any valid embeddings")
         except Exception as e:
             raise ValueError(f"Embedding generation failed: {str(e)}")
 
@@ -109,17 +132,21 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         except Exception as e:
             raise IOError(f"Failed to store file: {str(e)}")
 
-        # Create FAQ entry with file metadata
+        # Create FAQ entries for each chunk with file metadata
         try:
-            faq = FAQ.objects.create(
-                business=business,
-                question=f"Content from file: {filename}",
-                answer=text_content,
-                embedding=embedding,
-                file_path=saved_path,
-                file_type=mime_type,
-                file_size=file_size
-            )
+            faqs = []
+            for idx, chunk_data in enumerate(embeddings):
+                faq = FAQ.objects.create(
+                    business=business,
+                    question=f"Content from {filename} (Part {idx + 1}/{len(embeddings)})",
+                    answer=chunk_data['text'],
+                    embedding=chunk_data['embedding'],
+                    file_path=saved_path,
+                    file_type=mime_type,
+                    file_size=file_size,
+                    chunk_index=idx
+                )
+                faqs.append(faq)
         except Exception as e:
             # Cleanup stored file if FAQ creation fails
             default_storage.delete(saved_path)
