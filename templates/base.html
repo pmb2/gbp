@@ -77,14 +77,20 @@
 
 
     // --- File Upload Functionality ---
-    function handleFileDrop(event, businessId) {
+    function handleBusinessRowDrop(event, businessId) {
         event.preventDefault();
         event.stopPropagation();
         event.currentTarget.classList.remove('drag-over');
 
         const files = event.dataTransfer.files;
         if (files.length > 0) {
-            toggleBusinessDetails(businessId);
+            // First ensure the business row is expanded
+            const row = document.querySelector(`[data-business-id="${businessId}"]`);
+            const detailsRow = document.getElementById(`details-${businessId}`);
+            if (detailsRow.style.display === 'none' || !detailsRow.style.display) {
+                toggleBusinessDetails(businessId);
+            }
+            // Then switch to knowledge tab
             SwitchTab(businessId, 'knowledge');
 
             const formData = new FormData();

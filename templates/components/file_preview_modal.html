@@ -16,24 +16,45 @@
 
 <script>
 function previewFile(businessId, fileId) {
+    if (!fileId) {
+        console.error('Invalid file ID');
+        return;
+    }
+    
     const modal = document.getElementById('filePreviewModal');
     const contentArea = document.getElementById('previewContent');
     const fileName = document.getElementById('previewFileName');
     
     fetch(`/api/business/${businessId}/files/${fileId}/preview/`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            fileName.textContent = data.name;
-            contentArea.innerHTML = `
-                <pre class="whitespace-pre-wrap p-4">${data.content}</pre>
-                <div class="flex justify-end mt-4">
-                    <button onclick="showDeleteFileModal('${businessId}', ${fileId})" 
-                            class="text-red-600 hover:text-red-700 font-medium">
-                        Delete File
-                    </button>
-                </div>
-            `;
-            modal.classList.remove('hidden');
+            if (data.status === 'success') {
+                const fileData = data.file;
+                fileName.textContent = fileData.name;
+                contentArea.innerHTML = `
+                    <pre class="whitespace-pre-wrap p-4">${fileData.content}</pre>
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>Type: ${fileData.type || 'Unknown'}</p>
+                        <p>Size: ${fileData.size ? Math.round(fileData.size/1024) + 'KB' : 'Unknown'}</p>
+                        <p>Created: ${new Date(fileData.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="flex justify-end mt-4">
+                        <button onclick="showDeleteFileModal('${businessId}', '${fileId}')" 
+                                class="text-red-600 hover:text-red-700 font-medium">
+                            Delete File
+                        </button>
+                    </div>
+                `;
+                modal.classList.remove('hidden');
+            } else {
+                console.error('Preview failed:', data.message);
+                showAlertBanner('Error loading file preview');
+            }
         })
         .catch(error => {
             showAlertBanner('Error loading file preview');
