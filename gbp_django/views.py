@@ -959,7 +959,7 @@ def preview_file(request, business_id, file_id):
     """Preview or delete file content with enhanced error handling"""
     try:
         # Validate file_id
-        if not file_id or file_id == 'null':
+        if not file_id or str(file_id) == 'null':
             return JsonResponse({
                 'status': 'error',
                 'message': 'Invalid file ID'

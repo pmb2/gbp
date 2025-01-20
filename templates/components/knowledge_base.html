@@ -2,9 +2,9 @@
     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Knowledge Base</h3>
     <script>
     console.log('📚 knowledge_base.html: Loading knowledge base for business:', '{{ business.business_id }}');
-
+ 
     function previewFile(businessId, fileId) {
-        if (!fileId) {
+        if (!fileId || fileId === 'null') {
             console.error('Invalid file ID');
             return;
         }
@@ -132,9 +132,9 @@
                             <span class="text-sm text-gray-500 filesize"></span>
                             <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                 <button class="preview-file text-blue-500 hover:text-blue-700"
-                                        onclick="previewFile('{{ business.business_id }}', this.closest('.file-item').dataset.fileId)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
+                                       onclick="previewFile('{{ business.business_id }}', this.closest('.file-item').dataset.faqId)">
+                                   <i class="fas fa-eye"></i>
+                               </button>
                                 <button class="delete-file text-red-500 hover:text-red-700"
                                         onclick="deleteFile('{{ business.business_id }}', this.closest('.file-item').dataset.fileId)">
                                     <i class="fas fa-trash"></i>
