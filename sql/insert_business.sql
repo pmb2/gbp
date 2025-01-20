@@ -18,7 +18,8 @@ INSERT INTO gbp_django_business (
     compliance_score,
     created_at,
     updated_at,
-    user_id
+    user_id,
+    verification_status
 ) VALUES (
     'Test Business',
     'test-business-1',
@@ -39,5 +40,6 @@ INSERT INTO gbp_django_business (
     0,
     NOW(),
     NOW(),
-    1
+    1,
+    'UNVERIFIED'
 );
