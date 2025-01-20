@@ -41,21 +41,21 @@ def update_business_details(access_token, account_id, location_id, update_data):
 
         url = (f"https://mybusinessaccountmanagement.googleapis.com/v1/"
                f"{account_id}/locations/{location_id}")
-        
+
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json"
         }
-        
+
         # Use PATCH with updateMask to specify which fields to update
         params = {
             "updateMask": "locationName,primaryPhone,websiteUrl,primaryCategory,address"
         }
-        
+
         response = requests.patch(url, headers=headers, json=formatted_data, params=params)
         response.raise_for_status()
         return response.json()
-        
+
     except requests.exceptions.RequestException as e:
         print(f"API Error: {str(e)}")
         if hasattr(e.response, 'json'):
@@ -90,7 +90,7 @@ def get_business_accounts(access_token):
             if attempt > 0:
                 time.sleep(0.1)  # Reduced to 0.1s delay
                 print(f"[DEBUG] API retry attempt {attempt + 1}")
-            
+
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
@@ -154,7 +154,7 @@ def store_business_data(business_data, user_id, access_token):
     """Store business data from Google API response"""
     print("\n[DEBUG] Starting business data storage...")
     print(f"[DEBUG] Raw business data received: {business_data}")
-    
+
     stored_businesses = []
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"[DEBUG] Found {len(accounts)} accounts to process")
@@ -175,7 +175,7 @@ def store_business_data(business_data, user_id, access_token):
             # Basic business details from account
             # Generate unique business ID if not exists
             business_id = f"biz_{user_id}_{int(time.time())}"
-            
+
             business_details = {
                 'user_id': user_id,
                 'business_id': business_id,
@@ -187,7 +187,7 @@ def store_business_data(business_data, user_id, access_token):
 
             # Get locations for this account
             locations = get_locations(access_token, account['name'])
-            
+
             if locations.get('locations'):
                 # Use first location's details
                 location = locations['locations'][0]
@@ -239,36 +239,36 @@ def store_business_data(business_data, user_id, access_token):
             # Get the Google email from the user's social account
             from allauth.socialaccount.models import SocialAccount
             try:
-                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')                
+                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
                 google_email = social_account.extra_data.get('email')
             except SocialAccount.DoesNotExist:
                 google_email = None
 
             # Try to find existing business using multiple identifiers, prioritizing google_account_id
             existing_business = None
-            
+
             # Check by Google account ID first (most reliable)
             if google_account_id:
                 existing_business = Business.objects.filter(
                     google_account_id=google_account_id
                 ).first()
-            
+
             # If not found, try by Google email
             if not existing_business and google_email:
                 existing_business = Business.objects.filter(
                     google_email=google_email
                 ).first()
-                
+
             # Finally try by business location ID if available
             if not existing_business and business_details.get('google_location_id'):
                 existing_business = Business.objects.filter(
                     google_location_id=business_details['google_location_id']
-                ).first()            
+                ).first()
 
             # Add Google identifiers to business details, even if they are None
-            business_details['google_email'] = google_email            
+            business_details['google_email'] = google_email
             business_details['google_account_id'] = google_account_id
-            
+
             if existing_business:
                 # Update existing business
                 for key, value in business_details.items():
@@ -276,7 +276,7 @@ def store_business_data(business_data, user_id, access_token):
                 existing_business.save()
                 business = existing_business
                 created = False
-                
+
                 # Update business attributes
                 if 'attributes' in locals():
                     for key, value in attributes.items():
@@ -286,23 +286,23 @@ def store_business_data(business_data, user_id, access_token):
                                 key=key,
                                 defaults={
                                     'value': json.dumps(value) if isinstance(value, (dict, list)) else str(value)
-                                }                                
+                                }
                             )
             else:
                 # Create new business
                 business = Business.objects.create(**business_details)
                 created = True
-                
+
                 # Store initial business attributes
                 if 'attributes' in locals():
-                    for key, value in attributes.items():                        
+                    for key, value in attributes.items():
                         if value is not None:  # Only store non-null attributes
                             BusinessAttribute.objects.create(
                                 business=business,
-                                key=key,                                
+                                key=key,
                                 value=json.dumps(value) if isinstance(value, (dict, list)) else str(value)
                             )
-            
+
             stored_businesses.append(business)
             print(f"[INFO] {'Created' if created else 'Updated'} business: {business.business_name}")
 
@@ -315,7 +315,7 @@ def store_business_data(business_data, user_id, access_token):
         print("\n[DEBUG] No businesses found - creating unverified business record")
         timestamp = int(time.time())
         business_id = f"gbp-oauth-{user_id}-{timestamp}"
-        
+
         # Get user info from social account if available
         from allauth.socialaccount.models import SocialAccount
         try:
@@ -323,16 +323,16 @@ def store_business_data(business_data, user_id, access_token):
             user_info = social_account.extra_data
             business_name = user_info.get('name', '').strip() or 'New Business'
             business_email = user_info.get('email', '').strip() or 'pending@verification.com'
-+            google_email = user_info.get('email', '').strip()
-+            google_account_id = social_account.uid
-+
-+        except SocialAccount.DoesNotExist:
-+            business_name = 'New Business'
-+            business_email = 'pending@verification.com'
-+            
-+        # Always create a new unverified business
-+        business = Business.objects.create(
-+            user_id=user_id,
+            google_email = user_info.get('email', '').strip()
+            google_account_id = social_account.uid
+
+        except SocialAccount.DoesNotExist:
+            business_name = 'New Business'
+            business_email = 'pending@verification.com'
+
+        # Always create a new unverified business
+        business = Business.objects.create(
+            user_id=user_id,
 +            business_id=business_id,
 +            google_email=google_email,
 +            google_account_id=google_account_id,
@@ -344,42 +344,42 @@ def store_business_data(business_data, user_id, access_token):
 +            email_verification_token=secrets.token_urlsafe(32),
 +            address='Pending verification',
 +            phone_number='Pending verification',
-+            website_url='Pending verification', 
++            website_url='Pending verification',
 +            category='Pending verification',
 +            email_settings={
 +                'enabled': True,
 +                'compliance_alerts': True,
 +                'content_approval': True,
 +                'weekly_summary': True,
-+                'verification_reminders': True
-+            },
-+            automation_status='Active'
-+        )
-+        
-+        # Create notification
-+        from django.contrib.auth import get_user_model
-+        User = get_user_model()
-+        try:
-+            user = User.objects.get(id=user_id)
-+            Notification.objects.create(
-+                user=user,
-+                message="Please complete your business profile to get started.",
-+                notification_type="PROFILE_COMPLETION"
-+            )
-+        except Exception as e:
-+            print(f"[WARNING] Failed to create notification: {str(e)}")
-+        
-+        stored_businesses = [business]        
-+        return stored_businesses
+                'verification_reminders': True
+            },
+            automation_status='Active'
+        )
+
+        # Create notification
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        try:
+           user = User.objects.get(id=user_id)
+            Notification.objects.create(
+               user=user,
+                message="Please complete your business profile to get started.",
+                notification_type="PROFILE_COMPLETION"
+            )
+        except Exception as e:
+            print(f"[WARNING] Failed to create notification: {str(e)}")
+
+        stored_businesses = [business]
+        return stored_businesses
 
     # Process each account's business data
-    
+
     if not accounts:
         print("[WARNING] No accounts found in business data")
         # Create unvalidated business entry
         timestamp = int(time.time())
         business_id = f"unvalidated-{user_id}-{timestamp}"
-        
+
         business = Business.objects.create(
             user_id=user_id,
             business_id=business_id,
@@ -395,21 +395,21 @@ def store_business_data(business_data, user_id, access_token):
             email_settings={'enabled': True, 'compliance_alerts': True, 'content_approval': True, 'weekly_summary': True, 'verification_reminders': True},
             automation_status='Active'
         )
-        
+
         # Create notification
         Notification.objects.create(
             user_id=user_id,
             message="Please complete your business profile to get started."
         )
-        
+
         stored_businesses = [business]
         return stored_businesses
-        
+
     for account in accounts:
         try:
             # Get locations for this account
             locations = get_locations(access_token, account['name'])
-            
+
             if locations and locations.get('locations'):
                 for location in locations['locations']:
                     # Extract business details with enhanced data
@@ -441,7 +441,7 @@ def store_business_data(business_data, user_id, access_token):
                         'year_established': location.get('metadata', {}).get('yearEstablished', ''),
                         'employee_count': location.get('metadata', {}).get('employeeCount', '')
                     }
-                
+
                 # Get or create the business record with enhanced details
                 business, created = Business.objects.update_or_create(
                     business_id=account['name'],
@@ -456,7 +456,7 @@ def store_business_data(business_data, user_id, access_token):
                         'next_update_date': calculate_next_update(location)
                     }
                 )
-                
+
                 # Update business attributes
                 if 'attributes' in locals():
                     for key, value in attributes.items():
@@ -466,20 +466,20 @@ def store_business_data(business_data, user_id, access_token):
                                 key=key,
                                 defaults={'value': json.dumps(value) if isinstance(value, (dict, list)) else str(value)}
                             )
-                
+
                 stored_businesses.append(business)
                 print(f"[INFO] Successfully stored/updated business: {business.business_name}")
-                
+
         except Exception as e:
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
             continue
-    
+
     # If no businesses were stored, create an unverified business entry
     if not stored_businesses:
         print("\n[DEBUG] No businesses found - creating unverified business record")
         timestamp = int(time.time())
         business_id = f"unverified-{user_id}-{timestamp}"
-        
+
         # Get user info from social account if available
         from allauth.socialaccount.models import SocialAccount
         try:
@@ -494,7 +494,7 @@ def store_business_data(business_data, user_id, access_token):
             business_email = 'pending@verification.com'
             google_email = ''
             google_account_id = None
-            
+
         unverified_business = Business.objects.create(
             user_id=user_id,
             business_id=business_id,
@@ -517,15 +517,15 @@ def store_business_data(business_data, user_id, access_token):
             },
             automation_status='Active'
         )
-        
+
         # Create notification for new business
         Notification.objects.create(
             user_id=user_id,
             message="Please verify your business profile to unlock all features."
         )
-        
+
         stored_businesses = [unverified_business]
-        
+
     return stored_businesses
 
 def get_locations(access_token, account_id):
@@ -538,7 +538,7 @@ def get_locations(access_token, account_id):
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
-        
+
         # Get additional verification details for each location
         locations_data = response.json()
         if 'locations' in locations_data:
@@ -549,7 +549,7 @@ def get_locations(access_token, account_id):
                     verification_data = verification_response.json()
                     location['verification_state'] = verification_data.get('state', 'UNVERIFIED')
                     location['verification_method'] = verification_data.get('method', 'NONE')
-                
+
         return locations_data
     except requests.exceptions.RequestException as e:
         print(f"Error fetching location data: {str(e)}")
@@ -560,32 +560,32 @@ def calculate_compliance_score(location_data):
     """Calculate compliance score based on profile completeness"""
     score = 0
     total_checks = 7
-    
+
     # Check basic info
     if location_data.get('locationName'): score += 1
     if location_data.get('primaryPhone'): score += 1
     if location_data.get('websiteUrl'): score += 1
     if location_data.get('regularHours'): score += 1
-    
+
     # Check address
     address = location_data.get('address', {})
     if address and all(address.get(f) for f in ['addressLines', 'locality', 'regionCode']):
         score += 1
-        
+
     # Check categories
     if location_data.get('primaryCategory'): score += 1
-    
+
     # Check profile completeness
     profile = location_data.get('profile', {})
     if profile and profile.get('description') and profile.get('primaryPhoto'):
         score += 1
-        
+
     return int((score / total_checks) * 100)
 
 def calculate_next_update(location_data):
     """Calculate next update date based on last activity"""
     from datetime import datetime, timedelta
-    
+
     last_post = location_data.get('profile', {}).get('lastPostDate')
     if last_post:
         last_post_date = datetime.fromisoformat(last_post.replace('Z', '+00:00'))
