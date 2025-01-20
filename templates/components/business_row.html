@@ -7,7 +7,7 @@
     data-business-id="{{ business.business_id }}"
     data-verified="{{ business.is_verified }}"
     data-completion="{{ business.calculate_profile_completion }}"
-    ondrop="handleFileDrop(event, '{{ business.business_id }}')"
+    ondrop="handleBusinessRowDrop(event, '{{ business.business_id }}')"
     ondragover="handleDragOver(event)"
     ondragenter="handleDragEnter(event)"
     ondragleave="handleDragLeave(event)"
