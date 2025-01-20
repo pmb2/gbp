@@ -149,11 +149,24 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     
                     if embedding is None:
                         print(f"Warning: Embedding generation returned None for chunk {idx + 1}")
-                        continue
-                        
+                        print(f"Chunk content: {chunk[:500]}...")
+                        print("Retrying with cleaned content...")
+                        # Try cleaning the content and retry
+                        cleaned_chunk = ' '.join(chunk.split())  # Remove extra whitespace
+                        embedding = generate_embedding(cleaned_chunk)
+                        if embedding is None:
+                            print("Retry failed - skipping chunk")
+                            continue
+                    
                     if len(embedding) != 1536:
                         print(f"Warning: Invalid embedding dimensions for chunk {idx + 1}: {len(embedding)}")
-                        continue
+                        print("Attempting to pad/truncate embedding...")
+                        if len(embedding) < 1536:
+                            # Pad with zeros
+                            embedding.extend([0.0] * (1536 - len(embedding)))
+                        else:
+                            # Truncate to 1536
+                            embedding = embedding[:1536]
                     
                     embeddings.append({
                         'text': chunk,
@@ -166,10 +179,14 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                     continue
             
             if not embeddings:
-                error_msg = "Failed to generate any valid embeddings. "
-                error_msg += f"Processed {len(chunks)} chunks but none were successful. "
+                error_msg = "Failed to generate any valid embeddings.\n"
+                error_msg += f"Processed {len(chunks)} chunks but none were successful.\n"
+                error_msg += "Original text length: {len(text_content)} chars\n"
+                error_msg += "Number of paragraphs: {len(paragraphs)}\n"
+                error_msg += "First 500 chars of content: {text_content[:500]}\n"
                 error_msg += "Check the logs for specific chunk processing errors."
-                raise ValueError(error_msg)
+                print(error_msg)  # Log the detailed error
+                raise ValueError("Document processing failed - please check file content and format")
         except Exception as e:
             raise ValueError(f"Embedding generation failed: {str(e)}")
 
