@@ -76,12 +76,17 @@ def delete_location(access_token, account_id, location_id):
 
 @cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
-    print("\n[DEBUG] Starting business accounts fetch...")
+    print("\n🔄 Starting business accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
-    headers = {"Authorization": f"Bearer {access_token}"}
-    retries = 2  # Reduced retries
-    print(f"[DEBUG] Request URL: {url}")
-    print(f"[DEBUG] Authorization header present: {'Authorization' in headers}")
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    retries = 3
+    print(f"🌐 Request details:")
+    print(f"  • URL: {url}")
+    print(f"  • Headers: {list(headers.keys())}")
+    print(f"  • Max retries: {retries}")
 
     for attempt in range(retries):
         try:

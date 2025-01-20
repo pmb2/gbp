@@ -242,6 +242,10 @@ def google_oauth_callback(request):
     """Handle the callback from Google OAuth"""
     try:
         print("\n🔄 Starting Google OAuth callback...")
+        print("🔍 Request details:")
+        print(f"  • Method: {request.method}")
+        print(f"  • GET params: {request.GET}")
+        print(f"  • Session keys: {list(request.session.keys())}")
 
         code = request.GET.get('code')
         state = request.GET.get('state')
@@ -255,14 +259,28 @@ def google_oauth_callback(request):
 
         # Get tokens using the authorization code
         from allauth.socialaccount.models import SocialApp
-        google_app = SocialApp.objects.get(provider='google')
+        print("🔑 Retrieving Google app credentials...")
+        try:
+            google_app = SocialApp.objects.get(provider='google')
+            print("✅ Found Google app configuration")
+        except SocialApp.DoesNotExist:
+            print("❌ Google app configuration not found!")
+            raise
 
+        callback_uri = request.build_absolute_uri(reverse('google_oauth_callback'))
+        print(f"🔄 Using callback URI: {callback_uri}")
+        
+        print("🔑 Exchanging auth code for tokens...")
         tokens = get_access_token(
             code,
             google_app.client_id,
             google_app.secret,
-            request.build_absolute_uri(reverse('google_oauth_callback'))
+            callback_uri
         )
+        print("✅ Successfully retrieved tokens")
+        print(f"  • Access token length: {len(tokens.get('access_token', ''))}")
+        print(f"  • Refresh token present: {'refresh_token' in tokens}")
+        print(f"  • Token type: {tokens.get('token_type')}")
 
         access_token = tokens.get('access_token')
         refresh_token = tokens.get('refresh_token')
@@ -272,11 +290,16 @@ def google_oauth_callback(request):
             return redirect('login')
 
         # Fetch user info from Google
+        print("👤 Fetching Google user info...")
         user_info = get_user_info(access_token)
         google_email = user_info.get('email')
         google_id = user_info.get('sub')
 
-        print(f"[DEBUG] Fetched Google user info: {google_email}")
+        print(f"✅ User info retrieved:")
+        print(f"  • Email: {google_email}")
+        print(f"  • Google ID: {google_id}")
+        print(f"  • Name: {user_info.get('name')}")
+        print(f"  • Picture: {user_info.get('picture', 'None')}")
 
         # Find or create the user
         user, created = User.objects.get_or_create(email=google_email)
@@ -299,11 +322,21 @@ def google_oauth_callback(request):
         print(f"[DEBUG] User logged in: {user.email}")
 
         # Fetch and store business data
+        print("\n🏢 Starting business data collection...")
         print("🔍 Fetching business accounts from Google API...")
-        business_data = get_business_accounts(access_token)
-        
-        if business_data and business_data.get('accounts'):
-            print(f"📊 Found {len(business_data['accounts'])} business accounts")
+        try:
+            business_data = get_business_accounts(access_token)
+            print("✅ API call successful")
+            
+            if business_data and business_data.get('accounts'):
+                accounts = business_data['accounts']
+                print(f"📊 Found {len(accounts)} business accounts:")
+                for idx, account in enumerate(accounts, 1):
+                    print(f"\n📍 Account {idx}:")
+                    print(f"  • Name: {account.get('accountName', 'Unknown')}")
+                    print(f"  • ID: {account.get('name', 'Unknown')}")
+                    print(f"  • Type: {account.get('type', 'Unknown')}")
+                    print(f"  • Role: {account.get('role', 'Unknown')}")
             stored_businesses = store_business_data(business_data, user.id, access_token)
             
             if stored_businesses:
