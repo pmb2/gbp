@@ -243,12 +243,11 @@ def google_oauth_callback(request):
     try:
         print("\n[DEBUG] Starting Google OAuth callback...")
 
-        # Extract parameters
+        # Extract and validate parameters
         code = request.GET.get('code')
         state = request.GET.get('state')
         stored_state = request.session.get('oauth_state')
 
-        # Validate state
         if not code or not state or state != stored_state:
             print("[ERROR] OAuth validation failed")
             messages.error(request, 'Invalid OAuth state or missing code.')
@@ -262,49 +261,93 @@ def google_oauth_callback(request):
             messages.error(request, "Google integration is not configured. Please contact support.")
             return redirect('login')
 
-        # Exchange the authorization code for tokens
-        tokens = get_access_token(
-            code=code,
-            client_id=google_app.client_id,
-            client_secret=google_app.secret,
-            redirect_uri='https://gbp.backus.agency/google/callback/'
-        )
+        # Exchange code for tokens
+        try:
+            tokens = get_access_token(
+                code=code,
+                client_id=google_app.client_id,
+                client_secret=google_app.secret,
+                redirect_uri='https://gbp.backus.agency/google/callback/'
+            )
+            
+            access_token = tokens.get('access_token')
+            refresh_token = tokens.get('refresh_token')
 
-        access_token = tokens.get('access_token')
-        refresh_token = tokens.get('refresh_token')
-
-        if not access_token:
-            print("[ERROR] Failed to retrieve access token.")
+            if not access_token:
+                raise ValueError("No access token received")
+                
+        except Exception as e:
+            print(f"[ERROR] Token exchange failed: {str(e)}")
             messages.error(request, 'Failed to retrieve access token from Google.')
             return redirect('login')
 
-        # Fetch user info from Google
-        user_info = get_user_info(access_token)
-        google_email = user_info.get('email')
-        google_id = user_info.get('sub')
+        # Fetch and validate user info
+        try:
+            user_info = get_user_info(access_token)
+            if not user_info or not user_info.get('email'):
+                raise ValueError("Invalid user info received")
+                
+            google_email = user_info['email']
+            google_id = user_info['sub']
+            print(f"[DEBUG] Fetched Google user info: {google_email}")
+            
+        except Exception as e:
+            print(f"[ERROR] Failed to get user info: {str(e)}")
+            messages.error(request, 'Failed to retrieve user information.')
+            return redirect('login')
 
-        print(f"[DEBUG] Fetched Google user info: {google_email}")
+        # Find or create user
+        try:
+            user, created = User.objects.get_or_create(
+                email=google_email,
+                defaults={
+                    'google_id': google_id,
+                    'name': user_info.get('name'),
+                    'profile_picture_url': user_info.get('picture'),
+                }
+            )
+            print(f"[DEBUG] {'Created' if created else 'Found'} user: {google_email}")
+            
+            # Update user credentials
+            user.google_access_token = access_token
+            user.google_refresh_token = refresh_token
+            user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
+            user.save()
+            
+        except Exception as e:
+            print(f"[ERROR] User creation/update failed: {str(e)}")
+            messages.error(request, 'Failed to create/update user account.')
+            return redirect('login')
 
-        # Find or create the user
-        user, created = User.objects.get_or_create(email=google_email)
-        if created:
-            print(f"[DEBUG] Created new user: {google_email}")
-        else:
-            print(f"[DEBUG] Found existing user: {google_email}")
+        # Fetch and store business data
+        try:
+            print("[DEBUG] Fetching business accounts...")
+            business_data = get_business_accounts(access_token)
+            
+            if business_data and business_data.get('accounts'):
+                print(f"[DEBUG] Found {len(business_data['accounts'])} business accounts")
+                stored_businesses = store_business_data(business_data, user.id, access_token)
+                print(f"[DEBUG] Stored {len(stored_businesses)} businesses")
+                
+                # Create welcome notification for new businesses
+                if stored_businesses:
+                    Notification.objects.create(
+                        user=user,
+                        message=f"Successfully connected {len(stored_businesses)} business(es).",
+                        read=False
+                    )
+            else:
+                print("[DEBUG] No business accounts found")
+                
+        except Exception as e:
+            print(f"[ERROR] Business data sync failed: {str(e)}")
+            # Don't redirect - continue with login even if business sync fails
+            messages.warning(request, 'Connected to Google, but failed to sync business data. Please try reconnecting later.')
 
-        # Update user details and credentials
-        user.google_id = google_id
-        user.name = user_info.get('name')
-        user.profile_picture_url = user_info.get('picture')
-        user.google_access_token = access_token
-        user.google_refresh_token = refresh_token
-        user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
-        user.save()
-
-        # Log the user in
+        # Complete authentication
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
-
+        
         messages.success(request, "Successfully authenticated with Google!")
         return redirect('index')
 
