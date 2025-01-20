@@ -330,6 +330,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         faq_id=str(uuid.uuid4()) # Generate unique ID
                     )
                     faqs.append(faq)
+                    print(f"[DEBUG] Created FAQ with ID: {faq.id}, faq_id: {faq.faq_id}")
                 except Exception as chunk_error:
                     print(f"Error creating FAQ for chunk {idx}: {str(chunk_error)}")
                     continue
@@ -339,6 +340,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             raise ValueError(f"Failed to create FAQ entry: {str(e)}")
 
         # Return summary of processed file
+        print(f"[DEBUG] File processing complete. Returning file info with id: {faqs[-1].id if faqs else None}")
         return {
             'id': faqs[-1].id if faqs else None,
             'name': filename,
