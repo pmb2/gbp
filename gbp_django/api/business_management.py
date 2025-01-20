@@ -13,7 +13,7 @@ from gbp_django.api.authentication import refresh_access_token
 from gbp_django.utils.cache import cache_on_arguments
 from gbp_django.models import (
     Business, Post, BusinessAttribute,
-    QandA, Review, Notification
+    QandA, Review, Notification, User
 )
 from gbp_django.utils.logging_utils import log_api_request
 
