@@ -151,12 +151,22 @@ from ..models import Business
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
     """Store business data from Google API response"""
-    print("\n[DEBUG] Starting business data storage...")
-    print(f"[DEBUG] Raw business data received: {business_data}")
+    print("\n🔄 Starting business data storage...")
+    print(f"📦 Raw business data received: {business_data}")
     
     stored_businesses = []
     accounts = business_data.get('accounts', []) if business_data else []
-    print(f"[DEBUG] Found {len(accounts)} accounts to process")
+    print(f"🏢 Found {len(accounts)} business accounts to process")
+
+    # Get user's Google email from social account
+    from allauth.socialaccount.models import SocialAccount
+    try:
+        social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
+        google_email = social_account.extra_data.get('email')
+        print(f"👤 Found Google account: {google_email}")
+    except SocialAccount.DoesNotExist:
+        google_email = None
+        print("⚠️ No Google social account found")
 
     # Process each account from Google API
     for account in accounts:
@@ -369,20 +379,63 @@ def store_business_data(business_data, user_id, access_token):
                         'employee_count': location.get('metadata', {}).get('employeeCount', '')
                     }
                 
-                # Get or create the business record with enhanced details
-                business, created = Business.objects.update_or_create(
-                    business_id=account['name'],
-                    defaults={
+                # Try to find existing business by various identifiers
+                existing_business = None
+            
+                # Check by Google account ID
+                if account.get('name'):
+                    existing_business = Business.objects.filter(
+                        google_account_id=account['name']
+                    ).first()
+                    if existing_business:
+                        print(f"🔍 Found existing business by account ID: {account['name']}")
+
+                # Check by Google email if not found
+                if not existing_business and google_email:
+                    existing_business = Business.objects.filter(
+                        business_email=google_email
+                    ).first()
+                    if existing_business:
+                        print(f"🔍 Found existing business by email: {google_email}")
+
+                # Check by business name and user combination
+                if not existing_business:
+                    existing_business = Business.objects.filter(
+                        business_name=business_details['business_name'],
+                        user_id=user_id
+                    ).first()
+                    if existing_business:
+                        print(f"🔍 Found existing business by name and user: {business_details['business_name']}")
+
+                if existing_business:
+                    # Update existing business
+                    for key, value in business_details.items():
+                        setattr(existing_business, key, value)
+                    existing_business.is_verified = location.get('verification_state') == 'VERIFIED'
+                    existing_business.is_connected = True
+                    existing_business.google_location_id = location.get('name', '')
+                    existing_business.compliance_score = calculate_compliance_score(location)
+                    existing_business.automation_status = 'Active'
+                    existing_business.last_post_date = location.get('profile', {}).get('lastPostDate')
+                    existing_business.next_update_date = calculate_next_update(location)
+                    existing_business.user_id = user_id  # Ensure correct user association
+                    existing_business.save()
+                    business = existing_business
+                    print(f"✅ Updated existing business: {business.business_name}")
+                else:
+                    # Create new business
+                    business = Business.objects.create(
                         **business_details,
-                        'is_verified': location.get('verification_state') == 'VERIFIED',
-                        'is_connected': True,
-                        'google_location_id': location.get('name', ''),
-                        'compliance_score': calculate_compliance_score(location),
-                        'automation_status': 'Active',
-                        'last_post_date': location.get('profile', {}).get('lastPostDate'),
-                        'next_update_date': calculate_next_update(location)
-                    }
-                )
+                        is_verified=location.get('verification_state') == 'VERIFIED',
+                        is_connected=True,
+                        google_location_id=location.get('name', ''),
+                        compliance_score=calculate_compliance_score(location),
+                        automation_status='Active',
+                        last_post_date=location.get('profile', {}).get('lastPostDate'),
+                        next_update_date=calculate_next_update(location),
+                        user_id=user_id
+                    )
+                    print(f"🆕 Created new business: {business.business_name}")
                 
                 stored_businesses.append(business)
                 print(f"[INFO] Successfully stored/updated business: {business.business_name}")
