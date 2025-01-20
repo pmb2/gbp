@@ -22,45 +22,69 @@ class GroqModel(LLMInterface):
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
         self.model_name = "llama-3.3-70b-versatile"
+        self.embedding_model = "text-embedding-3-small"  # Default embedding model
         
     def generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embeddings using Groq's API"""
+        """Generate embeddings using Groq's API with OpenAI fallback"""
         try:
-            # Groq doesn't have native embedding support, so we'll use OpenAI as fallback
+            # First try OpenAI if configured
             if settings.OPENAI_API_KEY:
                 openai_model = OpenAIModel()
                 return openai_model.generate_embedding(text)
-            return None
+            
+            # If OpenAI not available, try Ollama
+            if settings.OLLAMA_ENABLED:
+                ollama_model = OllamaModel()
+                return ollama_model.generate_embedding(text)
+                
+            logger.warning("No embedding provider configured - falling back to simple text encoding")
+            # Fallback to simple text encoding if no providers available
+            return [float(ord(c)) for c in text[:1536]] + [0.0] * (1536 - len(text))
+            
         except Exception as e:
-            logger.error(f"Error generating embedding with Groq fallback: {str(e)}")
+            logger.error(f"Error generating embedding: {str(e)}")
             return None
         
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
-            # Format chat history and summarize memories
-            formatted_history = []
-            memory_summary = []
+            # First try Groq
+            messages = self._prepare_messages(query, context, chat_history)
             
-            if chat_history:
-                # Group messages by topic and summarize
-                current_topic = []
-                for msg in chat_history[-10:]:  # Look at last 10 messages
-                    current_topic.append(msg['content'])
-                    if len(current_topic) >= 3:  # Summarize every 3 messages
-                        summary = f"• Previous discussion about: {' '.join(current_topic)[:100]}..."
-                        memory_summary.append(summary)
-                        current_topic = []
-                
-                # Add remaining messages
-                if current_topic:
-                    summary = f"• Recent exchange about: {' '.join(current_topic)[:100]}..."
-                    memory_summary.append(summary)
-                
-                # Format recent messages
-                formatted_history = [
-                    {'role': m['role'], 'content': m['content']} 
-                    for m in chat_history[-5:]  # Keep last 5 messages verbatim
-                ]
+            start_time = time.time()
+            chat_completion = self.client.chat.completions.create(
+                messages=messages,
+                model=self.model_name,
+                temperature=0.7,
+                max_tokens=1000,
+                top_p=0.9,
+                stream=False
+            )
+            latency = time.time() - start_time
+            
+            logger.info(f"Groq response generated in {latency:.2f}s using {self.model_name}")
+            return chat_completion.choices[0].message.content.strip()
+            
+        except Exception as e:
+            logger.error(f"Error generating response with Groq: {str(e)}")
+            
+            # Fallback to OpenAI if configured
+            if settings.OPENAI_API_KEY:
+                try:
+                    openai_model = OpenAIModel()
+                    return openai_model.generate_response(query, context, chat_history)
+                except Exception as e:
+                    logger.error(f"OpenAI fallback failed: {str(e)}")
+            
+            # Final fallback to Ollama if enabled
+            if settings.OLLAMA_ENABLED:
+                try:
+                    ollama_model = OllamaModel()
+                    return ollama_model.generate_response(query, context, chat_history)
+                except Exception as e:
+                    logger.error(f"Ollama fallback failed: {str(e)}")
+            
+            # If all else fails, return a simple response
+            return f"I'm having trouble generating a response right now. Please try again later. (Error: {str(e)})"
 
             system_prompt = (
                 "You are an AI assistant for a business automation platform. "
@@ -103,22 +127,8 @@ class OllamaModel(LLMInterface):
         
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
         try:
-            # Format context and history
-            system_prompt = (
-                "You are an AI assistant for a business automation platform. "
-                "Use the provided context to give accurate, professional responses.\n\n"
-                f"Context: {context}\n\n"
-            )
-            
-            messages = [
-                {"role": "system", "content": system_prompt}
-            ]
-            
-            if chat_history:
-                for msg in chat_history[-5:]:  # Last 5 messages
-                    messages.append({"role": msg["role"], "content": msg["content"]})
-                    
-            messages.append({"role": "user", "content": query})
+            # First try the chat endpoint
+            messages = self._prepare_messages(query, context, chat_history)
             
             start_time = time.time()
             response = requests.post(
@@ -130,15 +140,38 @@ class OllamaModel(LLMInterface):
                 },
                 timeout=30
             )
+            
+            # If chat endpoint fails, try the generate endpoint
+            if response.status_code == 404:
+                response = requests.post(
+                    f"{self.base_url}/generate",
+                    json={
+                        "model": self.llm_model,
+                        "prompt": query,
+                        "context": context,
+                        "stream": False
+                    },
+                    timeout=30
+                )
+                
             response.raise_for_status()
             latency = time.time() - start_time
             
             logger.info(f"Ollama response generated in {latency:.2f}s using {self.llm_model}")
-            return response.json()["message"]["content"].strip()
+            
+            # Handle different response formats
+            response_data = response.json()
+            if "message" in response_data:
+                return response_data["message"]["content"].strip()
+            elif "response" in response_data:
+                return response_data["response"].strip()
+            else:
+                return str(response_data).strip()
             
         except Exception as e:
             logger.error(f"Error generating response with Ollama: {str(e)}")
-            return None
+            # Fallback to simple response if all else fails
+            return f"I'm having trouble generating a response right now. Please try again later. (Error: {str(e)})"
     
     def generate_embedding(self, text: str) -> Optional[List[float]]:
         try:
