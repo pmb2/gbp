@@ -49,13 +49,7 @@ class GroqModel(LLMInterface):
                 "You are an AI assistant for a business automation platform. "
                 "You have access to the business's profile information, documents, and chat history. "
                 "Use the provided context to give accurate, professional responses. "
-                "When referencing information from documents, maintain the original meaning while presenting it naturally. "
-                "If uncertain or if information seems outdated, acknowledge this in your response.\n\n"
-                "Guidelines:\n"
-                "- Synthesize information from multiple chunks when available\n"
-                "- Maintain factual accuracy while being conversational\n"
-                "- Cite specific sources when directly referencing information\n"
-                "- Acknowledge if information seems incomplete or uncertain\n\n"
+                "If uncertain, acknowledge the limitations of your knowledge.\n\n"
                 f"Business Context: {context}\n\n"
                 f"Memory Summaries:\n" + "\n".join(memory_summary) + "\n\n"
                 "Instructions: Provide a helpful response based on the context and history."
@@ -82,20 +76,7 @@ class GroqModel(LLMInterface):
             return "I apologize, but I'm unable to generate a response at the moment."
             
     def generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embeddings with better error handling and retries"""
-        try:
-            # First try Groq's embedding endpoint if available
-            response = requests.post(
-                "https://api.groq.com/v1/embeddings",
-                headers={"Authorization": f"Bearer {settings.GROQ_API_KEY}"},
-                json={"input": text, "model": "llama2-70b-4096"}
-            )
-            if response.ok:
-                return response.json()['data'][0]['embedding']
-        except Exception as e:
-            print(f"Groq embedding failed, falling back to Ollama: {str(e)}")
-            
-        # Fallback to Ollama
+        # Groq doesn't support embeddings yet, fallback to Ollama
         return OllamaModel().generate_embedding(text)
 
 class OllamaModel(LLMInterface):
@@ -138,7 +119,6 @@ class OllamaModel(LLMInterface):
             return "I apologize, but I'm unable to generate a response at the moment."
     
     def generate_embedding(self, text: str) -> Optional[List[float]]:
-        """Generate embeddings with better error handling and OpenAI fallback"""
         try:
             text = text.strip().replace('\n', ' ')
             
@@ -146,64 +126,33 @@ class OllamaModel(LLMInterface):
             if len(text) > 8000:
                 text = text[:8000]
             
-            try:
-                # Try to connect to Ollama with a short timeout
-                response = requests.post(
-                    f"{self.base_url}/api/generate",  # Fixed endpoint
-                    json={
-                        "model": "nomic-embed-text",
-                        "prompt": text,
-                        "stream": False,
-                        "options": {
-                            "temperature": 0,
-                            "num_ctx": 8192
-                        }
-                    },
-                    timeout=2  # Short timeout to fail fast if Ollama is down
-                )
-                response.raise_for_status()
-                
-                embedding = response.json().get('embedding')
-                if not embedding:
-                    raise ValueError("No embedding in response")
-                
-                # Handle different embedding dimensions
-                if len(embedding) == 1536:
-                    return embedding
-                elif len(embedding) == 768:
-                    return embedding * 2  # Repeat to get 1536 dims
-                else:
-                    print(f"[WARNING] Invalid embedding dimensions: {len(embedding)}")
-                    raise ValueError("Invalid embedding dimensions")
-                    
-            except (requests.exceptions.ConnectionError, 
-                    requests.exceptions.Timeout,
-                    requests.exceptions.HTTPError) as e:
-                print(f"Ollama service error, falling back to OpenAI: {str(e)}")
-                raise  # Re-raise to trigger fallback
-                
-            except Exception as e:
-                print(f"Error with Ollama embedding: {str(e)}")
-                raise  # Re-raise to trigger fallback
+            response = requests.post(
+                f"{self.base_url}/embeddings",
+                json={
+                    "model": "nomic-embed-text",
+                    "prompt": text,
+                    "options": {
+                        "temperature": 0,
+                        "num_ctx": 8192
+                    }
+                }
+            )
+            response.raise_for_status()
+            
+            embedding = response.json()['embedding']
+            
+            # Handle different embedding dimensions
+            if len(embedding) == 1536:
+                return embedding
+            elif len(embedding) == 768:
+                return embedding * 2  # Repeat to get 1536 dims
+            else:
+                print(f"[WARNING] Invalid embedding dimensions: {len(embedding)}")
+                return None
                 
         except Exception as e:
-            # Fall back to OpenAI for embeddings
-            try:
-                import openai
-                openai.api_key = settings.OPENAI_API_KEY
-                
-                response = openai.Embedding.create(
-                    input=text,
-                    model="text-embedding-ada-002"
-                )
-                
-                if response and response.data and response.data[0].embedding:
-                    return response.data[0].embedding
-                    
-            except Exception as openai_error:
-                print(f"OpenAI fallback failed: {str(openai_error)}")
-                # Final fallback to Groq
-                return GroqModel().generate_embedding(text)
+            print(f"Error generating embedding with Ollama: {str(e)}")
+            return None
 
 def get_llm_model() -> LLMInterface:
     """Factory function to get the configured LLM model"""
