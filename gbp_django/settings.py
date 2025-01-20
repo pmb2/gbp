@@ -13,7 +13,7 @@ SECRET_KEY = 'T0PS3CR3TSH1T'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['138.197.95.73', 'gbp.backus.agency', 'localhost']
+ALLOWED_HOSTS = ['138.197.95.73', 'gbp.backus.agency', 'localhost', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = [
     'https://gbp.backus.agency',
