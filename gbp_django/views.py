@@ -210,7 +210,7 @@ def direct_google_oauth(request):
     request.session['oauth_action'] = 'add_business' if request.user.is_authenticated else 'login'
 
     # Construct OAuth URL
-    callback_url = build_absolute_uri(request, reverse('google_oauth_callback'))
+    callback_url = 'https://gbp.backus.agency/google/callback/'
     scope = ' '.join([
         'openid',
         'https://www.googleapis.com/auth/business.manage',

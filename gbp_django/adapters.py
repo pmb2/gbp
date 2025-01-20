@@ -6,3 +6,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Get the most recently created app if multiple exist
         provider_id = provider.id if hasattr(provider, 'id') else provider
         return SocialApp.objects.filter(provider=provider_id).latest('id')
+        
+    def get_callback_url(self, request, app):
+        return 'https://gbp.backus.agency/google/callback/'
