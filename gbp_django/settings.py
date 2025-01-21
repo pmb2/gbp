@@ -97,9 +97,11 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = []
 
 # Content Security Policy settings
-CSP_DEFAULT_SRC = ["'self'", "https://ui-avatars.com"]
-CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://cdnjs.cloudflare.com"]
-CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com", "https://unpkg.com"]
+CSP_DEFAULT_SRC = ["'self'", "https://ui-avatars.com", "data:"]
+CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"]
+CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'"]
+CSP_IMG_SRC = ["'self'", "data:", "https://ui-avatars.com"]
+CSP_FONT_SRC = ["'self'", "data:"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -162,8 +164,10 @@ SITE_ID = 4
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 STATIC_URL = '/static/'
-STATIC_ROOT = '/var/www/gbp/static'
-STATICFILES_DIRS = []
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Site URL for email verification links
 SITE_URL = 'https://gbp.backus.agency'

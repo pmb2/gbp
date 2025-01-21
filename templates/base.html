@@ -44,6 +44,12 @@
 {% block extra_body %}{% endblock %}
 
 <script>
+    // --- Feedback Function ---
+    function toggleFeedbackForm() {
+        const form = document.getElementById('feedbackForm');
+        form.classList.toggle('hidden');
+    }
+
     // --- Utility Functions ---
     function showAlertBanner(message, type = 'error') {
         const banner = document.getElementById('alertBanner');
