@@ -14,6 +14,12 @@
 <body class="bg-gray-100">
 <div class="min-h-screen flex flex-col">
 
+    <!-- Alert Banner -->
+    <div id="alertBanner" class="hidden fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-md" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline" id="alertMessage"></span>
+    </div>
+
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden relative">
 
