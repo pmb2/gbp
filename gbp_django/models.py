@@ -241,11 +241,11 @@ class FAQ(models.Model):
         return f"{self.business.business_name} - {self.question[:50]}"
 
 class AutomationLog(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    business_id = models.CharField(max_length=255)
     action_type = models.CharField(max_length=50)
     details = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=50, default='pending')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True, null=True)
     retries = models.IntegerField(default=0)
     executed_at = models.DateTimeField(blank=True, null=True)
