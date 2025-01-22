@@ -8,5 +8,15 @@
         </svg>
         <span class="notification-badge absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 hidden">0</span>
     </button>
+    <script>
+    function toggleFeedbackForm() {
+        const form = document.getElementById('feedbackForm');
+        if (form) {
+            form.style.display = form.style.display === 'none' || form.style.display === '' ? 'block' : 'none';
+        } else {
+            console.error('Feedback form element not found');
+        }
+    }
+    </script>
     {% endif %}
 </div>
