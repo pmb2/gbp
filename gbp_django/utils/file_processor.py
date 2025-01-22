@@ -73,8 +73,10 @@ def process_markdown(content: bytes) -> str:
 
 def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[str, Any]:
     """Store file content and generate embeddings with extensive error handling and chunking"""
+    logger.info(f"Starting file processing for {filename} (Business ID: {business_id})")
     try:
         # Validate file size (10MB limit)
+        logger.debug(f"Original filename: {filename}")
         MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
         file_obj.seek(0, 2)  # Seek to end
         file_size = file_obj.tell()
@@ -307,7 +309,9 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         # Store file safely
         try:
             file_path = f'knowledge_base/{business_id}/{filename}'
+            logger.debug(f"Storing file at path: {file_path}")
             saved_path = default_storage.save(file_path, ContentFile(content))
+            logger.info(f"File stored successfully at: {saved_path}")
         except Exception as e:
             raise IOError(f"Failed to store file: {str(e)}")
 
@@ -327,7 +331,10 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         file_size=file_size,
                         chunk_index=idx,
                         total_chunks=total_chunks,
-                        faq_id=str(uuid.uuid4()) # Generate unique ID
+                        faq_id=str(uuid.uuid4()), # Generate unique ID
+                    )
+                    logger.debug(f"Created FAQ entry ID: {faq.id} for chunk {idx + 1} of {filename}",
+                        extra={'business_id': business_id, 'file_id': file_id, 'chunk': idx}
                     )
                     faqs.append(faq)
                     print(f"[INFO] Created FAQ entry - File ID: {file_id}")

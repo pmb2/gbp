@@ -14,11 +14,21 @@ def store_photos(photos_data, account_id):
             )
 
 def upload_photo(access_token, account_id, location_id, photo_data):
+    logger.info(f"Starting media upload for location {location_id}")
+    logger.debug(f"Request payload keys: {photo_data.keys()}")
+    
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/media"
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.post(url, headers=headers, json=photo_data)
-    response.raise_for_status()
-    return response.json()
+    
+    try:
+        response = requests.post(url, headers=headers, json=photo_data)
+        response.raise_for_status()
+        logger.info(f"Media upload successful - Status: {response.status_code}")
+        logger.debug(f"API response: {response.json()}")
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"Media upload failed - Status: {e.response.status_code} - Response: {e.response.text}")
+        raise
 
 def delete_photo(access_token, account_id, location_id, media_id):
     url = f"https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations/{location_id}/media/{media_id}"
