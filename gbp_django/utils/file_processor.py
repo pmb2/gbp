@@ -330,7 +330,10 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         faq_id=str(uuid.uuid4()) # Generate unique ID
                     )
                     faqs.append(faq)
-                    print(f"[DEBUG] Created FAQ with ID: {faq.id}, faq_id: {faq.faq_id}")
+                    print(f"[DEBUG] Created FAQ with ID: {faq.id}, faq_id: {faq.faq_id}, business_id: {business.business_id}")
+                    # Ensure business ID is properly set in both foreign key and raw field
+                    faq.business_id = business.business_id  # Set the actual string ID field
+                    faq.save(update_fields=['business_id'])
                 except Exception as chunk_error:
                     print(f"Error creating FAQ for chunk {idx}: {str(chunk_error)}")
                     continue
