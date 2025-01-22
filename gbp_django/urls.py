@@ -40,6 +40,7 @@ urlpatterns = [
          views.preview_file, name='preview_file'),
     path('api/business/<str:business_id>/memories/',
          views.get_memories, name='get_memories'),
+    path('submit-feedback/', views.submit_feedback, name='submit_feedback'),
 ]
 
 # Serve static files

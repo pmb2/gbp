@@ -836,15 +836,36 @@ def logout_view(request):
 
 @require_http_methods(["POST"])
 def submit_feedback(request):
+    """Handle feedback submissions with validation and email forwarding"""
     try:
         data = json.loads(request.body)
-        feedback_type = data.get('type', 'Not specified')
+        feedback_type = data.get('type', 'suggestion')
         message = data.get('message', '')
-        user_email = request.user.email if request.user.is_authenticated else 'GBP Automation Pro support'
+        user_email = data.get('email', request.user.email if request.user.is_authenticated else 'anonymous@user.com')
 
-        # Forward feedback using email service
-        EmailService.forward_feedback(user_email, feedback_type, message)
-        return JsonResponse({'status': 'success'})
+        if not message:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Message is required'
+            }, status=400)
+
+        # Forward feedback using email service with enhanced metadata
+        EmailService.forward_feedback(
+            user_email,
+            feedback_type,
+            f"Feedback Type: {feedback_type}\n\n{message}\n\nSubmitted by: {user_email}"
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Feedback submitted successfully'
+        })
+        
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON format'
+        }, status=400)
     except Exception as e:
         print(f"Error sending feedback: {str(e)}")
         return JsonResponse({

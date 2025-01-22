@@ -143,13 +143,26 @@ class EmailService:
     @staticmethod
     def forward_feedback(user_email, feedback_type, message):
         """
-        Forward user feedback to the support team.
+        Forward user feedback to the support team with enhanced formatting.
         """
         logger.info(f"Initiating feedback forwarding process from user: {user_email}")
-        subject = f'Feedback Received: {feedback_type}'
+        subject = f'New {feedback_type.title()} Feedback Received'
         context = {
             'user_email': user_email,
-            'feedback_type': feedback_type,
+            'feedback_type': feedback_type.title(),
             'message': message,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'system_info': 'GBP Automation Pro v2.4.1'
         }
-        EmailService.send_email('forward_feedback', subject, [settings.FEEDBACK_EMAIL], context)
+        try:
+            EmailService.send_email(
+                'forward_feedback', 
+                subject,
+                [settings.FEEDBACK_EMAIL],
+                context
+            )
+            logger.info(f"Successfully forwarded feedback from {user_email}")
+            return True
+        except Exception as e:
+            logger.error(f"Failed to forward feedback: {str(e)}")
+            return False
