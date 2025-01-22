@@ -252,15 +252,6 @@ class AutomationLog(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class EmailLog(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)
-    type = models.CharField(max_length=50)
-    status = models.CharField(max_length=20)
-    sent_at = models.DateTimeField(auto_now_add=True)
-    opened_at = models.DateTimeField(blank=True, null=True)
-    clicked_at = models.DateTimeField(blank=True, null=True)
-
 class Task(models.Model):
     TASK_TYPES = [
         ('POST', 'Social Post'),
@@ -315,6 +306,15 @@ class AutomationLog(models.Model):
     details = models.TextField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
     execution_duration = models.FloatField(null=True, blank=True)
+
+class EmailLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)
+    type = models.CharField(max_length=50)
+    status = models.CharField(max_length=20)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    opened_at = models.DateTimeField(blank=True, null=True)
+    clicked_at = models.DateTimeField(blank=True, null=True)
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
