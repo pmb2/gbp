@@ -29,28 +29,39 @@ def get_access_token(auth_code, client_id, client_secret, redirect_uri):
     
     return token_data
 
-def refresh_access_token(refresh_token, client_id, client_secret):
+def refresh_access_token(refresh_token, client_id, client_secret, redirect_uri=None):
+    """Refresh OAuth token with proper error handling"""
+    print("\n🔄 Refreshing access token...")
     url = "https://oauth2.googleapis.com/token"
     payload = {
         "client_id": client_id,
         "client_secret": client_secret,
         "refresh_token": refresh_token,
-        "grant_type": "refresh_token"
+        "grant_type": "refresh_token",
+        "redirect_uri": redirect_uri  # Match original redirect URI
     }
-    response = requests.post(url, data=payload)
-    response.raise_for_status()
-    return response.json()
+    
+    try:
+        response = requests.post(url, data=payload)
+        response.raise_for_status()
+        print("✅ Token refresh successful")
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        print(f"❌ Token refresh failed: {e.response.status_code} {e.response.text}")
+        raise
 def get_user_info(access_token):
     print("\n👤 Fetching Google user info...")
-    from django.contrib.sessions.backends.db import SessionStore
     url = "https://openidconnect.googleapis.com/v1/userinfo"
     headers = {"Authorization": f"Bearer {access_token}"}
     
-    print(f"📡 Making userinfo request to: {url}")
     try:
+        print(f"📡 Making userinfo request to: {url}")
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         user_data = response.json()
+        # Add fallback for email if not in response
+        if 'email' not in user_data:
+            user_data['email'] = f"{user_data.get('sub', 'unknown')}@googleauth.com"
         
         print("✅ User info retrieved successfully!")
         print(f"📦 User details:")
