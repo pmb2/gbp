@@ -292,16 +292,25 @@ class Task(models.Model):
         ('MONTHLY', 'Monthly'),
         ('CUSTOM', 'Custom')
     ]
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('RUNNING', 'Running'),
+        ('COMPLETED', 'Completed'),
+        ('FAILED', 'Failed'),
+        ('PAUSED', 'Paused')
+    ]
     
     business = models.ForeignKey('Business', on_delete=models.CASCADE)
     task_type = models.CharField(max_length=20, choices=TASK_TYPES)
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     next_run = models.DateTimeField()
     scheduled_time = models.TimeField()
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     parameters = models.JSONField(default=dict)
     last_run = models.DateTimeField(null=True, blank=True)
+    retry_count = models.IntegerField(default=0)
 
     def calculate_next_run(self):
         if self.frequency == 'DAILY':

@@ -1,0 +1,110 @@
+<div class="p-4 h-[612px]">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium">Automation Scheduler</h3>
+        <button onclick="openSchedulerModal()" 
+                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            + New Schedule
+        </button>
+    </div>
+    
+    <div class="space-y-4 h-[540px] overflow-y-auto">
+        {% for task in business.task_set.all %}
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="font-medium">{{ task.get_task_type_display }}</span>
+                        <span class="text-sm text-gray-500">•</span>
+                        <span class="text-sm {% if task.is_active %}text-green-500{% else %}text-gray-500{% endif %}">
+                            {{ task.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Next run: {{ task.next_run|date:"M j, Y H:i" }}
+                        {% if task.last_run %}
+                        • Last run: {{ task.last_run|date:"M j, Y H:i" }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <select class="frequency-select border rounded p-1 text-sm"
+                            data-task-id="{{ task.id }}"
+                            onchange="updateTaskSchedule('{{ task.id }}', this.value)">
+                        <option value="DAILY" {% if task.frequency == 'DAILY' %}selected{% endif %}>Daily</option>
+                        <option value="WEEKLY" {% if task.frequency == 'WEEKLY' %}selected{% endif %}>Weekly</option>
+                        <option value="MONTHLY" {% if task.frequency == 'MONTHLY' %}selected{% endif %}>Monthly</option>
+                        <option value="CUSTOM">Custom</option>
+                    </select>
+                    <input type="datetime-local" 
+                           class="custom-time border rounded p-1 text-sm {% if task.frequency != 'CUSTOM' %}hidden{% endif %}"
+                           data-task-id="{{ task.id }}"
+                           value="{{ task.next_run|date:'Y-m-d\TH:i' }}">
+                </div>
+            </div>
+            {% if task.parameters %}
+            <div class="mt-2 text-sm text-gray-500">
+                Parameters: {{ task.parameters }}
+            </div>
+            {% endif %}
+        </div>
+        {% empty %}
+        <div class="text-center text-gray-500 py-8">
+            No scheduled automations found. Click "+ New Schedule" to create one.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function openSchedulerModal() {
+    document.getElementById('schedulerModal').classList.remove('hidden');
+}
+
+function updateTaskSchedule(taskId, frequency) {
+    const customTimeInput = document.querySelector(`.custom-time[data-task-id="${taskId}"]`);
+    let scheduledTime = customTimeInput.value;
+    
+    if (frequency === 'CUSTOM') {
+        customTimeInput.classList.remove('hidden');
+        if (!scheduledTime) {
+            // Set default to current time + 1 hour
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            scheduledTime = now.toISOString().slice(0, 16);
+            customTimeInput.value = scheduledTime;
+        }
+    } else {
+        customTimeInput.classList.add('hidden');
+        scheduledTime = null;
+    }
+    
+    const payload = {
+        task_id: taskId,
+        frequency: frequency,
+        scheduled_time: scheduledTime,
+        csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value
+    };
+
+    fetch(`/api/business/${currentBusinessId}/tasks/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': payload.csrfmiddlewaretoken
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showAlertBanner('Schedule updated successfully', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showAlertBanner(data.message || 'Error updating schedule', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlertBanner('Error updating schedule', 'error');
+    });
+}
+</script>

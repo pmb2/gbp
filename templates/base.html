@@ -601,10 +601,51 @@
         }
     }
 
+    // --- Scheduler Functions ---
+    function handleSchedulerSubmit(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const payload = {
+            csrfmiddlewaretoken: formData.get('csrfmiddlewaretoken'),
+            task_type: formData.get('task_type'),
+            frequency: formData.get('frequency'),
+            custom_time: formData.get('custom_time'),
+            business_id: currentBusinessId
+        };
+
+        fetch(`/api/business/${currentBusinessId}/tasks/create/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': payload.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlertBanner('Task scheduled successfully', 'success');
+                document.getElementById('schedulerModal').classList.add('hidden');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlertBanner(data.message || 'Error creating task', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlertBanner('Error creating task', 'error');
+        });
+    }
+
     // --- Initialization & Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
         sortBusinessRows();
+        // Initialize current business ID from active business row
+        const activeRow = document.querySelector('.expandable-row[data-business-id]');
+        if (activeRow) {
+            currentBusinessId = activeRow.dataset.businessId;
+        }
 
         // Mobile menu functionality
         const mobileMenuButton = document.getElementById('mobile-menu-button');
