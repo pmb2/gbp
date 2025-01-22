@@ -240,27 +240,38 @@ class FAQ(models.Model):
     def __str__(self):
         return f"{self.business.business_name} - {self.question[:50]}"
 
+def default_none():
+    return None
+
 class AutomationLog(models.Model):
     business_id = models.CharField(max_length=255)
     action_type = models.CharField(max_length=50)
     details = models.TextField(blank=True, null=True)
-    status = models.CharField(max_length=50, default='pending')
+    status = models.CharField(
+        max_length=50,
+        choices=[
+            ('PENDING', 'Pending'),
+            ('RUNNING', 'Running'),
+            ('COMPLETED', 'Completed'),
+            ('FAILED', 'Failed')
+        ],
+        default='PENDING'
+    )
     user_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True, null=True)
     retries = models.IntegerField(default=0)
-    def default_none():
-        return None
-        
+
+    # DateTime fields with proper null handling
     executed_at = models.DateTimeField(
         blank=True,
         null=True,
-        default=default_none,
+        default=None,  # Explicit None instead of function reference
         help_text="Timestamp of actual execution"
     )
     deleted_at = models.DateTimeField(
         blank=True,
         null=True,
-        default=default_none,
+        default=None,
         help_text="Soft delete timestamp"
     )
     created_at = models.DateTimeField(
@@ -268,6 +279,12 @@ class AutomationLog(models.Model):
         editable=False,
         help_text="Record creation timestamp"
     )
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['business_id', '-created_at']),
+            models.Index(fields=['status', 'action_type']),
+        ]
 
 
 class Task(models.Model):
