@@ -13,6 +13,10 @@ def upload_photo(business):
     """
     Upload a photo to Google Business Profile
     """
+    print(f"\n📸 [OAUTH FLOW] Photo upload for business: {business.business_id}")
+    print(f"   - Business Name: {business.business_name}")
+    print(f"   - Owner User ID: {business.user.id}")
+    print(f"   - Verified Status: {business.is_verified}")
     try:
         # Get access token from business user
         access_token = business.user.google_access_token

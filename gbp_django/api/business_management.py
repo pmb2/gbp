@@ -169,8 +169,10 @@ from ..models import Business
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
     """Store business data from Google API response"""
-    print("\n🔄 Starting business data storage...")
-    print(f"📦 Raw business data received: {business_data}")
+    print("\n🔄 [OAUTH FLOW] Starting business data storage")
+    print(f"📦 [OAUTH FLOW] Raw business data keys: {list(business_data.keys())}")
+    print(f"👤 [OAUTH FLOW] Storing for user_id: {user_id}")
+    print(f"🔑 [OAUTH FLOW] Access token (first 8): {access_token[:8]}...") 
     
     stored_businesses = []
     accounts = business_data.get('accounts', []) if business_data else []
@@ -189,9 +191,14 @@ def store_business_data(business_data, user_id, access_token):
     # Process each account from Google API
     for account in accounts:
         try:
+            print(f"\n🔍 [OAUTH FLOW] Processing Google Business account: {account.get('name')}")
+            print(f"   - Account Type: {account.get('type', 'unknown')}")
+            print(f"   - Account Role: {account.get('role', 'unknown')}")
+            
             # Basic business details from account
             # Generate unique business ID if not exists
             business_id = f"biz_{user_id}_{int(time.time())}"
+            print(f"🏷️ [OAUTH FLOW] Generated business ID: {business_id}")
             
             business_details = {
                 'user_id': user_id,
@@ -251,9 +258,15 @@ def store_business_data(business_data, user_id, access_token):
             business_details['google_email'] = google_email
             
             if existing_business:
+                print(f"♻️ [OAUTH FLOW] Updating existing business record")
+                print(f"   - Existing ID: {existing_business.business_id}")
+                print(f"   - Google Account ID: {existing_business.google_account_id}")
+                print(f"   - Associated User: {existing_business.user_id}")
+                
                 # Update existing business
                 for key, value in business_details.items():
                     setattr(existing_business, key, value)
+                    print(f"   ↪️ Updated {key}: {value[:50]}" if isinstance(value, str) else f"   ↪️ Updated {key}: {value}")
                 existing_business.is_verified = location.get('verification_state') == 'VERIFIED'
                 existing_business.is_connected = True
                 existing_business.google_location_id = location.get('name', '')
@@ -267,6 +280,11 @@ def store_business_data(business_data, user_id, access_token):
                 print(f"✅ Updated existing business: {business.business_name}")
             else:
                 # Create new business
+                print("🆕 [OAUTH FLOW] Creating new business record")
+                print(f"   - User Association: {user_id}")
+                for k, v in business_details.items():
+                    print(f"   ➕ {k}: {v[:50]}" if isinstance(v, str) else f"   ➕ {k}: {v}")
+                    
                 business = Business.objects.create(
                     **business_details,
                     is_verified=location.get('verification_state') == 'VERIFIED',

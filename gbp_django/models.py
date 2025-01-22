@@ -152,7 +152,11 @@ class Business(models.Model):
 
     def calculate_profile_completion(self):
         """Calculate profile completion percentage"""
-        print(f"\n[DEBUG] Calculating profile completion for business: {self.business_name}")
+        print(f"\n[OAUTH FLOW] Calculating profile completion:")
+        print(f"   - Business ID: {self.business_id}")
+        print(f"   - User ID: {self.user.id}")
+        print(f"   - Google Account ID: {self.google_account_id}")
+        print(f"   - Business Name: {self.business_name}")
         print(f"[DEBUG] Verification status: {self.is_verified}")
         print(f"[DEBUG] Connection status: {self.is_connected}")
         print(f"[DEBUG] Business ID: {self.business_id}")
