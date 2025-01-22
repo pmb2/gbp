@@ -240,10 +240,10 @@ class FAQ(models.Model):
     def __str__(self):
         return f"{self.business.business_name} - {self.question[:50]}"
 
-def default_none():
-    return None
-
 class AutomationLog(models.Model):
+    @staticmethod
+    def default_none():
+        return None
     business_id = models.CharField(max_length=255)
     action_type = models.CharField(max_length=50)
     details = models.TextField(blank=True, null=True)
