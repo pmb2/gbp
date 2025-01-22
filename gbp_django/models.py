@@ -244,9 +244,26 @@ class AutomationLog(models.Model):
     @staticmethod
     def default_none():
         return None
-    business_id = models.CharField(max_length=255)
-    action_type = models.CharField(max_length=50)
-    details = models.TextField(blank=True, null=True)
+    business_id = models.CharField(
+        max_length=255,
+        help_text="Associated business ID for this log entry",
+        validators=[RegexValidator(r'^[a-zA-Z0-9_-]+$', 'Valid business ID required')]
+    )
+    action_type = models.CharField(
+        max_length=50,
+        choices=[
+            ('FILE_UPLOAD', 'File Upload'),
+            ('AUTO_RESPONSE', 'Automated Response'),
+            ('SCHEDULED_TASK', 'Scheduled Task'),
+            ('SYSTEM_ALERT', 'System Alert')
+        ],
+        default='FILE_UPLOAD'
+    )
+    details = models.JSONField(
+        blank=True, 
+        null=True,
+        help_text="Structured data about the automation event"
+    )
     status = models.CharField(
         max_length=50,
         choices=[
@@ -257,7 +274,11 @@ class AutomationLog(models.Model):
         ],
         default='PENDING'
     )
-    user_id = models.CharField(max_length=255)
+    user_id = models.CharField(
+        max_length=255,
+        help_text="User who initiated the action",
+        validators=[RegexValidator(r'^[a-zA-Z0-9_-]+$', 'Valid user ID required')]
+    )
     error_message = models.TextField(blank=True, null=True)
     retries = models.IntegerField(default=0)
 
@@ -325,13 +346,19 @@ class Task(models.Model):
     retry_count = models.IntegerField(default=0)
 
     def calculate_next_run(self):
+        """Calculate next scheduled run time based on frequency"""
+        base_time = self.next_run or timezone.now()
+        
         if self.frequency == 'DAILY':
-            return self.next_run + timedelta(days=1)
+            return base_time + timedelta(days=1)
         elif self.frequency == 'WEEKLY':
-            return self.next_run + timedelta(weeks=1)
+            return base_time + timedelta(weeks=1)
         elif self.frequency == 'MONTHLY':
-            return self.next_run + relativedelta(months=1)
-        return self.next_run
+            return base_time + relativedelta(months=1)
+        elif self.frequency == 'CUSTOM' and self.scheduled_date:
+            return datetime.combine(self.scheduled_date, self.scheduled_time)
+            
+        return base_time  # Fallback to current time if no valid schedule
 
 
 class EmailLog(models.Model):
