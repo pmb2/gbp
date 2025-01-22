@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from pgvector.django import VectorField
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 class UserManager(BaseUserManager):
     def create_user(self, email, google_id=None, password=None, **extra_fields):
