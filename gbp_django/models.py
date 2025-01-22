@@ -280,7 +280,7 @@ class Task(models.Model):
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     next_run = models.DateTimeField(default=timezone.now)
-    scheduled_time = models.TimeField(default=lambda: time(9, 0))  # Wrap in lambda to prevent immediate evaluation
+    scheduled_time = models.TimeField(default=time(9, 0))
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     parameters = models.JSONField(default=dict)
