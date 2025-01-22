@@ -13,6 +13,10 @@ def store_photos(photos_data, account_id):
                 value=photo['name']
             )
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def upload_photo(access_token, account_id, location_id, photo_data):
     logger.info(f"Starting media upload for location {location_id}")
     logger.debug(f"Request payload keys: {photo_data.keys()}")

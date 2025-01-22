@@ -71,9 +71,14 @@ def process_markdown(content: bytes) -> str:
     """Process markdown files"""
     return content.decode('utf-8', errors='ignore')
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[str, Any]:
     """Store file content and generate embeddings with extensive error handling and chunking"""
     logger.info(f"Starting file processing for {filename} (Business ID: {business_id})")
+    file_id = str(uuid.uuid4())  # Generate file ID once per file
     try:
         # Validate file size (10MB limit)
         logger.debug(f"Original filename: {filename}")
@@ -323,7 +328,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                 try:
                     faq = FAQ.objects.create(
                         business=business,
-                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",
+                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",  # file_id is defined above
                         answer=chunk_data['text'],
                         embedding=chunk_data['embedding'],
                         file_path=saved_path,
