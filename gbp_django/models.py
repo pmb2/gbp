@@ -274,12 +274,12 @@ class Task(models.Model):
         ('PAUSED', 'Paused')
     ]
     
-    business = models.ForeignKey('Business', on_delete=models.CASCADE)
-    task_type = models.CharField(max_length=20, choices=TASK_TYPES)
+    business = models.ForeignKey('Business', on_delete=models.CASCADE, default=1)
+    task_type = models.CharField(max_length=20, choices=TASK_TYPES, default='POST')
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    next_run = models.DateTimeField()
-    scheduled_time = models.TimeField()
+    next_run = models.DateTimeField(default=timezone.now)
+    scheduled_time = models.TimeField(default=datetime.time(9, 0))
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     parameters = models.JSONField(default=dict)
