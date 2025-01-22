@@ -93,7 +93,22 @@
     function handleBusinessRowDrop(event, businessId) {
         event.preventDefault();
         event.stopPropagation();
-        event.currentTarget.classList.remove('drag-over');
+        const target = event.currentTarget;
+        
+        // Find the closest element with the data-business-id attribute
+        let dropTarget = target.closest('[data-business-id]');
+        if (!dropTarget) {
+            // If not found, try to find the closest tab content
+            dropTarget = target.closest('.tab-content');
+        }
+        
+        if (dropTarget) {
+            businessId = dropTarget.dataset.businessId || businessId;
+        }
+        
+        if (target) {
+            target.classList.remove('drag-over');
+        }
 
         const files = event.dataTransfer.files;
         if (files.length > 0) {
