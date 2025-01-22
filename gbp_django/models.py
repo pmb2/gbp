@@ -280,7 +280,10 @@ class Task(models.Model):
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     next_run = models.DateTimeField(default=timezone.now, null=True)
-    scheduled_time = models.TimeField(default=lambda: time(9, 0))
+    def default_scheduled_time():
+        return time(9, 0)
+        
+    scheduled_time = models.TimeField(default=default_scheduled_time)
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     parameters = models.JSONField(default=dict)
@@ -296,17 +299,6 @@ class Task(models.Model):
             return self.next_run + relativedelta(months=1)
         return self.next_run
 
-class AutomationLog(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)
-    timestamp = models.DateTimeField(auto_now_add=True, null=True)
-    status = models.CharField(max_length=20, choices=[
-        ('PENDING', 'Pending'),
-        ('SUCCESS', 'Success'),
-        ('ERROR', 'Error')
-    ])
-    details = models.TextField(null=True, blank=True)
-    error_message = models.TextField(null=True, blank=True)
-    execution_duration = models.FloatField(null=True, blank=True)
 
 class EmailLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
