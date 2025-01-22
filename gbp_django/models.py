@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 from pgvector.django import VectorField
-from datetime import timedelta, datetime
+from datetime import time, timedelta, datetime
 from dateutil.relativedelta import relativedelta
 
 class UserManager(BaseUserManager):
@@ -280,7 +280,7 @@ class Task(models.Model):
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     next_run = models.DateTimeField(default=timezone.now)
-    scheduled_time = models.TimeField(default=datetime.time(9, 0))
+    scheduled_time = models.TimeField(default=time(9, 0))
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     parameters = models.JSONField(default=dict)
