@@ -1,6 +1,7 @@
 import os
 import requests
 from django.conf import settings
+from django.contrib.sessions.backends.db import SessionStore
 
 def get_access_token(auth_code, client_id, client_secret, redirect_uri):
     print("\n🔑 Starting OAuth token exchange...")
