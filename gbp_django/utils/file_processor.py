@@ -319,7 +319,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                 try:
                     faq = FAQ.objects.create(
                         business=business,
-                        question=f"Content from {filename} (Part {idx + 1}/{total_chunks})",
+                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",
                         answer=chunk_data['text'],
                         embedding=chunk_data['embedding'],
                         file_path=saved_path,
@@ -330,7 +330,11 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                         faq_id=str(uuid.uuid4()) # Generate unique ID
                     )
                     faqs.append(faq)
-                    print(f"[DEBUG] Created FAQ with ID: {faq.id}, faq_id: {faq.faq_id}, business_id: {business.business_id}")
+                    print(f"[INFO] Created FAQ entry - File ID: {file_id}")
+                    print(f"[INFO]   FAQ ID: {faq.id}")
+                    print(f"[INFO]   Business ID: {business.business_id}") 
+                    print(f"[INFO]   Chunk {idx + 1}/{total_chunks}")
+                    print(f"[INFO]   File Path: {saved_path}")
                     # Ensure business ID is properly set in both foreign key and raw field
                     faq.business_id = business.business_id  # Set the actual string ID field
                     faq.save(update_fields=['business_id'])

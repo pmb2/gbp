@@ -182,6 +182,7 @@ def get_relevant_context(query: str, business_id: str, min_similarity: float = 0
     return context
 
 def answer_question(query: str, business_id: str, chat_history: List[Dict[str, str]] = None) -> str:
+    print(f"\n[INFO] Starting RAG process for query: '{query}'")
     """Generate answer using enhanced RAG with chat history and memory"""
     try:
         print("\n[DEBUG] answer_question called with:")
@@ -234,9 +235,10 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             f"• Q&A: {business.qa_automation}\n"
         )
 
-        # Get relevant knowledge base entries
-        print("[DEBUG] Searching knowledge base for relevant context...")
+        # Get relevant knowledge base entries with enhanced similarity search
+        print("[INFO] Performing similarity search in knowledge base...")
         faq_results = search_knowledge_base(query, business_id, top_k=5)
+        print(f"[INFO] Found {len(faq_results)} relevant knowledge base entries")
         
         knowledge_context = []
         if faq_results:
@@ -263,7 +265,8 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
         else:
             print("[DEBUG] No relevant knowledge base entries found")
         
-        # Combine all contexts with clear sections
+        # Build context with RAG results first
+        print("[INFO] Building context for LLM response...")
         full_context = (
             f"{business_context}\n\n"
             f"📚 Knowledge Base Context:\n"
