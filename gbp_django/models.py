@@ -152,14 +152,12 @@ class Business(models.Model):
 
     def calculate_profile_completion(self):
         """Calculate profile completion percentage"""
-        print(f"\n[OAUTH FLOW] Calculating profile completion:")
-        print(f"   - Business ID: {self.business_id}")
-        print(f"   - User ID: {self.user.id}")
-        print(f"   - Google Account ID: {self.google_account_id}")
-        print(f"   - Business Name: {self.business_name}")
-        print(f"[DEBUG] Verification status: {self.is_verified}")
-        print(f"[DEBUG] Connection status: {self.is_connected}")
-        print(f"[DEBUG] Business ID: {self.business_id}")
+        print(f"\n[OAUTH FLOW] Calculating profile completion for {self.business_name}:")
+        print(f"   - ID: {self.business_id}")
+        print(f"   - User: {self.user.id}")
+        print(f"   - Google Account: {self.google_account_id or 'Not connected'}")
+        print(f"   - Verified: {self.is_verified}")
+        print(f"   - Connected: {self.is_connected}")
         
         # For unconnected businesses, return 0%
         if not self.is_connected:
@@ -187,13 +185,10 @@ class Business(models.Model):
         
         for field, score in required_fields:
             value = getattr(self, field)
-            print(f"[DEBUG] Checking {field}: {value}")
             if value and value not in ['No info', 'Pending verification', None, '']:
                 completion_score += score
-                print(f"[DEBUG] Added {score} points for {field}")
                 
         final_score = min(completion_score, 100)
-        print(f"[DEBUG] Final completion score: {final_score}%")
         return final_score
 
     def __str__(self):
