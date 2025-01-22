@@ -14,11 +14,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name="task",
-            old_name="completed_at",
-            new_name="last_run",
-        ),
         migrations.RemoveField(
             model_name="automationlog",
             name="business",
