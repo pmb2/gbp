@@ -94,7 +94,7 @@ DATABASES = {
         },
         'TEST': {
             'OPTIONS': {
-                'options': '-c search_path=public',
+                'options': '-c search_path=public -c default_table_access_method=heap',
                 'isolation_level': 'repeatable read',
             },
         },
