@@ -296,7 +296,7 @@ class Task(models.Model):
         return self.next_run
 
 class AutomationLog(models.Model):
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, null=True, blank=True)
     timestamp = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=[
         ('PENDING', 'Pending'),
