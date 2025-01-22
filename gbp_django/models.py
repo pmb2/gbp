@@ -248,9 +248,9 @@ class AutomationLog(models.Model):
     user_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True, null=True)
     retries = models.IntegerField(default=0)
-    executed_at = models.DateTimeField(blank=True, null=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    executed_at = models.DateTimeField(blank=True, null=True, default=None)
+    deleted_at = models.DateTimeField(blank=True, null=True, default=None)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
 
 class Task(models.Model):
