@@ -5,6 +5,7 @@
             {{ business.calculate_profile_completion }}%,
             transparent {{ business.calculate_profile_completion }}%)"
     data-business-id="{{ business.business_id }}"
+    data-business-name="{{ business.business_name }}"
     data-verified="{{ business.is_verified }}"
     data-completion="{{ business.calculate_profile_completion }}"
     ondrop="handleBusinessRowDrop(event, '{{ business.business_id }}')"
