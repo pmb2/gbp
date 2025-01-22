@@ -248,9 +248,26 @@ class AutomationLog(models.Model):
     user_id = models.CharField(max_length=255)
     error_message = models.TextField(blank=True, null=True)
     retries = models.IntegerField(default=0)
-    executed_at = models.DateTimeField(blank=True, null=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    def default_none():
+        return None
+        
+    executed_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        default=default_none,
+        help_text="Timestamp of actual execution"
+    )
+    deleted_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        default=default_none,
+        help_text="Soft delete timestamp"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        editable=False,
+        help_text="Record creation timestamp"
+    )
 
 
 class Task(models.Model):
