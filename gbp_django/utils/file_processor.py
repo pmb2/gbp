@@ -328,7 +328,8 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                 try:
                     faq = FAQ.objects.create(
                         business=business,
-                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",  # file_id is defined above
+                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",
+                        file_id=file_id,
                         answer=chunk_data['text'],
                         embedding=chunk_data['embedding'],
                         file_path=saved_path,
@@ -360,7 +361,14 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Return summary of processed file
         print(f"[DEBUG] File processing complete. Returning file info with id: {faqs[-1].id if faqs else None}")
+        print(f"\n[DEBUG] File processing completed successfully")
+        print(f"Generated File ID: {file_id}")
+        print(f"Total chunks processed: {len(faqs)}/{len(embeddings)}")
+        print(f"Business ID: {business_id}")
+        print(f"Stored path: {saved_path}")
+        
         return {
+            'file_id': file_id,
             'id': faqs[-1].id if faqs else None,
             'name': filename,
             'size': file_size,

@@ -170,7 +170,8 @@
             const fileItem = template.content.cloneNode(true);
             fileItem.querySelector('.filename').textContent = file.name;
             fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
-            fileItem.querySelector('.file-item').dataset.fileId = file.id;
+            fileItem.querySelector('.file-item').dataset.fileId = file.file_id;
+            fileItem.querySelector('.delete-file').dataset.fileId = file.file_id;
             fileList.appendChild(fileItem);
         });
     }
@@ -328,7 +329,7 @@
         const business = document.querySelector(`[data-business-id="${businessId}"]`);
         if (!business) return;
 
-        const businessName = business.querySelector('.font-medium').textContent;
+        const businessName = business.dataset.businessName;
         const fileList = document.getElementById(`file-list-${businessId}`);
         const fileCount = fileList ? fileList.querySelectorAll('.file-item:not([data-deleted="true"])').length : 0;
         const faqCount = document.querySelector(`[data-faq-count="${businessId}"]`)?.dataset.count || 0;
@@ -347,6 +348,7 @@
             summary += `\nI've analyzed these materials and can help answer questions about ${businessName}'s operations, policies, and services.\n\n`;
         } else {
             summary += `No documents or FAQs have been added yet. You can upload business materials to help me better assist you with ${businessName}.\n\n`;
+            console.log('[DEBUG] No documents found for business:', businessName);
         }
 
         summary += `💡 How can I help you with ${businessName} today? Feel free to ask about:\n`;
