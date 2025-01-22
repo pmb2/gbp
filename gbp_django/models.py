@@ -278,6 +278,52 @@ class EmailLog(models.Model):
     opened_at = models.DateTimeField(blank=True, null=True)
     clicked_at = models.DateTimeField(blank=True, null=True)
 
+class Task(models.Model):
+    TASK_TYPES = [
+        ('POST', 'Social Post'),
+        ('PHOTO', 'Photo Upload'),
+        ('REVIEW', 'Review Monitoring'),
+        ('QA', 'Q&A Check'),
+        ('COMPLIANCE', 'Compliance Check')
+    ]
+    FREQUENCIES = [
+        ('DAILY', 'Daily'),
+        ('WEEKLY', 'Weekly'),
+        ('MONTHLY', 'Monthly'),
+        ('CUSTOM', 'Custom')
+    ]
+    
+    business = models.ForeignKey('Business', on_delete=models.CASCADE)
+    task_type = models.CharField(max_length=20, choices=TASK_TYPES)
+    frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
+    next_run = models.DateTimeField()
+    scheduled_time = models.TimeField()
+    scheduled_date = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+    parameters = models.JSONField(default=dict)
+    last_run = models.DateTimeField(null=True, blank=True)
+
+    def calculate_next_run(self):
+        if self.frequency == 'DAILY':
+            return self.next_run + timedelta(days=1)
+        elif self.frequency == 'WEEKLY':
+            return self.next_run + timedelta(weeks=1)
+        elif self.frequency == 'MONTHLY':
+            return self.next_run + relativedelta(months=1)
+        return self.next_run
+
+class AutomationLog(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=[
+        ('PENDING', 'Pending'),
+        ('SUCCESS', 'Success'),
+        ('ERROR', 'Error')
+    ])
+    details = models.TextField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
+    execution_duration = models.FloatField(null=True, blank=True)
+
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.TextField()
