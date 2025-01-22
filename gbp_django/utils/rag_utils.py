@@ -240,7 +240,6 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
                 for doc in business.documents.all()
             ]
         }
-        )
 
         # Get relevant knowledge base entries with enhanced similarity search
         print("[INFO] Performing similarity search in knowledge base...")
