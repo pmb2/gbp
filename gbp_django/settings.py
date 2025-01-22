@@ -97,11 +97,11 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = []
 
 # Content Security Policy settings
-CSP_DEFAULT_SRC = ["'self'", "https://ui-avatars.com", "data:"]
-CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"]
-CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'"]
-CSP_IMG_SRC = ["'self'", "data:", "https://ui-avatars.com"]
-CSP_FONT_SRC = ["'self'", "data:"]
+# CSP_DEFAULT_SRC = ["'self'", "https://ui-avatars.com", "data:"]
+# CSP_STYLE_SRC = ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"]
+# CSP_SCRIPT_SRC = ["'self'", "'unsafe-inline'"]
+# CSP_IMG_SRC = ["'self'", "data:", "https://ui-avatars.com"]
+# CSP_FONT_SRC = ["'self'", "data:"]
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
