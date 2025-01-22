@@ -251,25 +251,6 @@ class AutomationLog(models.Model):
     deleted_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-class Task(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    type = models.CharField(max_length=50)
-    status = models.CharField(max_length=50)
-    content = models.JSONField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    scheduled_for = models.DateTimeField(blank=True, null=True)
-    completed_at = models.DateTimeField(blank=True, null=True)
-    approval_token = models.CharField(max_length=100, unique=True)
-
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'type': self.type,
-            'status': self.status,
-            'content': self.content,
-            'scheduled_for': self.scheduled_for.isoformat() if self.scheduled_for else None,
-            'created_at': self.created_at.isoformat(),
-        }
 
 class EmailLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
