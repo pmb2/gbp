@@ -108,7 +108,7 @@ def update_qa(business):
             # Example answer data
             answer_data = {
                 "answer": {
-                    "text": f"Thank you for your question. {generate_answer(qa.question)}"
+                    "text": generate_answer(qa.question, business.id)
                 }
             }
             
@@ -156,7 +156,11 @@ def respond_to_reviews(business):
         
         for review in unresponded_reviews:
             # Generate appropriate response based on rating
-            response_text = generate_review_response(review.rating, review.content)
+            response_text = generate_review_response(
+                review.rating, 
+                review.content,
+                business.id
+            )
             
             response_data = {
                 "comment": response_text
@@ -192,17 +196,24 @@ def respond_to_reviews(business):
         )
         raise
 
-def generate_answer(question):
-    """Helper function to generate Q&A answers"""
-    # This should be replaced with actual AI-generated responses
-    return "We appreciate your interest. Our team will be happy to assist you."
+from .rag_utils import answer_question
 
-def generate_review_response(rating, content):
-    """Helper function to generate review responses"""
-    # This should be replaced with actual AI-generated responses
-    if rating >= 4:
-        return "Thank you for your positive feedback! We're glad you had a great experience."
-    elif rating >= 3:
-        return "Thank you for your feedback. We appreciate your comments and will use them to improve our service."
-    else:
-        return "We apologize for your experience. Please contact us directly so we can address your concerns."
+def generate_answer(question, business_id):
+    """Generate context-aware answers using RAG"""
+    return answer_question(
+        query=question,
+        business_id=business_id,
+        chat_history=[],
+    )
+
+def generate_review_response(rating, content, business_id):
+    """Generate context-aware review responses using RAG"""
+    context = f"Review rating: {rating}/5\nReview content: {content}"
+    return answer_question(
+        query="Generate an appropriate professional response to this review: " + content,
+        business_id=business_id,
+        chat_history=[{
+            'role': 'system',
+            'content': f"Business context: {context}\nResponse requirements: Maintain professional tone, address specific feedback, offer solution if needed"
+        }]
+    )

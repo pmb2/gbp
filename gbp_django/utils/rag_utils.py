@@ -219,20 +219,27 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
                 except Exception as e:
                     print(f"[WARNING] Failed to add chat history to knowledge base: {str(e)}")
         
-        # Build comprehensive business context
-        business_context = (
-            f"🏢 Business Profile:\n"
-            f"• Name: {business.business_name}\n"
-            f"• Category: {business.category}\n"
-            f"• Location: {business.address}\n"
-            f"• Website: {business.website_url}\n"
-            f"• Phone: {business.phone_number}\n"
-            f"• Status: {'✅ Verified' if business.is_verified else '⚠️ Not Verified'}\n"
-            f"• Profile Completion: {business.calculate_profile_completion()}%\n"
-            f"\n⚙️ Automation Settings:\n"
-            f"• Posts: {business.posts_automation}\n"
-            f"• Reviews: {business.reviews_automation}\n"
-            f"• Q&A: {business.qa_automation}\n"
+        # Build structured business context
+        business_context = {
+            "profile": {
+                "name": business.business_name,
+                "category": business.category,
+                "location": business.address,
+                "website": business.website_url,
+                "phone": business.phone_number,
+                "verification_status": 'Verified' if business.is_verified else 'Not Verified',
+                "profile_completion": f"{business.calculate_profile_completion()}%",
+            },
+            "automation_settings": {
+                "posts": business.posts_automation,
+                "reviews": business.reviews_automation,
+                "qa": business.qa_automation,
+            },
+            "content_sources": [
+                {"type": "file", "name": doc.file_name, "summary": doc.summary}
+                for doc in business.documents.all()
+            ]
+        }
         )
 
         # Get relevant knowledge base entries with enhanced similarity search

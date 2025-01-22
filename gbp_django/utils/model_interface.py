@@ -82,12 +82,16 @@ class GroqModel(LLMInterface):
 
         system_prompt = (
                 "You are an AI assistant for a business automation platform. "
-                "You have access to the business's profile information, documents, and chat history. "
-                "Use the provided context to give accurate, professional responses. "
-                "If uncertain, acknowledge the limitations of your knowledge.\n\n"
-                f"Business Context: {context}\n\n"
-                f"Memory Summaries:\n" + "\n".join(memory_summary) + "\n\n"
-                                                                     "Instructions: Provide a helpful response based on the context and history."
+                "Use the following information to craft your response:\n\n"
+                "1. BUSINESS PROFILE:\n{{business_profile}}\n\n"
+                "2. KNOWLEDGE BASE:\n{{knowledge_base}}\n\n"
+                "3. CHAT HISTORY:\n{{chat_history}}\n\n"
+                "4. MEMORY SUMMARIES:\n{{memory_summaries}}\n\n"
+                "Response Requirements:\n"
+                "- Prioritize information from the knowledge base\n"
+                "- Maintain professional tone matching business profile\n"
+                "- Acknowledge uncertainties clearly\n"
+                "- Cite sources from knowledge base when possible"
         )
 
         messages = [{'role': 'system', 'content': system_prompt}]
