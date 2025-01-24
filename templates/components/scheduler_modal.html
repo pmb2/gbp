@@ -1,4 +1,4 @@
-<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50" x-data="{ show: false }">
     <div class="bg-white rounded-lg p-6 max-w-md mx-auto mt-20">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Schedule New Automation</h3>
@@ -34,7 +34,7 @@
                     <label class="block text-sm font-medium mb-1">Date and Time</label>
                     <input type="datetime-local" name="custom_time" class="w-full border rounded p-2">
                 </div>
-                <button type="button" onclick="createNewTask(this.closest('[data-business-id]').dataset.businessId)" 
+                <button type="button" onclick="handleScheduleTask(this)" 
                         class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Schedule Task
                 </button>
@@ -42,3 +42,25 @@
         </form>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    window.showSchedulerModal = (businessId) => {
+        const modal = document.getElementById('schedulerModal');
+        modal.querySelector('#businessIdInput').value = businessId;
+        modal.classList.remove('hidden');
+    };
+
+    window.handleScheduleTask = (button) => {
+        const form = button.closest('form');
+        const businessId = form.dataset.businessId;
+        const taskData = new FormData(form);
+        
+        // Add your task creation logic here
+        console.log('Creating task for business:', businessId, taskData);
+        
+        // Close modal after submission
+        document.getElementById('schedulerModal').classList.add('hidden');
+    };
+});
+</script>
