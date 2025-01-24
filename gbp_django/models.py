@@ -347,6 +347,9 @@ class Task(models.Model):
 
     def calculate_next_run(self):
         """Calculate next scheduled run time based on frequency"""
+        if not self.business.is_verified:
+            raise ValueError("Cannot schedule tasks for unverified businesses")
+            
         base_time = self.next_run or timezone.now()
         
         if self.frequency == 'DAILY':

@@ -7,11 +7,12 @@
                 &times;
             </button>
         </div>
-        <form id="taskForm">
+        <form id="taskForm" data-business-id="">
+            <input type="hidden" name="business_id" id="businessIdInput">
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium mb-1">Task Type</label>
-                    <select name="task_type" class="w-full border rounded p-2">
+                    <select name="task_type" class="w-full border rounded p-2" required>
                         <option value="POST">Social Post</option>
                         <option value="PHOTO">Photo Upload</option>
                         <option value="REVIEW">Review Monitoring</option>
@@ -33,7 +34,7 @@
                     <label class="block text-sm font-medium mb-1">Date and Time</label>
                     <input type="datetime-local" name="custom_time" class="w-full border rounded p-2">
                 </div>
-                <button type="button" onclick="createNewTask()" 
+                <button type="button" onclick="createNewTask(this.closest('[data-business-id]').dataset.businessId)" 
                         class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Schedule Task
                 </button>
