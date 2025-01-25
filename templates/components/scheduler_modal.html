@@ -52,12 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        const modal = document.getElementById('');
+        const modal = document.getElementById('schedulerModal');
+        console.log('[INFO] Found schedulerModal element:', modal);
         // Close any existing modals first
         document.querySelectorAll('.modal-open').forEach(m => m.classList.add('hidden'));
         
-        modal.querySelector('#businessIdInput').value = businessId;
-        modal.dataset.businessId = businessId;
+        console.log('[INFO] Setting business ID in modal:', businessId);
+        document.getElementById('businessIdInput').value = businessId;
+        document.getElementById('taskForm').dataset.businessId = businessId;
         console.log('[INFO] Showing modal for business:', businessId);
         modal.classList.remove('hidden');
         // Add backdrop filter for better visual focus

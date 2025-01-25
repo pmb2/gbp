@@ -602,7 +602,7 @@
     }
 
     // --- Scheduler Functions ---
-    function handleSchedulerSubmit(event) {
+    // Removed duplicate scheduler submit handler
         event.preventDefault();
         const formData = new FormData(event.target);
         const payload = {
