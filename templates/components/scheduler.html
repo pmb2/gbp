@@ -71,21 +71,6 @@
                 </div>
 
                 <div class="absolute top-2 right-2 md:relative md:top-0 md:right-0 flex gap-2">
-                <div class="flex items-center space-x-2">
-                    <select class="frequency-select border rounded p-1 text-sm"
-                            data-task-id="{{ task.id }}"
-                            onchange="updateTaskSchedule('{{ task.id }}', this.value)">
-                        <option value="daily" {% if task.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                        <option value="weekly" {% if task.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
-                        <option value="monthly" {% if task.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
-                        <option value="custom">Custom</option>
-                    </select>
-                    <input type="datetime-local" 
-                           class="custom-time border rounded p-1 text-sm {% if task.frequency != 'custom' %}hidden{% endif %}"
-                           data-task-id="{{ task.id }}"
-                           value="{{ task.next_run|date:'Y-m-d\TH:i' }}">
-                </div>
-            </div>
             {% if task.parameters %}
             <div class="mt-2 text-sm text-gray-500">
                 Parameters: {{ task.parameters }}
