@@ -40,9 +40,9 @@
                         <select class="frequency-select border rounded p-1 text-sm w-full max-w-[120px]"
                                 data-task-id="{{ task.id }}"
                                 onchange="updateTaskSchedule('{{ task.id }}', this.value)">
-                            <option value="daily" {% if task.frequency == 'daily' %}selected="selected"{% endif %}>Daily</option>
-                            <option value="weekly" {% if task.frequency == 'weekly' %}selected="selected"{% endif %}>Weekly</option>
-                            <option value="monthly" {% if task.frequency == 'monthly' %}selected="selected"{% endif %}>Monthly</option>
+                            <option value="daily" {% if task.frequency == 'daily' %}selected{% endif %}>Daily</option>
+                            <option value="weekly" {% if task.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
+                            <option value="monthly" {% if task.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
                             <option value="custom">Custom</option>
                         </select>
                         <input type="datetime-local" 
