@@ -1,5 +1,5 @@
-<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
-    <div class="bg-white rounded-lg p-6 max-w-md mx-auto mt-20">
+<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 backdrop-blur-sm flex items-center justify-center overflow-y-auto">
+    <div class="bg-white rounded-lg p-6 max-w-md mx-4">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Schedule New Automation</h3>
             <button onclick="document.getElementById('schedulerModal').classList.add('hidden')" 
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('taskForm').dataset.businessId = businessId;
         console.log('[INFO] Showing modal for business:', businessId);
         modal.classList.remove('hidden');
-        modal.classList.add('backdrop-blur-sm');
+        modal.style.display = 'flex'; // Ensure flex layout is applied
     };
 
     window.handleScheduleTask = (button) => {
