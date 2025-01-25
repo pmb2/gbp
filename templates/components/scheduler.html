@@ -71,18 +71,15 @@
                 </div>
 
                 <div class="absolute top-2 right-2 md:relative md:top-0 md:right-0 flex gap-2">
-            {% if task.parameters %}
-            <div class="mt-2 text-sm text-gray-500">
-                Parameters: {{ task.parameters }}
+                </div>
+                {% endfor %}
+                
+                {% empty %}
+                <div class="col-span-12 text-center text-gray-500 py-8">
+                    No scheduled automations found. Click "+ New Schedule" to create one.
+                </div>
+                {% endfor %}
             </div>
-            {% endif %}
-        </div>
-        {% empty %}
-        <div class="text-center text-gray-500 py-8">
-            No scheduled automations found. Click "+ New Schedule" to create one.
-        </div>
-        {% endfor %}
-    </div>
 </div>
 
 <script>

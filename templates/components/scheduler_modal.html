@@ -99,7 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('[INFO] handleScheduleTask called');
         const form = button.closest('form');
         const businessId = form.dataset.businessId;
-        console.log('[INFO] Processing task for business:', businessId);
         
         if (!businessId) {
             console.error('[ERROR] No businessId found in form');
@@ -107,15 +106,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const taskData = new FormData(form);
-        console.log('[INFO] Task data:', Object.fromEntries(taskData.entries()));
-        
-        // Add your task creation logic here
-        console.log('Creating task for business:', businessId, taskData);
-        
-        // Close modal after submission
-        const modal = document.getElementById('schedulerModal');
-        modal.classList.add('hidden');
-        modal.classList.remove('backdrop-blur-sm');
+        const payload = {
+            business_id: businessId,
+            task_type: taskData.get('task_type'),
+            frequency: taskData.get('frequency'),
+            custom_time: taskData.get('custom_time'),
+            csrfmiddlewaretoken: taskData.get('csrfmiddlewaretoken')
+        };
+
+        fetch(`/api/business/${businessId}/tasks/create/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': payload.csrfmiddlewaretoken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlertBanner('Task scheduled successfully', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlertBanner(data.message || 'Error creating task', 'error');
+            }
+            closeSchedulerModal();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlertBanner('Error creating task', 'error');
+            closeSchedulerModal();
+        });
     };
 });
 </script>
