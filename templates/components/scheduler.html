@@ -9,7 +9,15 @@
     
     <div class="space-y-4 h-[540px] overflow-y-auto">
         {% for task in business.task_set.all %}
-        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 relative group">
+            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onclick="editTask('{{ task.id }}')" class="text-blue-500 hover:text-blue-700 p-1">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button onclick="deleteTask('{{ task.id }}')" class="text-red-500 hover:text-red-700 p-1">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
             <div class="flex justify-between items-start">
                 <div class="flex-1">
                     <div class="flex items-center space-x-2 mb-2">
