@@ -33,7 +33,7 @@
                         <option value="daily" {% if task.frequency == 'daily' %}selected{% endif %}>Daily</option>
                         <option value="weekly" {% if task.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
                         <option value="monthly" {% if task.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
-                        <option value="CUSTOM">Custom</option>
+                        <option value="custom">Custom</option>
                     </select>
                     <input type="datetime-local" 
                            class="custom-time border rounded p-1 text-sm {% if task.frequency != 'CUSTOM' %}hidden{% endif %}"
@@ -64,7 +64,7 @@ function updateTaskSchedule(taskId, frequency) {
     const customTimeInput = document.querySelector(`.custom-time[data-task-id="${taskId}"]`);
     let scheduledTime = customTimeInput.value;
     
-    if (frequency === 'CUSTOM') {
+    if (frequency === 'custom') {
         customTimeInput.classList.remove('hidden');
         if (!scheduledTime) {
             // Set default to current time + 1 hour
