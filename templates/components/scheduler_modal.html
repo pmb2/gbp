@@ -45,9 +45,9 @@
 
 <script>
 // Initialize scheduler modal early in load process
-window.showSchedulerModal = (businessId) => {
-    console.log('[INFO] showSchedulerModal initial call for:', businessId);
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
+    window.showSchedulerModal = (businessId) => {
+        console.log('[INFO] DOM Ready - Initializing scheduler modal');
         console.log('[INFO] showSchedulerModal called with businessId:', businessId);
         if (!businessId) {
             console.error('[ERROR] showSchedulerModal called without businessId');
@@ -64,11 +64,8 @@ window.showSchedulerModal = (businessId) => {
         document.getElementById('taskForm').dataset.businessId = businessId;
         console.log('[INFO] Showing modal for business:', businessId);
         modal.classList.remove('hidden');
-        // Add backdrop filter for better visual focus
         modal.classList.add('backdrop-blur-sm');
-    };
-
-    window.handleScheduleTask = (button) => {
+    });
         console.log('[INFO] handleScheduleTask called');
         const form = button.closest('form');
         const businessId = form.dataset.businessId;
