@@ -23,11 +23,11 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Frequency</label>
                     <select name="frequency" class="w-full border rounded p-2" 
-                            onchange="document.getElementById('customDate').style.display = this.value === 'CUSTOM' ? 'block' : 'none'">
-                        <option value="DAILY">Daily</option>
-                        <option value="WEEKLY">Weekly</option>
-                        <option value="MONTHLY">Monthly</option>
-                        <option value="CUSTOM">Custom</option>
+                            onchange="document.getElementById('customDate').style.display = this.value === 'custom' ? 'block' : 'none'">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="custom">Custom</option>
                     </select>
                 </div>
                 <div id="customDate" style="display: none;">

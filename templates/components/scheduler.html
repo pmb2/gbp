@@ -36,7 +36,7 @@
                         <option value="custom">Custom</option>
                     </select>
                     <input type="datetime-local" 
-                           class="custom-time border rounded p-1 text-sm {% if task.frequency != 'CUSTOM' %}hidden{% endif %}"
+                           class="custom-time border rounded p-1 text-sm {% if task.frequency != 'custom' %}hidden{% endif %}"
                            data-task-id="{{ task.id }}"
                            value="{{ task.next_run|date:'Y-m-d\TH:i' }}">
                 </div>
