@@ -44,8 +44,10 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    window.showSchedulerModal = (businessId) => {
+// Initialize scheduler modal early in load process
+window.showSchedulerModal = (businessId) => {
+    console.log('[INFO] showSchedulerModal initial call for:', businessId);
+    document.addEventListener('DOMContentLoaded', () => {
         console.log('[INFO] showSchedulerModal called with businessId:', businessId);
         if (!businessId) {
             console.error('[ERROR] showSchedulerModal called without businessId');
