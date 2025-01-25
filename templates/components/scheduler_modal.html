@@ -1,4 +1,4 @@
-<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[1000] backdrop-blur-sm flex items-center justify-center overflow-y-auto">
+<div id="schedulerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[10000] backdrop-blur-sm flex items-center justify-center overflow-y-auto" style="display: none;">
     <div class="bg-white rounded-lg p-6 max-w-md mx-4">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Schedule New Automation</h3>
@@ -65,11 +65,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('[INFO] Showing modal for business:', businessId);
         // Remove all hiding classes and ensure proper display
         modal.classList.remove('hidden');
-        modal.classList.add('flex'); // Explicitly add flex display
-        // Bring modal to front
-        modal.style.zIndex = '1000';
+        modal.style.display = 'flex';
+        // Bring modal to front with higher z-index
+        modal.style.zIndex = '10000';
+        // Ensure backdrop is visible
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
         // Force layout recalc to ensure visibility
         modal.getBoundingClientRect();
+        console.log('[DEBUG] Modal computed styles:', window.getComputedStyle(modal));
     };
 
     window.handleScheduleTask = (button) => {
