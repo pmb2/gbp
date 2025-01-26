@@ -106,7 +106,7 @@ function openSchedulerModal() {
 function updateTaskSchedule(taskId, frequency) {
     const customTimeInput = document.querySelector(`.custom-time[data-task-id="${taskId}"]`);
     let scheduledTime = customTimeInput.value;
-    
+
     if (frequency === 'CUSTOM') {
         customTimeInput.classList.remove('hidden');
         if (!scheduledTime) {
@@ -120,7 +120,7 @@ function updateTaskSchedule(taskId, frequency) {
         customTimeInput.classList.add('hidden');
         scheduledTime = null;
     }
-    
+
     const payload = {
         task_id: taskId,
         frequency: frequency,
@@ -136,19 +136,19 @@ function updateTaskSchedule(taskId, frequency) {
         },
         body: JSON.stringify(payload)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showAlertBanner('Schedule updated successfully', 'success');
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            showAlertBanner(data.message || 'Error updating schedule', 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showAlertBanner('Error updating schedule', 'error');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlertBanner('Schedule updated successfully', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlertBanner(data.message || 'Error updating schedule', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlertBanner('Error updating schedule', 'error');
+        });
 }
 </script>
 

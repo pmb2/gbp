@@ -84,42 +84,43 @@
 </div>
 
 <script>
-// Edit/Delete functions moved to scheduler.html script
-// Initialize scheduler modal early in load process
-document.addEventListener('DOMContentLoaded', () => {
-    window.showSchedulerModal = (businessId) => {
-        console.log('[INFO] DOM Ready - Initializing scheduler modal');
-        console.log('[INFO] showSchedulerModal called with businessId:', businessId);
-        if (!businessId) {
-            console.error('[ERROR] showSchedulerModal called without businessId');
-            return;
-        }
-        
-        const modal = document.getElementById('schedulerModal');
-        console.log('[INFO] Found schedulerModal element:', modal);
-        // Close any existing modals first
-        document.querySelectorAll('.modal-open').forEach(m => m.classList.add('hidden'));
-        
-        console.log('[INFO] Setting business ID in modal:', businessId);
-        document.getElementById('businessIdInput').value = businessId;
-        document.getElementById('taskForm').dataset.businessId = businessId;
-        console.log('[INFO] Showing modal for business:', businessId);
-        // Remove all hiding classes and ensure proper display
-        // Use class-based transitions instead of inline styles
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        // Reset form when opening
-        document.getElementById('taskForm').reset();
-        document.getElementById('generatedContentContainer').classList.add('hidden');
-        document.getElementById('generatedContent').value = '';
-    };
+    // Edit/Delete functions moved to scheduler.html script
+    // Initialize scheduler modal early in load process
+    document.addEventListener('DOMContentLoaded', () => {
+        window.showSchedulerModal = (businessId) => {
+            console.log('[INFO] DOM Ready - Initializing scheduler modal');
+            console.log('[INFO] showSchedulerModal called with businessId:', businessId);
+            if (!businessId) {
+                console.error('[ERROR] showSchedulerModal called without businessId');
+                return;
+            }
 
-    // Close modal when clicking outside content
-    // Handle outside clicks with proper event listener
-    document.getElementById('schedulerModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeSchedulerModal();
-        }
+            const modal = document.getElementById('schedulerModal');
+            console.log('[INFO] Found schedulerModal element:', modal);
+            // Close any existing modals first
+            document.querySelectorAll('.modal-open').forEach(m => m.classList.add('hidden'));
+
+            console.log('[INFO] Setting business ID in modal:', businessId);
+            document.getElementById('businessIdInput').value = businessId;
+            document.getElementById('taskForm').dataset.businessId = businessId;
+            console.log('[INFO] Showing modal for business:', businessId);
+            // Remove all hiding classes and ensure proper display
+            // Use class-based transitions instead of inline styles
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            // Reset form when opening
+            document.getElementById('taskForm').reset();
+            document.getElementById('generatedContentContainer').classList.add('hidden');
+            document.getElementById('generatedContent').value = '';
+        };
+
+        // Close modal when clicking outside content
+        // Handle outside clicks with proper event listener
+        document.getElementById('schedulerModal').addEventListener('click', function (event) {
+            if (event.target === this) {
+                closeSchedulerModal();
+            }
+        });
     });
 
     // Content generation functions
@@ -127,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const generateBtn = document.getElementById('generateButtonText');
         const loader = document.getElementById('generateLoader');
         const businessId = document.getElementById('businessIdInput').value;
-        
+
         generateBtn.textContent = 'Analyzing business profile...';
         loader.classList.remove('hidden');
-        
+
         try {
             const response = await fetch(`/api/generate-content/?business_id=${businessId}`, {
                 headers: {
@@ -138,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             });
-            
+
             const data = await response.json();
             if (data.content) {
                 document.getElementById('generatedContent').value = data.content;
@@ -151,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Content generation error:', error);
             generateBtn.textContent = 'Generation failed - try again';
         }
-        
+
         loader.classList.add('hidden');
         setTimeout(() => {
             generateBtn.textContent = '✨ Generate AI Content';
@@ -175,17 +176,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('existingTasks').classList.add('hidden');
         document.getElementById('submitButtonText').textContent = 'Schedule Task';
     }
-    
+
     window.handleScheduleTask = (button) => {
         console.log('[INFO] handleScheduleTask called');
         const form = button.closest('form');
         const businessId = form.dataset.businessId;
-        
+
         if (!businessId) {
             console.error('[ERROR] No businessId found in form');
             return;
         }
-        
+
         const taskData = new FormData(form);
         const payload = {
             business_id: businessId,
@@ -203,21 +204,20 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(payload)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showAlertBanner('Task scheduled successfully', 'success');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showAlertBanner(data.message || 'Error creating task', 'error');
-            }
-            closeSchedulerModal();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlertBanner('Error creating task', 'error');
-            closeSchedulerModal();
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showAlertBanner('Task scheduled successfully', 'success');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    showAlertBanner(data.message || 'Error creating task', 'error');
+                }
+                closeSchedulerModal();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlertBanner('Error creating task', 'error');
+                closeSchedulerModal();
+            });
     };
-});
 </script>
