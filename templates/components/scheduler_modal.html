@@ -134,7 +134,7 @@
         loader.classList.remove('hidden');
 
         try {
-            const response = await fetch(`/api/generate-content/?business_id=${businessId}&task_type=${taskType}`, { // Send task type
+            const response = await fetch(`/api/generate-content?business_id=${businessId}&task_type=${taskType}`, { // Send task type
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
