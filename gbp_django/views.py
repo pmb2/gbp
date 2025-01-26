@@ -593,6 +593,60 @@ def update_automation_settings(request, business_id):
         }, status=500)
 
 
+@login_required
+@require_http_methods(["POST"])
+def generate_content(request):
+    """Generate content using LLM and RAG"""
+    try:
+        business_id = request.GET.get('business_id')
+        if not business_id:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Business ID is required'
+            }, status=400)
+
+        # Get business context
+        business = Business.objects.get(business_id=business_id)
+        if not business:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Business not found'
+            }, status=404)
+
+        # Get LLM model
+        model = get_llm_model()
+
+        # Generate a prompt for content generation
+        prompt = f"Generate content for a business profile for {business.business_name} in the {business.category} category. Include details about the business, its location, and services. Keep it concise and engaging."
+
+        # Get response using RAG
+        response = answer_question(
+            query=prompt,
+            business_id=business_id
+        )
+
+        return JsonResponse({
+            'status': 'success',
+            'content': response,
+            'metadata': {
+                'model': model.__class__.__name__,
+                'business_name': business.business_name,
+                'timestamp': timezone.now().isoformat()
+            }
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
+
+
 def bulk_upload_businesses(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Only POST method is allowed'}, status=405)

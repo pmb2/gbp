@@ -221,3 +221,16 @@
             });
     };
 </script>
+```
+
+gbp_django/views.py
+```python
+<<<<<<< SEARCH
+    return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error'}, status=405)
+
+
+@login_required
+@login_required
+@require_http_methods(["POST"])
+def update_automation_settings(request, business_id):
