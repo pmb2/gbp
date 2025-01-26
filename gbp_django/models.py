@@ -308,6 +308,10 @@ class AutomationLog(models.Model):
         ]
 
 
+def default_scheduled_time():
+    return time(9, 0)
+
+
 class Task(models.Model):
     TASK_TYPES = [
         ('POST', 'Social Post'),
@@ -335,9 +339,7 @@ class Task(models.Model):
     frequency = models.CharField(max_length=20, choices=FREQUENCIES, default='WEEKLY')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     next_run = models.DateTimeField(default=timezone.now, null=True)
-    def default_scheduled_time():
-        return time(9, 0)
-        
+
     scheduled_time = models.TimeField(default=default_scheduled_time)
     scheduled_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
