@@ -1,6 +1,7 @@
-<div id="schedulerModal" class="fixed inset-0 bg-black bg-opacity-50 z-[10000] backdrop-blur-sm flex items-center justify-center overflow-y-auto hidden"
+<div id="schedulerModal" class="fixed inset-0 bg-black bg-opacity-50 z-[10000] backdrop-blur-sm overflow-y-auto hidden"
      onclick="handleModalClick(event)">
-    <div class="bg-white rounded-lg p-6 max-w-md mx-4 relative" onclick="event.stopPropagation()">
+    <div class="min-h-full flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative" onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Schedule New Automation</h3>
             <button onclick="closeSchedulerModal()" 
@@ -88,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeSchedulerModal() {
         const modal = document.getElementById('schedulerModal');
         modal.classList.add('hidden');
-        modal.style.display = 'none';
         document.getElementById('taskIdInput').value = '';
         document.getElementById('existingTasks').classList.add('hidden');
         document.getElementById('submitButtonText').textContent = 'Schedule Task';
