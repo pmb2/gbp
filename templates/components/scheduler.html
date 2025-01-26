@@ -40,10 +40,10 @@
                         <select class="frequency-select border rounded p-1 text-sm w-full max-w-[120px]"
                                 data-task-id="{{ task.id }}"
                                 onchange="updateTaskSchedule('{{ task.id }}', this.value)">
-                            <option value="daily" {% if task.frequency == 'daily' %}selected{% endif %}>Daily</option>
-                            <option value="weekly" {% if task.frequency == 'weekly' %}selected{% endif %}>Weekly</option>
-                            <option value="monthly" {% if task.frequency == 'monthly' %}selected{% endif %}>Monthly</option>
-                            <option value="custom">Custom</option>
+                            <option value="DAILY" {% if task.frequency == 'DAILY' %}selected{% endif %}>Daily</option>
+                            <option value="WEEKLY" {% if task.frequency == 'WEEKLY' %}selected{% endif %}>Weekly</option>
+                            <option value="MONTHLY" {% if task.frequency == 'MONTHLY' %}selected{% endif %}>Monthly</option>
+                            <option value="CUSTOM">Custom</option>
                         </select>
                         <input type="datetime-local" 
                                class="custom-time border rounded p-1 text-sm w-full max-w-[160px] {% if task.frequency != 'custom' %}hidden{% else %}block{% endif %}"
@@ -107,7 +107,7 @@ function updateTaskSchedule(taskId, frequency) {
     const customTimeInput = document.querySelector(`.custom-time[data-task-id="${taskId}"]`);
     let scheduledTime = customTimeInput.value;
     
-    if (frequency === 'custom') {
+    if (frequency === 'CUSTOM') {
         customTimeInput.classList.remove('hidden');
         if (!scheduledTime) {
             // Set default to current time + 1 hour
