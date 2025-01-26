@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/business/<str:business_id>/memories/',
          views.get_memories, name='get_memories'),
     path('submit-feedback/', views.submit_feedback, name='submit_feedback'),
+    path('api/business/<str:business_id>/tasks/create/', views.create_task, name='create_task'),
 ]
 
 # Serve static files
