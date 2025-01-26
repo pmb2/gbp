@@ -116,8 +116,9 @@
 
         // Close modal when clicking outside content
         // Handle outside clicks with proper event listener
-        document.getElementById('schedulerModal').addEventListener('click', function (event) {
-            if (event.target === this) {
+        document.addEventListener('click', function (event) {
+            const modal = document.getElementById('schedulerModal');
+            if (modal && event.target === modal) {
                 closeSchedulerModal();
             }
         });
