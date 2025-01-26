@@ -1,6 +1,6 @@
 <div id="schedulerModal" class="fixed inset-0 bg-black bg-opacity-50 z-[10000] backdrop-blur-sm overflow-y-auto hidden">
     <div class="flex items-center justify-center min-h-screen p-4"> <!-- Changed to min-h-screen for full viewport centering -->
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative shadow-xl transform transition-all" 
+        <div class="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 relative shadow-2xl transform transition-all" 
              onclick="event.stopPropagation()">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Schedule New Automation</h3>
@@ -12,7 +12,9 @@
         <form id="taskForm" data-business-id="">
             <input type="hidden" name="task_id" id="taskIdInput">
             <input type="hidden" name="business_id" id="businessIdInput">
-            <div class="space-y-4">
+            <div class="space-y-6">
+                <div class="border-b pb-4">
+                    <h4 class="text-sm font-semibold text-gray-500 mb-2">Task Configuration</h4>
                 <div>
                     <label class="block text-sm font-medium mb-1">Task Type</label>
                     <select name="task_type" class="w-full border rounded p-2" required>
@@ -37,10 +39,45 @@
                     <label class="block text-sm font-medium mb-1">Date and Time</label>
                     <input type="datetime-local" name="custom_time" class="w-full border rounded p-2">
                 </div>
-                <button type="button" onclick="handleScheduleTask(this)" 
-                        class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    <span id="submitButtonText">Schedule Task</span>
-                </button>
+                </div>
+                
+                <div class="border-b pb-4">
+                    <h4 class="text-sm font-semibold text-gray-500 mb-2">Content Generation</h4>
+                    <div class="space-y-4">
+                        <div id="generatedContentContainer" class="hidden">
+                            <label class="block text-sm font-medium mb-1">Generated Content</label>
+                            <textarea id="generatedContent" class="w-full border rounded-lg p-3 h-32 text-sm" 
+                                    placeholder="AI-generated content will appear here..."></textarea>
+                            <div class="flex gap-2 mt-2">
+                                <button type="button" onclick="regenerateContent()" 
+                                        class="text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-lg">
+                                    ↻ Regenerate
+                                </button>
+                                <button type="button" onclick="applyContent()" 
+                                        class="text-sm bg-blue-100 hover:bg-blue-200 px-3 py-1 rounded-lg">
+                                    ✓ Apply Content
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button type="button" onclick="generateInitialContent()" 
+                                class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-3 rounded-lg">
+                            <span id="generateButtonText">✨ Generate AI Content</span>
+                            <div id="generateLoader" class="hidden inline-block ml-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="handleScheduleTask(this)" 
+                            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition-all">
+                        <span id="submitButtonText">Schedule Task</span>
+                    </button>
+                    <button type="button" onclick="closeSchedulerModal()" 
+                            class="px-4 py-3 rounded-lg border hover:bg-gray-50">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -73,7 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.add('flex');
         // Reset form when opening
         document.getElementById('taskForm').reset();
-        console.log('[DEBUG] Modal computed styles:', window.getComputedStyle(modal));
+        document.getElementById('generatedContentContainer').classList.add('hidden');
+        document.getElementById('generatedContent').value = '';
     };
 
     // Close modal when clicking outside content
@@ -83,6 +121,52 @@ document.addEventListener('DOMContentLoaded', () => {
             closeSchedulerModal();
         }
     });
+
+    // Content generation functions
+    async function generateInitialContent() {
+        const generateBtn = document.getElementById('generateButtonText');
+        const loader = document.getElementById('generateLoader');
+        const businessId = document.getElementById('businessIdInput').value;
+        
+        generateBtn.textContent = 'Analyzing business profile...';
+        loader.classList.remove('hidden');
+        
+        try {
+            const response = await fetch(`/api/generate-content/?business_id=${businessId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            });
+            
+            const data = await response.json();
+            if (data.content) {
+                document.getElementById('generatedContent').value = data.content;
+                document.getElementById('generatedContentContainer').classList.remove('hidden');
+                generateBtn.textContent = 'Content generated!';
+            } else {
+                generateBtn.textContent = 'Error generating content - try again';
+            }
+        } catch (error) {
+            console.error('Content generation error:', error);
+            generateBtn.textContent = 'Generation failed - try again';
+        }
+        
+        loader.classList.add('hidden');
+        setTimeout(() => {
+            generateBtn.textContent = '✨ Generate AI Content';
+        }, 2000);
+    }
+
+    function regenerateContent() {
+        document.getElementById('generatedContent').value = 'Regenerating content...';
+        generateInitialContent();
+    }
+
+    function applyContent() {
+        // TODO: Connect to actual content storage
+        showAlertBanner('Content saved for task!', 'success');
+    }
 
     function closeSchedulerModal() {
         const modal = document.getElementById('schedulerModal');
