@@ -77,12 +77,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Close modal when clicking outside content
-    function handleModalClick(event) {
-        if (event.target === document.getElementById('schedulerModal')) {
+    // Handle outside clicks with proper event listener
+    document.getElementById('schedulerModal').addEventListener('click', function(event) {
+        if (event.target === this) {
             closeSchedulerModal();
         }
-    }
-    
+    });
+
     function closeSchedulerModal() {
         const modal = document.getElementById('schedulerModal');
         modal.classList.add('hidden');
