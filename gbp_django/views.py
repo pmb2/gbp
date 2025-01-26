@@ -542,7 +542,6 @@ def dismiss_notification(request, notification_id):
 
 
 @login_required
-@login_required
 @require_http_methods(["POST"])
 def update_automation_settings(request, business_id):
     try:
