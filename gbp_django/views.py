@@ -593,11 +593,12 @@ def update_automation_settings(request, business_id):
 
 
 @login_required
-@require_http_methods(["POST"])
+@require_http_methods(["GET"])
 def generate_content(request):
-    """Generate content using LLM and RAG"""
+    """Generate content using LLM and RAG with task-specific prompts"""
     try:
         business_id = request.GET.get('business_id')
+        task_type = request.GET.get('task_type', 'POST')  # Default to 'POST' if not provided
         if not business_id:
             return JsonResponse({
                 'status': 'error',
@@ -615,8 +616,37 @@ def generate_content(request):
         # Get LLM model
         model = get_llm_model()
 
-        # Generate a prompt for content generation
-        prompt = f"Generate content for a business profile for {business.business_name} in the {business.category} category. Include details about the business, its location, and services. Keep it concise and engaging."
+        # Define prompts and templates for different task types
+        prompts = {
+            'POST': (
+                f"Generate a social media post for {business.business_name} in the {business.category} category. "
+                f"Include details about the business, its location, and services. Keep it concise and engaging. "
+                f"Use a friendly and professional tone. Focus on attracting new customers and highlighting key features."
+            ),
+            'PHOTO': (
+                f"Generate a caption for a photo of {business.business_name} in the {business.category} category. "
+                f"Describe the photo and its relevance to the business. Keep it short and engaging. "
+                f"Use a tone that encourages interaction and highlights the visual appeal."
+            ),
+            'REVIEW': (
+                f"Generate a response to a customer review for {business.business_name} in the {business.category} category. "
+                f"Acknowledge the customer's feedback and address any concerns. Keep it professional and courteous. "
+                f"Use a tone that shows appreciation and encourages further engagement."
+            ),
+            'QA': (
+                f"Generate a question and answer pair for {business.business_name} in the {business.category} category. "
+                f"The question should be relevant to the business and its services. The answer should be informative and helpful. "
+                f"Use a tone that is clear, concise, and professional."
+            ),
+            'COMPLIANCE': (
+                f"Generate a compliance check report for {business.business_name} in the {business.category} category. "
+                f"Identify any potential compliance issues and suggest solutions. Keep it concise and informative. "
+                f"Use a tone that is professional and objective."
+            )
+        }
+
+        # Get the appropriate prompt based on task type
+        prompt = prompts.get(task_type, prompts['POST'])
 
         # Get response using RAG
         response = answer_question(

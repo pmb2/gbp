@@ -128,12 +128,13 @@
         const generateBtn = document.getElementById('generateButtonText');
         const loader = document.getElementById('generateLoader');
         const businessId = document.getElementById('businessIdInput').value;
+        const taskType = document.querySelector('select[name="task_type"]').value; // Get selected task type
 
         generateBtn.textContent = 'Analyzing business profile...';
         loader.classList.remove('hidden');
 
         try {
-            const response = await fetch(`/api/generate-content/?business_id=${businessId}`, {
+            const response = await fetch(`/api/generate-content/?business_id=${businessId}&task_type=${taskType}`, { // Send task type
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
