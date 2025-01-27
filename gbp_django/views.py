@@ -547,6 +547,7 @@ def update_business(request, business_id):
         return JsonResponse({
             'status': 'error',
             'message': 'An unexpected error occurred'
+        })
 
 
 def dismiss_notification(request, notification_id):
