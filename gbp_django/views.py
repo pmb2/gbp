@@ -1255,6 +1255,16 @@ def add_knowledge(request, business_id):
         }, status=500)
 
 
+from django.http import HttpResponseNotFound
+
+def create_task(request, business_id):
+    """
+    This is a placeholder for the create_task view.
+    Replace this with the actual logic for creating a task.
+    """
+    return HttpResponseNotFound("<h1>Create Task Not Implemented</h1>")
+
+
 def root_view(request):
     """
     Root view that handles the base URL '/'.
