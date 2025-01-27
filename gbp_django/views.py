@@ -547,47 +547,6 @@ def update_business(request, business_id):
         return JsonResponse({
             'status': 'error',
             'message': 'An unexpected error occurred'
-    except Exception as e:
-        print(f"Unexpected error: {str(e)}")
-        return JsonResponse({
-            'status': 'error',
-            'message': 'An unexpected error occurred'
-@login_required
-def get_seo_health(request, business_id):
-    """API endpoint to get SEO health data"""
-    try:
-        business = Business.objects.get(business_id=business_id, user=request.user)
-        if not business.website_url:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'No website URL provided'
-            }, status=400)
-
-        report = analyze_website(business.website_url)
-        business.seo_report = report
-        business.save()
-
-        return JsonResponse({
-            'status': 'success',
-            'overall_score': report.get('overall_score', 0),
-            'meta_tags_score': report.get('meta_tags_score', 0),
-            'content_quality_score': report.get('content_quality_score', 0),
-            'mobile_friendly_score': report.get('mobile_friendly_score', 0),
-            'page_speed_score': report.get('page_speed_score', 0),
-            'backlinks_score': report.get('backlinks_score', 0),
-            'report': report
-        })
-
-    except Business.DoesNotExist:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Business not found'
-        }, status=404)
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
 
 
 def dismiss_notification(request, notification_id):
