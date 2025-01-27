@@ -1256,13 +1256,89 @@ def add_knowledge(request, business_id):
 
 
 from django.http import HttpResponseNotFound
+from .models import Task
+from django.utils import timezone
 
+@login_required
+@require_http_methods(["POST"])
 def create_task(request, business_id):
-    """
-    This is a placeholder for the create_task view.
-    Replace this with the actual logic for creating a task.
-    """
-    return HttpResponseNotFound("<h1>Create Task Not Implemented</h1>")
+    """Create or update a scheduled task for a business."""
+    try:
+        data = json.loads(request.body)
+        task_id = data.get('task_id')
+        task_type = data.get('task_type')
+        frequency = data.get('frequency')
+        custom_time = data.get('custom_time')
+
+        if not task_type or not frequency:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Task type and frequency are required'
+            }, status=400)
+
+        business = Business.objects.get(business_id=business_id, user=request.user)
+
+        if task_id:
+            # Update existing task
+            task = Task.objects.get(id=task_id, business=business)
+            task.task_type = task_type
+            task.frequency = frequency
+            if custom_time:
+                task.next_run = custom_time
+            task.save()
+            message = 'Task updated successfully'
+        else:
+            # Create new task
+            if frequency == 'CUSTOM' and not custom_time:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Custom time is required for custom frequency'
+                }, status=400)
+            
+            next_run = None
+            if custom_time:
+                next_run = custom_time
+            elif frequency == 'DAILY':
+                next_run = timezone.now() + timedelta(days=1)
+            elif frequency == 'WEEKLY':
+                next_run = timezone.now() + timedelta(weeks=1)
+            elif frequency == 'MONTHLY':
+                next_run = timezone.now() + timedelta(days=30)
+
+            task = Task.objects.create(
+                business=business,
+                task_type=task_type,
+                frequency=frequency,
+                next_run=next_run
+            )
+            message = 'Task created successfully'
+
+        return JsonResponse({
+            'status': 'success',
+            'message': message,
+            'task_id': task.id
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Task.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Task not found'
+        }, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Invalid JSON data'
+        }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
 
 
 def root_view(request):

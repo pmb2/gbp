@@ -42,6 +42,7 @@ urlpatterns = [
          views.get_memories, name='get_memories'),
     path('submit-feedback/', views.submit_feedback, name='submit_feedback'),
     path('api/business/<str:business_id>/tasks/create/', views.create_task, name='create_task'),
+    path('api/business/<str:business_id>/tasks/update/', views.create_task, name='update_task'),
     path('api/generate-content/', views.generate_content, name='generate_content'),
 ]
 
