@@ -1,5 +1,4 @@
-// Initialize scheduler modal
-window.showSchedulerModal = function(businessId) {
+function showSchedulerModal(businessId) {
     console.log('[INFO] showSchedulerModal called with businessId:', businessId);
     if (!businessId) {
         console.error('[ERROR] showSchedulerModal called without businessId');
@@ -21,9 +20,9 @@ window.showSchedulerModal = function(businessId) {
     document.getElementById('businessIdInput').value = businessId;
     document.getElementById('taskForm').dataset.businessId = businessId;
     
-    // Show modal with flex display
-    modal.style.display = 'flex';
+    // Show modal
     modal.classList.remove('hidden');
+    modal.style.display = 'flex';
     
     // Reset form
     document.getElementById('taskForm').reset();
@@ -35,7 +34,10 @@ window.showSchedulerModal = function(businessId) {
     if (generatedContent) {
         generatedContent.value = '';
     }
-};
+}
+
+// Make function globally available
+window.showSchedulerModal = showSchedulerModal;
 
 // Close modal when clicking outside
 document.addEventListener('click', function(event) {
