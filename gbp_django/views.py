@@ -30,8 +30,8 @@ from .utils.email_service import EmailService
 from .utils.file_processor import store_file_content, process_folder
 from .utils.rag_utils import answer_question, add_to_knowledge_base
 from .utils.model_interface import get_llm_model
-from .utils.seo_analyzer import analyze_website
 from .utils.website_scraper import scrape_and_summarize_website
+from .utils.seo_analyzer import analyze_website
 
 
 def send_verification_email(business):
@@ -489,8 +489,7 @@ def update_business(request, business_id):
             business.phone_number = data.get('phone', business.phone_number)
             business.website_url = data.get('website', business.website_url)
             business.category = data.get('category', business.category)
-            business.save()
-
+            
             # Update website summary if website URL has changed
             if data.get('website') and data.get('website') != business.website_url:
                 try:
@@ -499,13 +498,7 @@ def update_business(request, business_id):
                 except Exception as e:
                     print(f"Error scraping website: {e}")
                     business.website_summary = "Error scraping website"
-
-            # Update local database
-            business.business_name = data.get('business_name', business.business_name)
-            business.address = data.get('address', business.address)
-            business.phone_number = data.get('phone', business.phone_number)
-            business.website_url = data.get('website', business.website_url)
-            business.category = data.get('category', business.category)
+            
             business.save()
 
             return JsonResponse({
@@ -605,6 +598,37 @@ def update_automation_settings(request, business_id):
             'status': 'error',
             'message': 'Invalid JSON data'
         }, status=400)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+@login_required
+@require_http_methods(["GET"])
+def get_seo_health(request, business_id):
+    """API endpoint to get SEO health data for a business."""
+    try:
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        if not business.website_url:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No website URL found for this business'
+            }, status=400)
+
+        seo_data = analyze_website(business.website_url)
+        return JsonResponse({
+            'status': 'success',
+            **seo_data
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
     except Exception as e:
         return JsonResponse({
             'status': 'error',
