@@ -86,101 +86,12 @@
         </div>
 </div>
 
-<script>Ï
-    // Initialize scheduler modal early in load process
-    document.addEventListener('DOMContentLoaded', () => {
-        window.showSchedulerModal = (businessId) => {
-            console.log('[INFO] DOM Ready - Initializing scheduler modal');
-            console.log('[INFO] showSchedulerModal called with businessId:', businessId);
-            if (!businessId) {
-                console.error('[ERROR] showSchedulerModal called without businessId');
-                return;
-            }
-
-            const modal = document.getElementById('schedulerModal');
-            console.log('[INFO] Found schedulerModal element:', modal);
-            // Close any existing modals first
-            document.querySelectorAll('.modal-open').forEach(m => m.classList.add('hidden'));
-
-            console.log('[INFO] Setting business ID in modal:', businessId);
-            document.getElementById('businessIdInput').value = businessId;
-            document.getElementById('taskForm').dataset.businessId = businessId;
-            console.log('[INFO] Showing modal for business:', businessId);
-            // Remove all hiding classes and ensure proper display
-            // Use class-based transitions instead of inline styles
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            // Reset form when opening
-            document.getElementById('taskForm').reset();
-            document.getElementById('generatedContentContainer').classList.add('hidden');
-            document.getElementById('generatedContent').value = '';
-        };
-    });
-
-function handleModalClick(event) {
-    const modal = document.getElementById('schedulerModal');
-    if (event.target === modal) {
-        closeSchedulerModal();
-    }
-}
-
-function closeSchedulerModal() {
-    const modal = document.getElementById('schedulerModal');
-    modal.classList.add('hidden');
-}
-
-function openSchedulerModal() {
-    document.getElementById('schedulerModal').classList.remove('hidden');
-}
-
-function updateTaskSchedule(taskId, frequency) {
-    const customTimeInput = document.querySelector(`.custom-time[data-task-id="${taskId}"]`);
-    let scheduledTime = customTimeInput.value;
-
-    if (frequency === 'CUSTOM') {
-        customTimeInput.classList.remove('hidden');
-        if (!scheduledTime) {
-            // Set default to current time + 1 hour
-            const now = new Date();
-            now.setHours(now.getHours() + 1);
-            scheduledTime = now.toISOString().slice(0, 16);
-            customTimeInput.value = scheduledTime;
-        }
-    } else {
-        customTimeInput.classList.add('hidden');
-        scheduledTime = null;
-    }
-
-    const payload = {
-        task_id: taskId,
-        frequency: frequency,
-        scheduled_time: scheduledTime,
-        csrfmiddlewaretoken: document.querySelector('[name=csrfmiddlewaretoken]').value
-    };
-
-    fetch(`/api/business/${currentBusinessId}/tasks/update/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': payload.csrfmiddlewaretoken
-        },
-        body: JSON.stringify(payload)
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                showAlertBanner('Schedule updated successfully', 'success');
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showAlertBanner(data.message || 'Error updating schedule', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlertBanner('Error updating schedule', 'error');
-        });
-}
-</script>
+    </div>
+</div>
+    {% include 'components/scheduler_modal.html' %}
+<script src="{% static 'js/scheduler_modal.js' %}"></script>
+    </div>
+</div>
 
     </div>
 </div>
