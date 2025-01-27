@@ -30,6 +30,8 @@ from .utils.email_service import EmailService
 from .utils.file_processor import store_file_content, process_folder
 from .utils.rag_utils import answer_question, add_to_knowledge_base
 from .utils.model_interface import get_llm_model
+from .utils.seo_analyzer import analyze_website
+from .utils.website_scraper import scrape_and_summarize_website
 
 
 def send_verification_email(business):
@@ -489,6 +491,23 @@ def update_business(request, business_id):
             business.category = data.get('category', business.category)
             business.save()
 
+            # Update website summary if website URL has changed
+            if data.get('website') and data.get('website') != business.website_url:
+                try:
+                    summary = scrape_and_summarize_website(data.get('website'))
+                    business.website_summary = summary
+                except Exception as e:
+                    print(f"Error scraping website: {e}")
+                    business.website_summary = "Error scraping website"
+
+            # Update local database
+            business.business_name = data.get('business_name', business.business_name)
+            business.address = data.get('address', business.address)
+            business.phone_number = data.get('phone', business.phone_number)
+            business.website_url = data.get('website', business.website_url)
+            business.category = data.get('category', business.category)
+            business.save()
+
             return JsonResponse({
                 'status': 'success',
                 'data': {
@@ -496,7 +515,8 @@ def update_business(request, business_id):
                     'address': business.address,
                     'phone': business.phone_number,
                     'website': business.website_url,
-                    'category': business.category
+                    'category': business.category,
+                    'website_summary': business.website_summary
                 }
             })
 
@@ -527,6 +547,46 @@ def update_business(request, business_id):
         return JsonResponse({
             'status': 'error',
             'message': 'An unexpected error occurred'
+    except Exception as e:
+        print(f"Unexpected error: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': 'An unexpected error occurred'
+@login_required
+def get_seo_health(request, business_id):
+    """API endpoint to get SEO health data"""
+    try:
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        if not business.website_url:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No website URL provided'
+            }, status=400)
+
+        report = analyze_website(business.website_url)
+        business.seo_report = report
+        business.save()
+
+        return JsonResponse({
+            'status': 'success',
+            'overall_score': report.get('overall_score', 0),
+            'meta_tags_score': report.get('meta_tags_score', 0),
+            'content_quality_score': report.get('content_quality_score', 0),
+            'mobile_friendly_score': report.get('mobile_friendly_score', 0),
+            'page_speed_score': report.get('page_speed_score', 0),
+            'backlinks_score': report.get('backlinks_score', 0),
+            'report': report
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
         }, status=500)
 
 
