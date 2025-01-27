@@ -69,8 +69,8 @@ document.addEventListener('click', function(event) {
                     sample_input: document.getElementById('sampleInput').value,
                     template: document.getElementById('templateSelect').value,
                     business_context: {
-                        name: "{{ business.business_name }}",
-                        category: "{{ business.category }}",
+                        name: document.getElementById('businessNameInput').value,
+                        category: document.getElementById('businessCategoryInput').value,
                         faqs: JSON.parse(document.getElementById('businessFaqsInput').textContent)
                     }
                 })
@@ -162,7 +162,7 @@ document.addEventListener('click', function(event) {
     };
     // Initialize scheduler modal early in load process
     document.addEventListener('DOMContentLoaded', () => {
-        window.showSchedulerModal = (businessId) => {
+        showSchedulerModal = (businessId) => {
             console.log('[INFO] DOM Ready - Initializing scheduler modal');
             console.log('[INFO] showSchedulerModal called with businessId:', businessId);
             if (!businessId) {
