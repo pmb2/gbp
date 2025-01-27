@@ -20,9 +20,10 @@ function showSchedulerModal(businessId) {
     document.getElementById('businessIdInput').value = businessId;
     document.getElementById('taskForm').dataset.businessId = businessId;
     
-    // Show modal
-    modal.classList.remove('hidden');
+    // Show modal with proper display and z-index
     modal.style.display = 'flex';
+    modal.style.zIndex = '999999';
+    modal.classList.remove('hidden');
     
     // Reset form
     document.getElementById('taskForm').reset();
