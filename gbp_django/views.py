@@ -602,10 +602,6 @@ def update_automation_settings(request, business_id):
         return JsonResponse({
             'status': 'error',
             'message': str(e)
-    except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
 @login_required
 @require_http_methods(["GET"])
 def get_seo_health(request, business_id):
