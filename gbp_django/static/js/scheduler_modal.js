@@ -60,7 +60,7 @@
                     business_context: {
                         name: "{{ business.business_name }}",
                         category: "{{ business.category }}",
-                        faqs: {{ business.faqs.all|safe|json_script:"businessFaqs" }}
+                        faqs: JSON.parse(document.getElementById('businessFaqsInput').textContent)
                     }
                 })
             });
@@ -211,7 +211,7 @@
                     business_context: {
                         name: "{{ business.business_name }}",
                         category: "{{ business.category }}",
-                        faqs: {{ business.faqs.all|safe|json_script:"businessFaqs" }}
+                        faqs: JSON.parse(document.getElementById('businessFaqsInput').textContent)
                     }
                 })
             });
