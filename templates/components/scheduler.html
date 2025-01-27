@@ -45,10 +45,10 @@
                             <option value="MONTHLY" {% if task.frequency == 'MONTHLY' %}selected{% endif %}>Monthly</option>
                             <option value="CUSTOM" {% if task.frequency == 'CUSTOM' %}selected{% endif %}>Custom</option>
                         </select>
-                        <input type="datetime-local" 
-                               class="custom-time border rounded p-1 text-sm w-full max-w-[160px] {% if task.frequency != 'custom' %}hidden{% else %}block{% endif %}"
+                        <input type="datetime-local"
+                               class="custom-time border rounded p-1 text-sm w-full max-w-[160px] {% if task.frequency != 'CUSTOM' %}hidden{% else %}block{% endif %}"
                                data-task-id="{{ task.id }}"
-                               value="{{ task.next_run|date:'Y-m-d\TH:i' }}">
+                               value="{% if task.frequency == 'CUSTOM' and task.next_run %}{{ task.next_run|date:'Y-m-d\TH:i' }}{% endif %}">
                     </div>
                 </div>
 

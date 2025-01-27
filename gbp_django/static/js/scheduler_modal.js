@@ -121,7 +121,7 @@
             business_id: businessId,
             task_type: taskData.get('task_type'),
             frequency: taskData.get('frequency'),
-            custom_time: taskData.get('custom_time'),
+            custom_time: taskData.get('custom_time') ? String(taskData.get('custom_time')) : null,
             csrfmiddlewaretoken: taskData.get('csrfmiddlewaretoken')
         };
 

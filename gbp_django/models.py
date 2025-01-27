@@ -364,9 +364,10 @@ class Task(models.Model):
             return base_time + timedelta(weeks=1)
         elif self.frequency == 'MONTHLY':
             return base_time + relativedelta(months=1)
-        elif self.frequency == 'CUSTOM' and self.scheduled_date:
+        elif self.frequency == 'CUSTOM' and self.scheduled_date and self.scheduled_time:
             return datetime.combine(self.scheduled_date, self.scheduled_time)
-            
+        elif self.frequency == 'CUSTOM' and self.next_run:
+            return self.next_run
         return base_time  # Fallback to current time if no valid schedule
 
 
