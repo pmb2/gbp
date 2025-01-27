@@ -500,16 +500,19 @@ def update_business(request, business_id):
                     business.website_summary = "Error scraping website"
             
             business.save()
+            
+            # Fetch updated business data
+            updated_business = Business.objects.get(business_id=business_id, user=request.user)
 
             return JsonResponse({
                 'status': 'success',
                 'data': {
                     'business_name': business.business_name,
                     'address': business.address,
-                    'phone': business.phone_number,
-                    'website': business.website_url,
-                    'category': business.category,
-                    'website_summary': business.website_summary
+                    'phone': updated_business.phone_number,
+                    'website': updated_business.website_url,
+                    'category': updated_business.category,
+                    'website_summary': updated_business.website_summary
                 }
             })
 
