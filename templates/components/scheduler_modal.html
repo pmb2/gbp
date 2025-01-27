@@ -9,9 +9,15 @@
                 &times;
             </button>
         </div>
-        <form id="taskForm" data-business-id="">
+        <form id="taskForm" data-business-id=""
+              data-business-name="{{ business.business_name }}"
+              data-business-category="{{ business.category }}"
+              data-business-faqs="{{ business.faqs.all|safe|json_script:'businessFaqs' }}">
             <input type="hidden" name="task_id" id="taskIdInput">
             <input type="hidden" name="business_id" id="businessIdInput">
+            <input type="hidden" id="businessNameInput" value="{{ business.business_name }}">
+            <input type="hidden" id="businessCategoryInput" value="{{ business.category }}">
+            <div id="businessFaqsInput" class="hidden">{{ business.faqs.all|safe|json }}</div>
             <div class="space-y-6">
                 <div class="border-b pb-4">
                     <h4 class="text-sm font-semibold text-gray-500 mb-2">Task Configuration</h4>
