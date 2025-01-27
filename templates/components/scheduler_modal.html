@@ -17,12 +17,23 @@
                     <h4 class="text-sm font-semibold text-gray-500 mb-2">Task Configuration</h4>
                 <div>
                     <label class="block text-sm font-medium mb-1">Task Type</label>
-                    <select name="task_type" class="w-full border rounded p-2" required>
+                    <select name="task_type" id="taskTypeSelect" class="w-full border rounded p-2" required 
+                            onchange="updatePromptTemplate(this.value)">
                         <option value="POST">Social Post</option>
                         <option value="PHOTO">Photo Upload</option>
                         <option value="REVIEW">Review Monitoring</option>
                         <option value="QA">QA Check</option>
                         <option value="COMPLIANCE">Compliance Check</option>
+                    </select>
+                </div>
+                <div id="templateSection" class="hidden">
+                    <label class="block text-sm font-medium mb-1">Prompt Template</label>
+                    <select id="templateSelect" class="w-full border rounded p-2" 
+                            onchange="updateSampleInput(this.value)">
+                        <option value="DEFAULT">Default Template</option>
+                        <option value="ENGAGING">Engaging Post</option>
+                        <option value="PROMOTIONAL">Promotional</option>
+                        <option value="INFORMATIVE">Informative</option>
                     </select>
                 </div>
                 <div>
@@ -75,6 +86,7 @@
                             class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg transition-all">
                         <span id="submitButtonText">Schedule Task</span>
                     </button>
+                    {% csrf_token %}
                     <button type="button" onclick="closeSchedulerModal()" 
                             class="px-4 py-3 rounded-lg border hover:bg-gray-50">
                         Cancel
@@ -138,10 +150,20 @@
 
         try {
             const response = await fetch(`/api/generate-content?business_id=${businessId}&task_type=${taskType}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                }
+                },
+                body: JSON.stringify({
+                    sample_input: document.getElementById('sampleInput').value,
+                    template: document.getElementById('templateSelect').value,
+                    business_context: {
+                        name: "{{ business.business_name }}",
+                        category: "{{ business.category }}",
+                        faqs: {{ business.faqs.all|safe|json_script:"businessFaqs" }}
+                    }
+                })
             });
 
             const data = await response.json();

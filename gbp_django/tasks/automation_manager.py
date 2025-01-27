@@ -61,11 +61,25 @@ class AutomationManager:
         )
 
     def _execute_task(self, task_type, content):
-        """Execute automated task"""
+        """Execute automated task with RAG context"""
+        from ..utils.rag_utils import get_relevant_context
+        
+        # Get relevant knowledge base context
+        rag_context = get_relevant_context(
+            query=content,
+            business_id=self.business.business_id,
+            min_similarity=0.6
+        )
+        
+        # Create task with RAG-enhanced content
         task = Task.objects.create(
             business=self.business,
             type=task_type,
-            content=content,
+            content={
+                'original': content,
+                'rag_context': rag_context,
+                'generated': self._generate_task_content(task_type, content, rag_context)
+            },
             status='completed',
             executed_at=datetime.now()
         )

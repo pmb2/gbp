@@ -346,6 +346,10 @@ class Task(models.Model):
     parameters = models.JSONField(default=dict)
     last_run = models.DateTimeField(null=True, blank=True)
     retry_count = models.IntegerField(default=0)
+    template = models.TextField(
+        blank=True,
+        help_text="Prompt template used for this task"
+    )
 
     def calculate_next_run(self):
         """Calculate next scheduled run time based on frequency"""

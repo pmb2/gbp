@@ -181,6 +181,20 @@ def get_relevant_context(query: str, business_id: str, min_similarity: float = 0
     print(f"[DEBUG] Generated context length: {len(context)}")
     return context
 
+TASK_TEMPLATES = {
+    "POST": {
+        "DEFAULT": "Create a social media post about {topic} that aligns with our brand voice and incorporates key information from our knowledge base.",
+        "ENGAGING": "Generate an engaging social media post about {topic} that encourages user interaction. Use emojis and include relevant FAQs: {faqs}",
+        "PROMOTIONAL": "Create promotional content about {topic} that highlights special offers. Use these key points: {faqs}",
+        "INFORMATIVE": "Write an informative post explaining {topic}. Use this structured information: {faqs}"
+    },
+    "REVIEW": {
+        "DEFAULT": "Generate a professional response to this review: {review_text}. Consider these business details: {faqs}",
+        "APPRECIATIVE": "Create a grateful response to this positive review: {review_text}. Mention: {faqs}",
+        "EMPATHETIC": "Draft an empathetic response to this negative review: {review_text}. Reference our policies: {faqs}"
+    }
+}
+
 def answer_question(query: str, business_id: str, chat_history: List[Dict[str, str]] = None) -> str:
     print(f"\n[INFO] Starting RAG process for query: '{query}'")
     """Generate answer using enhanced RAG with chat history and memory"""
