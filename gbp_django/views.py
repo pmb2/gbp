@@ -32,6 +32,13 @@ from .utils.rag_utils import answer_question, add_to_knowledge_base
 from .utils.model_interface import get_llm_model
 from .utils.website_scraper import scrape_and_summarize_website
 from .utils.seo_analyzer import analyze_website
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from .utils.email_service import EmailService
+import json
+from .models import Notification, Business
+from .api.business_management import update_business_details
 
 
 def send_verification_email(business):
@@ -606,6 +613,34 @@ def update_automation_settings(request, business_id):
             'status': 'error',
             'message': str(e)
         })
+@login_required
+@require_http_methods(["GET"])
+def get_seo_health(request, business_id):
+    """API endpoint to get SEO health data for a business."""
+    try:
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        if not business.website_url:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'No website URL found for this business'
+            }, status=400)
+
+        seo_data = analyze_website(business.website_url)
+        return JsonResponse({
+            'status': 'success',
+            **seo_data
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Business not found'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
 @login_required
 @require_http_methods(["GET"])
 def get_seo_health(request, business_id):

@@ -1,4 +1,5 @@
 import requests
+import requests
 from bs4 import BeautifulSoup
 from transformers import pipeline
 
@@ -13,7 +14,7 @@ def scrape_and_summarize_website(url):
         text_content = ' '.join(soup.body.stripped_strings)
 
         # Initialize the summarization pipeline
-        summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+        summarizer = pipeline("summarization", model="facebook/bart-large-cnn", device=0)
 
         # Generate summary
         summary_text = summarizer(text_content, max_length=150, min_length=30, do_sample=False)[0]['summary_text']
