@@ -37,7 +37,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from .utils.email_service import EmailService
 import json
-from .models import Notification, Business
+from .models import Notification, Business, Task
 from .api.business_management import update_business_details
 
 
@@ -640,7 +640,6 @@ def get_seo_health(request, business_id):
         return JsonResponse({
             'status': 'error',
             'message': str(e)
-        }, status=500)
 @login_required
 @require_http_methods(["GET"])
 def get_seo_health(request, business_id):
@@ -1388,7 +1387,8 @@ def create_task(request, business_id):
                 business=business,
                 task_type=task_type,
                 frequency=frequency,
-                next_run=next_run
+                next_run=next_run,
+                parameters={'content': data.get('generated_content', '')}
             )
             message = 'Task created successfully'
 
