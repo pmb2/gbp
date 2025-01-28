@@ -613,10 +613,12 @@
 
 
     // --- Modal Functions ---
-    function showSchedulerModal(businessId) {
+    function openSchedulerModal(businessId) {
+        console.log('Opening scheduler modal for business:', businessId);
         const modal = document.getElementById('schedulerModal');
         const businessIdInput = document.getElementById('businessIdInput');
         if (modal && businessIdInput) {
+            modal.style.display = 'block';
             modal.classList.remove('hidden');
             businessIdInput.value = businessId;
             // Reset form fields
