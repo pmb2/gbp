@@ -620,20 +620,11 @@
         
         if (!modal || !businessIdInput) {
             console.error('Modal or business ID input not found');
-            console.log('Modal:', modal);
-            console.log('Business ID Input:', businessIdInput);
             return;
         }
 
         try {
-            // Force display block and remove hidden class
-            modal.style.display = 'block';
-            modal.classList.remove('hidden');
-            
-            // Set business ID
-            businessIdInput.value = businessId;
-            
-            // Reset form
+            // Reset form first
             const form = document.getElementById('taskForm');
             if (form) {
                 form.reset();
@@ -643,20 +634,32 @@
                 if (generatedContainer) generatedContainer.classList.add('hidden');
             }
             
-            // Prevent body scrolling and ensure modal is visible
+            // Set business ID
+            businessIdInput.value = businessId;
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            
+            // Prevent body scrolling
             document.body.style.overflow = 'hidden';
-            modal.style.opacity = '1';
-            modal.style.visibility = 'visible';
             
             console.log('Modal opened successfully');
-            console.log('Modal display style:', modal.style.display);
-            console.log('Modal visibility:', modal.style.visibility);
-            console.log('Modal opacity:', modal.style.opacity);
-            console.log('Modal classList:', modal.classList);
         } catch (error) {
             console.error('Error opening modal:', error);
         }
     }
+
+    // Close modal when clicking outside
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('schedulerModal');
+        if (modal) {
+            modal.addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeSchedulerModal();
+                }
+            });
+        }
+    });
 
     function closeSchedulerModal() {
         const modal = document.getElementById('schedulerModal');
