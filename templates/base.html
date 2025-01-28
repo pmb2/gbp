@@ -613,18 +613,43 @@
 
 
     // --- Modal Functions ---
-    function openSchedulerModal(businessId) {
+    function showSchedulerModal(businessId) {
         const modal = document.getElementById('schedulerModal');
         const businessIdInput = document.getElementById('businessIdInput');
         if (modal && businessIdInput) {
             modal.classList.remove('hidden');
             businessIdInput.value = businessId;
             // Reset form fields
-            document.getElementById('taskForm').reset();
-            document.getElementById('generatedContent').value = '';
-            document.getElementById('generatedContentContainer').classList.add('hidden');
+            const form = document.getElementById('taskForm');
+            if (form) {
+                form.reset();
+                const generatedContent = document.getElementById('generatedContent');
+                const generatedContainer = document.getElementById('generatedContentContainer');
+                if (generatedContent) generatedContent.value = '';
+                if (generatedContainer) generatedContainer.classList.add('hidden');
+            }
+            // Center modal
+            window.scrollTo(0, 0);
+            document.body.style.overflow = 'hidden';
         } else {
             console.error('Modal or business ID input not found');
+        }
+    }
+
+    function closeSchedulerModal() {
+        const modal = document.getElementById('schedulerModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            // Reset form
+            const form = document.getElementById('taskForm');
+            if (form) {
+                form.reset();
+                document.getElementById('taskIdInput').value = '';
+                document.getElementById('generatedContent').value = '';
+                document.getElementById('generatedContentContainer').classList.add('hidden');
+                document.getElementById('submitButtonText').textContent = 'Schedule Task';
+            }
         }
     }
 
