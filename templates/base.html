@@ -637,15 +637,41 @@
             // Set business ID
             businessIdInput.value = businessId;
             
-            // Show modal
-            modal.classList.remove('hidden');
+            // Show modal - important to set display before removing hidden
+            modal.style.display = 'block';
             
             // Prevent body scrolling
             document.body.style.overflow = 'hidden';
             
             console.log('Modal opened successfully');
+            console.log('Modal display:', modal.style.display);
+            console.log('Modal classList:', modal.classList);
+            console.log('Modal z-index:', getComputedStyle(modal).zIndex);
         } catch (error) {
             console.error('Error opening modal:', error);
+        }
+    }
+
+    function closeSchedulerModal() {
+        const modal = document.getElementById('schedulerModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Reset form
+            const form = document.getElementById('taskForm');
+            if (form) {
+                form.reset();
+                const taskIdInput = document.getElementById('taskIdInput');
+                const generatedContent = document.getElementById('generatedContent');
+                const generatedContainer = document.getElementById('generatedContentContainer');
+                const submitButton = document.getElementById('submitButtonText');
+                
+                if (taskIdInput) taskIdInput.value = '';
+                if (generatedContent) generatedContent.value = '';
+                if (generatedContainer) generatedContainer.classList.add('hidden');
+                if (submitButton) submitButton.textContent = 'Schedule Task';
+            }
         }
     }
 
