@@ -637,16 +637,14 @@
             // Set business ID
             businessIdInput.value = businessId;
             
-            // Show modal - important to set display before removing hidden
-            modal.style.display = 'block';
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.style.cssText = 'display: flex !important; align-items: center; justify-content: center;';
             
             // Prevent body scrolling
             document.body.style.overflow = 'hidden';
             
             console.log('Modal opened successfully');
-            console.log('Modal display:', modal.style.display);
-            console.log('Modal classList:', modal.classList);
-            console.log('Modal z-index:', getComputedStyle(modal).zIndex);
         } catch (error) {
             console.error('Error opening modal:', error);
         }
