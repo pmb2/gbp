@@ -626,8 +626,8 @@
         }
 
         try {
-            // Remove both display:none and hidden class
-            modal.style.removeProperty('display');
+            // Force display block and remove hidden class
+            modal.style.display = 'block';
             modal.classList.remove('hidden');
             
             // Set business ID
@@ -643,10 +643,16 @@
                 if (generatedContainer) generatedContainer.classList.add('hidden');
             }
             
-            // Prevent body scrolling
+            // Prevent body scrolling and ensure modal is visible
             document.body.style.overflow = 'hidden';
+            modal.style.opacity = '1';
+            modal.style.visibility = 'visible';
             
             console.log('Modal opened successfully');
+            console.log('Modal display style:', modal.style.display);
+            console.log('Modal visibility:', modal.style.visibility);
+            console.log('Modal opacity:', modal.style.opacity);
+            console.log('Modal classList:', modal.classList);
         } catch (error) {
             console.error('Error opening modal:', error);
         }
