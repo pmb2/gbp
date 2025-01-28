@@ -617,11 +617,23 @@
         console.log('Opening scheduler modal for business:', businessId);
         const modal = document.getElementById('schedulerModal');
         const businessIdInput = document.getElementById('businessIdInput');
-        if (modal && businessIdInput) {
-            modal.style.display = 'block';
+        
+        if (!modal || !businessIdInput) {
+            console.error('Modal or business ID input not found');
+            console.log('Modal:', modal);
+            console.log('Business ID Input:', businessIdInput);
+            return;
+        }
+
+        try {
+            // Remove both display:none and hidden class
+            modal.style.removeProperty('display');
             modal.classList.remove('hidden');
+            
+            // Set business ID
             businessIdInput.value = businessId;
-            // Reset form fields
+            
+            // Reset form
             const form = document.getElementById('taskForm');
             if (form) {
                 form.reset();
@@ -630,11 +642,13 @@
                 if (generatedContent) generatedContent.value = '';
                 if (generatedContainer) generatedContainer.classList.add('hidden');
             }
-            // Center modal
-            window.scrollTo(0, 0);
+            
+            // Prevent body scrolling
             document.body.style.overflow = 'hidden';
-        } else {
-            console.error('Modal or business ID input not found');
+            
+            console.log('Modal opened successfully');
+        } catch (error) {
+            console.error('Error opening modal:', error);
         }
     }
 
