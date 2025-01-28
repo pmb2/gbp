@@ -612,6 +612,22 @@
     }
 
 
+    // --- Modal Functions ---
+    function openSchedulerModal(businessId) {
+        const modal = document.getElementById('schedulerModal');
+        const businessIdInput = document.getElementById('businessIdInput');
+        if (modal && businessIdInput) {
+            modal.classList.remove('hidden');
+            businessIdInput.value = businessId;
+            // Reset form fields
+            document.getElementById('taskForm').reset();
+            document.getElementById('generatedContent').value = '';
+            document.getElementById('generatedContentContainer').classList.add('hidden');
+        } else {
+            console.error('Modal or business ID input not found');
+        }
+    }
+
     // --- Initialization & Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
         initTheme();
