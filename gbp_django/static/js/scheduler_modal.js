@@ -160,45 +160,6 @@ document.addEventListener('click', function(event) {
                 closeSchedulerModal();
             });
     };
-    // Initialize scheduler modal early in load process
-    document.addEventListener('DOMContentLoaded', () => {
-        showSchedulerModal = (businessId) => {
-            console.log('[INFO] DOM Ready - Initializing scheduler modal');
-            console.log('[INFO] showSchedulerModal called with businessId:', businessId);
-            if (!businessId) {
-                console.error('[ERROR] showSchedulerModal called without businessId');
-                return;
-            }
-
-            const modal = document.getElementById('schedulerModal');
-            console.log('[INFO] Found schedulerModal element:', modal);
-            // Close any existing modals first
-            document.querySelectorAll('.modal-open').forEach(m => m.classList.add('hidden'));
-
-            console.log('[INFO] Setting business ID in modal:', businessId);
-            document.getElementById('businessIdInput').value = businessId;
-            document.getElementById('taskForm').dataset.businessId = businessId;
-            console.log('[INFO] Showing modal for business:', businessId);
-            // Remove all hiding classes and ensure proper display
-            // Use class-based transitions instead of inline styles
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            // Reset form when opening
-            document.getElementById('taskForm').reset();
-            document.getElementById('generatedContentContainer').classList.add('hidden');
-            document.getElementById('generatedContent').value = '';
-        };
-
-        // Close modal when clicking outside content
-        // Handle outside clicks with proper event listener
-        document.addEventListener('click', function (event) {
-            const modal = document.getElementById('schedulerModal');
-            if (modal && event.target === modal) {
-                closeSchedulerModal();
-            }
-        });
-    });
-
     // Content generation functions
     async function generateInitialContent() {
         const generateBtn = document.getElementById('generateButtonText');
