@@ -102,7 +102,10 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         except Exception as e:
             raise ValueError(f"Failed to determine file type: {str(e)}")
 
-        # Process content based on mime type with enhanced error handling
+        # Truncate the MIME type if it exceeds the max_length
+        max_mime_length = KnowledgeFile._meta.get_field('file_type').max_length
+        if len(mime_type) > max_mime_length:
+            mime_type = mime_type[:max_mime_length]
         try:
             print(f"\nProcessing file content:")
             print(f"[INFO] MIME type: {mime_type}")

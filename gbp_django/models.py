@@ -242,7 +242,7 @@ class KnowledgeFile(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='knowledge_files')
     file_name = models.CharField(max_length=255)
     file_path = models.CharField(max_length=255)
-    file_type = models.CharField(max_length=50)
+    file_type = models.CharField(max_length=100)
     file_size = models.IntegerField()
     content = models.TextField()  # To store extracted text content
     embedding = VectorField(dimensions=1536, null=True, blank=True)
