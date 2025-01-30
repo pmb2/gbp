@@ -151,11 +151,36 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             return "Business not found"
 
         # Get relevant context
+        context = get_relevant_context(query, business_id)
 
         # Ensure context is not empty
         if not context.strip():
             context = "No relevant context found in the knowledge base."
-        context = get_relevant_context(query, business_id)
+        # Prepare business context
+        business_context = (
+            f"Name: {business.business_name}\n"
+            f"Category: {business.category}\n"
+            f"Location: {business.address}\n"
+            f"Website: {business.website_url}\n"
+            f"Phone: {business.phone_number}\n"
+            f"Verification Status: {'Verified' if business.is_verified else 'Not Verified'}\n"
+            f"Profile Completion: {business.calculate_profile_completion()}%\n"
+        )
+
+        # Trim context to fit within token limit
+        encoding = tiktoken.encoding_for_model('gpt-3.5-turbo')  # Adjust based on your LLM
+        max_tokens = 4096  # Max tokens for gpt-3.5-turbo
+        query_tokens = len(encoding.encode(query))
+        context_tokens = len(encoding.encode(context))
+        available_tokens = max_tokens - query_tokens - 500  # Reserve tokens for response and overhead
+
+        if context_tokens > available_tokens:
+            # Trim context to fit within token limit
+            trimmed_context = encoding.decode(encoding.encode(context)[:available_tokens])
+            print(f"[DEBUG] Trimmed context to fit within token limit: {available_tokens} tokens")
+        else:
+            trimmed_context = context
+
         # Assemble the full context
         full_context = (
             f"You are an AI assistant for a business automation platform. "
