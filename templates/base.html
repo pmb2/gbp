@@ -693,22 +693,6 @@
         }
     });
 
-    function closeSchedulerModal() {
-        const modal = document.getElementById('schedulerModal');
-        if (modal) {
-            modal.classList.add('hidden');
-            document.body.style.overflow = '';
-            // Reset form
-            const form = document.getElementById('taskForm');
-            if (form) {
-                form.reset();
-                document.getElementById('taskIdInput').value = '';
-                document.getElementById('generatedContent').value = '';
-                document.getElementById('generatedContentContainer').classList.add('hidden');
-                document.getElementById('submitButtonText').textContent = 'Schedule Task';
-            }
-        }
-    }
 
     // --- Initialization & Event Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
