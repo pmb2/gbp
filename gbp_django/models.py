@@ -225,6 +225,18 @@ class QandA(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+class FAQ(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
+    question = models.TextField()
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+    embedding = VectorField(dimensions=1536, null=True)
+
+    def __str__(self):
+        return f"{self.question[:50]}..."
+
 class KnowledgeFile(models.Model):
     business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='knowledge_files')
     file_name = models.CharField(max_length=255)
