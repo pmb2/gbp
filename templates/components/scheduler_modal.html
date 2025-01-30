@@ -156,9 +156,41 @@
         generateInitialContent();
     }
 
-    function applyContent() {
-        // TODO: Connect to actual content storage
-        showAlertBanner('Content saved for task!', 'success');
+    async function applyContent() {
+        const businessId = document.getElementById('businessIdInput').value;
+        const taskType = document.querySelector('select[name="task_type"]').value;
+        const frequency = document.querySelector('select[name="frequency"]').value;
+        const customTime = document.querySelector('input[name="custom_time"]').value;
+        const content = document.getElementById('generatedContent').value;
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        try {
+            const response = await fetch(`/api/business/${businessId}/tasks/create/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    task_type: taskType,
+                    frequency: frequency,
+                    custom_time: customTime,
+                    content: content
+                })
+            });
+
+            const data = await response.json();
+            if (data.status === 'success') {
+                showAlertBanner('Task saved successfully!', 'success');
+                closeSchedulerModal();
+            } else {
+                showAlertBanner(data.message || 'Error saving task', 'error');
+            }
+        } catch (error) {
+            console.error('Error saving task:', error);
+            showAlertBanner('Error saving task', 'error');
+        }
+    }
     }
 
     // Close modal when clicking outside

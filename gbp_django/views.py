@@ -1298,7 +1298,6 @@ def create_task(request, business_id):
     """
     try:
         data = json.loads(request.body)
-        task_id = data.get('task_id')
         task_type = data.get('task_type')
         frequency = data.get('frequency')
         custom_time = data.get('custom_time')
@@ -1311,41 +1310,39 @@ def create_task(request, business_id):
 
         business = Business.objects.get(business_id=business_id, user=request.user)
 
-        if task_id:
-            # Update existing task
-            task = Task.objects.get(id=task_id, business=business)
-            task.task_type = task_type
-            task.frequency = frequency
-            if custom_time:
-                task.next_run = custom_time
-            task.save()
-            message = 'Task updated successfully'
+        # Calculate next_run based on frequency
+        next_run = timezone.now()
+        if frequency == 'CUSTOM' and custom_time:
+            next_run = datetime.strptime(custom_time, '%Y-%m-%dT%H:%M')
+        elif frequency == 'DAILY':
+            next_run += timedelta(days=1)
+        elif frequency == 'WEEKLY':
+            next_run += timedelta(weeks=1)
+        elif frequency == 'MONTHLY':
+            next_run += timedelta(days=30)
         else:
-            # Create new task
-            if frequency == 'CUSTOM' and not custom_time:
+            # If custom time is not provided for CUSTOM frequency
+            if frequency == 'CUSTOM':
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Custom time is required for custom frequency'
                 }, status=400)
 
-            next_run = None
-            if custom_time:
-                next_run = custom_time
-            elif frequency == 'DAILY':
-                next_run = timezone.now() + timedelta(days=1)
-            elif frequency == 'WEEKLY':
-                next_run = timezone.now() + timedelta(weeks=1)
-            elif frequency == 'MONTHLY':
-                next_run = timezone.now() + timedelta(days=30)
+        # Create the task
+        task = Task.objects.create(
+            business=business,
+            task_type=task_type,
+            frequency=frequency,
+            next_run=next_run,
+            content=content,
+            status='PENDING'
+        )
 
-            task = Task.objects.create(
-                business=business,
-                task_type=task_type,
-                frequency=frequency,
-                next_run=next_run,
-                parameters={'content': data.get('generated_content', '')}
-            )
-            message = 'Task created successfully'
+        return JsonResponse({
+            'status': 'success',
+            'message': 'Task created successfully',
+            'task_id': task.id
+        })
 
         return JsonResponse({
             'status': 'success',

@@ -346,6 +346,11 @@ class Task(models.Model):
     parameters = models.JSONField(default=dict)
     last_run = models.DateTimeField(null=True, blank=True)
     retry_count = models.IntegerField(default=0)
+    content = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Generated content for the task"
+    )
     template = models.TextField(
         blank=True,
         help_text="Prompt template used for this task"
