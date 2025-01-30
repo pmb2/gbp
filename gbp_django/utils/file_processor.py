@@ -337,21 +337,9 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
             KnowledgeChunk.objects.create(
                 knowledge_file=knowledge_file,
-                business=business,  # Add this line to set the business
+                business=business,  # Set the business
                 content=chunk_data['text'],
-                embedding=chunk_data['embedding'],
-                position=idx
-            )
-                print(f"[ERROR] Invalid embedding for chunk {idx} in file {filename}")
-                continue  # Skip this chunk
-
-            print(f"[DEBUG] Valid embedding generated for chunk {idx} in file {filename}")
-
-            KnowledgeChunk.objects.create(
-                knowledge_file=knowledge_file,
-                business=business,  # Add this line to set the business
-                content=chunk_data['text'],
-                embedding=chunk_data['embedding'],
+                embedding=embedding,
                 position=idx
             )
 
