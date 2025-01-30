@@ -24,6 +24,9 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
     for prompt in prompts:
         embedding = generate_embedding(prompt)
         if embedding:
+            if len(embedding) != 1536:
+                print(f"[ERROR] Invalid query embedding dimension: {len(embedding)}")
+                continue
             query_embeddings.append(embedding)
             print(f"[DEBUG] Generated embedding for prompt: {prompt[:50]}...")
         else:

@@ -107,6 +107,10 @@ class GroqModel(LLMInterface):
         then fall back to Ollama, then to OpenAI if needed.
         """
         try:
+            print("[DEBUG] Messages sent to LLM:")
+            for msg in messages:
+                print(f"Role: {msg['role']}, Content: {msg['content'][:500]}...")  # Adjust content length as needed
+
             messages = self._prepare_messages(query, context, chat_history)
             print("[DEBUG] Sending messages to Groq:")
             for msg in messages:
@@ -283,10 +287,19 @@ class OllamaModel(LLMInterface):
 
             print(f"[DEBUG] Received embedding of length {len(embedding)}")
 
+            # Adjust embedding dimension to 1536 if necessary
+            if len(embedding) != 1536:
+                if len(embedding) == 768:
+                    embedding = embedding * 2  # Duplicate to reach 1536 dimensions
+                    print(f"[DEBUG] Adjusted embedding from 768 to 1536 dimensions")
+                else:
+                    raise ValueError(f"Unexpected embedding dimension: {len(embedding)}")
+
             return embedding
 
         except Exception as e:
             logger.error(f"Error generating embedding with Ollama: {str(e)}")
+            logger.error(traceback.format_exc())
             return None
 
 
