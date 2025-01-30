@@ -181,35 +181,8 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             ]
         }
 
-        # Get relevant knowledge base entries with enhanced similarity search
-        print("[INFO] Performing similarity search in knowledge base...")
-        faq_results = search_knowledge_base(query, business_id, top_k=5)
-        print(f"[INFO] Found {len(faq_results)} relevant knowledge base entries")
-        
-        knowledge_context = []
-        if faq_results:
-            print(f"[DEBUG] Found {len(faq_results)} relevant knowledge base entries")
-            for result in faq_results:
-                confidence = float(result['metadata']['confidence'].strip('%')) / 100
-                source = result['metadata']['source']
-                
-                if confidence >= 0.8:
-                    prefix = "🟢 [High Confidence]"
-                elif confidence >= 0.6:
-                    prefix = "🟡 [Moderate Confidence]"
-                else:
-                    prefix = "🔴 [Low Confidence]"
-                    
-                entry = (
-                    f"{prefix} Source: {source}\n"
-                    f"Q: {result['question']}\n"
-                    f"A: {result['answer']}\n"
-                    f"---"
-                )
-                knowledge_context.append(entry)
-                print(f"[DEBUG] Added context from {source} with confidence {confidence:.2%}")
-        else:
-            print("[DEBUG] No relevant knowledge base entries found")
+        # Get relevant context as a single string
+        context = get_relevant_context(query, business_id)
         
         # Build context with RAG results first
         print("[INFO] Building context for LLM response...")
