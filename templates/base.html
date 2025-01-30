@@ -187,6 +187,7 @@
 
         files.forEach(file => {
             console.log('[INFO] Adding file to list:', file.name);
+            console.log('[DEBUG] File object:', file);
             const template = document.getElementById('file-item-template');
             const fileItem = template.content.cloneNode(true);
             fileItem.querySelector('.filename').textContent = file.name;

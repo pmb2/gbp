@@ -346,6 +346,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             )
 
         # Return file info
+        print(f"[DEBUG] KnowledgeFile ID: {knowledge_file.id}")
         return {
             'id': knowledge_file.id,
             'name': filename,

@@ -1179,6 +1179,7 @@ def add_knowledge(request, business_id):
                     print(f"[INFO] Processing file: {file.name}")
                     try:
                         result = store_file_content(business_id, file, file.name)
+                        print(f"[DEBUG] Result for {file.name}: {result}")
                         results.append(result)
                     except Exception as e:
                         print(f"[ERROR] Error processing file {file.name}: {str(e)}")
