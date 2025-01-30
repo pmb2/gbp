@@ -40,6 +40,8 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
             return []
         
         results = []
+        min_similarity = 0.4  # Adjust threshold as needed
+
         for query_embedding in query_embeddings:
             # Get the chunks associated with the business's knowledge files
             chunks = KnowledgeChunk.objects.filter(
@@ -50,8 +52,8 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
             ).order_by('similarity')[:top_k]
 
             for chunk in chunks:
-                cosine_sim = float(chunk.similarity)
-                if cosine_sim >= 0.3:  # Adjusted threshold for cosine similarity
+                cosine_sim = 1 - float(chunk.similarity)
+                if cosine_sim >= min_similarity:
                     results.append({
                         'content': chunk.content,
                         'similarity': cosine_sim,
