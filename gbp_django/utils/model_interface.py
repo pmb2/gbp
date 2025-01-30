@@ -283,34 +283,10 @@ class OllamaModel(LLMInterface):
 
             print(f"[DEBUG] Received embedding of length {len(embedding)}")
 
-            # Ensure the embedding has the correct dimension
-            if len(embedding) != 1536:
-                embedding = self._adjust_embedding_dimension(embedding)
-                if embedding is None:
-                    raise ValueError(f"Unable to adjust embedding to 1536 dimensions")
-            latency = time.time() - start_time
-            logger.info(f"Ollama embedding generated in {latency:.2f}s using {self.embedding_model}")
-
-            # Attempt to unify to 1536 dims if needed
-            if len(embedding) == 1536:
-                return embedding
-            else:
-                logger.warning(f"Unexpected embedding dimension: {len(embedding)}")
-                return None
+            return embedding
 
         except Exception as e:
             logger.error(f"Error generating embedding with Ollama: {str(e)}")
-            return None
-
-    def _adjust_embedding_dimension(self, embedding: List[float]) -> Optional[List[float]]:
-        """Adjust embedding to 1536 dimensions if possible."""
-        if len(embedding) == 768:
-            # Duplicate the embedding to reach 1536 dimensions
-            adjusted_embedding = embedding * 2
-            print(f"[DEBUG] Adjusted embedding from 768 to 1536 dimensions")
-            return adjusted_embedding
-        else:
-            logger.warning(f"Unexpected embedding dimension: {len(embedding)}")
             return None
 
 

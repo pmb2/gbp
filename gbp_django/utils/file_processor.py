@@ -255,8 +255,6 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                                 print("Retry failed - skipping chunk")
                                 continue
                         
-                        if len(embedding) != 1536:
-                            raise ValueError(f"Invalid embedding size: {len(embedding)}. Expected size is 1536.")
                         
                         embeddings.append({
                             'text': chunk,

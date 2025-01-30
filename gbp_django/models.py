@@ -422,6 +422,6 @@ class KnowledgeChunk(models.Model):
     )
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     content = models.TextField()
-    embedding = VectorField()
+    embedding = VectorField(dimensions=768)
     position = models.IntegerField()  # To maintain the order of chunks
     created_at = models.DateTimeField(auto_now_add=True)
