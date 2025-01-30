@@ -146,6 +146,9 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             print(f"[ERROR] No business found with ID: {business_id}")
             return "Business not found"
 
+        # Get relevant context
+        context = get_relevant_context(query, business_id)
+
         # Ensure context is not empty
         if not context.strip():
             context = "No relevant context found in the knowledge base."

@@ -297,19 +297,19 @@ class OllamaModel(LLMInterface):
                 logger.warning(f"Unexpected embedding dimension: {len(embedding)}")
                 return None
 
-        def _adjust_embedding_dimension(self, embedding: List[float]) -> Optional[List[float]]:
-            """Adjust embedding to 1536 dimensions if possible."""
-            if len(embedding) == 768:
-                # Duplicate the embedding to reach 1536 dimensions
-                adjusted_embedding = embedding * 2
-                print(f"[DEBUG] Adjusted embedding from 768 to 1536 dimensions")
-                return adjusted_embedding
-            else:
-                logger.warning(f"Unexpected embedding dimension: {len(embedding)}")
-                return None
-
         except Exception as e:
             logger.error(f"Error generating embedding with Ollama: {str(e)}")
+            return None
+
+    def _adjust_embedding_dimension(self, embedding: List[float]) -> Optional[List[float]]:
+        """Adjust embedding to 1536 dimensions if possible."""
+        if len(embedding) == 768:
+            # Duplicate the embedding to reach 1536 dimensions
+            adjusted_embedding = embedding * 2
+            print(f"[DEBUG] Adjusted embedding from 768 to 1536 dimensions")
+            return adjusted_embedding
+        else:
+            logger.warning(f"Unexpected embedding dimension: {len(embedding)}")
             return None
 
 
