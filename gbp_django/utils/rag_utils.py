@@ -158,7 +158,7 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
         context = get_relevant_context(query, business_id)
         print(f"[DEBUG] Retrieved context: {context}")
 
-        # Build full context for LLM
+        # Use trimmed context
         print("[INFO] Building context for LLM response...")
         business_context = {
             "profile": {
@@ -186,7 +186,7 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             f"{business_context}\n\n"
             f"📚 Knowledge Base Context:\n"
             f"{'-' * 40}\n"
-            f"{context if context else 'No relevant context found in the knowledge base.'}\n\n"
+            f"{trimmed_context}\n\n"
             f"💬 Recent Chat Context:\n"
             f"{'-' * 40}\n"
         )
