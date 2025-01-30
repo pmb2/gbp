@@ -256,14 +256,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                                 continue
                         
                         if len(embedding) != 1536:
-                            print(f"Warning: Invalid embedding dimensions for chunk {idx + 1}: {len(embedding)}")
-                            print("Attempting to pad/truncate embedding...")
-                            if len(embedding) < 1536:
-                                # Pad with zeros
-                                embedding.extend([0.0] * (1536 - len(embedding)))
-                            else:
-                                # Truncate to 1536
-                                embedding = embedding[:1536]
+                            raise ValueError(f"Invalid embedding size: {len(embedding)}. Expected size is 1536.")
                         
                         embeddings.append({
                             'text': chunk,

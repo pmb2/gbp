@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 import numpy as np
 from django.db.models import Q
-from pgvector.django import CosineDistance, L2Distance
+from pgvector.django import CosineSimilarity, L2Distance
 from ..models import Business, FAQ, KnowledgeChunk
 from .embeddings import generate_embedding, generate_response
 
@@ -46,12 +46,12 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
                 knowledge_file__business__business_id=business_id,
                 knowledge_file__deleted_at__isnull=True
             ).annotate(
-                similarity=CosineDistance('embedding', query_embedding)
-            ).order_by('similarity')[:top_k]
+                similarity=CosineSimilarity('embedding', query_embedding)
+            ).order_by('-similarity')[:top_k]
 
             for chunk in chunks:
-                cosine_sim = 1 - float(chunk.similarity)
-                if cosine_sim >= min_similarity:
+                cosine_sim = float(chunk.similarity)
+                if cosine_sim >= 0.3:  # Adjusted threshold for cosine similarity
                     results.append({
                         'content': chunk.content,
                         'similarity': cosine_sim,
@@ -217,7 +217,7 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             f"{business_context}\n\n"
             f"📚 Knowledge Base Context:\n"
             f"{'-' * 40}\n"
-            f"{''.join(knowledge_context) if knowledge_context else 'No specific documentation found for this query.'}\n\n"
+            f"{context if context else 'No relevant context found in the knowledge base.'}\n\n"
             f"💬 Recent Chat Context:\n"
             f"{'-' * 40}\n"
         )
