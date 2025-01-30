@@ -19,7 +19,7 @@ from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialApp
 
 from .models import (
-    User, Post, BusinessAttribute, QandA, Review, FAQ, Business, Notification, Task
+    User, Post, QandA, Review, FAQ, Business, Notification, Task
 )
 from .api.authentication import get_access_token, get_user_info
 from .api.business_management import (
@@ -843,7 +843,7 @@ def index(request):
 
     print("[DEBUG] Fetching businesses and related data...")
     businesses = Business.objects.filter(user=request.user).prefetch_related(
-        'post_set', 'businessattribute_set', 'qanda_set', 'review_set'
+        'post_set', 'qanda_set', 'review_set', 'knowledge_files'
     ).order_by('-is_connected', '-is_verified')
 
     print(f"[DEBUG] Found {businesses.count()} businesses for user {request.user.email}")
@@ -854,7 +854,7 @@ def index(request):
         if not hasattr(business, '_processed'):
             business.profile_completion = business.calculate_profile_completion()
             business.posts_count = business.post_set.count()
-            business.photos_count = business.businessattribute_set.filter(key='photo').count()
+            business.photos_count = business.knowledge_files.filter(file_type__startswith='image/').count()
             business.qanda_count = business.qanda_set.count()
             business.reviews_count = business.review_set.count()
             business._processed = True
