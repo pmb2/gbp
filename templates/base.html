@@ -132,7 +132,7 @@
             console.log('[INFO] Handling files:', files);
             console.log('[INFO] FormData entries:', Array.from(formData.entries()));
             for (let i = 0; i < files.length; i++) {
-                formData.append('files[]', files[i]);
+                formData.append('files', files[i]);
             }
 
             // Show upload progress
@@ -151,6 +151,7 @@
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 },
+                credentials: 'include', // Ensure cookies are included
                 body: formData
             })
             .then(response => {
@@ -164,7 +165,11 @@
                 if (data.status === 'success') {
                     updateFileList(businessId, data.files);
                 } else {
-                    showAlertBanner('Error uploading files: ' + data.message, 'error');
+                    let errorMsg = data.message;
+                    if (data.errors && data.errors.length > 0) {
+                        errorMsg += ' Details: ' + data.errors.map(e => `${e.file}: ${e.error}`).join('; ');
+                    }
+                    showAlertBanner('Error uploading files: ' + errorMsg, 'error');
                 }
             })
             .catch(error => {

@@ -1168,8 +1168,12 @@ def add_knowledge(request, business_id):
                     'message': 'Business not found or access denied'
                 }, status=404)
 
-            if 'files[]' in request.FILES:
-                files = request.FILES.getlist('files[]')
+            print(f"request.FILES keys: {list(request.FILES.keys())}")
+            if request.FILES.getlist('files'):
+                files = request.FILES.getlist('files')
+            else:
+                print("[ERROR] No files uploaded in request")
+                return JsonResponse({'status': 'error', 'message': 'No files uploaded'}, status=400)
                 print(f"[INFO] Received {len(files)} files for upload")
                 results = []
                 errors = []
@@ -1184,13 +1188,19 @@ def add_knowledge(request, business_id):
                         errors.append({'file': file.name, 'error': str(e)})
                         continue
 
-                response_data = {
-                    'status': 'success' if results else 'error',
-                    'message': f'Processed {len(results)} files with {len(errors)} errors' if errors else f'Processed {len(results)} files successfully',
-                    'files': results
-                }
                 if errors:
-                    response_data['errors'] = errors
+                    response_data = {
+                        'status': 'error',
+                        'message': 'Errors occurred while processing files',
+                        'files': results,
+                        'errors': errors
+                    }
+                else:
+                    response_data = {
+                        'status': 'success',
+                        'message': f'Processed {len(results)} files successfully',
+                        'files': results
+                    }
 
                 print(f"[INFO] Upload response data: {response_data}")
                 return JsonResponse(response_data)
