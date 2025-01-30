@@ -161,28 +161,15 @@
         showAlertBanner('Content saved for task!', 'success');
     }
 
-    function closeSchedulerModal() {
+    // Close modal when clicking outside
+    document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('schedulerModal');
         if (modal) {
-            modal.classList.add('hidden');
-            // Reset form
-            const form = document.getElementById('taskForm');
-            if (form) {
-                form.reset();
-                document.getElementById('taskIdInput').value = '';
-                document.getElementById('generatedContent').value = '';
-                document.getElementById('generatedContentContainer').classList.add('hidden');
-                document.getElementById('submitButtonText').textContent = 'Schedule Task';
-            }
-        } else {
-            console.error("Modal element not found");
-        }
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('schedulerModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            closeSchedulerModal();
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeSchedulerModal();
+                }
+            });
         }
     });
 
