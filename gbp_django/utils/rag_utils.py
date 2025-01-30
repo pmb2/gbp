@@ -151,13 +151,24 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             return "Business not found"
 
         # Get relevant context
-        context = get_relevant_context(query, business_id)
 
         # Ensure context is not empty
         if not context.strip():
             context = "No relevant context found in the knowledge base."
         context = get_relevant_context(query, business_id)
-        print(f"[DEBUG] Retrieved context: {context}")
+        # Assemble the full context
+        full_context = (
+            f"You are an AI assistant for a business automation platform. "
+            f"Use the following information to craft your response:\n\n"
+            f"1. BUSINESS PROFILE:\n{business_context}\n\n"
+            f"2. KNOWLEDGE BASE:\n{trimmed_context}\n\n"
+            f"3. CHAT HISTORY:\nNo previous chat history.\n\n"
+            "Response Requirements:\n"
+            "- Prioritize information from the knowledge base\n"
+            "- Maintain professional tone matching business profile\n"
+            "- Acknowledge uncertainties clearly\n"
+            "- Cite sources from knowledge base when possible"
+        )
 
         # Trim context to fit within token limit
         encoding = tiktoken.encoding_for_model('gpt-3.5-turbo')  # Adjust based on your LLM

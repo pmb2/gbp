@@ -56,50 +56,17 @@ class GroqModel(LLMInterface):
             logger.error(f"Error generating embedding: {str(e)}")
             return None
 
-    def _prepare_messages(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> List[
-        Dict[str, str]]:
-        """Prepare messages array for LLM input with memory summaries."""
-        memory_summary = []
-        formatted_history = []
-
+    def _prepare_messages(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> List[Dict[str, str]]:
+        """Prepare messages array for LLM input."""
+        messages = [{'role': 'system', 'content': context}]
         if chat_history:
-            # Summarize recent messages
-            current_topic = []
-            for msg in chat_history[-10:]:  # Summarize up to last 10 messages
-                current_topic.append(msg['content'])
-                if len(current_topic) >= 3:  # Summarize every 3 messages
-                    summary = f"• Previous discussion about: {' '.join(current_topic)[:100]}..."
-                    memory_summary.append(summary)
-                    current_topic = []
-            if current_topic:
-                summary = f"• Recent exchange about: {' '.join(current_topic)[:100]}..."
-                memory_summary.append(summary)
-
             # Keep last 5 messages verbatim
             formatted_history = [
                 {'role': m['role'], 'content': m['content']}
                 for m in chat_history[-5:]
             ]
-
-        system_prompt = (
-                "You are an AI assistant for a business automation platform. "
-                "Use the following information to craft your response:\n\n"
-                "1. BUSINESS PROFILE:\n{{business_profile}}\n\n"
-                "2. KNOWLEDGE BASE:\n{{knowledge_base}}\n\n"
-                "3. CHAT HISTORY:\n{{chat_history}}\n\n"
-                "4. MEMORY SUMMARIES:\n{{memory_summaries}}\n\n"
-                "Response Requirements:\n"
-                "- Prioritize information from the knowledge base\n"
-                "- Maintain professional tone matching business profile\n"
-                "- Acknowledge uncertainties clearly\n"
-                "- Cite sources from knowledge base when possible"
-        )
-
-        messages = [{'role': 'system', 'content': system_prompt}]
-        if formatted_history:
             messages.extend(formatted_history)
         messages.append({'role': 'user', 'content': query})
-
         return messages
 
     def generate_response(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> str:
