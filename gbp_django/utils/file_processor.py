@@ -229,7 +229,8 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
             # Generate embeddings with improved chunking and retries
             embeddings = []
             max_retries = 3
-            
+            embedding_vector = None  # Initialize embedding_vector
+
             for idx, chunk in enumerate(chunks):
                 retry_count = 0
                 while retry_count < max_retries:
@@ -265,6 +266,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
                             'text': chunk,
                             'embedding': embedding
                         })
+                        embedding_vector = embedding  # Assign the last successful embedding
                         print(f"Successfully generated embedding for chunk {idx + 1}")
                         break  # Exit retry loop on success
                         
