@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 import numpy as np
 from django.db.models import Q
-from pgvector.django import CosineSimilarity, L2Distance
+from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ, KnowledgeChunk
 from .embeddings import generate_embedding, generate_response
 
@@ -46,8 +46,8 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
                 knowledge_file__business__business_id=business_id,
                 knowledge_file__deleted_at__isnull=True
             ).annotate(
-                similarity=CosineSimilarity('embedding', query_embedding)
-            ).order_by('-similarity')[:top_k]
+                similarity=CosineDistance('embedding', query_embedding)
+            ).order_by('similarity')[:top_k]
 
             for chunk in chunks:
                 cosine_sim = float(chunk.similarity)
