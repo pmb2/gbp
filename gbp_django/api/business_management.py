@@ -9,8 +9,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from gbp_django.api.authentication import refresh_access_token
 from gbp_django.utils.cache import cache_on_arguments
 from gbp_django.models import (
-    Business, Post, BusinessAttribute,
-    QandA, Review
+    Business, Post, QandA, Review
 )
 
 def create_business_location(access_token, account_id, location_data):
@@ -417,17 +416,17 @@ def store_business_data(business_data, user_id, access_token):
                         'description': location.get('profile', {}).get('description', '')
                     }
 
-                    # Store additional attributes
-                    attributes = {
-                        'opening_hours': location.get('regularHours', {}),
-                        'special_hours': location.get('specialHours', {}),
-                        'service_area': location.get('serviceArea', {}),
-                        'labels': location.get('labels', []),
-                        'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
-                        'business_type': location.get('metadata', {}).get('businessType', ''),
-                        'year_established': location.get('metadata', {}).get('yearEstablished', ''),
-                        'employee_count': location.get('metadata', {}).get('employeeCount', '')
-                    }
+                    # Optionally remove or comment out the unused attributes dictionary
+                    # attributes = {
+                    #     'opening_hours': location.get('regularHours', {}),
+                    #     'special_hours': location.get('specialHours', {}),
+                    #     'service_area': location.get('serviceArea', {}),
+                    #     'labels': location.get('labels', []),
+                    #     'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
+                    #     'business_type': location.get('metadata', {}).get('businessType', ''),
+                    #     'year_established': location.get('metadata', {}).get('yearEstablished', ''),
+                    #     'employee_count': location.get('metadata', {}).get('employeeCount', '')
+                    # }
                 
                 # Try to find existing business by various identifiers
                 existing_business = None
