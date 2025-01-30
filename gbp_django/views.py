@@ -1147,6 +1147,7 @@ def add_knowledge(request, business_id):
             try:
                 business = Business.objects.get(business_id=business_id, user=request.user)
             except Business.DoesNotExist:
+                print("[ERROR] Business not found or access denied")
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Business not found or access denied'
@@ -1154,14 +1155,17 @@ def add_knowledge(request, business_id):
 
             if 'files[]' in request.FILES:
                 files = request.FILES.getlist('files[]')
+                print(f"[INFO] Received {len(files)} files for upload")
                 results = []
                 errors = []
 
                 for file in files:
+                    print(f"[INFO] Processing file: {file.name}")
                     try:
                         result = store_file_content(business_id, file, file.name)
                         results.append(result)
                     except Exception as e:
+                        print(f"[ERROR] Error processing file {file.name}: {str(e)}")
                         errors.append({'file': file.name, 'error': str(e)})
                         continue
 
@@ -1173,15 +1177,19 @@ def add_knowledge(request, business_id):
                 if errors:
                     response_data['errors'] = errors
 
+                print(f"[INFO] Upload response data: {response_data}")
                 return JsonResponse(response_data)
             else:
+                print("[ERROR] No files uploaded in request")
                 return JsonResponse({'status': 'error', 'message': 'No files uploaded'}, status=400)
 
         except Business.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Business not found or access denied'}, status=404)
         except Exception as e:
+            print(f"[ERROR] Unexpected error in add_knowledge: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
     else:
+        print(f"[ERROR] Method not allowed: {request.method}")
         return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 

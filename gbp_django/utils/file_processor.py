@@ -105,8 +105,8 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         # Process content based on mime type with enhanced error handling
         try:
             print(f"\nProcessing file content:")
-            print(f"MIME type: {mime_type}")
-            print(f"File size: {file_size/1024:.1f}KB")
+            print(f"[INFO] MIME type: {mime_type}")
+            print(f"[INFO] File size: {file_size/1024:.1f}KB")
             
             if mime_type == 'text/plain':
                 text_content = process_text_file(content)
