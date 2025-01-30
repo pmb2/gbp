@@ -192,7 +192,12 @@
             const fileItem = template.content.cloneNode(true);
             fileItem.querySelector('.filename').textContent = file.name;
             fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
-            fileItem.querySelector('.file-item').dataset.fileId = file.id;  // Use file.id
+            console.log('[DEBUG] file.id:', file.id);
+            if (!file.id) {
+                console.error('Invalid file ID:', file.id);
+                return;
+            }
+            fileItem.querySelector('.file-item').dataset.fileId = file.id;
             fileItem.querySelector('.delete-file').onclick = function() {
                 deleteFile(businessId, file.id);
             };
