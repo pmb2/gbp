@@ -1,4 +1,4 @@
-from django.conf import settings
+from pgvector.django import VectorField
 from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
@@ -413,7 +413,16 @@ class Notification(models.Model):
     def delete_notification(self):
         self.delete()
 
-class BusinessAttribute(models.Model):
+class KnowledgeChunk(models.Model):
+    knowledge_file = models.ForeignKey(
+        KnowledgeFile,
+        on_delete=models.CASCADE,
+        related_name='chunks'
+    )
+    content = models.TextField()
+    embedding = VectorField()
+    position = models.IntegerField()  # To maintain the order of chunks
+    created_at = models.DateTimeField(auto_now_add=True)
     business = models.ForeignKey(Business, on_delete=models.CASCADE)
     key = models.CharField(max_length=255)
     value = models.TextField(blank=True, null=True)

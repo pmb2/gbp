@@ -9,7 +9,7 @@ import time
 from typing import Dict, Any, List, Optional
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from ..models import KnowledgeFile, Business
+from ..models import KnowledgeFile, Business, KnowledgeChunk
 from .embeddings import generate_embedding
 
 def get_file_mime_type(file_content: bytes) -> str:
@@ -322,16 +322,24 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         except Exception as e:
             raise IOError(f"Failed to store file: {str(e)}")
 
-        # Create KnowledgeFile instance
+        # Create KnowledgeFile instance (without the embedding field)
         knowledge_file = KnowledgeFile.objects.create(
             business=business,
             file_name=filename,
             file_path=saved_path,
             file_type=mime_type,
             file_size=file_size,
-            content=text_content,
-            embedding=embedding_vector  # Replace with your embedding variable
+            content=text_content  # Consider removing this field if content is too large
         )
+
+        # Save each chunk and its embedding as a KnowledgeChunk
+        for idx, chunk_data in enumerate(embeddings):
+            KnowledgeChunk.objects.create(
+                knowledge_file=knowledge_file,
+                content=chunk_data['text'],
+                embedding=chunk_data['embedding'],
+                position=idx
+            )
 
         # Return file info
         return {

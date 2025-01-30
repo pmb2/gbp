@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 import numpy as np
 from django.db.models import Q
 from pgvector.django import CosineDistance, L2Distance
-from ..models import Business, FAQ
+from ..models import Business, FAQ, KnowledgeChunk
 from .embeddings import generate_embedding, generate_response
 
 def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_similarity: float = 0.20) -> List[Dict[str, Any]]:
@@ -39,105 +39,30 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
             print(f"[ERROR] Business not found with ID: {business_id}")
             return []
         
-        # Get related FAQs using multiple similarity metrics and embeddings
-        print("[DEBUG] Querying knowledge base with enhanced vector similarity search...")
-        all_results = []
-        
-        for query_embedding in query_embeddings:
-            faqs = FAQ.objects.filter(
-                business=business,
-                deleted_at__isnull=True,
-                embedding__isnull=False
-            ).annotate(
-                cosine_similarity=CosineDistance('embedding', query_embedding),
-                l2_distance=L2Distance('embedding', query_embedding)
-            ).order_by('cosine_similarity')[:top_k * 2]
-            
-            all_results.extend(faqs)
-        
-        print(f"[DEBUG] Retrieved {len(all_results)} total candidate FAQs")
-        
-        # Deduplicate results while keeping highest scores
-        seen_ids = set()
-        unique_results = []
-        for faq in all_results:
-            if faq.id not in seen_ids:
-                seen_ids.add(faq.id)
-                unique_results.append(faq)
-        
+        # Get the chunks associated with the business's knowledge files
+        chunks = KnowledgeChunk.objects.filter(
+            knowledge_file__business__business_id=business_id,
+            knowledge_file__deleted_at__isnull=True
+        ).annotate(
+            similarity=CosineDistance('embedding', query_embedding)
+        ).order_by('similarity')[:top_k]
+
         results = []
-        for faq in unique_results:
-            # Enhanced similarity scoring with context awareness
-            cosine_sim = 1 - float(faq.cosine_similarity)
-            l2_sim = 1 / (1 + float(faq.l2_distance))
-            
-            # Enhanced content-based scoring with improved chunk awareness
-            text_length = len(faq.answer)
-            
-            # Dynamic chunk position scoring
-            chunk_position_bonus = 1.0
-            if hasattr(faq, 'chunk_index'):
-                if faq.chunk_index == 0:
-                    chunk_position_bonus = 1.2  # Higher boost for document starts
-                elif hasattr(faq, 'total_chunks') and faq.chunk_index == faq.total_chunks - 1:
-                    chunk_position_bonus = 1.1  # Slight boost for document conclusions
-                
-            # Adjusted length bonus to better handle chunks
-            length_bonus = min(1.1, max(0.9, text_length / 500)) * chunk_position_bonus
-            
-            # Term matching score
-            query_terms = set(query.lower().split())
-            content_terms = set((faq.question + " " + faq.answer).lower().split())
-            term_overlap = len(query_terms & content_terms) / len(query_terms) if query_terms else 0
-            
-            # Semantic relevance weights
-            semantic_weight = 0.5  # Cosine similarity
-            structural_weight = 0.3  # L2 distance
-            term_weight = 0.2  # Term matching
-            
-            # Calculate comprehensive score
-            combined_score = (
-                (cosine_sim * semantic_weight) +
-                (l2_sim * structural_weight) +
-                (term_overlap * term_weight)
-            ) * length_bonus
-            
-            # Apply additional relevance boosting
-            if any(term.lower() in faq.question.lower() for term in query.split()):
-                combined_score *= 1.3  # Higher boost for question matches
-            
-            if any(term.lower() in faq.answer.lower() for term in query.split()):
-                combined_score *= 1.2  # Boost for answer matches
-            
-            if combined_score >= min_similarity:
-                print(f"\n[DEBUG] Found relevant FAQ:")
-                print(f"Question: {faq.question[:100]}...")
-                print(f"Answer length: {len(faq.answer)} chars")
-                print(f"Semantic similarity: {cosine_sim:.3f}")
-                print(f"Structural similarity: {l2_sim:.3f}")
-                print(f"Length bonus: {length_bonus:.3f}")
-                print(f"Final score: {combined_score:.3f}")
-                
+        for chunk in chunks:
+            cosine_sim = 1 - float(chunk.similarity)
+            if cosine_sim >= min_similarity:
                 results.append({
-                    'question': faq.question,
-                    'answer': faq.answer,
-                    'similarity': combined_score,
+                    'content': chunk.content,
+                    'similarity': cosine_sim,
                     'metadata': {
-                        'cosine_similarity': f"{cosine_sim:.3f}",
-                        'l2_similarity': f"{l2_sim:.3f}",
-                        'file_type': faq.file_type,
-                        'created_at': faq.created_at.isoformat(),
-                        'source': faq.file_path.split('/')[-1] if faq.file_path else 'Direct Input',
-                        'length': text_length,
-                        'confidence': f"{combined_score:.1%}",
-                        'relevance_boost': 'Yes' if combined_score > min_similarity * 1.2 else 'No'
+                        'file_name': chunk.knowledge_file.file_name,
+                        'position': chunk.position,
+                        'created_at': chunk.created_at.isoformat(),
+                        'confidence': f"{cosine_sim:.1%}"
                     }
                 })
-            else:
-                print(f"[DEBUG] Skipping FAQ (score too low: {combined_score:.3f})")
-        
-        # Return top K results after reranking
-        return sorted(results, key=lambda x: x['similarity'], reverse=True)[:top_k]
+
+        return results
         
     except Exception as e:
         print(f"[ERROR] Failed to search knowledge base: {str(e)}")

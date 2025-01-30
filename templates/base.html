@@ -186,8 +186,13 @@
             const fileItem = template.content.cloneNode(true);
             fileItem.querySelector('.filename').textContent = file.name;
             fileItem.querySelector('.file-info').textContent = formatFileSize(file.size);
-            fileItem.querySelector('.file-item').dataset.fileId = file.file_id;
-            fileItem.querySelector('.delete-file').dataset.fileId = file.file_id;
+            fileItem.querySelector('.file-item').dataset.fileId = file.id;  // Use file.id
+            fileItem.querySelector('.delete-file').onclick = function() {
+                deleteFile(businessId, file.id);
+            };
+            fileItem.querySelector('.preview-file').onclick = function() {
+                previewFile(businessId, file.id);
+            };
             fileList.appendChild(fileItem);
         });
     }

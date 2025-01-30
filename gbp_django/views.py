@@ -1100,19 +1100,23 @@ def preview_file(request, business_id, file_id):
             deleted_at__isnull=True
         )
 
-        if request.method == "GET":
-            response_data = {
-                'status': 'success',
-                'file': {
-                    'id': knowledge_file.id,
-                    'name': knowledge_file.file_name,
-                    'content': knowledge_file.content,
-                    'type': knowledge_file.file_type,
-                    'created_at': knowledge_file.uploaded_at.isoformat(),
-                    'size': knowledge_file.file_size
-                }
+    if request.method == "GET":
+        # Fetch the first few chunks for preview
+        preview_chunks = knowledge_file.chunks.order_by('position')[:5]
+        preview_content = '\n\n'.join([chunk.content for chunk in preview_chunks])
+
+        response_data = {
+            'status': 'success',
+            'file': {
+                'id': knowledge_file.id,
+                'name': knowledge_file.file_name,
+                'content': preview_content,  # Use the preview content
+                'type': knowledge_file.file_type,
+                'created_at': knowledge_file.uploaded_at.isoformat(),
+                'size': knowledge_file.file_size
             }
-            return JsonResponse(response_data)
+        }
+        return JsonResponse(response_data)
 
         elif request.method == "DELETE":
             knowledge_file.deleted_at = timezone.now()
