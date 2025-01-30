@@ -5,19 +5,17 @@ from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ, KnowledgeChunk
 from .embeddings import generate_embedding, generate_response
 
-def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_similarity: float = 0.20) -> List[Dict[str, Any]]:
-    """Enhanced knowledge base search with comprehensive similarity scoring and metadata"""
+def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_similarity: float = 0.4) -> List[Dict[str, Any]]:
     print(f"\n[DEBUG] Searching knowledge base for query: {query}")
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
     print(f"[DEBUG] Minimum similarity threshold: {min_similarity}")
     
-    # Generate multiple query embeddings with different prompts
     query_embeddings = []
     prompts = [
-        query,  # Original query
-        f"Information about: {query}",  # Broader context
-        f"Details regarding: {query}",  # Alternative phrasing
-        f"Find content related to: {query}"  # Semantic search
+        query,
+        f"Information about: {query}",
+        f"Details regarding: {query}",
+        f"Find content related to: {query}"
     ]
     
     for prompt in prompts:
@@ -25,25 +23,20 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
         if embedding:
             query_embeddings.append(embedding)
             print(f"[DEBUG] Generated embedding for prompt: {prompt[:50]}...")
-    
+        else:
+            print(f"[WARNING] Failed to generate embedding for prompt: {prompt[:50]}")
+
     if not query_embeddings:
         print("[ERROR] Failed to generate any query embeddings")
         return []
         
     try:
-        # Get business and validate existence
-        try:
-            business = Business.objects.get(business_id=business_id)
-            print(f"[DEBUG] Found business: {business.business_name}")
-        except Business.DoesNotExist:
-            print(f"[ERROR] Business not found with ID: {business_id}")
-            return []
+        business = Business.objects.get(business_id=business_id)
+        print(f"[DEBUG] Found business: {business.business_name}")
         
         results = []
-        min_similarity = 0.4  # Adjust threshold as needed
-
+        
         for query_embedding in query_embeddings:
-            # Get the chunks associated with the business's knowledge files
             chunks = KnowledgeChunk.objects.filter(
                 knowledge_file__business__business_id=business_id,
                 knowledge_file__deleted_at__isnull=True
@@ -54,6 +47,7 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
             for chunk in chunks:
                 cosine_sim = 1 - float(chunk.similarity)
                 if cosine_sim >= min_similarity:
+                    print(f"[DEBUG] Chunk ID: {chunk.id}, Similarity: {cosine_sim}")
                     results.append({
                         'content': chunk.content,
                         'similarity': cosine_sim,
@@ -64,50 +58,50 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
                             'confidence': f"{cosine_sim:.1%}"
                         }
                     })
+                else:
+                    print(f"[DEBUG] Chunk ID: {chunk.id} below similarity threshold: {cosine_sim}")
 
+        print(f"[DEBUG] Total relevant chunks found: {len(results)}")
         return results
         
     except Exception as e:
         print(f"[ERROR] Failed to search knowledge base: {str(e)}")
+        traceback.print_exc()
         return []
 
 def get_relevant_context(query: str, business_id: str, min_similarity: float = 0.6) -> str:
-    """Get relevant context from knowledge base with enhanced formatting and metadata"""
     print(f"\n[DEBUG] Getting relevant context for query: {query}")
-    results = search_knowledge_base(query, business_id, min_similarity=min_similarity)
-    
-    if not results:
-        print("[DEBUG] No relevant context found in knowledge base")
+    try:
+        results = search_knowledge_base(query, business_id, min_similarity=min_similarity)
+        print(f"[DEBUG] search_knowledge_base returned {len(results)} results")
+        if not results:
+            print("[DEBUG] No relevant context found in knowledge base")
+            return ""
+
+        context_parts = []
+        for i, result in enumerate(results, 1):
+            metadata = result['metadata']
+            content = result['content']
+            print(f"[DEBUG] Result {i} metadata: {metadata}")
+            # Use available metadata keys
+            context_parts.append(
+                f"[Context Block {i}]\n"
+                f"Source: {metadata.get('file_name', 'Unknown')}\n"
+                f"Position: {metadata.get('position', 'N/A')}\n"
+                f"Confidence: {metadata.get('confidence', 'N/A')}\n"
+                f"Created At: {metadata.get('created_at', 'N/A')}\n"
+                f"Content:\n{content}\n"
+                f"{'='*50}\n"
+            )
+
+        context = "\n".join(context_parts)
+        print(f"[DEBUG] Generated context length: {len(context)}")
+        return context
+
+    except Exception as e:
+        print(f"[ERROR] Exception in get_relevant_context: {str(e)}")
+        traceback.print_exc()
         return ""
-    
-    print(f"[DEBUG] Building context from {len(results)} relevant results")
-    
-    # Build comprehensive context with detailed metadata
-    context_parts = []
-    for i, result in enumerate(results, 1):
-        metadata = result['metadata']
-        
-        # Format context with rich metadata
-        context_parts.append(
-            f"[Context Block {i}]\n"
-            f"Source: {metadata['source']}\n"
-            f"Confidence: {metadata['confidence']}\n"
-            f"Semantic Similarity: {metadata['cosine_similarity']}\n"
-            f"Structural Match: {metadata['l2_similarity']}\n"
-            f"Relevance Boost: {metadata['relevance_boost']}\n"
-            f"Created: {metadata['created_at']}\n"
-            f"Length: {metadata['length']} chars\n"
-            f"\nQuestion: {result['question']}\n"
-            f"Answer: {result['answer']}\n"
-            f"{'='*50}\n"
-        )
-    
-    if not context_parts:
-        return ""
-        
-    context = "\n".join(context_parts)
-    print(f"[DEBUG] Generated context length: {len(context)}")
-    return context
 
 TASK_TEMPLATES = {
     "POST": {
@@ -123,45 +117,30 @@ TASK_TEMPLATES = {
     }
 }
 
+import traceback  # Add this import at the top
+
 def answer_question(query: str, business_id: str, chat_history: List[Dict[str, str]] = None) -> str:
     print(f"\n[INFO] Starting RAG process for query: '{query}'")
-    """Generate answer using enhanced RAG with chat history and memory"""
     try:
         print("\n[DEBUG] answer_question called with:")
         print(f"[DEBUG] Query: {query}")
         print(f"[DEBUG] Business ID: {business_id}")
-        print(f"[DEBUG] Chat history length: {len(chat_history) if chat_history else 0}")
+        print(f"[DEBUG] Chat history: {chat_history}")
 
         # Get business info
         try:
             business = Business.objects.get(business_id=business_id)
-            print(f"[DEBUG] Found business:")
-            print(f"[DEBUG] - ID: {business.id}")
-            print(f"[DEBUG] - Business ID: {business.business_id}")
-            print(f"[DEBUG] - Name: {business.business_name}")
-            print(f"[DEBUG] - User ID: {business.user_id}")
+            print(f"[DEBUG] Found business: {business.business_name}")
         except Business.DoesNotExist:
             print(f"[ERROR] No business found with ID: {business_id}")
             return "Business not found"
 
-        # Store chat history as embeddings
-        if chat_history:
-            print("[DEBUG] Processing chat history for embeddings...")
-            for msg in chat_history:
-                try:
-                    # Create FAQ entry for each message pair
-                    if msg['role'] == 'user':
-                        question = msg['content']
-                        # Find corresponding assistant response
-                        idx = chat_history.index(msg)
-                        if idx + 1 < len(chat_history) and chat_history[idx + 1]['role'] == 'assistant':
-                            answer = chat_history[idx + 1]['content']
-                            add_to_knowledge_base(business_id, question, answer)
-                            print(f"[DEBUG] Added Q&A to knowledge base: Q: {question[:50]}...")
-                except Exception as e:
-                    print(f"[WARNING] Failed to add chat history to knowledge base: {str(e)}")
-        
-        # Build structured business context
+        # Get relevant context
+        context = get_relevant_context(query, business_id)
+        print(f"[DEBUG] Retrieved context: {context}")
+
+        # Build full context for LLM
+        print("[INFO] Building context for LLM response...")
         business_context = {
             "profile": {
                 "name": business.business_name,
@@ -177,17 +156,13 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
                 "reviews": business.reviews_automation,
                 "qa": business.qa_automation,
             },
+            # Assuming you have a way to get summaries
             "content_sources": [
-                {"type": "file", "name": doc.file_name, "summary": doc.summary}
-                for doc in business.documents.all()
+                {"type": "file", "name": doc.file_name, "summary": getattr(doc, 'summary', 'No summary available')}
+                for doc in business.knowledge_files.all()
             ]
         }
 
-        # Get relevant context as a single string
-        context = get_relevant_context(query, business_id)
-        
-        # Build context with RAG results first
-        print("[INFO] Building context for LLM response...")
         full_context = (
             f"{business_context}\n\n"
             f"📚 Knowledge Base Context:\n"
@@ -209,26 +184,26 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             full_context += "No previous chat history.\n"
 
         print("[DEBUG] Final context length:", len(full_context))
-        print("[DEBUG] Context sections:", full_context.count('---'))
-        
+        print("[DEBUG] Full context:\n", full_context)
+
         # Generate response using chat history
         response = generate_response(query, full_context, chat_history)
-        
+        print("[DEBUG] Generated response:", response)
+
         # Store the interaction in chat history
         if chat_history is not None:
             chat_history.append({'role': 'user', 'content': query})
             chat_history.append({'role': 'assistant', 'content': response})
-        
+
         # Add source attribution if relevant context was found
         if context:
             response += "\n\n[Response based on business documentation and profile information]"
-        
+
         return response
-        
-    except Business.DoesNotExist:
-        return "I couldn't find information for this business."
+
     except Exception as e:
-        print(f"[ERROR] Failed to answer question: {str(e)}")
+        print(f"[ERROR] Exception in answer_question: {str(e)}")
+        traceback.print_exc()  # This will print the stack trace
         return "I apologize, but I encountered an error while trying to answer your question."
 
 def add_to_knowledge_base(business_id: str, question: str, answer: str) -> Optional[FAQ]:
