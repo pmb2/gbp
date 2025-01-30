@@ -420,11 +420,8 @@ class KnowledgeChunk(models.Model):
         on_delete=models.CASCADE,
         related_name='chunks'
     )
+    business = models.ForeignKey(Business, on_delete=models.CASCADE)
     content = models.TextField()
     embedding = VectorField()
     position = models.IntegerField()  # To maintain the order of chunks
-    created_at = models.DateTimeField(auto_now_add=True)
-    business = models.ForeignKey(Business, on_delete=models.CASCADE)
-    key = models.CharField(max_length=255)
-    value = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

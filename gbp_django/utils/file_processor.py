@@ -339,6 +339,7 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         for idx, chunk_data in enumerate(embeddings):
             KnowledgeChunk.objects.create(
                 knowledge_file=knowledge_file,
+                business=business,  # Add this line to set the business
                 content=chunk_data['text'],
                 embedding=chunk_data['embedding'],
                 position=idx
