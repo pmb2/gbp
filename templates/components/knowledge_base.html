@@ -10,7 +10,12 @@
         }
 
         fetch(`/api/business/${businessId}/files/${fileId}/preview/`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.status === 'success') {
                     const fileData = data.file;
