@@ -158,7 +158,19 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
         context = get_relevant_context(query, business_id)
         print(f"[DEBUG] Retrieved context: {context}")
 
-        # Use trimmed context
+        # Trim context to fit within token limit
+        encoding = tiktoken.encoding_for_model('gpt-3.5-turbo')  # Adjust based on your LLM
+        max_tokens = 4096  # Max tokens for gpt-3.5-turbo
+        query_tokens = len(encoding.encode(query))
+        context_tokens = len(encoding.encode(context))
+        available_tokens = max_tokens - query_tokens - 500  # Reserve tokens for response and overhead
+
+        if context_tokens > available_tokens:
+            # Trim context to fit within token limit
+            trimmed_context = encoding.decode(encoding.encode(context)[:available_tokens])
+            print(f"[DEBUG] Trimmed context to fit within token limit: {available_tokens} tokens")
+        else:
+            trimmed_context = context
         print("[INFO] Building context for LLM response...")
         business_context = {
             "profile": {
