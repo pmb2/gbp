@@ -77,6 +77,7 @@ def login(request):
         print(f"[DEBUG] User already authenticated: {request.user.email}")
         return redirect('index')
 
+    print(f"[INFO] add_knowledge called with business_id: {business_id}")
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')

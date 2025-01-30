@@ -77,7 +77,7 @@ logger = logging.getLogger(__name__)
 
 def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[str, Any]:
     """Store file content and generate embeddings with extensive error handling and chunking"""
-    logger.info(f"Starting file processing for {filename} (Business ID: {business_id})")
+    print(f"[INFO] Starting file processing for {filename} (Business ID: {business_id})")
     file_id = str(uuid.uuid4())  # Generate file ID once per file
     try:
         # Validate file size (10MB limit)

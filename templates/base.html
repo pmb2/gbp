@@ -99,6 +99,7 @@
     function handleBusinessRowDrop(event, businessId) {
         event.preventDefault();
         event.stopPropagation();
+        console.log('[INFO] handleBusinessRowDrop called with businessId:', businessId);
         const target = event.currentTarget;
         
         // Find the closest element with the data-business-id attribute
@@ -128,6 +129,8 @@
             SwitchTab(businessId, 'knowledge');
 
             const formData = new FormData();
+            console.log('[INFO] Handling files:', files);
+            console.log('[INFO] FormData entries:', Array.from(formData.entries()));
             for (let i = 0; i < files.length; i++) {
                 formData.append('files[]', files[i]);
             }
@@ -173,10 +176,12 @@
     }
 
     function updateFileList(businessId, files) {
+        console.log('[INFO] updateFileList called with files:', files);
         const fileList = document.getElementById(`file-list-${businessId}`);
         if (!fileList) return;
 
         files.forEach(file => {
+            console.log('[INFO] Adding file to list:', file.name);
             const template = document.getElementById('file-item-template');
             const fileItem = template.content.cloneNode(true);
             fileItem.querySelector('.filename').textContent = file.name;
@@ -621,7 +626,8 @@
 
     // --- Modal Functions ---
     function openSchedulerModal(businessId) {
-        console.log('Opening scheduler modal for business:', businessId);
+        console.log('[INFO] openSchedulerModal called with businessId:', businessId);
+        console.log('[INFO] closeSchedulerModal called');
         const modal = document.getElementById('schedulerModal');
         const businessIdInput = document.getElementById('businessIdInput');
         
@@ -651,7 +657,7 @@
             // Prevent body scrolling
             document.body.style.overflow = 'hidden';
             
-            console.log('Modal opened successfully');
+            console.log('[INFO] Modal opened successfully');
         } catch (error) {
             console.error('Error opening modal:', error);
         }
