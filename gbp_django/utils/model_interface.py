@@ -6,6 +6,7 @@ import openai
 from django.conf import settings
 from groq import Groq
 import logging
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -108,10 +109,10 @@ class GroqModel(LLMInterface):
         """
         try:
             print("[DEBUG] Messages sent to LLM:")
+            messages = self._prepare_messages(query, context, chat_history)
+            print("[DEBUG] Messages sent to LLM:")
             for msg in messages:
                 print(f"Role: {msg['role']}, Content: {msg['content'][:500]}...")  # Adjust content length as needed
-
-            messages = self._prepare_messages(query, context, chat_history)
             print("[DEBUG] Sending messages to Groq:")
             for msg in messages:
                 print(f"[DEBUG] Role: {msg['role']}, Content: {msg['content'][:200]}...")  # Limit content length
