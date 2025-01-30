@@ -107,6 +107,7 @@ class GroqModel(LLMInterface):
         then fall back to Ollama, then to OpenAI if needed.
         """
         try:
+            messages = self._prepare_messages(query, context, chat_history)
             print("[DEBUG] Sending messages to Groq:")
             for msg in messages:
                 print(f"[DEBUG] Role: {msg['role']}, Content: {msg['content'][:200]}...")  # Limit content length
@@ -208,7 +209,7 @@ class OllamaModel(LLMInterface):
             messages = self._prepare_messages(query, context, chat_history)
             start_time = time.time()
 
-            # Attempt the /chat endpoint first
+            print(f"[DEBUG] OllamaModel: Preparing messages for response generation")
             print(f"[DEBUG] OllamaModel: Generating embedding for text of length {len(text)}")
 
             response = requests.post(
