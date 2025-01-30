@@ -370,3 +370,4 @@ def get_embedding_model() -> LLMInterface:
         return OpenAIModel()
 
     raise ValueError("No valid embedding configuration found. Check your settings.")
+
