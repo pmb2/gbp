@@ -210,7 +210,7 @@ class OllamaModel(LLMInterface):
             start_time = time.time()
 
             print(f"[DEBUG] OllamaModel: Preparing messages for response generation")
-            print(f"[DEBUG] OllamaModel: Generating embedding for text of length {len(text)}")
+            print(f"[DEBUG] OllamaModel: Generating response for query of length {len(query)}")
 
             response = requests.post(
                 f"{self.base_url}/chat",
