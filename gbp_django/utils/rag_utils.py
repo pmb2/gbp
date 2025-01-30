@@ -1,5 +1,6 @@
 from typing import List, Dict, Any, Optional
 import numpy as np
+import tiktoken
 from django.db.models import Q
 from pgvector.django import CosineDistance, L2Distance
 from ..models import Business, FAQ, KnowledgeChunk
