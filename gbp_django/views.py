@@ -1171,9 +1171,6 @@ def add_knowledge(request, business_id):
             print(f"request.FILES keys: {list(request.FILES.keys())}")
             if request.FILES.getlist('files'):
                 files = request.FILES.getlist('files')
-            else:
-                print("[ERROR] No files uploaded in request")
-                return JsonResponse({'status': 'error', 'message': 'No files uploaded'}, status=400)
                 print(f"[INFO] Received {len(files)} files for upload")
                 results = []
                 errors = []
