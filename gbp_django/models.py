@@ -1,3 +1,4 @@
+from django.conf import settings
 from pgvector.django import VectorField
 from django.core.validators import RegexValidator
 from django.db import models

@@ -257,6 +257,10 @@ def google_oauth_callback(request):
             google_app.secret,
             callback_uri
         )
+    except KnowledgeFile.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'File not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
         print("✅ Successfully retrieved tokens")
         access_token = tokens.get('access_token')
         refresh_token = tokens.get('refresh_token')

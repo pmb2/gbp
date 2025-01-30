@@ -39,28 +39,29 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
             print(f"[ERROR] Business not found with ID: {business_id}")
             return []
         
-        # Get the chunks associated with the business's knowledge files
-        chunks = KnowledgeChunk.objects.filter(
-            knowledge_file__business__business_id=business_id,
-            knowledge_file__deleted_at__isnull=True
-        ).annotate(
-            similarity=CosineDistance('embedding', query_embedding)
-        ).order_by('similarity')[:top_k]
-
         results = []
-        for chunk in chunks:
-            cosine_sim = 1 - float(chunk.similarity)
-            if cosine_sim >= min_similarity:
-                results.append({
-                    'content': chunk.content,
-                    'similarity': cosine_sim,
-                    'metadata': {
-                        'file_name': chunk.knowledge_file.file_name,
-                        'position': chunk.position,
-                        'created_at': chunk.created_at.isoformat(),
-                        'confidence': f"{cosine_sim:.1%}"
-                    }
-                })
+        for query_embedding in query_embeddings:
+            # Get the chunks associated with the business's knowledge files
+            chunks = KnowledgeChunk.objects.filter(
+                knowledge_file__business__business_id=business_id,
+                knowledge_file__deleted_at__isnull=True
+            ).annotate(
+                similarity=CosineDistance('embedding', query_embedding)
+            ).order_by('similarity')[:top_k]
+
+            for chunk in chunks:
+                cosine_sim = 1 - float(chunk.similarity)
+                if cosine_sim >= min_similarity:
+                    results.append({
+                        'content': chunk.content,
+                        'similarity': cosine_sim,
+                        'metadata': {
+                            'file_name': chunk.knowledge_file.file_name,
+                            'position': chunk.position,
+                            'created_at': chunk.created_at.isoformat(),
+                            'confidence': f"{cosine_sim:.1%}"
+                        }
+                    })
 
         return results
         
