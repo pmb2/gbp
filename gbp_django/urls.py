@@ -22,6 +22,7 @@ urlpatterns = [
          views.dismiss_notification, name='dismiss_notification'),
     path('api/notifications/mark-all-read/',
          views.mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('api/business/<str:business_id>/knowledge/', views.add_knowledge, name='add_knowledge'),
     path('api/business/<str:business_id>/update/',
          views.update_business, name='update_business'),
     path('api/business/<str:business_id>/automation/',
