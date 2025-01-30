@@ -905,7 +905,7 @@ def index(request):
         # Only query counts for actual businesses
         if not hasattr(biz, 'no_data'):
             biz.posts_count = Post.objects.filter(business=biz).count()
-            biz.photos_count = BusinessAttribute.objects.filter(business=biz, key='photo').count()
+            biz.photos_count = biz.knowledge_files.filter(file_type__startswith='image/').count()
             biz.qanda_count = QandA.objects.filter(business=biz).count()
             biz.reviews_count = Review.objects.filter(business=biz).count()
 
