@@ -330,6 +330,13 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
 
         # Save each chunk and its embedding as a KnowledgeChunk
         for idx, chunk_data in enumerate(embeddings):
+            embedding = chunk_data['embedding']
+            if embedding is None or len(embedding) != 1536:
+                print(f"[ERROR] Invalid embedding for chunk {idx} in file {filename}")
+                continue  # Skip this chunk
+
+            print(f"[DEBUG] Valid embedding generated for chunk {idx} in file {filename}")
+
             KnowledgeChunk.objects.create(
                 knowledge_file=knowledge_file,
                 business=business,  # Add this line to set the business

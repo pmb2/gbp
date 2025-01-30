@@ -10,6 +10,9 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
     print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
     print(f"[DEBUG] Minimum similarity threshold: {min_similarity}")
     
+    print(f"[DEBUG] Business ID: {business_id}, Top K: {top_k}")
+    print(f"[DEBUG] Minimum similarity threshold: {min_similarity}")
+
     query_embeddings = []
     prompts = [
         query,
@@ -31,6 +34,14 @@ def search_knowledge_base(query: str, business_id: str, top_k: int = 20, min_sim
         return []
         
     try:
+        valid_chunks = KnowledgeChunk.objects.filter(
+            knowledge_file__business__business_id=business_id,
+            knowledge_file__deleted_at__isnull=True,
+            embedding__isnull=False
+        )
+
+        print(f"[DEBUG] Found {valid_chunks.count()} valid chunks with embeddings")
+
         business = Business.objects.get(business_id=business_id)
         print(f"[DEBUG] Found business: {business.business_name}")
         
@@ -135,7 +146,9 @@ def answer_question(query: str, business_id: str, chat_history: List[Dict[str, s
             print(f"[ERROR] No business found with ID: {business_id}")
             return "Business not found"
 
-        # Get relevant context
+        # Ensure context is not empty
+        if not context.strip():
+            context = "No relevant context found in the knowledge base."
         context = get_relevant_context(query, business_id)
         print(f"[DEBUG] Retrieved context: {context}")
 
