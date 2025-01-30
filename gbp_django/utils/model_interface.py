@@ -359,31 +359,28 @@ class OpenAIModel(LLMInterface):
 
 def get_llm_model() -> LLMInterface:
     """
-    Factory function to get the configured LLM model:
-      1) Groq if GROQ_API_KEY is set,
-      2) otherwise Ollama if OLLAMA_ENABLED,
-      3) else OpenAI if OPENAI_API_KEY,
-      4) else raise error.
+    Factory function to get the configured LLM model based on the LLM_MODEL environment variable.
     """
-    # 1) Try Groq
-    if getattr(settings, 'GROQ_API_KEY', None):
+    if settings.LLM_MODEL == 'groq':
         try:
             return GroqModel()
         except Exception as e:
             logger.warning(f"Failed to initialize Groq: {str(e)}")
-
-    # 2) If Groq not available, try Ollama
-    if getattr(settings, 'OLLAMA_ENABLED', False):
+            raise ValueError(f"Failed to initialize Groq model: {str(e)}")
+    elif settings.LLM_MODEL == 'ollama':
         try:
             return OllamaModel()
         except Exception as e:
             logger.warning(f"Failed to initialize Ollama: {str(e)}")
-
-    # 3) If Ollama not available, try OpenAI
-    if getattr(settings, 'OPENAI_API_KEY', None):
-        return OpenAIModel()
-
-    raise ValueError("No valid LLM configuration found. Check your settings.")
+            raise ValueError(f"Failed to initialize Ollama model: {str(e)}")
+    elif settings.LLM_MODEL == 'openai':
+        try:
+            return OpenAIModel()
+        except Exception as e:
+            logger.warning(f"Failed to initialize OpenAI: {str(e)}")
+            raise ValueError(f"Failed to initialize OpenAI model: {str(e)}")
+    else:
+        raise ValueError(f"Invalid LLM_MODEL '{settings.LLM_MODEL}' specified in settings")
 
 
 def get_embedding_model() -> LLMInterface:
