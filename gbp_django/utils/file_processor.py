@@ -9,7 +9,7 @@ import time
 from typing import Dict, Any, List, Optional
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from ..models import FAQ, Business
+from ..models import KnowledgeFile, Business
 from .embeddings import generate_embedding
 
 def get_file_mime_type(file_content: bytes) -> str:
@@ -320,62 +320,24 @@ def store_file_content(business_id: str, file_obj: Any, filename: str) -> Dict[s
         except Exception as e:
             raise IOError(f"Failed to store file: {str(e)}")
 
-        # Create FAQ entries for each chunk with file metadata
-        try:
-            faqs = []
-            total_chunks = len(embeddings)
-            for idx, chunk_data in enumerate(embeddings):
-                try:
-                    faq = FAQ.objects.create(
-                        business=business,
-                        question=f"[File ID: {file_id}] Content from {filename} (Part {idx + 1}/{total_chunks})",
-                        file_id=file_id,
-                        answer=chunk_data['text'],
-                        embedding=chunk_data['embedding'],
-                        file_path=saved_path,
-                        file_type=mime_type,
-                        file_size=file_size,
-                        chunk_index=idx,
-                        total_chunks=total_chunks,
-                        faq_id=str(uuid.uuid4()), # Generate unique ID
-                    )
-                    logger.debug(f"Created FAQ entry ID: {faq.id} for chunk {idx + 1} of {filename}",
-                        extra={'business_id': business_id, 'file_id': file_id, 'chunk': idx}
-                    )
-                    faqs.append(faq)
-                    print(f"[INFO] Created FAQ entry - File ID: {file_id}")
-                    print(f"[INFO]   FAQ ID: {faq.id}")
-                    print(f"[INFO]   Business ID: {business.business_id}") 
-                    print(f"[INFO]   Chunk {idx + 1}/{total_chunks}")
-                    print(f"[INFO]   File Path: {saved_path}")
-                    # Ensure business ID is properly set in both foreign key and raw field
-                    faq.business_id = business.business_id  # Set the actual string ID field
-                    faq.save(update_fields=['business_id'])
-                except Exception as chunk_error:
-                    print(f"Error creating FAQ for chunk {idx}: {str(chunk_error)}")
-                    continue
-        except Exception as e:
-            # Cleanup stored file if FAQ creation fails
-            default_storage.delete(saved_path)
-            raise ValueError(f"Failed to create FAQ entry: {str(e)}")
+        # Create KnowledgeFile instance
+        knowledge_file = KnowledgeFile.objects.create(
+            business=business,
+            file_name=filename,
+            file_path=saved_path,
+            file_type=mime_type,
+            file_size=file_size,
+            content=text_content,
+            embedding=embedding_vector  # Replace with your embedding variable
+        )
 
-        # Return summary of processed file
-        print(f"[DEBUG] File processing complete. Returning file info with id: {faqs[-1].id if faqs else None}")
-        print(f"\n[DEBUG] File processing completed successfully")
-        print(f"Generated File ID: {file_id}")
-        print(f"Total chunks processed: {len(faqs)}/{len(embeddings)}")
-        print(f"Business ID: {business_id}")
-        print(f"Stored path: {saved_path}")
-        
+        # Return file info
         return {
-            'file_id': file_id,
-            'id': faqs[-1].id if faqs else None,
+            'id': knowledge_file.id,
             'name': filename,
             'size': file_size,
             'type': mime_type,
             'path': saved_path,
-            'chunks_processed': len(faqs),
-            'total_chunks': len(embeddings)
         }
 
     except (ValueError, IOError) as e:

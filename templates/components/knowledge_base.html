@@ -4,42 +4,23 @@
     console.log('📚 knowledge_base.html: Loading knowledge base for business:', '{{ business.business_id }}');
  
     function previewFile(businessId, fileId) {
-        console.log(`[DEBUG] previewFile called with businessId: ${businessId}, fileId: ${fileId}`);
         if (!fileId || fileId === 'null') {
             console.error('Invalid file ID');
             return;
         }
-        
+
         fetch(`/api/business/${businessId}/files/${fileId}/preview/`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
                     const fileData = data.file;
-                    // Show file preview modal with content
                     const modal = document.getElementById('file-preview-modal');
                     const content = document.getElementById('file-preview-content');
                     const title = document.getElementById('file-preview-title');
-                    
+
                     title.textContent = fileData.name;
                     content.textContent = fileData.content;
-                    
-                    // Add metadata if available
-                    const metadata = document.getElementById('file-preview-metadata');
-                    if (metadata) {
-                        metadata.innerHTML = `
-                            <div class="text-sm text-gray-500">
-                                <p>Type: ${fileData.type || 'Unknown'}</p>
-                                <p>Size: ${fileData.size ? Math.round(fileData.size/1024) + 'KB' : 'Unknown'}</p>
-                                <p>Created: ${new Date(fileData.created_at).toLocaleString()}</p>
-                            </div>
-                        `;
-                    }
-                    
+
                     modal.classList.remove('hidden');
                 } else {
                     console.error('Preview failed:', data.message);
@@ -58,29 +39,28 @@
             showAlertBanner('Invalid file ID');
             return;
         }
-        
+
         if (confirm('Are you sure you want to delete this file?')) {
-            fetch(`/api/business/${businessId}/knowledge/${fileId}/`, {
+            fetch(`/api/business/${businessId}/files/${fileId}/preview/`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Remove the file item from the list
-                    const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
-                    if (fileItem) {
-                        fileItem.remove();
-                    }
-                } else {
-                    showAlertBanner('Error deleting file');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showAlertBanner('Error deleting file');
-            });
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.status === 'success') {
+                      const fileItem = document.querySelector(`[data-file-id="${fileId}"]`);
+                      if (fileItem) {
+                          fileItem.remove();
+                      }
+                  } else {
+                      showAlertBanner('Error deleting file');
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  showAlertBanner('Error deleting file');
+              });
         }
     }
     </script>
@@ -104,23 +84,23 @@
                 </button>
             </div>
             <div id="file-list-{{ business.business_id }}" class="space-y-2 mb-4 max-h-[300px] overflow-y-auto">
-                {% for faq in business.faqs.all %}
-                    {% if faq.file_path and not faq.deleted_at %}
-                        <div class="file-item flex items-center justify-between p-2 hover:bg-gray-100 rounded group" data-file-id="{{ faq.id }}">
+                {% for file in business.knowledge_files.all %}
+                    {% if not file.deleted_at %}
+                        <div class="file-item flex items-center justify-between p-2 hover:bg-gray-100 rounded group" data-file-id="{{ file.id }}">
                             <div class="flex items-center space-x-2 flex-grow">
                                 <i class="fas fa-file text-gray-400 file-icon"></i>
                                 <div class="flex-1">
-                                    <span class="filename truncate block">{{ faq.file_path|cut:"knowledge_base/"|cut:business.business_id|cut:"/" }}</span>
-                                    <span class="text-xs text-gray-500 file-info">{{ faq.file_type }} • {{ faq.created_at|date:"m/d/y" }}</span>
+                                    <span class="filename truncate block">{{ file.file_name }}</span>
+                                    <span class="text-xs text-gray-500 file-info">{{ file.file_type }} • {{ file.uploaded_at|date:"m/d/y" }}</span>
                                 </div>
                                 <div class="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                     <button class="preview-file text-blue-500 hover:text-blue-700"
-                                            onclick="previewFile('{{ business.business_id }}', '{{ faq.id }}')"
-                                            data-file-id="{{ faq.id }}">
+                                            onclick="previewFile('{{ business.business_id }}', '{{ file.id }}')"
+                                            data-file-id="{{ file.id }}">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="delete-file text-red-500 hover:text-red-700" 
-                                            onclick="deleteFile('{{ business.business_id }}', '{{ faq.file_id }}')">
+                                            onclick="deleteFile('{{ business.business_id }}', '{{ file.id }}')">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>

@@ -225,20 +225,19 @@ class QandA(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-class FAQ(models.Model):
-    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='faqs')
-    question = models.TextField()
-    answer = models.TextField()
-    embedding = VectorField(dimensions=1536)
-    file_path = models.CharField(max_length=255, null=True, blank=True)
-    file_type = models.CharField(max_length=50, null=True, blank=True)
-    file_size = models.IntegerField(null=True, blank=True)
+class KnowledgeFile(models.Model):
+    business = models.ForeignKey(Business, on_delete=models.CASCADE, related_name='knowledge_files')
+    file_name = models.CharField(max_length=255)
+    file_path = models.CharField(max_length=255)
+    file_type = models.CharField(max_length=50)
+    file_size = models.IntegerField()
+    content = models.TextField()  # To store extracted text content
+    embedding = VectorField(dimensions=1536, null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
     deleted_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.business.business_name} - {self.question[:50]}"
+        return f"{self.business.business_name} - {self.file_name}"
 
 class AutomationLog(models.Model):
     @staticmethod

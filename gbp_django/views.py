@@ -346,7 +346,7 @@ from django.contrib.auth.decorators import login_required
 import json
 
 from .utils.email_service import EmailService
-from .models import Notification, Business
+from .models import Notification, Business, KnowledgeFile
 from .api.business_management import update_business_details
 
 
@@ -1092,17 +1092,8 @@ def get_memories(request, business_id):
 
 
 def preview_file(request, business_id, file_id):
-    """
-    Preview or delete file content associated with a particular FAQ entry (i.e., "file" in the knowledge base).
-    """
     try:
-        if not file_id or str(file_id) == 'null':
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Invalid file ID'
-            }, status=400)
-
-        faq = FAQ.objects.select_related('business').get(
+        knowledge_file = KnowledgeFile.objects.get(
             id=file_id,
             business__business_id=business_id,
             business__user=request.user,
@@ -1113,44 +1104,35 @@ def preview_file(request, business_id, file_id):
             response_data = {
                 'status': 'success',
                 'file': {
-                    'id': faq.id,
-                    'name': os.path.basename(faq.file_path) if faq.file_path else 'Unknown',
-                    'content': faq.answer,
-                    'type': faq.file_type,
-                    'created_at': faq.created_at.isoformat(),
-                    'size': getattr(faq, 'file_size', None)
+                    'id': knowledge_file.id,
+                    'name': knowledge_file.file_name,
+                    'content': knowledge_file.content,
+                    'type': knowledge_file.file_type,
+                    'created_at': knowledge_file.uploaded_at.isoformat(),
+                    'size': knowledge_file.file_size
                 }
             }
             return JsonResponse(response_data)
 
         elif request.method == "DELETE":
-            faq.deleted_at = timezone.now()
-            faq.save(update_fields=['deleted_at'])
-
-            # Count remaining files
-            remaining_files = FAQ.objects.filter(
+            knowledge_file.deleted_at = timezone.now()
+            knowledge_file.save(update_fields=['deleted_at'])
+            remaining_files = KnowledgeFile.objects.filter(
                 business__business_id=business_id,
                 deleted_at__isnull=True
             ).count()
-
             return JsonResponse({
                 'status': 'success',
                 'message': 'File deleted successfully',
                 'remaining_files': remaining_files
             })
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
-        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
-
-    except FAQ.DoesNotExist:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'File not found'
-        }, status=404)
+    except KnowledgeFile.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'File not found'}, status=404)
     except Exception as e:
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
 def add_knowledge(request, business_id):
@@ -1169,124 +1151,37 @@ def add_knowledge(request, business_id):
                     'message': 'Business not found or access denied'
                 }, status=404)
 
-            # For non-DEBUG environments, ensure business is verified
-            if not settings.DEBUG and not business.is_verified:
-                return JsonResponse({
-                    'status': 'error',
-                    'message': 'Business must be verified to upload files'
-                }, status=403)
-
-            # Handle file uploads (multipart/form-data)
-            if request.content_type and 'multipart/form-data' in request.content_type:
-                if 'files[]' not in request.FILES:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'No files were uploaded'
-                    }, status=400)
-
+            if 'files[]' in request.FILES:
                 files = request.FILES.getlist('files[]')
-                if not files:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Empty file list'
-                    }, status=400)
-
                 results = []
                 errors = []
 
-                # Process each file
                 for file in files:
                     try:
-                        if not hasattr(file, 'name') or not file.name:
-                            raise ValueError("Invalid or missing filename")
-                        if not hasattr(file, 'size') or file.size == 0:
-                            raise ValueError("Empty or invalid file")
-
-                        allowed_extensions = {'.txt', '.pdf', '.doc', '.docx', '.md'}
-                        ext = os.path.splitext(file.name)[1].lower()
-                        if ext not in allowed_extensions:
-                            raise ValueError(f"Unsupported file type: {ext}")
-
-                        # Handle folder upload
-                        if hasattr(file, 'content_type') and file.content_type == 'application/x-directory':
-                            try:
-                                folder_results = process_folder(business_id, file.temporary_file_path())
-                                results.extend(folder_results)
-                            except Exception as e:
-                                errors.append({
-                                    'file': file.name,
-                                    'error': f"Folder processing failed: {str(e)}"
-                                })
-                            continue
-                        else:
-                            # Handle single file
-                            try:
-                                result = store_file_content(business_id, file, file.name)
-                                results.append(result)
-                            except ValueError as e:
-                                errors.append({
-                                    'file': file.name,
-                                    'error': str(e)
-                                })
-                            except Exception as e:
-                                errors.append({
-                                    'file': file.name,
-                                    'error': f"Unexpected error: {str(e)}"
-                                })
-                            continue
-
+                        result = store_file_content(business_id, file, file.name)
+                        results.append(result)
                     except Exception as e:
-                        errors.append({
-                            'file': getattr(file, 'name', 'unknown'),
-                            'error': f"File processing failed: {str(e)}"
-                        })
+                        errors.append({'file': file.name, 'error': str(e)})
                         continue
 
                 response_data = {
                     'status': 'success' if results else 'error',
-                    'message': (
-                            f'Processed {len(results)} files'
-                            + (f' with {len(errors)} errors' if errors else '')
-                    ),
+                    'message': f'Processed {len(results)} files with {len(errors)} errors' if errors else f'Processed {len(results)} files successfully',
                     'files': results
                 }
                 if errors:
                     response_data['errors'] = errors
 
                 return JsonResponse(response_data)
-
-            # Handle question/answer pairs (JSON)
             else:
-                data = json.loads(request.body)
-                question = data.get('question')
-                answer = data.get('answer')
+                return JsonResponse({'status': 'error', 'message': 'No files uploaded'}, status=400)
 
-                if not question or not answer:
-                    return JsonResponse({
-                        'status': 'error',
-                        'message': 'Question and answer are required'
-                    }, status=400)
-
-                faq = add_to_knowledge_base(business_id, question, answer)
-                return JsonResponse({
-                    'status': 'success',
-                    'data': {
-                        'id': faq.id,
-                        'question': faq.question,
-                        'answer': faq.answer
-                    }
-                })
-
+        except Business.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Business not found or access denied'}, status=404)
         except Exception as e:
-            return JsonResponse({
-                'status': 'error',
-                'message': f'Server error: {str(e)}'
-            }, status=500)
-
-    return JsonResponse({
-        'status': 'error',
-        'message': 'Method not allowed'
-    }, status=405)
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Method not allowed'}, status=405)
 
 
 @login_required
