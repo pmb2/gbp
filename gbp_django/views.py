@@ -2,7 +2,7 @@ import os
 import secrets
 import json
 import requests
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -1301,6 +1301,7 @@ def create_task(request, business_id):
         task_type = data.get('task_type')
         frequency = data.get('frequency')
         custom_time = data.get('custom_time')
+        content = data.get('content', '')
 
         if not task_type or not frequency:
             return JsonResponse({
@@ -1346,7 +1347,7 @@ def create_task(request, business_id):
 
         return JsonResponse({
             'status': 'success',
-            'message': message,
+            'message': 'Task created successfully',
             'task_id': task.id
         })
 
