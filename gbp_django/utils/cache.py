@@ -1,4 +1,6 @@
 import hashlib
+from functools import wraps
+from django.core.cache import cache
 
 def cache_on_arguments(timeout=300):
     def decorator(func):
