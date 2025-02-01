@@ -294,6 +294,9 @@ def google_oauth_callback(request):
         user.google_token_expiry = timezone.now() + timedelta(seconds=tokens.get('expires_in', 3600))
         user.save()
 
+        # Set the backend attribute
+        user.backend = 'django.contrib.auth.backends.ModelBackend'
+
         # Log in the user
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
