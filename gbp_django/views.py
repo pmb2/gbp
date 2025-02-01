@@ -2,7 +2,10 @@ import os
 import secrets
 import json
 import requests
+import logging
 from datetime import timedelta, datetime
+
+logger = logging.getLogger(__name__)
 
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
@@ -228,9 +231,9 @@ def google_oauth_callback(request):
     Also retrieves business accounts/locations from Google and stores them locally.
     """
     try:
-        print("\n🔄 Starting Google OAuth callback...")
-        print(f"🔍 GET params: {request.GET}")
-        print(f"🔍 Session keys: {list(request.session.keys())}")
+        logger.info("Starting Google OAuth callback...")
+        logger.debug(f"GET params: {request.GET}")
+        logger.debug(f"Session keys: {list(request.session.keys())}")
 
         code = request.GET.get('code')
         state = request.GET.get('state')
@@ -250,8 +253,8 @@ def google_oauth_callback(request):
             print("❌ Google app configuration not found!")
             raise
 
-        callback_uri = request.build_absolute_uri(reverse('google_oauth_callback'))
-        print(f"🔄 Using callback URI: {callback_uri}")
+        callback_uri = settings.GOOGLE_OAUTH2_REDIRECT_URI
+        logger.debug(f"Using callback URI: {callback_uri}")
 
         # Exchange auth code for tokens
         tokens = get_access_token(
@@ -337,18 +340,14 @@ def google_oauth_callback(request):
         messages.error(request, "Google integration is not configured. Please contact support.")
         return redirect('login')
 
-    except Exception as e:
-        print(f"[ERROR] OAuth callback error: {e}")
-        messages.error(request, "An error occurred during authentication. Please try again.")
-        return redirect('login')
-
     except SocialApp.DoesNotExist:
-        print("[ERROR] Google SocialApp is not configured.")
+        logger.error("Google SocialApp is not configured.")
         messages.error(request, "Google integration is not configured. Please contact support.")
         return redirect('login')
 
     except Exception as e:
-        print(f"[ERROR] OAuth callback error: {e}")
+        logger.error(f"OAuth callback error: {e}")
+        logger.debug(traceback.format_exc())
         messages.error(request, "An error occurred during authentication. Please try again.")
         return redirect('login')
 
