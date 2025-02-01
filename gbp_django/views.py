@@ -27,7 +27,7 @@ from .models import (
 )
 from .api.authentication import get_access_token, get_user_info
 from .api.business_management import (
-    get_business_accounts, store_business_data, get_locations
+    get_business_accounts, store_business_data, get_locations, get_user_locations
 )
 from .api.business_management import (
     get_business_accounts, store_business_data, get_locations, update_business_details
