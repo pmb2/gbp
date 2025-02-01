@@ -47,7 +47,7 @@ def get_business_accounts(access_token):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
-    max_retries = 5  # Adjust the number of retries
+    max_retries = 3  # Reduce the number of retries
     backoff_factor = 2  # Exponential backoff factor
     initial_wait = 1  # Start with 1 second wait
 
@@ -86,10 +86,10 @@ def get_business_accounts(access_token):
             if response.status_code == 429:
                 if attempt < max_retries - 1:
                     wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
-                    total_wait_time = sum(initial_wait * (backoff_factor ** i) for i in range(attempt + 1))
-                    if total_wait_time + wait_time > 100:
-                        print("[ERROR] Exceeded acceptable total wait time due to rate limiting.")
-                        return {"accounts": []}
+                    total_wait += wait_time
+                    if total_wait > 20:  # Set a maximum total wait time (in seconds)
+                        print("[ERROR] Total wait time exceeded due to rate limiting.")
+                        break
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
                 else:
@@ -99,6 +99,7 @@ def get_business_accounts(access_token):
                     return {"accounts": []}
             else:
                 print(f"[ERROR] Failed to fetch business accounts: {e}")
+                print(f"Response content: {response.text}")
                 return {"accounts": []}
         except requests.exceptions.RequestException as e:
             if attempt < max_retries - 1:
@@ -124,7 +125,7 @@ def store_business_data(business_data, user_id, access_token):
     print(f"\n🔄 [OAUTH FLOW] Starting business data storage")
     print(f"📦 [OAUTH FLOW] Raw business data keys: {list(business_data.keys())}")
     print(f"👤 [OAUTH FLOW] Storing for user_id: {user_id}")
-    print(f"🔑 [OAUTH FLOW] Access token (first 8): {access_token[:8]}...") 
+    print(f"🔑 [OAUTH FLOW] Access token (first 8): {access_token[:8]}...")
     
     stored_businesses = []
     accounts = business_data.get('accounts', []) if business_data else []
@@ -145,7 +146,6 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[DEBUG] Account data: {json.dumps(account, indent=2)}")
             print(f"   - Account Type: {account.get('type', 'unknown')}")
             print(f"   - Account Role: {account.get('role', 'unknown')}")
-                
             # Process each location within the account
             locations = account.get('locations', [])
             if locations:
@@ -187,6 +187,12 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[ERROR] Error processing account {account.get('name')}: {str(e)}")
             traceback.print_exc()
             continue
+
+    if not stored_businesses:
+        print("[ERROR] No businesses were stored. Possible causes:")
+        print(" - Rate limiting prevented data retrieval.")
+        print(" - API did not return any accounts or locations.")
+        print(" - Data mapping issues in 'store_business_data' function.")
 
 def get_locations(access_token, account_id):
     """Get detailed location information including verification status"""
