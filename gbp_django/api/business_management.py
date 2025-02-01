@@ -228,7 +228,7 @@ def store_business_data(business_data, user_id, access_token):
                     'category': location.get('primaryCategory', {}).get('displayName', 'Pending'),
                     'is_verified': location.get('locationState', {}).get('isVerified', False),
                     'description': location.get('profile', {}).get('description', '')
-                }
+                })
             else:
                 # No locations found - store with pending values
                 business_details.update({
