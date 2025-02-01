@@ -1,80 +1,6 @@
-import json
-import os
-import random
-import requests
 import time
-import secrets
-from django.conf import settings
-from ..models import Business, Notification
-from django.contrib.sessions.backends.db import SessionStore
-from gbp_django.api.authentication import refresh_access_token
-from gbp_django.utils.cache import cache_on_arguments
-from gbp_django.models import (
-    Business, Post, QandA, Review
-)
+import random
 
-def create_business_location(access_token, account_id, location_data):
-    """Create a new business location."""
-    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
-           f"{account_id}/locations")
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.post(url, headers=headers, json=location_data)
-    response.raise_for_status()
-    return response.json()
-
-
-def update_business_details(access_token, account_id, location_id, update_data):
-    """Update details for a business location."""
-    try:
-        # Format the data according to Google's API requirements
-        formatted_data = {
-            "locationName": update_data.get('business_name', ''),
-            "primaryPhone": update_data.get('phone', ''),
-            "websiteUrl": update_data.get('website', ''),
-            "primaryCategory": {"displayName": update_data.get('category', '')},
-            "address": {
-                "regionCode": "US",  # Default to US
-                "addressLines": [update_data.get('address', '')]
-            }
-        }
-
-        url = (f"https://mybusinessaccountmanagement.googleapis.com/v1/"
-               f"{account_id}/locations/{location_id}")
-        
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Use PATCH with updateMask to specify which fields to update
-        params = {
-            "updateMask": "locationName,primaryPhone,websiteUrl,primaryCategory,address"
-        }
-        
-        response = requests.patch(url, headers=headers, json=formatted_data, params=params)
-        response.raise_for_status()
-        return response.json()
-        
-    except requests.exceptions.RequestException as e:
-        print(f"API Error: {str(e)}")
-        if hasattr(e.response, 'json'):
-            error_details = e.response.json()
-            print(f"Error details: {error_details}")
-        raise
-
-
-def delete_location(access_token, account_id, location_id):
-    """Delete a business location."""
-    url = (f"https://mybusiness.googleapis.com/v4/accounts/"
-           f"{account_id}/locations/{location_id}")
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.delete(url, headers=headers)
-    response.raise_for_status()
-    return response.status_code == 204
-
-
-
-@cache_on_arguments(timeout=300)
 def get_business_accounts(access_token):
     print("\n🔄 Starting Google Business Profile accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
@@ -82,30 +8,28 @@ def get_business_accounts(access_token):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
-    retries = 3
+    max_retries = 5  # Increase the number of retries
+    backoff_factor = 2  # Exponential backoff factor
+    initial_wait = 1  # Start with 1 second wait
+
     print(f"🌐 API Request details:")
     print(f"  • URL: {url}")
-    print(f"  • Headers: {list(headers.keys())}")
-    print(f"  • Max retries: {retries}")
+    print(f"  • Headers: ['Authorization', 'Content-Type']")
+    print(f"  • Max retries: {max_retries}")
     print(f"  • Access token (first 10 chars): {access_token[:10]}...")
 
-    for attempt in range(retries):
+    for attempt in range(max_retries):
         try:
-            # Very minimal delay between attempts
-            if attempt > 0:
-                time.sleep(0.1)  # Reduced to 0.1s delay
-                print(f"[DEBUG] API retry attempt {attempt + 1}")
-            
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
-            
+
             if not data or not data.get('accounts'):
                 print("\n⚠️ [WARNING] No business accounts found in API response")
                 print("📝 Raw API response:")
                 print(data)
                 return {"accounts": []}
-            
+
             print("\n✅ Successfully retrieved business accounts!")
             print(f"📊 Found {len(data.get('accounts', []))} business accounts:")
             for idx, account in enumerate(data['accounts'], 1):
@@ -114,58 +38,35 @@ def get_business_accounts(access_token):
                 print(f"  • ID: {account.get('name', 'Unknown')}")
                 print(f"  • Type: {account.get('type', 'Unknown')}")
                 print(f"  • Role: {account.get('role', 'Unknown')}")
-            
+
             return data
         except requests.exceptions.HTTPError as e:
-            if response.status_code == 401:
-                # Token expired, refresh token
-                print("[INFO] Access token expired, attempting to refresh.")
-                session = SessionStore()
-                new_token = refresh_access_token(
-                    session.get('refresh_token'),
-                    settings.GOOGLE_OAUTH2_CLIENT_ID,
-                    settings.GOOGLE_OAUTH2_CLIENT_SECRET
-                )
-                session['google_token'] = new_token['access_token']
-                session.save()
-                headers["Authorization"] = f"Bearer {new_token['access_token']}"
-            elif response.status_code == 429:
-                # Too many requests, apply exponential backoff
-                if attempt < retries - 1:
-                    wait_time = 0.1 * (attempt + 1)  # Reduced linear backoff: 0.1s, 0.2s
-                    print(f"[INFO] Rate limit exceeded. Retrying in {wait_time} seconds...")
+            if response.status_code == 429:
+                if attempt < max_retries - 1:
+                    wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
+                    print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
-                elif response.status_code == 401:
-                    # Token expired, refresh token
-                    print("[INFO] Access token expired, attempting to refresh.")
-                    from django.contrib.sessions.backends.db import SessionStore
-                    session = SessionStore()
-                    if session.get('refresh_token'):
-                        new_token = refresh_access_token(
-                            session.get('refresh_token'),
-                            settings.GOOGLE_OAUTH2_CLIENT_ID,
-                            settings.GOOGLE_OAUTH2_CLIENT_SECRET
-                        )
-                        session['google_token'] = new_token['access_token']
-                        session.save()
-                        headers["Authorization"] = f"Bearer {new_token['access_token']}"
-                    else:
-                        raise Exception("No refresh token available. User needs to re-authenticate.")
                 else:
-                    print(f"[ERROR] Failed to fetch business accounts: {e}")
-                    return {"accounts": []}  # Return an empty structure to continue the flow
+                    print("[ERROR] Maximum retry attempts reached due to rate limiting.")
+                    print("Please try again later.")
+                    return {"accounts": []}
+            else:
+                print(f"[ERROR] Failed to fetch business accounts: {e}")
+                return {"accounts": []}
         except requests.exceptions.RequestException as e:
-            if attempt < retries - 1:
-                wait_time = 0.5 * (attempt + 1)  # Linear backoff: 0.5s, 1s
-                print(f"[INFO] Request failed. Retrying in {wait_time} seconds...")
+            if attempt < max_retries - 1:
+                wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
+                print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
             else:
-                print("[ERROR] Maximum retry attempts reached. Please try again later.")
-                raise e
+                print("[ERROR] Maximum retry attempts reached due to request failure.")
+                print(f"Error details: {str(e)}")
+                return {"accounts": []}
 
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from ..models import Business
+import traceback
 
 @transaction.atomic
 def store_business_data(business_data, user_id, access_token):
@@ -219,6 +120,10 @@ def store_business_data(business_data, user_id, access_token):
                     # Use the location 'name' as 'business_id' to ensure uniqueness
                     business_id = location.get('name')
                     
+                    print(f"Business Defaults for {business_id}:")
+                    for key, value in business_defaults.items():
+                        print(f"  - {key}: {value}")
+                    
                     business_obj, created = Business.objects.update_or_create(
                         business_id=business_id,
                         defaults=business_defaults
@@ -229,7 +134,8 @@ def store_business_data(business_data, user_id, access_token):
             else:
                 print("⚠️ No locations found for this account")
         except Exception as e:
-            print(f"Error processing account {account.get('name')}: {str(e)}")
+            print(f"[ERROR] Error processing account {account.get('name')}: {str(e)}")
+            traceback.print_exc()
             continue
 
 def get_locations(access_token, account_id):

@@ -1,19 +1,38 @@
-from django.core.cache import cache
-from functools import wraps
+import hashlib
 
 def cache_on_arguments(timeout=300):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Create a more robust cache key
-            key_parts = [
-                func.__module__,
-                func.__name__,
-                ":".join(str(arg) for arg in args),
-                ":".join(f"{k}={v}" for k, v in sorted(kwargs.items()))
-            ]
+            # Exclude access_token from cache key or hash it
+            key_parts = [func.__module__, func.__name__]
+
+            # Process args, replace access_token with its hash
+            processed_args = []
+            for arg in args:
+                if isinstance(arg, str) and len(arg) > 100:
+                    arg_hash = hashlib.sha256(arg.encode('utf-8')).hexdigest()[:10]
+                    processed_args.append(f"<hashed:{arg_hash}>")
+                else:
+                    processed_args.append(str(arg))
+
+            # Process kwargs similarly
+            processed_kwargs = {}
+            for k, v in kwargs.items():
+                if k == 'access_token':
+                    v_hash = hashlib.sha256(v.encode('utf-8')).hexdigest()[:10]
+                    processed_kwargs[k] = f"<hashed:{v_hash}>"
+                else:
+                    processed_kwargs[k] = v
+
+            key_parts.extend(processed_args)
+            key_parts.extend(f"{k}={v}" for k, v in sorted(processed_kwargs.items()))
             key = "cache:" + ":".join(key_parts)
-            
+
+            # Truncate the key if necessary
+            if len(key) > 200:
+                key = "cache:" + hashlib.sha256(key.encode('utf-8')).hexdigest()
+
             result = cache.get(key)
             if result is None:
                 result = func(*args, **kwargs)
