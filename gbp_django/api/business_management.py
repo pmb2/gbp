@@ -3,6 +3,43 @@ import random
 import requests
 import json
 
+def update_business_details(access_token, account_id, location_id, update_data):
+    """
+    Update business details on Google Business Profile.
+
+    Parameters:
+    - access_token: str, OAuth 2.0 access token.
+    - account_id: str, in the format 'accounts/ACCOUNT_ID'.
+    - location_id: str, in the format 'accounts/ACCOUNT_ID/locations/LOCATION_ID'.
+    - update_data: dict, data to update in the business profile.
+
+    Returns:
+    - dict: Response data from the API call.
+
+    Raises:
+    - requests.exceptions.HTTPError: If the API call fails.
+    """
+    print("\n🔄 Starting business details update...")
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{location_id}?updateMask={','.join(update_data.keys())}"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    print(f"🌐 API Request details:")
+    print(f"  • URL: {url}")
+    print(f"  • Headers: {headers}")
+    print(f"  • Update data: {update_data}")
+
+    try:
+        response = requests.patch(url, headers=headers, json=update_data)
+        response.raise_for_status()
+        print("✅ Business details updated successfully!")
+        return response.json()
+    except requests.exceptions.HTTPError as e:
+        print(f"[ERROR] Failed to update business details: {e}")
+        print(f"Response content: {response.text}")
+        raise
+
 def get_business_accounts(access_token):
     print("\n🔄 Starting Google Business Profile accounts fetch...")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
