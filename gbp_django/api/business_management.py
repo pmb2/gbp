@@ -47,7 +47,7 @@ def get_business_accounts(access_token):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
-    max_retries = 5  # Increase the number of retries
+    max_retries = 7  # Increase the number of retries
     backoff_factor = 2  # Exponential backoff factor
     initial_wait = 1  # Start with 1 second wait
 
@@ -67,6 +67,8 @@ def get_business_accounts(access_token):
                 print("\n⚠️ [WARNING] No business accounts found in API response")
                 print("📝 Raw API response:")
                 print(data)
+                print(f"[ERROR] Failed to fetch business accounts: {e}")
+                print(f"Response content: {response.text}")
                 return {"accounts": []}
 
             print("\n✅ Successfully retrieved business accounts!")
@@ -88,6 +90,7 @@ def get_business_accounts(access_token):
                 else:
                     print("[ERROR] Maximum retry attempts reached due to rate limiting.")
                     print("Please try again later.")
+                    print("Please try again later.")
                     return {"accounts": []}
             else:
                 print(f"[ERROR] Failed to fetch business accounts: {e}")
@@ -97,8 +100,10 @@ def get_business_accounts(access_token):
                 wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
                 print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
+                time.sleep(wait_time)
             else:
                 print("[ERROR] Maximum retry attempts reached due to request failure.")
+                print(f"Error details: {str(e)}")
                 print(f"Error details: {str(e)}")
                 return {"accounts": []}
 
