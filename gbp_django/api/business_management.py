@@ -200,44 +200,39 @@ def store_business_data(business_data, user_id, access_token):
             print(f"   - Account Type: {account.get('type', 'unknown')}")
             print(f"   - Account Role: {account.get('role', 'unknown')}")
                 
-            # Basic business details from account
-            # Generate unique business ID if not exists
-            business_id = f"biz_{user_id}_{int(time.time())}"
-            print(f"🏷️ [OAUTH FLOW] Generated business ID: {business_id}")
-                
-            business_details = {
-                'user_id': user_id,
-                'business_id': business_id,
-                'google_account_id': account['name'],  # Store Google account ID separately
-                'business_name': account.get('accountName', 'Unnamed Business'),
-                'business_email': account.get('primaryOwner', {}).get('email', ''),
-                'is_connected': True  # Mark as connected via OAuth
-            }
-
-            # Get locations from the account data
+            # Process each location within the account
             locations = account.get('locations', [])
             if locations:
-                # Use first location's details
-                location = locations[0]
-                print(f"[DEBUG] Location data: {json.dumps(location, indent=2)}")
-                business_details.update({
-                    'google_location_id': location['name'],
-                    'address': location.get('address', {}).get('formattedAddress', 'Pending'),
-                    'phone_number': location.get('primaryPhone', 'Pending'),
-                    'website_url': location.get('websiteUrl', 'Pending'),
-                    'category': location.get('primaryCategory', {}).get('displayName', 'Pending'),
-                    'is_verified': location.get('locationState', {}).get('isVerified', False),
-                    'description': location.get('profile', {}).get('description', '')
-                })
+                for location in locations:
+                    print(f"🗺️ Processing location: {location.get('name')}")
+                    # Map API data to Business model fields
+                    business_defaults = {
+                        'user_id': user_id,
+                        'google_account_id': account['name'],
+                        'google_location_id': location['name'],
+                        'business_name': location.get('title', 'Unnamed Business'),
+                        'address': location.get('address', {}).get('formattedAddress', ''),
+                        'phone_number': location.get('primaryPhone', ''),
+                        'website_url': location.get('websiteUrl', ''),
+                        'category': location.get('primaryCategory', {}).get('displayName', ''),
+                        'description': location.get('profile', {}).get('description', ''),
+                        'is_verified': location.get('metadata', {}).get('verified', False),
+                        'profile_photo_url': location.get('profile', {}).get('profilePhotoUrl', ''),
+                        'is_connected': True,
+                    }
+                    
+                    # Use the location 'name' as 'business_id' to ensure uniqueness
+                    business_id = location.get('name')
+                    
+                    business_obj, created = Business.objects.update_or_create(
+                        business_id=business_id,
+                        defaults=business_defaults
+                    )
+                    action = 'Created' if created else 'Updated'
+                    print(f"✅ {action} business: {business_obj.business_name} (ID: {business_obj.id})")
+                    stored_businesses.append(business_obj)
             else:
-                # No locations found - store with pending values
-                business_details.update({
-                    'is_verified': False,
-                    'address': 'Pending',
-                    'phone_number': 'Pending',
-                    'website_url': 'Pending',
-                    'category': 'Pending'
-                })
+                print("⚠️ No locations found for this account")
         except Exception as e:
             print(f"Error processing account {account.get('name')}: {str(e)}")
             continue

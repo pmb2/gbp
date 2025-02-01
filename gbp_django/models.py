@@ -88,6 +88,13 @@ class Business(models.Model):
     id = models.BigAutoField(primary_key=True)
     business_id = models.CharField(max_length=255, unique=True, default='unverified')
     google_account_id = models.CharField(max_length=255, unique=True, null=True, blank=True)
+    google_location_id = models.CharField(max_length=255, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    website_url = models.TextField(null=True, blank=True)
+    category = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    profile_photo_url = models.TextField(null=True, blank=True)
     verification_status = models.CharField(
         max_length=50,
         choices=[
