@@ -302,24 +302,13 @@ def google_oauth_callback(request):
         print(f"[DEBUG] User logged in: {user.email}")
 
         # Fetch and store business data
-        print("\n🏢 Starting business data collection...")
-        print("🔍 Fetching business accounts from Google API...")
-        business_data = get_business_accounts(access_token)
-        print("✅ Initial API call successful")
+        print("🔍 Fetching locations from Google API...")
+        locations_data = get_user_locations(access_token)
+        print("✅ Locations API call successful")
 
-        # Get detailed location data for each account
-        if business_data and business_data.get('accounts'):
-            for account in business_data['accounts']:
-                print(f"\n📍 Fetching locations for account: {account.get('accountName')}")
-                locations = get_locations(access_token, account['name'])
-                if locations and locations.get('locations'):
-                    account['locations'] = locations['locations']
-                    print(f"✅ Found {len(locations['locations'])} location(s)")
-                else:
-                    account['locations'] = []
-                    print("⚠️ No locations found for this account")
-
-            # Store business data with updated account information
+        if locations_data and locations_data.get('locations'):
+            # Convert locations data into the format expected by store_business_data
+            business_data = {'locations': locations_data['locations']}
             stored_businesses = store_business_data(business_data, user.id, access_token)
             if stored_businesses:
                 print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
@@ -328,8 +317,8 @@ def google_oauth_callback(request):
                 print("⚠️ No businesses were stored")
                 messages.warning(request, "No businesses were found to import")
         else:
-            print("⚠️ No business accounts found in Google API response")
-            messages.warning(request, "No businesses were found in your Google account")
+            print("⚠️ No locations found in Google API response")
+            messages.warning(request, "No locations were found in your Google account")
 
         # Clean up session flags
         request.session['google_token'] = access_token

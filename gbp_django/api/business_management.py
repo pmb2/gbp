@@ -40,23 +40,17 @@ def update_business_details(access_token, account_id, location_id, update_data):
         print(f"Response content: {response.text}")
         raise
 
-def get_business_accounts(access_token):
-    print("\n🔄 Starting Google Business Profile accounts fetch...")
-    url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
+def get_user_locations(access_token):
+    print("\n🔄 Starting Google Business Profile locations fetch...")
+    url = "https://mybusinessbusinessinformation.googleapis.com/v1/locations"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
-    max_retries = 3  # Reduce the number of retries
-    backoff_factor = 2  # Exponential backoff factor
-    initial_wait = 1  # Start with 1 second wait
-    total_wait = 0  # Initialize total wait time
-
-    print(f"🌐 API Request details:")
-    print(f"  • URL: {url}")
-    print(f"  • Headers: ['Authorization', 'Content-Type']")
-    print(f"  • Max retries: {max_retries}")
-    print(f"  • Access token (first 10 chars): {access_token[:10]}...")
+    max_retries = 3
+    backoff_factor = 2
+    initial_wait = 1
+    total_wait = 0
 
     for attempt in range(max_retries):
         try:
@@ -64,39 +58,43 @@ def get_business_accounts(access_token):
             response.raise_for_status()
             data = response.json()
 
-            if not data or not data.get('accounts'):
-                print("\n⚠️ [WARNING] No business accounts found in API response")
+            if not data or not data.get('locations'):
+                print("\n⚠️ [WARNING] No locations found in API response")
                 print("📝 Raw API response:")
                 print(data)
-                print("\n⚠️ [WARNING] No business accounts found in API response")
-                print("📝 Raw API response:")
-                print(data)
-                return {"accounts": []}
+                return {"locations": []}
 
-            print("\n✅ Successfully retrieved business accounts!")
-            print(f"📊 Found {len(data.get('accounts', []))} business accounts:")
-            for idx, account in enumerate(data['accounts'], 1):
-                print(f"\n📍 Account {idx}:")
-                print(f"  • Name: {account.get('accountName', 'Unknown')}")
-                print(f"  • ID: {account.get('name', 'Unknown')}")
-                print(f"  • Type: {account.get('type', 'Unknown')}")
-                print(f"  • Role: {account.get('role', 'Unknown')}")
-
+            print("\n✅ Successfully retrieved locations!")
+            print(f"📊 Found {len(data.get('locations', []))} locations:")
+            for idx, location in enumerate(data['locations'], 1):
+                print(f"\n📍 Location {idx}:")
+                print(f"  • Name: {location.get('title', 'Unknown')}")
+                print(f"  • ID: {location.get('name', 'Unknown')}")
+                print(f"  • Address: {location.get('address', {}).get('formattedAddress', 'Unknown')}")
             return data
+
         except requests.exceptions.HTTPError as e:
+            response_content = response.text if response else 'No response content'
+            print(f"[ERROR] HTTPError: {e}, Response Content: {response_content}")
             if response.status_code == 429:
                 if attempt < max_retries - 1:
                     wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
                     total_wait += wait_time
-                    if total_wait > 20:  # Set a maximum total wait time (in seconds)
+                    if total_wait > 20:
                         print("[ERROR] Total wait time exceeded due to rate limiting.")
                         break
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
+                else:
+                    print("[ERROR] Maximum retry attempts reached due to rate limiting.")
+                    break
+            else:
+                break
         except requests.exceptions.RequestException as e:
             print(f"[ERROR] Request exception: {e}")
-            return {"accounts": []}
-    return {"accounts": []}  # Return empty accounts if all retries fail
+            break
+
+    return {"locations": []}
 
 from django.db import transaction
 from django.contrib.auth import get_user_model
@@ -104,71 +102,57 @@ from ..models import Business
 import traceback
 
 @transaction.atomic
-def store_business_data(business_data, user_id, access_token):
-    """Store business data from Google API response"""
+def store_business_data(locations_data, user_id, access_token):
     print(f"\n🔄 [OAUTH FLOW] Starting business data storage")
-    print(f"📦 [OAUTH FLOW] Raw business data keys: {list(business_data.keys())}")
     print(f"👤 [OAUTH FLOW] Storing for user_id: {user_id}")
     print(f"🔑 [OAUTH FLOW] Access token (first 8): {access_token[:8]}...")
     
     stored_businesses = []
-    accounts = business_data.get('accounts', []) if business_data else []
-    print(f"🏢 Found {len(accounts)} business accounts to process")
+    locations = locations_data.get('locations', [])
+    print(f"🏢 Found {len(locations)} locations to process")
 
-    # Check for empty accounts
-    if not accounts:
-        print("[WARNING] No accounts found in business data")
+    if not locations:
+        print("[WARNING] No locations found in location data")
         return stored_businesses
 
     # Retrieve the User instance
     User = get_user_model()
     user = User.objects.get(pk=user_id)
 
-    for account in accounts:
+    for location in locations:
         try:
-            print(f"\n🔍 [OAUTH FLOW] Processing Google Business account: {account.get('name')}")
-            print(f"[DEBUG] Account data: {json.dumps(account, indent=2)}")
-            print(f"   - Account Type: {account.get('type', 'unknown')}")
-            print(f"   - Account Role: {account.get('role', 'unknown')}")
-            # Process each location within the account
-            locations = account.get('locations', [])
-            if locations:
-                for location in locations:
-                    print(f"🗺️ Processing location: {location.get('name')}")
-                    # Map API data to Business model fields
-                    business_defaults = {
-                        'user': user,
-                        'google_account_id': account['name'],
-                        'google_location_id': location['name'],
-                        'business_name': location.get('title', 'Unnamed Business'),
-                        'address': location.get('address', {}).get('formattedAddress', ''),
-                        'phone_number': location.get('primaryPhone', ''),
-                        'website_url': location.get('websiteUrl', ''),
-                        'category': location.get('primaryCategory', {}).get('displayName', ''),
-                        'description': location.get('profile', {}).get('description', ''),
-                        'is_verified': location.get('metadata', {}).get('verified', False),
-                        'profile_photo_url': location.get('profile', {}).get('profilePhotoUrl', ''),
-                        'is_connected': True,
-                    }
-                    
-                    # Use the location 'name' as 'business_id' to ensure uniqueness
-                    business_id = location.get('name')
-                    
-                    print(f"Business Defaults for {business_id}:")
-                    for key, value in business_defaults.items():
-                        print(f"  - {key}: {value}")
-                    
-                    business_obj, created = Business.objects.update_or_create(
-                        business_id=business_id,
-                        defaults=business_defaults
-                    )
-                    action = 'Created' if created else 'Updated'
-                    print(f"✅ {action} business: {business_obj.business_name} (ID: {business_obj.id})")
-                    stored_businesses.append(business_obj)
-            else:
-                print("⚠️ No locations found for this account")
+            print(f"\n🗺️ Processing location: {location.get('name')}")
+            # Map API data to Business model fields
+            business_defaults = {
+                'user': user,
+                'google_location_id': location['name'],
+                'business_name': location.get('title', 'Unnamed Business'),
+                'address': location.get('address', {}).get('formattedAddress', ''),
+                'phone_number': location.get('regularPhone', ''),
+                'website_url': location.get('websiteUrl', ''),
+                'category': location.get('primaryCategory', {}).get('displayName', ''),
+                'description': location.get('profile', {}).get('description', ''),
+                'is_verified': location.get('metadata', {}).get('verificationState', '') == 'VERIFIED',
+                'profile_photo_url': location.get('profile', {}).get('profilePhotoUrl', ''),
+                'is_connected': True,
+            }
+            
+            # Use the location 'name' as 'business_id' to ensure uniqueness
+            business_id = location.get('name')
+            
+            print(f"Business Defaults for {business_id}:")
+            for key, value in business_defaults.items():
+                print(f"  - {key}: {value}")
+            
+            business_obj, created = Business.objects.update_or_create(
+                business_id=business_id,
+                defaults=business_defaults
+            )
+            action = 'Created' if created else 'Updated'
+            print(f"✅ {action} business: {business_obj.business_name} (ID: {business_obj.id})")
+            stored_businesses.append(business_obj)
         except Exception as e:
-            print(f"[ERROR] Error processing account {account.get('name')}: {str(e)}")
+            print(f"[ERROR] Error processing location {location.get('name')}: {str(e)}")
             traceback.print_exc()
             continue
 
