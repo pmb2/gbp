@@ -294,11 +294,43 @@ def google_oauth_callback(request):
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
 
-# Log in the user
-auth_login(request, user)
-print(f"[DEBUG] User logged in: {user.email}")
+        # Fetch and store business data
+        print("\n🏢 Starting business data collection...")
+        print("🔍 Fetching business accounts from Google API...")
+        business_data = get_business_accounts(access_token)
+        print("✅ Initial API call successful")
 
-# Fetch and store business data
+        # Get detailed location data for each account
+        if business_data and business_data.get('accounts'):
+            for account in business_data['accounts']:
+                print(f"\n📍 Fetching locations for account: {account.get('accountName')}")
+                locations = get_locations(access_token, account['name'])
+                if locations and locations.get('locations'):
+                    account['locations'] = locations['locations']
+                    print(f"✅ Found {len(locations['locations'])} location(s)")
+                else:
+                    account['locations'] = []
+                    print("⚠️ No locations found for this account")
+
+            # Store business data with updated account information
+            stored_businesses = store_business_data(business_data, user.id, access_token)
+            if stored_businesses:
+                print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
+                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+            else:
+                print("⚠️ No businesses were stored")
+                messages.warning(request, "No businesses were found to import")
+        else:
+            print("⚠️ No business accounts found in Google API response")
+            messages.warning(request, "No businesses were found in your Google account")
+
+        # Clean up session flags
+        request.session['google_token'] = access_token
+        if refresh_token:
+            request.session['refresh_token'] = refresh_token
+        request.session.pop('oauth_state', None)
+
+        return redirect('index')
 print("\n🏢 Starting business data collection...")
 print("🔍 Fetching business accounts from Google API...")
 business_data = get_business_accounts(access_token)
