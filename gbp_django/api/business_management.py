@@ -47,7 +47,7 @@ def get_business_accounts(access_token):
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
     }
-    max_retries = 7  # Increase the number of retries
+    max_retries = 5  # Adjust the number of retries
     backoff_factor = 2  # Exponential backoff factor
     initial_wait = 1  # Start with 1 second wait
 
@@ -86,6 +86,10 @@ def get_business_accounts(access_token):
             if response.status_code == 429:
                 if attempt < max_retries - 1:
                     wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
+                    total_wait_time = sum(initial_wait * (backoff_factor ** i) for i in range(attempt + 1))
+                    if total_wait_time + wait_time > 100:
+                        print("[ERROR] Exceeded acceptable total wait time due to rate limiting.")
+                        return {"accounts": []}
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
                 else:
@@ -100,7 +104,9 @@ def get_business_accounts(access_token):
             if attempt < max_retries - 1:
                 wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
                 print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
-                time.sleep(wait_time)
+                    time.sleep(wait_time)
+                wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
+                print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
             else:
                 print("[ERROR] Maximum retry attempts reached due to request failure.")
