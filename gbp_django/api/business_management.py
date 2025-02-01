@@ -92,9 +92,9 @@ def get_business_accounts(access_token):
                         break
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
-            except requests.exceptions.RequestException as e:
-                print(f"[ERROR] Request exception: {e}")
-                return {"accounts": []}
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] Request exception: {e}")
+            return {"accounts": []}
     return {"accounts": []}  # Return empty accounts if all retries fail
 
 from django.db import transaction
