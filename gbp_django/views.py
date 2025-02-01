@@ -298,37 +298,24 @@ def google_oauth_callback(request):
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
 
-        # Fetch user accounts
-        print("🔍 Fetching accounts from Google API...")
-        accounts_data = get_user_accounts(access_token)
-        print("✅ Accounts API call successful")
+        # Fetch locations directly
+        print("🔍 Fetching locations from Google API...")
+        locations_data = get_user_locations(access_token)
+        print("✅ Locations API call successful")
 
-        if accounts_data and accounts_data.get('accounts'):
-            for account in accounts_data['accounts']:
-                account_name = account['name']  # e.g., "accounts/1234567890"
-
-                # Fetch locations for the current account
-                print(f"🔍 Fetching locations for account {account_name}...")
-                locations_data = get_user_locations(access_token, account_name)
-                print("✅ Locations API call successful for account:", account_name)
-
-                if locations_data and locations_data.get('locations'):
-                    # Convert locations data into the expected format
-                    business_data = {'locations': locations_data['locations']}
-                    stored_businesses = store_business_data(business_data, user.id, access_token)
-                    if stored_businesses:
-                        print(f"✅ Successfully stored {len(stored_businesses)} business(es) for account {account_name}")
-                        messages.success(request, f"Successfully linked {len(stored_businesses)} business(es) for account {account_name}")
-                    else:
-                        print("⚠️ No businesses were stored for this account")
-                        messages.warning(request, f"No businesses were found in account {account_name}")
-                else:
-                    print(f"⚠️ No locations found in Google API response for account {account_name}")
-                    messages.warning(request, f"No locations were found in your Google account {account_name}")
-
+        if locations_data and locations_data.get('locations'):
+            # Convert locations data into the expected format
+            business_data = {'locations': locations_data['locations']}
+            stored_businesses = store_business_data(business_data, user.id, access_token)
+            if stored_businesses:
+                print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
+                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+            else:
+                print("⚠️ No businesses were stored")
+                messages.warning(request, "No businesses were found to import")
         else:
-            print("⚠️ No accounts found in your Google account")
-            messages.warning(request, "No accounts were found in your Google account")
+            print("⚠️ No locations found in Google API response")
+            messages.warning(request, "No locations were found in your Google account")
 
         # Clean up session flags
         request.session['google_token'] = access_token
