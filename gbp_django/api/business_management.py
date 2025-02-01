@@ -192,19 +192,18 @@ def store_business_data(business_data, user_id, access_token):
         google_email = None
         print("⚠️ No Google social account found")
 
-    # Process each account from Google API
     for account in accounts:
         try:
             print(f"\n🔍 [OAUTH FLOW] Processing Google Business account: {account.get('name')}")
             print(f"[DEBUG] Account data: {json.dumps(account, indent=2)}")
             print(f"   - Account Type: {account.get('type', 'unknown')}")
             print(f"   - Account Role: {account.get('role', 'unknown')}")
-            
+                
             # Basic business details from account
             # Generate unique business ID if not exists
             business_id = f"biz_{user_id}_{int(time.time())}"
             print(f"🏷️ [OAUTH FLOW] Generated business ID: {business_id}")
-            
+                
             business_details = {
                 'user_id': user_id,
                 'business_id': business_id,
@@ -238,6 +237,9 @@ def store_business_data(business_data, user_id, access_token):
                     'website_url': 'Pending',
                     'category': 'Pending'
                 })
+        except Exception as e:
+            print(f"Error processing account {account.get('name')}: {str(e)}")
+            continue
 
 def get_locations(access_token, account_id):
     """Get detailed location information including verification status"""
