@@ -138,6 +138,8 @@ SUPPORT_EMAIL_SUBJECT_PREFIX = '[SUPPORT/FEEDBACK]'
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 LLM_MODEL = os.getenv('LLM_MODEL', 'groq')  # 'groq' or 'ollama'
 
+SOCIALACCOUNT_ADAPTER = 'gbp_django.adapters.CustomSocialAccountAdapter'
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': [
