@@ -9,7 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.root_view, name='root'),
     path('dashboard/', login_required(views.index), name='index'),
-    path('accounts/', include('allauth.urls')),
     path('login/', views.login, name='login'),
     path('google/callback/', views.google_oauth_callback, name='google_oauth_callback'),
     path('register/', views.register, name='register'),

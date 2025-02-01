@@ -23,11 +23,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # Custom adapter for handling multiple social apps
-SOCIALACCOUNT_ADAPTER = 'gbp_django.adapters.CustomSocialAccountAdapter'
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,10 +37,6 @@ INSTALLED_APPS = [
     'gbp_django.templatetags',  # Add templatetags
     'django.contrib.sites',  # Add this if not present
     'django_extensions',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',  # Add the Google provider
 ]
 
 MIDDLEWARE = [
