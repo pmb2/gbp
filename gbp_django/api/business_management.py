@@ -177,6 +177,11 @@ def store_business_data(business_data, user_id, access_token):
     accounts = business_data.get('accounts', []) if business_data else []
     print(f"🏢 Found {len(accounts)} business accounts to process")
 
+    # Check for empty accounts
+    if not accounts:
+        print("[WARNING] No accounts found in business data")
+        return stored_businesses
+
     # Get user's Google email from social account
     from allauth.socialaccount.models import SocialAccount
     try:
@@ -191,6 +196,7 @@ def store_business_data(business_data, user_id, access_token):
     for account in accounts:
         try:
             print(f"\n🔍 [OAUTH FLOW] Processing Google Business account: {account.get('name')}")
+            print(f"[DEBUG] Account data: {json.dumps(account, indent=2)}")
             print(f"   - Account Type: {account.get('type', 'unknown')}")
             print(f"   - Account Role: {account.get('role', 'unknown')}")
             
@@ -213,6 +219,7 @@ def store_business_data(business_data, user_id, access_token):
             if locations:
                 # Use first location's details
                 location = locations[0]
+                print(f"[DEBUG] Location data: {json.dumps(location, indent=2)}")
                 business_details.update({
                     'google_location_id': location['name'],
                     'address': location.get('address', {}).get('formattedAddress', 'Pending'),
@@ -232,13 +239,6 @@ def store_business_data(business_data, user_id, access_token):
                     'category': 'Pending'
                 })
 
-            # Get the Google email from the user's social account
-            from allauth.socialaccount.models import SocialAccount
-            try:
-                social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
-                google_email = social_account.extra_data.get('email')
-            except SocialAccount.DoesNotExist:
-                google_email = None
 
             # Try to find existing business by Google email first
             existing_business = None
@@ -277,6 +277,7 @@ def store_business_data(business_data, user_id, access_token):
                 existing_business.save()
                 business = existing_business
                 print(f"✅ Updated existing business: {business.business_name}")
+                stored_businesses.append(business)
             else:
                 # Create new business
                 print("🆕 [OAUTH FLOW] Creating new business record")
@@ -296,6 +297,7 @@ def store_business_data(business_data, user_id, access_token):
                     user_id=user_id
                 )
                 print(f"🆕 Created new business: {business.business_name}")
+                stored_businesses.append(business)
 
         except Exception as e:
             print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
@@ -356,190 +358,6 @@ def store_business_data(business_data, user_id, access_token):
             print(f"[WARNING] Failed to create notification: {str(e)}")
         
         stored_businesses = [business]
-        return stored_businesses
-
-    # Process each account's business data
-    
-    if not accounts:
-        print("[WARNING] No accounts found in business data")
-        # Create unvalidated business entry
-        timestamp = int(time.time())
-        business_id = f"unvalidated-{user_id}-{timestamp}"
-        
-        business = Business.objects.create(
-            user_id=user_id,
-            business_id=business_id,
-            business_name="Unvalidated Business",
-            business_email="pending@verification.com",
-            is_verified=False,
-            email_verification_pending=True,
-            email_verification_token=secrets.token_urlsafe(32),
-            address='Pending verification',
-            phone_number='Pending verification',
-            website_url='Pending verification',
-            category='Pending verification',
-            email_settings='{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
-            automation_status='Active'
-        )
-        
-        # Create notification
-        Notification.objects.create(
-            user_id=user_id,
-            message="Please complete your business profile to get started."
-        )
-        
-        stored_businesses = [business]
-        return stored_businesses
-        
-    for account in accounts:
-        try:
-            # Get locations for this account
-            locations = get_locations(access_token, account['name'])
-            
-            if locations.get('locations'):
-                for location in locations['locations']:
-                    # Extract business details with enhanced data
-                    business_details = {
-                        'user_id': user_id,
-                        'business_name': account.get('accountName', 'Unnamed Business'),
-                        'business_id': account['name'],
-                        'business_email': account.get('primaryOwner', {}).get('email', 'pending@verification.com'),
-                        'address': location.get('address', {}).get('formattedAddress', 'No info'),
-                        'phone_number': location.get('primaryPhone', 'No info'),
-                        'website_url': location.get('websiteUrl', 'No info'),
-                        'category': location.get('primaryCategory', {}).get('displayName', 'No info'),
-                        'is_verified': location.get('locationState', {}).get('isVerified', False),
-                        'email_verification_pending': True,
-                        'email_verification_token': secrets.token_urlsafe(32),
-                        'email_settings': '{"enabled":true,"compliance_alerts":true,"content_approval":true,"weekly_summary":true,"verification_reminders":true}',
-                        'automation_status': 'Active',
-                        'description': location.get('profile', {}).get('description', '')
-                    }
-
-                    # Optionally remove or comment out the unused attributes dictionary
-                    # attributes = {
-                    #     'opening_hours': location.get('regularHours', {}),
-                    #     'special_hours': location.get('specialHours', {}),
-                    #     'service_area': location.get('serviceArea', {}),
-                    #     'labels': location.get('labels', []),
-                    #     'profile_state': location.get('profile', {}).get('state', 'COMPLETE'),
-                    #     'business_type': location.get('metadata', {}).get('businessType', ''),
-                    #     'year_established': location.get('metadata', {}).get('yearEstablished', ''),
-                    #     'employee_count': location.get('metadata', {}).get('employeeCount', '')
-                    # }
-                
-                # Try to find existing business by various identifiers
-                existing_business = None
-            
-                # Check by Google account ID
-                if account.get('name'):
-                    existing_business = Business.objects.filter(
-                        google_account_id=account['name']
-                    ).first()
-                    if existing_business:
-                        print(f"🔍 Found existing business by account ID: {account['name']}")
-
-                # Check by Google email if not found
-                if not existing_business and google_email:
-                    existing_business = Business.objects.filter(
-                        business_email=google_email
-                    ).first()
-                    if existing_business:
-                        print(f"🔍 Found existing business by email: {google_email}")
-
-                # Check by business name and user combination
-                if not existing_business:
-                    existing_business = Business.objects.filter(
-                        business_name=business_details['business_name'],
-                        user_id=user_id
-                    ).first()
-                    if existing_business:
-                        print(f"🔍 Found existing business by name and user: {business_details['business_name']}")
-
-                if existing_business:
-                    # Update existing business
-                    for key, value in business_details.items():
-                        setattr(existing_business, key, value)
-                    existing_business.is_verified = location.get('verification_state') == 'VERIFIED'
-                    existing_business.is_connected = True
-                    existing_business.google_location_id = location.get('name', '')
-                    existing_business.compliance_score = calculate_compliance_score(location)
-                    existing_business.automation_status = 'Active'
-                    existing_business.last_post_date = location.get('profile', {}).get('lastPostDate')
-                    existing_business.next_update_date = calculate_next_update(location)
-                    existing_business.user_id = user_id  # Ensure correct user association
-                    existing_business.save()
-                    business = existing_business
-                    print(f"✅ Updated existing business: {business.business_name}")
-                else:
-                    # Create new business
-                    business = Business.objects.create(
-                        **business_details,
-                        is_verified=location.get('verification_state') == 'VERIFIED',
-                        is_connected=True,
-                        google_location_id=location.get('name', ''),
-                        compliance_score=calculate_compliance_score(location),
-                        automation_status='Active',
-                        last_post_date=location.get('profile', {}).get('lastPostDate'),
-                        next_update_date=calculate_next_update(location),
-                        user_id=user_id
-                    )
-                    print(f"🆕 Created new business: {business.business_name}")
-                
-                stored_businesses.append(business)
-                print(f"[INFO] Successfully stored/updated business: {business.business_name}")
-                
-        except Exception as e:
-            print(f"[ERROR] Failed to store business data for account {account.get('name')}: {str(e)}")
-            continue
-    
-    # If no businesses were stored, create an unverified business entry
-    if not stored_businesses:
-        print("\n[DEBUG] No businesses found - creating unverified business record")
-        timestamp = int(time.time())
-        business_id = f"unverified-{user_id}-{timestamp}"
-        
-        # Get user info from social account if available
-        from allauth.socialaccount.models import SocialAccount
-        try:
-            social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
-            user_info = social_account.extra_data
-            business_name = user_info.get('name', 'My Business')
-            business_email = user_info.get('email', 'pending@verification.com')
-        except SocialAccount.DoesNotExist:
-            business_name = 'My Business'
-            business_email = 'pending@verification.com'
-            
-        unverified_business = Business.objects.create(
-            user_id=user_id,
-            business_id=business_id,
-            business_name=business_name,
-            business_email=business_email,
-            is_verified=False,
-            is_connected=True,  # Connected via OAuth but not verified
-            email_verification_pending=True,
-            email_verification_token=secrets.token_urlsafe(32),
-            address='Pending verification',
-            phone_number='Pending verification',
-            website_url='Pending verification',
-            category='Pending verification',
-            email_settings={
-                'enabled': True,
-                'compliance_alerts': True,
-                'content_approval': True,
-                'weekly_summary': True,
-                'verification_reminders': True
-            },
-            automation_status='Active'
-        )
-        
-        # Create notification for new business
-        Notification.objects.create(
-            user_id=user_id,
-            message="Please verify your business profile to unlock all features."
-        )
-        
-        stored_businesses = [unverified_business]
         
     return stored_businesses
 
