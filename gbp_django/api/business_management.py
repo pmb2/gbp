@@ -104,8 +104,7 @@ def get_business_accounts(access_token):
             if attempt < max_retries - 1:
                 wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
                 print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
-                    time.sleep(wait_time)
-                wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
+                time.sleep(wait_time)
                 print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
             else:
