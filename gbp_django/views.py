@@ -27,10 +27,7 @@ from .models import (
 )
 from .api.authentication import get_access_token, get_user_info
 from .api.business_management import (
-    get_business_accounts, store_business_data, get_locations, get_user_locations
-)
-from .api.business_management import (
-    get_business_accounts, store_business_data, get_locations, update_business_details
+    store_business_data, get_locations, get_user_locations, update_business_details
 )
 from .utils.model_interface import get_llm_model
 from .utils.rag_utils import answer_question, add_to_knowledge_base
@@ -1352,25 +1349,24 @@ def get_verification_status(request, business_id):
 
         # For real businesses, fetch data from Google
         access_token = request.user.google_access_token
-        account_data = get_business_accounts(access_token)
-        business_data = next(
-            (acc for acc in account_data.get('accounts', []) if acc['name'] == business_id),
-            None
-        )
+        # Fetch and store business data
+        print("🔍 Fetching locations from Google API...")
+        locations_data = get_user_locations(access_token)
+        print("✅ Locations API call successful")
 
-        if not business_data:
-            return JsonResponse({'error': 'Business not found'}, status=404)
-
-        status = {
-            'business_name': bool(business_data.get('accountName')),
-            'address': bool(business_data.get('address')),
-            'phone': bool(business_data.get('primaryPhone')),
-            'category': bool(business_data.get('primaryCategory')),
-            'website': bool(business_data.get('websiteUrl')),
-            'hours': bool(business_data.get('regularHours')),
-            'photos': bool(business_data.get('photos')),
-        }
-        return JsonResponse(status)
+        if locations_data and locations_data.get('locations'):
+            # Convert locations data into the format expected by store_business_data
+            business_data = {'locations': locations_data['locations']}
+            stored_businesses = store_business_data(business_data, request.user.id, access_token)
+            if stored_businesses:
+                print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
+                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+            else:
+                print("⚠️ No businesses were stored")
+                messages.warning(request, "No businesses were found to import")
+        else:
+            print("⚠️ No locations found in Google API response")
+            messages.warning(request, "No locations were found in your Google account")
 
     except Business.DoesNotExist:
         return JsonResponse({'error': 'Business not found'}, status=404)
