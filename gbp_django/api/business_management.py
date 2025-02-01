@@ -50,6 +50,7 @@ def get_business_accounts(access_token):
     max_retries = 3  # Reduce the number of retries
     backoff_factor = 2  # Exponential backoff factor
     initial_wait = 1  # Start with 1 second wait
+    total_wait = 0  # Initialize total wait time
 
     print(f"🌐 API Request details:")
     print(f"  • URL: {url}")
