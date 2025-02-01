@@ -164,6 +164,7 @@ def get_business_accounts(access_token):
                 raise e
 
 from django.db import transaction
+from django.contrib.auth import get_user_model
 from ..models import Business
 
 @transaction.atomic
@@ -183,15 +184,9 @@ def store_business_data(business_data, user_id, access_token):
         print("[WARNING] No accounts found in business data")
         return stored_businesses
 
-    # Get user's Google email from social account
-    from allauth.socialaccount.models import SocialAccount
-    try:
-        social_account = SocialAccount.objects.get(user_id=user_id, provider='google')
-        google_email = social_account.extra_data.get('email')
-        print(f"👤 Found Google account: {google_email}")
-    except SocialAccount.DoesNotExist:
-        google_email = None
-        print("⚠️ No Google social account found")
+    # Retrieve the User instance
+    User = get_user_model()
+    user = User.objects.get(pk=user_id)
 
     for account in accounts:
         try:
@@ -207,7 +202,7 @@ def store_business_data(business_data, user_id, access_token):
                     print(f"🗺️ Processing location: {location.get('name')}")
                     # Map API data to Business model fields
                     business_defaults = {
-                        'user_id': user_id,
+                        'user': user,
                         'google_account_id': account['name'],
                         'google_location_id': location['name'],
                         'business_name': location.get('title', 'Unnamed Business'),
