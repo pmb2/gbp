@@ -67,8 +67,9 @@ def get_business_accounts(access_token):
                 print("\n⚠️ [WARNING] No business accounts found in API response")
                 print("📝 Raw API response:")
                 print(data)
-                print(f"[ERROR] Failed to fetch business accounts: {e}")
-                print(f"Response content: {response.text}")
+                print("\n⚠️ [WARNING] No business accounts found in API response")
+                print("📝 Raw API response:")
+                print(data)
                 return {"accounts": []}
 
             print("\n✅ Successfully retrieved business accounts!")
