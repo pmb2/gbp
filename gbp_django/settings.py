@@ -23,6 +23,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # Custom adapter for handling multiple social apps
@@ -37,6 +38,10 @@ INSTALLED_APPS = [
     'gbp_django.templatetags',  # Add templatetags
     'django.contrib.sites',  # Add this if not present
     'django_extensions',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -163,7 +168,7 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 SOCIALACCOUNT_AUTO_SIGNUP = True
 
-SITE_ID = 4
+SITE_ID = 1  # Or the ID that matches your site in the django_sites table
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
