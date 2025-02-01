@@ -228,7 +228,7 @@ def store_business_data(business_data, user_id, access_token):
                     'category': location.get('primaryCategory', {}).get('displayName', 'Pending'),
                     'is_verified': location.get('locationState', {}).get('isVerified', False),
                     'description': location.get('profile', {}).get('description', '')
-                })
+                }
             else:
                 # No locations found - store with pending values
                 business_details.update({
@@ -237,6 +237,7 @@ def store_business_data(business_data, user_id, access_token):
                     'phone_number': 'Pending',
                     'website_url': 'Pending',
                     'category': 'Pending'
+                })
 
 def get_locations(access_token, account_id):
     """Get detailed location information including verification status"""
