@@ -92,27 +92,10 @@ def get_business_accounts(access_token):
                         break
                     print(f"[INFO] Rate limit exceeded. Retrying in {wait_time:.2f} seconds...")
                     time.sleep(wait_time)
-                else:
-                    print("[ERROR] Maximum retry attempts reached due to rate limiting.")
-                    print("Please try again later.")
-                    print("Please try again later.")
-                    return {"accounts": []}
-            else:
-                print(f"[ERROR] Failed to fetch business accounts: {e}")
-                print(f"Response content: {response.text}")
+            except requests.exceptions.RequestException as e:
+                print(f"[ERROR] Request exception: {e}")
                 return {"accounts": []}
-        except requests.exceptions.RequestException as e:
-            if attempt < max_retries - 1:
-                wait_time = initial_wait * (backoff_factor ** attempt) + random.uniform(0, 1)
-                print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
-                time.sleep(wait_time)
-                print(f"[INFO] Request failed. Retrying in {wait_time:.2f} seconds...")
-                time.sleep(wait_time)
-            else:
-                print("[ERROR] Maximum retry attempts reached due to request failure.")
-                print(f"Error details: {str(e)}")
-                print(f"Error details: {str(e)}")
-                return {"accounts": []}
+    return {"accounts": []}  # Return empty accounts if all retries fail
 
 from django.db import transaction
 from django.contrib.auth import get_user_model
