@@ -3,6 +3,37 @@ import random
 import requests
 import json
 
+def get_user_accounts(access_token):
+    print("\n🔄 Starting Google Business Profile accounts fetch...")
+    url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+
+        if not data or not data.get('accounts'):
+            print("\n⚠️ [WARNING] No accounts found in API response")
+            print("📝 Raw API response:")
+            print(data)
+            return {"accounts": []}
+
+        print("\n✅ Successfully retrieved accounts!")
+        print(f"📊 Found {len(data.get('accounts', []))} accounts:")
+        for idx, account in enumerate(data['accounts'], 1):
+            print(f"\n🧾 Account {idx}:")
+            print(f"  • Name: {account.get('name', 'Unknown')}")
+            print(f"  • Account Number: {account.get('accountNumber', 'Unknown')}")
+        return data
+
+    except requests.exceptions.RequestException as e:
+        print(f"[ERROR] Error fetching accounts data: {str(e)}")
+        return {"accounts": []}
+
 def update_business_details(access_token, account_id, location_id, update_data):
     """
     Update business details on Google Business Profile.
@@ -40,7 +71,9 @@ def update_business_details(access_token, account_id, location_id, update_data):
         print(f"Response content: {response.text}")
         raise
 
-def get_user_locations(access_token):
+def get_user_locations(access_token, account_name):
+    print(f"\n🔄 Starting locations fetch for account: {account_name}")
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_name}/locations"
     print("\n🔄 Starting Google Business Profile locations fetch...")
     url = "https://mybusinessbusinessinformation.googleapis.com/v1/locations"
     headers = {
