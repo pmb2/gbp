@@ -201,8 +201,7 @@ def direct_google_oauth(request):
         'openid',
         'https://www.googleapis.com/auth/business.manage',
         'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/business.location.readonly'
+        'https://www.googleapis.com/auth/userinfo.profile'
     ])
 
     print(f"[INFO] OAuth scopes used: {scope}")
@@ -350,11 +349,13 @@ def google_oauth_callback(request):
                 retry_count = 0
                 while retry_count < max_retries:
                     try:
+                        # Use the v4 API endpoint for locations
                         locations_response = requests.get(
-                            f'https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{account_id}/locations',
+                            f'https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations',
                             headers={
                                 'Authorization': f'Bearer {access_token}',
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
                             }
                         )
                         locations_response.raise_for_status()
