@@ -4,6 +4,7 @@ import json
 import requests
 import logging
 import traceback
+import time
 from datetime import timedelta, datetime
 
 logger = logging.getLogger(__name__)
@@ -275,34 +276,61 @@ def google_oauth_callback(request):
         print("[INFO] Fetching Google Business Profile account ID...")
         
         try:
-            # Get account ID first using v4 API
-            account_response = requests.get(
-                'https://mybusiness.googleapis.com/v4/accounts',
-                headers={
-                    'Authorization': f'Bearer {access_token}',
-                    'Content-Type': 'application/json'
-                }
-            )
-            account_response.raise_for_status()
-            print(f"[DEBUG] Account Response: {account_response.text}")
-            account_data = account_response.json()
+            # Get account ID with retries for rate limiting
+            max_retries = 3
+            retry_count = 0
+            while retry_count < max_retries:
+                try:
+                    account_response = requests.get(
+                        'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+                        headers={
+                            'Authorization': f'Bearer {access_token}',
+                            'Content-Type': 'application/json'
+                        }
+                    )
+                    account_response.raise_for_status()
+                    print(f"[DEBUG] Account Response: {account_response.text}")
+                    account_data = account_response.json()
+                    break
+                except requests.exceptions.HTTPError as e:
+                    if e.response.status_code == 429:  # Rate limit exceeded
+                        retry_count += 1
+                        if retry_count < max_retries:
+                            wait_time = int(e.response.headers.get('Retry-After', 60))
+                            print(f"[INFO] Rate limit hit, waiting {wait_time} seconds...")
+                            time.sleep(wait_time)
+                            continue
+                    raise
             
             if 'accounts' in account_data and account_data['accounts']:
                 account_id = account_data['accounts'][0]['name'].split('/')[-1]
                 print(f"[INFO] Found account ID: {account_id}")
                 
-                # Now fetch locations using v4 API
+                # Now fetch locations with retries
                 print("[INFO] Fetching business locations...")
-                locations_response = requests.get(
-                    f'https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations',
-                    headers={
-                        'Authorization': f'Bearer {access_token}',
-                        'Content-Type': 'application/json'
-                    }
-                )
-                locations_response.raise_for_status()
-                print(f"[DEBUG] Locations Response: {locations_response.text}")
-                locations_data = locations_response.json()
+                retry_count = 0
+                while retry_count < max_retries:
+                    try:
+                        locations_response = requests.get(
+                            f'https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{account_id}/locations',
+                            headers={
+                                'Authorization': f'Bearer {access_token}',
+                                'Content-Type': 'application/json'
+                            }
+                        )
+                        locations_response.raise_for_status()
+                        print(f"[DEBUG] Locations Response: {locations_response.text}")
+                        locations_data = locations_response.json()
+                        break
+                    except requests.exceptions.HTTPError as e:
+                        if e.response.status_code == 429:  # Rate limit exceeded
+                            retry_count += 1
+                            if retry_count < max_retries:
+                                wait_time = int(e.response.headers.get('Retry-After', 60))
+                                print(f"[INFO] Rate limit hit, waiting {wait_time} seconds...")
+                                time.sleep(wait_time)
+                                continue
+                        raise
                 
                 if 'locations' in locations_data:
                     print(f"[INFO] Found {len(locations_data['locations'])} locations")
