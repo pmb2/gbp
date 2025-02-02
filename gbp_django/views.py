@@ -200,7 +200,8 @@ def direct_google_oauth(request):
         'openid',
         'https://www.googleapis.com/auth/business.manage',
         'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile'
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/business.information'
     ])
 
     print(f"[INFO] OAuth scopes used: {scope}")
@@ -300,26 +301,50 @@ def google_oauth_callback(request):
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
 
-        # Fetch locations directly
-        print("[INFO] Initiating retrieval of Google Business Profile locations with access token:", access_token[:10])
-        locations_data = get_user_locations(access_token)
-        print("[INFO] Retrieved locations data:", locations_data)
-        if locations_data and locations_data.get('locations'):
-            print(f"[INFO] {len(locations_data['locations'])} locations found.")
-
-        if locations_data and locations_data.get('locations'):
-            # Convert locations data into the expected format
-            business_data = {'locations': locations_data['locations']}
-            stored_businesses = store_business_data(business_data, user.id, access_token)
-            if stored_businesses:
-                print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
-                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+        # First get the account ID
+        print("[INFO] Fetching Google Business Profile account ID...")
+        try:
+            account_response = requests.get(
+                'https://mybusiness.googleapis.com/v4/accounts',
+                headers={'Authorization': f'Bearer {access_token}'}
+            )
+            account_response.raise_for_status()
+            account_data = account_response.json()
+            
+            if 'accounts' in account_data and account_data['accounts']:
+                account_id = account_data['accounts'][0]['name'].split('/')[-1]
+                print(f"[INFO] Found account ID: {account_id}")
+                
+                # Now fetch locations using the account ID
+                print("[INFO] Fetching business locations...")
+                locations_response = requests.get(
+                    f'https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations',
+                    headers={'Authorization': f'Bearer {access_token}'}
+                )
+                locations_response.raise_for_status()
+                locations_data = locations_response.json()
+                
+                if 'locations' in locations_data:
+                    stored_businesses = store_business_data(locations_data, user.id, access_token)
+                    if stored_businesses:
+                        print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
+                        messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+                    else:
+                        print("[INFO] No businesses were stored")
+                        messages.warning(request, "No businesses were found to import")
+                else:
+                    print("⚠️ No locations found in API response")
+                    messages.warning(request, "No locations were found in your Google account")
             else:
-                print("[INFO] No businesses were stored")
-                messages.warning(request, "No businesses were found to import")
-        else:
-            print("⚠️ No locations found in Google API response")
-            messages.warning(request, "No locations were found in your Google account")
+                print("⚠️ No accounts found")
+                messages.warning(request, "No Google Business Profile account found")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] API request failed: {str(e)}")
+            if hasattr(e, 'response'):
+                print(f"Response status: {e.response.status_code}")
+                print(f"Response body: {e.response.text}")
+            messages.error(request, "Failed to fetch business details. Please try again.")
 
         # Clean up session flags
         request.session['google_token'] = access_token
@@ -331,11 +356,6 @@ def google_oauth_callback(request):
 
     except SocialApp.DoesNotExist:
         print("[ERROR] Google SocialApp is not configured.")
-        messages.error(request, "Google integration is not configured. Please contact support.")
-        return redirect('login')
-
-    except SocialApp.DoesNotExist:
-        logger.error("Google SocialApp is not configured.")
         messages.error(request, "Google integration is not configured. Please contact support.")
         return redirect('login')
 
