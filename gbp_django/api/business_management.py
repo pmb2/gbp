@@ -5,7 +5,7 @@ import json
 
 def get_business_account_id(access_token):
     print("\n[INFO] Fetching Google Business Account ID...")
-    url = "https://mybusinessbusinessinformation.googleapis.com/v1/accounts"
+    url = "https://mybusiness.googleapis.com/v4/accounts"
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
@@ -14,6 +14,8 @@ def get_business_account_id(access_token):
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         data = response.json()
+        print("[DEBUG] Full accounts API response:")
+        print(json.dumps(data, indent=2))
         accounts = data.get("accounts", [])
         if not accounts:
             print("[ERROR] No business accounts found.")
@@ -69,7 +71,7 @@ def get_user_locations(access_token):
     if not account_id:
         print("[ERROR] Unable to fetch account ID. Aborting location fetch.")
         return {"locations": []}
-    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    url = f"https://mybusiness.googleapis.com/v4/{account_id}/locations"
     print(f"\n[INFO] Fetching locations from URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -85,7 +87,8 @@ def get_user_locations(access_token):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
             data = response.json()
-
+            print("[DEBUG] Full locations API response:")
+            print(json.dumps(data, indent=2))
             if not data or not data.get('locations'):
                 print("\n⚠️ [WARNING] No locations found in API response")
                 print("📝 Raw API response:")
