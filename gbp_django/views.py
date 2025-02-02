@@ -272,10 +272,36 @@ def google_oauth_callback(request):
             messages.error(request, 'Failed to get access token.')
             return redirect('login')
 
-        # First get the account ID and business details
-        print("[INFO] Fetching Google Business Profile account ID...")
-        
+        # Validate and refresh token if needed
+        print("[INFO] Validating OAuth token...")
         try:
+            # Check token validity
+            token_info_response = requests.get(
+                'https://www.googleapis.com/oauth2/v3/tokeninfo',
+                params={'access_token': access_token}
+            )
+            
+            if token_info_response.status_code != 200:
+                print("[INFO] Access token expired or invalid, attempting refresh...")
+                if refresh_token:
+                    refresh_response = requests.post(
+                        'https://oauth2.googleapis.com/token',
+                        data={
+                            'client_id': google_app.client_id,
+                            'client_secret': google_app.secret,
+                            'refresh_token': refresh_token,
+                            'grant_type': 'refresh_token'
+                        }
+                    )
+                    if refresh_response.status_code == 200:
+                        refresh_data = refresh_response.json()
+                        access_token = refresh_data['access_token']
+                        print("[INFO] Successfully refreshed access token")
+                    else:
+                        raise Exception("Failed to refresh access token")
+                else:
+                    raise Exception("No refresh token available")
+
             # Get account ID with retries for rate limiting
             max_retries = 3
             retry_count = 0
@@ -291,6 +317,19 @@ def google_oauth_callback(request):
                     account_response.raise_for_status()
                     print(f"[DEBUG] Account Response: {account_response.text}")
                     account_data = account_response.json()
+                    
+                    # Validate required scopes
+                    token_scopes = token_info_response.json().get('scope', '').split(' ')
+                    required_scopes = [
+                        'https://www.googleapis.com/auth/business.manage',
+                        'https://www.googleapis.com/auth/userinfo.email',
+                        'https://www.googleapis.com/auth/userinfo.profile'
+                    ]
+                    
+                    missing_scopes = [scope for scope in required_scopes if scope not in token_scopes]
+                    if missing_scopes:
+                        raise Exception(f"Missing required OAuth scopes: {', '.join(missing_scopes)}")
+                    
                     break
                 except requests.exceptions.HTTPError as e:
                     if e.response.status_code == 429:  # Rate limit exceeded
