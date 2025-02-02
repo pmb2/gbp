@@ -307,10 +307,11 @@ def google_oauth_callback(request):
             while retry_count < max_retries:
                 try:
                     account_response = requests.get(
-                        'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+                        'https://mybusiness.googleapis.com/v4/accounts',
                         headers={
                             'Authorization': f'Bearer {access_token}',
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
                         }
                     )
                     account_response.raise_for_status()
