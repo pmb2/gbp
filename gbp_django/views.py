@@ -201,8 +201,11 @@ def direct_google_oauth(request):
         'https://www.googleapis.com/auth/business.manage',
         'https://www.googleapis.com/auth/userinfo.email',
         'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/mybusiness.management',
+        'https://www.googleapis.com/auth/mybusiness.account'
     ])
 
+    print(f"[INFO] OAuth scopes used: {scope}")
     # Generate and store state
     state = secrets.token_urlsafe(16)
     request.session['oauth_state'] = state
