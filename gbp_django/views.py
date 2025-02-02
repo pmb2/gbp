@@ -274,6 +274,7 @@ def google_oauth_callback(request):
         user_info = get_user_info(access_token)
         google_email = user_info.get('email')
         google_id = user_info.get('sub')
+        print(f"[INFO] Google user info retrieved: email={google_email}, id={google_id}")
 
         # Find or create the user
         user, created = User.objects.get_or_create(email=google_email)
