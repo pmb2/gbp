@@ -270,7 +270,45 @@ def google_oauth_callback(request):
             messages.error(request, 'Failed to get access token.')
             return redirect('login')
 
-        # Fetch user info from Google
+        # First get the account ID and business details
+        print("[INFO] Fetching Google Business Profile account ID...")
+        
+        try:
+            # Get account ID first
+            account_response = requests.get(
+                'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
+                headers={'Authorization': f'Bearer {access_token}'}
+            )
+            account_response.raise_for_status()
+            account_data = account_response.json()
+            
+            if 'accounts' in account_data and account_data['accounts']:
+                account_id = account_data['accounts'][0]['name'].split('/')[-1]
+                print(f"[INFO] Found account ID: {account_id}")
+                
+                # Now fetch locations using the account ID
+                print("[INFO] Fetching business locations...")
+                locations_response = requests.get(
+                    f'https://mybusinessbusinessinformation.googleapis.com/v1/accounts/{account_id}/locations',
+                    headers={'Authorization': f'Bearer {access_token}'}
+                )
+                locations_response.raise_for_status()
+                locations_data = locations_response.json()
+                
+                if 'locations' in locations_data:
+                    print(f"[INFO] Found {len(locations_data['locations'])} locations")
+                else:
+                    print("[INFO] No locations found in response")
+            else:
+                print("[INFO] No accounts found in response")
+                
+        except requests.exceptions.RequestException as e:
+            print(f"[ERROR] Failed to fetch business details: {str(e)}")
+            if hasattr(e, 'response'):
+                print(f"Response status: {e.response.status_code}")
+                print(f"Response body: {e.response.text}")
+
+        # Now fetch user info from Google
         print("👤 Fetching Google user info...")
         user_info = get_user_info(access_token)
         google_email = user_info.get('email')
@@ -300,8 +338,15 @@ def google_oauth_callback(request):
         auth_login(request, user)
         print(f"[DEBUG] User logged in: {user.email}")
 
-        # First get the account ID
-        print("[INFO] Fetching Google Business Profile account ID...")
+        # Store the business data if we found any
+        if 'locations_data' in locals() and locations_data.get('locations'):
+            stored_businesses = store_business_data(locations_data, user.id, access_token)
+            if stored_businesses:
+                print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
+                messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+            else:
+                print("[INFO] No businesses were stored")
+                messages.warning(request, "No businesses were found to import")
         try:
             account_response = requests.get(
                 'https://mybusiness.googleapis.com/v4/accounts',
