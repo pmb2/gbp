@@ -162,6 +162,8 @@ def store_business_data(locations_data, user_id, access_token):
                 'website_url': location.get('websiteUrl', ''),
                 'category': location.get('primaryCategory', {}).get('displayName', ''),
                 'description': location.get('profile', {}).get('description', ''),
+                'verification_status': location.get('verification_state', location.get('metadata', {}).get('verificationState', 'UNVERIFIED')),
+                'verification_method': location.get('verification_method', 'NONE'),
                 'is_verified': location.get('metadata', {}).get('verificationState', '') == 'VERIFIED',
                 'profile_photo_url': location.get('profile', {}).get('profilePhotoUrl', ''),
                 'is_connected': True,
@@ -195,6 +197,8 @@ def store_business_data(locations_data, user_id, access_token):
 
 def get_locations(access_token, account_id):
     """Get detailed location information including verification status"""
+    if not account_id.startswith("accounts/"):
+         account_id = f"accounts/{account_id}"
     url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
     headers = {
         "Authorization": f"Bearer {access_token}",
