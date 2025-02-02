@@ -21,12 +21,27 @@ def is_token_expired(expiry_time, buffer_minutes=5):
         logger.error(f"Error checking token expiration: {str(e)}")
         return True
 
+def validate_business_data(locations_data):
+    """Validate the structure and content of business location data"""
+    if not locations_data or not isinstance(locations_data, list):
+        logger.error("Invalid locations data structure")
+        return False
+        
+    required_fields = ['name', 'locationName', 'address', 'phoneNumbers']
+    for location in locations_data:
+        missing_fields = [field for field in required_fields if field not in location]
+        if missing_fields:
+            logger.error(f"Missing required fields: {missing_fields}")
+            return False
+    
+    return True
+
 def refresh_oauth_token(user):
     """
     Refresh OAuth token if expired or about to expire
     Returns True if token was refreshed, False if not needed
     
-    Includes enhanced validation and debugging
+    Includes enhanced validation, debugging, and business data fetching
     """
     try:
         # Enhanced token validation

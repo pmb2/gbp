@@ -8,6 +8,78 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
+def get_business_account_id(access_token):
+    """Fetch the Google Business Account ID for the authenticated user"""
+    url = "https://mybusinessbusinessinformation.googleapis.com/v1/accounts"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        logger.info("🏢 Fetching business account ID...")
+        logger.debug(f"Making request to: {url}")
+        logger.debug(f"Using token (first 10 chars): {access_token[:10]}...")
+        
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        accounts_data = response.json()
+        logger.debug(f"Accounts response: {json.dumps(accounts_data, indent=2)}")
+        
+        if not accounts_data.get('accounts'):
+            logger.warning("No business accounts found for this user")
+            return None
+            
+        account_id = accounts_data['accounts'][0]['name']
+        logger.info(f"✅ Found business account ID: {account_id}")
+        return account_id
+        
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"❌ Failed to fetch business account: {str(e)}")
+        logger.error(f"Response: {e.response.text}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Unexpected error fetching business account: {str(e)}")
+        return None
+
+def get_business_locations(access_token, account_id):
+    """Fetch all business locations for the given account"""
+    if not account_id:
+        logger.error("❌ No account ID provided")
+        return None
+        
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    
+    try:
+        logger.info(f"🏪 Fetching business locations for account: {account_id}")
+        logger.debug(f"Making request to: {url}")
+        
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        locations_data = response.json()
+        logger.debug(f"Locations response: {json.dumps(locations_data, indent=2)}")
+        
+        if not locations_data.get('locations'):
+            logger.warning("No locations found for this account")
+            return None
+            
+        logger.info(f"✅ Found {len(locations_data['locations'])} location(s)")
+        return locations_data['locations']
+        
+    except requests.exceptions.HTTPError as e:
+        logger.error(f"❌ Failed to fetch locations: {str(e)}")
+        logger.error(f"Response: {e.response.text}")
+        return None
+    except Exception as e:
+        logger.error(f"❌ Unexpected error fetching locations: {str(e)}")
+        return None
+
 def get_access_token(auth_code, client_id, client_secret, redirect_uri):
     logger.info("\n🔑 Starting OAuth token exchange...")
     url = "https://oauth2.googleapis.com/token"
@@ -65,12 +137,16 @@ def refresh_access_token(refresh_token, client_id, client_secret, redirect_uri=N
         print(f"❌ Token refresh failed: {e.response.status_code} {e.response.text}")
         raise
 def get_user_info(access_token):
-    print("\n👤 Fetching Google user info...")
+    logger.info("\n👤 Fetching Google user info...")
     url = "https://openidconnect.googleapis.com/v1/userinfo"
-    headers = {"Authorization": f"Bearer {access_token}"}
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
     
     try:
-        print(f"📡 Making userinfo request to: {url}")
+        logger.info(f"📡 Making userinfo request to: {url}")
+        logger.debug(f"Using token (first 10 chars): {access_token[:10]}...")
         response = requests.get(url, headers=headers)
         response.raise_for_status()
         user_data = response.json()
