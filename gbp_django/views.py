@@ -275,29 +275,39 @@ def google_oauth_callback(request):
         print("[INFO] Fetching Google Business Profile account ID...")
         
         try:
-            # Get account ID first
+            # Get account ID first using v4 API
             account_response = requests.get(
-                'https://mybusinessaccountmanagement.googleapis.com/v1/accounts',
-                headers={'Authorization': f'Bearer {access_token}'}
+                'https://mybusiness.googleapis.com/v4/accounts',
+                headers={
+                    'Authorization': f'Bearer {access_token}',
+                    'Content-Type': 'application/json'
+                }
             )
             account_response.raise_for_status()
+            print(f"[DEBUG] Account Response: {account_response.text}")
             account_data = account_response.json()
             
             if 'accounts' in account_data and account_data['accounts']:
                 account_id = account_data['accounts'][0]['name'].split('/')[-1]
                 print(f"[INFO] Found account ID: {account_id}")
                 
-                # Now fetch locations using the account ID
+                # Now fetch locations using v4 API
                 print("[INFO] Fetching business locations...")
                 locations_response = requests.get(
-                    f'https://mybusinessbusinessinformation.googleapis.com/v1/accounts/{account_id}/locations',
-                    headers={'Authorization': f'Bearer {access_token}'}
+                    f'https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations',
+                    headers={
+                        'Authorization': f'Bearer {access_token}',
+                        'Content-Type': 'application/json'
+                    }
                 )
                 locations_response.raise_for_status()
+                print(f"[DEBUG] Locations Response: {locations_response.text}")
                 locations_data = locations_response.json()
                 
                 if 'locations' in locations_data:
                     print(f"[INFO] Found {len(locations_data['locations'])} locations")
+                    # Store the locations data for processing after user creation
+                    request.session['locations_data'] = locations_data
                 else:
                     print("[INFO] No locations found in response")
             else:
@@ -308,6 +318,7 @@ def google_oauth_callback(request):
             if hasattr(e, 'response'):
                 print(f"Response status: {e.response.status_code}")
                 print(f"Response body: {e.response.text}")
+                print(f"Response headers: {e.response.headers}")
 
         # Now fetch user info from Google
         print("👤 Fetching Google user info...")
