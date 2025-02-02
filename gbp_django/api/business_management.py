@@ -3,6 +3,28 @@ import random
 import requests
 import json
 
+def get_business_account_id(access_token):
+    print("\n[INFO] Fetching Google Business Account ID...")
+    url = "https://mybusinessbusinessinformation.googleapis.com/v1/accounts"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        data = response.json()
+        accounts = data.get("accounts", [])
+        if not accounts:
+            print("[ERROR] No business accounts found.")
+            return None
+        account_id = accounts[0].get("name")
+        print(f"[INFO] Found account id: {account_id}")
+        return account_id
+    except Exception as e:
+        print(f"[ERROR] Failed to fetch business account id: {e}")
+        return None
+
 
 def update_business_details(access_token, account_id, location_id, update_data):
     """
@@ -42,10 +64,13 @@ def update_business_details(access_token, account_id, location_id, update_data):
         raise
 
 def get_user_locations(access_token):
-    print("\n🔄 Starting locations fetch")
-    url = "https://mybusinessbusinessinformation.googleapis.com/v1/locations"
-    print("\n🔄 Starting Google Business Profile locations fetch...")
-    url = "https://mybusinessbusinessinformation.googleapis.com/v1/locations"
+    print("\n🔄 Starting locations fetch for business locations")
+    account_id = get_business_account_id(access_token)
+    if not account_id:
+        print("[ERROR] Unable to fetch account ID. Aborting location fetch.")
+        return {"locations": []}
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    print(f"\n[INFO] Fetching locations from URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
