@@ -299,19 +299,21 @@ def google_oauth_callback(request):
         print(f"[DEBUG] User logged in: {user.email}")
 
         # Fetch locations directly
-        print("🔍 Fetching locations from Google API...")
+        print("[INFO] Initiating retrieval of Google Business Profile locations with access token:", access_token[:10])
         locations_data = get_user_locations(access_token)
-        print("✅ Locations API call successful")
+        print("[INFO] Retrieved locations data:", locations_data)
+        if locations_data and locations_data.get('locations'):
+            print(f"[INFO] {len(locations_data['locations'])} locations found.")
 
         if locations_data and locations_data.get('locations'):
             # Convert locations data into the expected format
             business_data = {'locations': locations_data['locations']}
             stored_businesses = store_business_data(business_data, user.id, access_token)
             if stored_businesses:
-                print(f"✅ Successfully stored {len(stored_businesses)} business(es)")
+                print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
                 messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
             else:
-                print("⚠️ No businesses were stored")
+                print("[INFO] No businesses were stored")
                 messages.warning(request, "No businesses were found to import")
         else:
             print("⚠️ No locations found in Google API response")

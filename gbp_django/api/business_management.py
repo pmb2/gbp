@@ -125,6 +125,20 @@ def store_business_data(locations_data, user_id, access_token):
     for location in locations:
         try:
             print(f"\n🗺️ Processing location: {location.get('name')}")
+            business_defaults = {
+                'user': user,
+                'google_location_id': location['name'],
+                'business_name': location.get('title', 'Unnamed Business'),
+                'address': location.get('address', {}).get('formattedAddress', ''),
+                'phone_number': location.get('regularPhone', ''),
+                'website_url': location.get('websiteUrl', ''),
+                'category': location.get('primaryCategory', {}).get('displayName', ''),
+                'description': location.get('profile', {}).get('description', ''),
+                'is_verified': location.get('metadata', {}).get('verificationState', '') == 'VERIFIED',
+                'profile_photo_url': location.get('profile', {}).get('profilePhotoUrl', ''),
+                'is_connected': True,
+            }
+            print(f"[INFO] Mapped business defaults: {business_defaults}")
             # Map API data to Business model fields
             business_defaults = {
                 'user': user,
@@ -152,7 +166,7 @@ def store_business_data(locations_data, user_id, access_token):
                 defaults=business_defaults
             )
             action = 'Created' if created else 'Updated'
-            print(f"✅ {action} business: {business_obj.business_name} (ID: {business_obj.id})")
+            print(f"[INFO] {action} business: {business_obj.business_name} (DB id: {business_obj.id})")
             stored_businesses.append(business_obj)
         except Exception as e:
             print(f"[ERROR] Error processing location {location.get('name')}: {str(e)}")
