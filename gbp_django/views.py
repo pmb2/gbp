@@ -200,8 +200,7 @@ def direct_google_oauth(request):
         'openid',
         'https://www.googleapis.com/auth/business.manage',
         'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/business.information'
+        'https://www.googleapis.com/auth/userinfo.profile'
     ])
 
     print(f"[INFO] OAuth scopes used: {scope}")
