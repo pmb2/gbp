@@ -4,9 +4,11 @@ from django.contrib.auth.decorators import login_required
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from allauth.account.views import LoginView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('', views.root_view, name='root'),
     path('dashboard/', login_required(views.index), name='index'),
     path('login/', views.login, name='login'),
