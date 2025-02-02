@@ -1,10 +1,15 @@
 import os
 import requests
+import logging
+from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 def get_access_token(auth_code, client_id, client_secret, redirect_uri):
-    print("\n🔑 Starting OAuth token exchange...")
+    logger.info("\n🔑 Starting OAuth token exchange...")
     url = "https://oauth2.googleapis.com/token"
     payload = {
         "code": auth_code,
@@ -31,8 +36,11 @@ def get_access_token(auth_code, client_id, client_secret, redirect_uri):
     return token_data
 
 def refresh_access_token(refresh_token, client_id, client_secret, redirect_uri=None):
-    """Refresh OAuth token with proper error handling"""
-    print("\n🔄 Refreshing access token...")
+    """
+    Refresh OAuth token with proper error handling and expiration tracking
+    Returns dict with new token info including calculated expiry timestamp
+    """
+    logger.info("\n🔄 Refreshing access token...")
     url = "https://oauth2.googleapis.com/token"
     payload = {
         "client_id": client_id,
@@ -45,8 +53,14 @@ def refresh_access_token(refresh_token, client_id, client_secret, redirect_uri=N
     try:
         response = requests.post(url, data=payload)
         response.raise_for_status()
-        print("✅ Token refresh successful")
-        return response.json()
+        token_data = response.json()
+        # Add absolute expiration timestamp
+        token_data['expiry_timestamp'] = (timezone.now() + 
+            timedelta(seconds=token_data.get('expires_in', 3600))).isoformat()
+        
+        logger.info("✅ Token refresh successful")
+        logger.debug(f"New token expires at: {token_data['expiry_timestamp']}")
+        return token_data
     except requests.exceptions.HTTPError as e:
         print(f"❌ Token refresh failed: {e.response.status_code} {e.response.text}")
         raise

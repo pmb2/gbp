@@ -7,15 +7,32 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def is_token_expired(expiry_time, buffer_minutes=5):
+    """Check if token is expired or will expire soon"""
+    if not expiry_time:
+        return True
+    
+    try:
+        if isinstance(expiry_time, str):
+            expiry_time = datetime.fromisoformat(expiry_time)
+        buffer_time = timezone.now() + timedelta(minutes=buffer_minutes)
+        return expiry_time <= buffer_time
+    except Exception as e:
+        logger.error(f"Error checking token expiration: {str(e)}")
+        return True
+
 def refresh_oauth_token(user):
     """
     Refresh OAuth token if expired or about to expire
     Returns True if token was refreshed, False if not needed
+    
+    Includes enhanced validation and debugging
     """
     try:
-        # Check if token needs refresh (within 5 minutes of expiry)
-        if not user.google_token_expiry or \
-           user.google_token_expiry - timezone.now() < timedelta(minutes=5):
+        # Enhanced token validation
+        if is_token_expired(user.google_token_expiry):
+            logger.debug(f"Token expired or near expiry for user {user.email}")
+            logger.debug(f"Current token expiry: {user.google_token_expiry}")
             
             logger.info(f"Refreshing OAuth token for user {user.email}")
             
@@ -41,6 +58,8 @@ def refresh_oauth_token(user):
                                    'google_token_expiry'])
             
             logger.info(f"Successfully refreshed token for {user.email}")
+            logger.debug(f"New token expiry: {user.google_token_expiry}")
+            logger.debug(f"Token length: {len(user.google_access_token)}")
             return True
             
         return False
