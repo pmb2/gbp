@@ -316,7 +316,7 @@ def google_oauth_callback(request):
                 if 'locations' in locations_data:
                     print(f"[INFO] Found {len(locations_data['locations'])} locations")
                     # Store the locations data
-                    stored_businesses = store_business_data(locations_data, user.id, access_token)
+                    stored_businesses = store_business_data(locations_data, request.user.id, access_token)
                     if stored_businesses:
                         print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
                         messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
