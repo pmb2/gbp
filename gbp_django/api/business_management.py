@@ -21,6 +21,8 @@ def get_account_details(access_token):
     print("\n[INFO] get_account_details: Using My Business Account Management API endpoint.")
     url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
     print(f"[DEBUG] get_account_details: GET URL: {url}")
+    if "v4/accounts" in url:
+        print("[ERROR] get_account_details: Detected deprecated endpoint in URL.")
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json"
