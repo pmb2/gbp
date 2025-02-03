@@ -376,3 +376,6 @@ def calculate_next_update(location_data):
     next_update = datetime.now() + timedelta(days=1)
     print(f"[INFO] No valid last post date found. Defaulting next update to: {next_update.isoformat()}")
     return next_update
+
+# Alias for backward compatibility
+get_locations = get_locations_with_verification
