@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 # Log the module load and path to ensure the updated module is in use.
 print(f"[INFO] business_management module loaded from: {__file__}")
+print("[INFO] Using updated endpoints: Account details -> https://mybusinessaccountmanagement.googleapis.com/v1/accounts, Locations -> https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations")
 
 
 # ======================
