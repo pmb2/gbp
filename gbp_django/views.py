@@ -285,39 +285,39 @@ def google_oauth_callback(request):
             messages.error(request, 'Required permissions not granted. Please authorize the required scopes.')
             return redirect('login')
 
-            # Fetch account details using updated function
-            print("[DEBUG] Fetching account details using get_account_details()")
-            account_data = get_account_details(access_token)
+        # Fetch account details using updated function
+        print("[DEBUG] Fetching account details using get_account_details()")
+        account_data = get_account_details(access_token)
 
-            if 'accounts' in account_data and account_data['accounts']:
-                account_id = account_data['accounts'][0]['name']
-                print(f"[INFO] Found account ID: {account_id}")
+        if 'accounts' in account_data and account_data['accounts']:
+            account_id = account_data['accounts'][0]['name']
+            print(f"[INFO] Found account ID: {account_id}")
 
-                # Fetch locations using updated function
-                print("[DEBUG] Fetching user locations using get_user_locations()")
-                locations_data = get_user_locations(access_token)
+            # Fetch locations using updated function
+            print("[DEBUG] Fetching user locations using get_user_locations()")
+            locations_data = get_user_locations(access_token)
 
-                if 'locations' in locations_data:
-                    print(f"[INFO] Found {len(locations_data['locations'])} locations")
-                    # Store the locations data
-                    stored_businesses = store_business_data(locations_data, request.user.id, access_token)
-                    if stored_businesses:
-                        print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
-                        messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
-                    else:
-                        print("[INFO] No businesses were stored")
-                        messages.warning(request, "No businesses were found to import")
+            if 'locations' in locations_data:
+                print(f"[INFO] Found {len(locations_data['locations'])} locations")
+                # Store the locations data
+                stored_businesses = store_business_data(locations_data, request.user.id, access_token)
+                if stored_businesses:
+                    print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
+                    messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
                 else:
-                    print("[INFO] No locations found in response")
+                    print("[INFO] No businesses were stored")
+                    messages.warning(request, "No businesses were found to import")
             else:
-                print("[INFO] No accounts found in response")
-                messages.warning(request, "No Google Business Profile account found")
-        except requests.exceptions.RequestException as e:
-            print(f"[ERROR] Failed to fetch business details: {str(e)}")
-            if hasattr(e, 'response'):
-                print(f"Response status: {e.response.status_code}")
-                print(f"Response body: {e.response.text}")
-                print(f"Response headers: {e.response.headers}")
+                print("[INFO] No locations found in response")
+        else:
+            print("[INFO] No accounts found in response")
+            messages.warning(request, "No Google Business Profile account found")
+    except requests.exceptions.RequestException as e:
+        print(f"[ERROR] Failed to fetch business details: {str(e)}")
+        if hasattr(e, 'response'):
+            print(f"Response status: {e.response.status_code}")
+            print(f"Response body: {e.response.text}")
+            print(f"Response headers: {e.response.headers}")
 
         # Now fetch user info from Google
         print("👤 Fetching Google user info...")
