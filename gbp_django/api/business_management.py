@@ -19,7 +19,7 @@ def get_account_details(access_token):
     This endpoint is current and works with the 'mybusiness.account' scope.
     """
     print("\n[INFO] get_account_details: Using Google Business Profile API endpoint.")
-    url = "https://businessprofile.googleapis.com/v1/accounts"
+    url = "https://mybusinessbusinessinformation.googleapis.com/v1/accounts"
     print(f"[DEBUG] get_account_details: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -66,7 +66,7 @@ def get_user_locations(access_token):
     if not account_id:
         print("[ERROR] get_user_locations: No valid account ID; cannot fetch locations.")
         return {"locations": []}
-    url = f"https://businessprofile.googleapis.com/v1/{account_id}/locations"
+    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
     print(f"[DEBUG] get_user_locations: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
