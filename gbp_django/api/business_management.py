@@ -18,7 +18,7 @@ def get_account_details(access_token):
     Fetch the full account details using the My Business Account Management API.
     This endpoint is current and works with the 'mybusiness.account' scope.
     """
-    print("\n[INFO] get_account_details: Using My Business Account Management API endpoint.")
+    print("\n[INFO] get_account_details: Using Google Business Profile API endpoint.")
     url = "https://businessprofile.googleapis.com/v1/accounts"
     print(f"[DEBUG] get_account_details: GET URL: {url}")
     headers = {
