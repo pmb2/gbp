@@ -19,7 +19,7 @@ def get_account_details(access_token):
     This endpoint is current and works with the 'mybusiness.account' scope.
     """
     print("\n[INFO] get_account_details: Using My Business Account Management API endpoint.")
-    url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
+    url = "https://businessprofile.googleapis.com/v1/accounts"
     print(f"[DEBUG] get_account_details: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -66,7 +66,7 @@ def get_user_locations(access_token):
     if not account_id:
         print("[ERROR] get_user_locations: No valid account ID; cannot fetch locations.")
         return {"locations": []}
-    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    url = f"https://businessprofile.googleapis.com/v1/{account_id}/locations"
     print(f"[DEBUG] get_user_locations: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -105,7 +105,7 @@ def get_location_details(access_token, location_id):
     Fetch detailed information for a single location using the Business Information API.
     """
     print(f"\n[INFO] get_location_details: Fetching details for location: {location_id}")
-    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{location_id}"
+    url = f"https://businessprofile.googleapis.com/v1/{location_id}"
     print(f"[DEBUG] get_location_details: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -288,8 +288,8 @@ def store_business_data(locations_data, user_id, access_token):
             business_defaults = {
                 'user': user,
                 'google_location_id': location_id,
-                'business_name': location.get('locationName', 'Unnamed Business'),
-                'address': location.get('address', {}).get('formattedAddress', ''),
+                'business_name': location.get('title', 'Unnamed Business'),
+                'address': location.get('storefrontAddress', {}).get('addressLines', [''])[0],
                 'phone_number': location.get('regularPhone', ''),
                 'website_url': location.get('websiteUrl', ''),
                 'category': location.get('primaryCategory', {}).get('displayName', ''),
