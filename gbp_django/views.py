@@ -28,7 +28,7 @@ from .models import (
 )
 from .api.authentication import get_access_token, get_user_info
 from .api.business_management import (
-    store_business_data, get_locations, get_user_locations, update_business_details
+    store_business_data, get_locations, get_user_locations, update_business_details, get_account_details
 )
 from .utils.model_interface import get_llm_model
 from .utils.rag_utils import answer_question, add_to_knowledge_base
@@ -301,87 +301,33 @@ def google_oauth_callback(request):
                 else:
                     raise Exception("No refresh token available")
 
-            # Get account ID with retries for rate limiting
-            max_retries = 3
-            retry_count = 0
-            while retry_count < max_retries:
-                try:
-                    account_response = requests.get(
-                        'https://mybusiness.googleapis.com/v4/accounts',
-                        headers={
-                            'Authorization': f'Bearer {access_token}',
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        }
-                    )
-                    account_response.raise_for_status()
-                    print(f"[DEBUG] Account Response: {account_response.text}")
-                    account_data = account_response.json()
-                    
-                    # Validate required scopes
-                    token_scopes = token_info_response.json().get('scope', '').split(' ')
-                    required_scopes = [
-                        'https://www.googleapis.com/auth/business.manage',
-                        'https://www.googleapis.com/auth/userinfo.email',
-                        'https://www.googleapis.com/auth/userinfo.profile'
-                    ]
-                    
-                    missing_scopes = [scope for scope in required_scopes if scope not in token_scopes]
-                    if missing_scopes:
-                        raise Exception(f"Missing required OAuth scopes: {', '.join(missing_scopes)}")
-                    
-                    break
-                except requests.exceptions.HTTPError as e:
-                    if e.response.status_code == 429:  # Rate limit exceeded
-                        retry_count += 1
-                        if retry_count < max_retries:
-                            wait_time = int(e.response.headers.get('Retry-After', 60))
-                            print(f"[INFO] Rate limit hit, waiting {wait_time} seconds...")
-                            time.sleep(wait_time)
-                            continue
-                    raise
-            
+            # Fetch account details using updated function
+            print("[DEBUG] Fetching account details using get_account_details()")
+            account_data = get_account_details(access_token)
+
             if 'accounts' in account_data and account_data['accounts']:
-                account_id = account_data['accounts'][0]['name'].split('/')[-1]
+                account_id = account_data['accounts'][0]['name']
                 print(f"[INFO] Found account ID: {account_id}")
-                
-                # Now fetch locations with retries
-                print("[INFO] Fetching business locations...")
-                retry_count = 0
-                while retry_count < max_retries:
-                    try:
-                        # Use the v4 API endpoint for locations
-                        locations_response = requests.get(
-                            f'https://mybusiness.googleapis.com/v4/accounts/{account_id}/locations',
-                            headers={
-                                'Authorization': f'Bearer {access_token}',
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            }
-                        )
-                        locations_response.raise_for_status()
-                        print(f"[DEBUG] Locations Response: {locations_response.text}")
-                        locations_data = locations_response.json()
-                        break
-                    except requests.exceptions.HTTPError as e:
-                        if e.response.status_code == 429:  # Rate limit exceeded
-                            retry_count += 1
-                            if retry_count < max_retries:
-                                wait_time = int(e.response.headers.get('Retry-After', 60))
-                                print(f"[INFO] Rate limit hit, waiting {wait_time} seconds...")
-                                time.sleep(wait_time)
-                                continue
-                        raise
-                
+
+                # Fetch locations using updated function
+                print("[DEBUG] Fetching user locations using get_user_locations()")
+                locations_data = get_user_locations(access_token)
+
                 if 'locations' in locations_data:
                     print(f"[INFO] Found {len(locations_data['locations'])} locations")
-                    # Store the locations data for processing after user creation
-                    request.session['locations_data'] = locations_data
+                    # Store the locations data
+                    stored_businesses = store_business_data(locations_data, user.id, access_token)
+                    if stored_businesses:
+                        print(f"[INFO] Successfully stored {len(stored_businesses)} business(es)")
+                        messages.success(request, f"Successfully linked {len(stored_businesses)} business(es)")
+                    else:
+                        print("[INFO] No businesses were stored")
+                        messages.warning(request, "No businesses were found to import")
                 else:
                     print("[INFO] No locations found in response")
             else:
                 print("[INFO] No accounts found in response")
-                
+                messages.warning(request, "No Google Business Profile account found")
         except requests.exceptions.RequestException as e:
             print(f"[ERROR] Failed to fetch business details: {str(e)}")
             if hasattr(e, 'response'):
