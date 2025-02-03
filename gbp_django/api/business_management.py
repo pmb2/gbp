@@ -38,6 +38,8 @@ def get_account_details(access_token):
         return data
     except Exception as e:
         print(f"[ERROR] get_account_details: Exception while fetching account details: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"[ERROR] Response content: {e.response.text}")
         return {}
 
 
