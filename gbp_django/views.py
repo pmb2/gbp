@@ -201,9 +201,7 @@ def direct_google_oauth(request):
         'openid',
         'https://www.googleapis.com/auth/business.manage',
         'https://www.googleapis.com/auth/userinfo.email',
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/mybusiness.account',
-        'https://www.googleapis.com/auth/mybusiness.manage',
+        'https://www.googleapis.com/auth/userinfo.profile'
     ])
 
     print(f"[INFO] OAuth scopes used: {scope}")
@@ -273,35 +271,19 @@ def google_oauth_callback(request):
             messages.error(request, 'Failed to get access token.')
             return redirect('login')
 
-        # Validate and refresh token if needed
-        print("[INFO] Validating OAuth token...")
-        try:
-            # Check token validity
-            token_info_response = requests.get(
-                'https://www.googleapis.com/oauth2/v3/tokeninfo',
-                params={'access_token': access_token}
-            )
-            
-            if token_info_response.status_code != 200:
-                print("[INFO] Access token expired or invalid, attempting refresh...")
-                if refresh_token:
-                    refresh_response = requests.post(
-                        'https://oauth2.googleapis.com/token',
-                        data={
-                            'client_id': google_app.client_id,
-                            'client_secret': google_app.secret,
-                            'refresh_token': refresh_token,
-                            'grant_type': 'refresh_token'
-                        }
-                    )
-                    if refresh_response.status_code == 200:
-                        refresh_data = refresh_response.json()
-                        access_token = refresh_data['access_token']
-                        print("[INFO] Successfully refreshed access token")
-                    else:
-                        raise Exception("Failed to refresh access token")
-                else:
-                    raise Exception("No refresh token available")
+        # Validate the access token scopes
+        print("[INFO] Validating OAuth token scopes...")
+        token_info_response = requests.get(
+            'https://www.googleapis.com/oauth2/v3/tokeninfo',
+            params={'access_token': access_token}
+        )
+        token_info = token_info_response.json()
+        print(f"[DEBUG] Token Info: {json.dumps(token_info, indent=2)}")
+        scopes = token_info.get('scope', '')
+        if 'https://www.googleapis.com/auth/business.manage' not in scopes:
+            print("[ERROR] Required scope 'business.manage' not present in token.")
+            messages.error(request, 'Required permissions not granted. Please authorize the required scopes.')
+            return redirect('login')
 
             # Fetch account details using updated function
             print("[DEBUG] Fetching account details using get_account_details()")

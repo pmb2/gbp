@@ -19,7 +19,7 @@ def get_account_details(access_token):
     This endpoint is current and works with the 'mybusiness.account' scope.
     """
     print("\n[INFO] get_account_details: Using My Business Account Management API endpoint.")
-    url = "https://mybusinessaccountmanagement.googleapis.com/v1/accounts"
+    url = "https://mybusiness.googleapis.com/v4/accounts"
     print(f"[DEBUG] get_account_details: GET URL: {url}")
     if "v4/accounts" in url:
         print("[ERROR] get_account_details: Detected deprecated endpoint in URL.")
@@ -68,7 +68,7 @@ def get_user_locations(access_token):
     if not account_id:
         print("[ERROR] get_user_locations: No valid account ID; cannot fetch locations.")
         return {"locations": []}
-    url = f"https://mybusinessbusinessinformation.googleapis.com/v1/{account_id}/locations"
+    url = f"https://mybusiness.googleapis.com/v4/{account_id}/locations"
     print(f"[DEBUG] get_user_locations: GET URL: {url}")
     headers = {
         "Authorization": f"Bearer {access_token}",
@@ -290,7 +290,7 @@ def store_business_data(locations_data, user_id, access_token):
             business_defaults = {
                 'user': user,
                 'google_location_id': location_id,
-                'business_name': location.get('title', 'Unnamed Business'),
+                'business_name': location.get('locationName', 'Unnamed Business'),
                 'address': location.get('address', {}).get('formattedAddress', ''),
                 'phone_number': location.get('regularPhone', ''),
                 'website_url': location.get('websiteUrl', ''),
