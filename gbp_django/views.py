@@ -312,6 +312,7 @@ def google_oauth_callback(request):
         else:
             print("[INFO] No accounts found in response")
             messages.warning(request, "No Google Business Profile account found")
+            return redirect('index')
     except requests.exceptions.RequestException as e:
         print(f"[ERROR] Failed to fetch business details: {str(e)}")
         if hasattr(e, 'response'):
