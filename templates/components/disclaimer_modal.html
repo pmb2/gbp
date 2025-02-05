@@ -1,0 +1,112 @@
+<!-- disclaimer_modal.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disclaimer & Terms</title>
+    <!-- Include Bootstrap CSS (or your own CSS) -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom styles to ensure the modal appears correctly */
+        .modal-backdrop {
+            opacity: 0.5 !important;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Disclaimer Modal -->
+<div class="modal fade" id="disclaimerModal" tabindex="-1" role="dialog" aria-labelledby="disclaimerModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="disclaimerModalLabel">Disclaimer & Terms of Use</h2>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+                        onclick="rejectDisclaimer()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>Overview</h4>
+                <p>
+                    This application automates interactions on your behalf on Google Business Profile. It uses a
+                    combination of OAuth token authentication and browser automation to simulate human activity. By
+                    using this application, you acknowledge and accept the risks and limitations outlined below.
+                </p>
+                <h4>Security & Privacy</h4>
+                <ul>
+                    <li>Your OAuth token and any personal data are handled in accordance with industry best practices.
+                    </li>
+                    <li>Only the minimum necessary data is accessed and stored.</li>
+                    <li>Please review our <a href="/privacy-policy" target="_blank">Privacy Policy</a> for full details.
+                    </li>
+                </ul>
+                <h4>Automation & Limitations</h4>
+                <ul>
+                    <li>The system automates many interactions (e.g. updating business details, posting responses) by
+                        simulating human behavior. Certain actions may still require your review or approval before
+                        being finalized.
+                    </li>
+                    <li>The tool uses automated browser interactions; while it strives to mimic human behavior, the
+                        process may be detected by automated security measures.
+                    </li>
+                    <li>Google’s APIs and interfaces may change over time, which could affect functionality.</li>
+                </ul>
+                <h4>Liability Disclaimer</h4>
+                <ul>
+                    <li>This application is not affiliated with or endorsed by Google.</li>
+                    <li>You agree that the provider of this application is not liable for any errors, omissions, or
+                        damages arising from the use of this automated system.
+                    </li>
+                    <li>You are responsible for reviewing all automated actions before they are publicly posted or acted
+                        upon.
+                    </li>
+                </ul>
+                <h4>User Consent</h4>
+                <p>
+                    By clicking “I Agree,” you confirm that you have read and understood the above terms and that you
+                    consent to the automated actions performed on your behalf. You further acknowledge that you have
+                    reviewed our <a href="/terms-of-service" target="_blank">Terms of Service</a>.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="rejectDisclaimer()">I Do Not Agree</button>
+                <button type="button" class="btn btn-primary" onclick="acceptDisclaimer()">I Agree</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap JS and dependencies (jQuery and Popper.js) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // When the document loads, check if the disclaimer has been accepted.
+    document.addEventListener("DOMContentLoaded", function () {
+        if (localStorage.getItem("disclaimerAccepted") !== "true") {
+            $('#disclaimerModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $('#disclaimerModal').modal('show');
+        }
+    });
+
+    function acceptDisclaimer() {
+        // Record acceptance (using localStorage; adjust as needed)
+        localStorage.setItem("disclaimerAccepted", "true");
+        $('#disclaimerModal').modal('hide');
+        console.log("User accepted the disclaimer.");
+    }
+
+    function rejectDisclaimer() {
+        // Redirect the user or block further actions if they do not accept.
+        console.log("User rejected the disclaimer.");
+        window.location.href = "/disclaimer-required";
+    }
+</script>
+</body>
+</html>
