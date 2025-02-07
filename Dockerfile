@@ -1,3 +1,4 @@
+# Use a Python image that meets the browser-use requirement (Python 3.12-slim satisfies >=3.11)
 FROM python:3.12-slim
 
 # Set the working directory
@@ -7,6 +8,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    chromium \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install Python dependencies
@@ -19,8 +21,8 @@ COPY . .
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Expose the application port
-EXPOSE 8000
+# Expose ports for the Django app and the agent API
+EXPOSE 8000 5000
 
-# Run the application
+# Default command (this can be overridden in docker-compose)
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

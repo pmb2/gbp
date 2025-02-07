@@ -39,5 +39,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  agent:
+    build: .
+    command: python gbp_django/utils/automations.py
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    environment:
+      # Environment variables specific to the agent
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - HEADLESS=false
+      - COOKIES_FILE=/app/browser_cookies/gbp_cookies_agent.txt
+      # Ensure any other agent-specific environment variables are provided
+
 volumes:
   postgres_data:
