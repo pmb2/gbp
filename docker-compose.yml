@@ -31,12 +31,13 @@ services:
       - LLM_MODEL=${LLM_MODEL}
 
   db:
-    image: postgres:13
+    image: postgres:17
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
+      - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data/
 
   agent:
