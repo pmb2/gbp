@@ -1,7 +1,6 @@
 # Web Framework
 Django>=4.2.0
 django
-django-allauth>=0.54.0
 django-extensions
 django-allauth
 
@@ -21,6 +20,7 @@ groq
 
 # File Processing
 python-magic>=0.4.27
+python-magic-bin
 python-docx>=0.8.11
 PyPDF2
 
@@ -49,4 +49,10 @@ torch>=2.2.0
 undetected-chromedriver
 langchain_google_genai
 playwright
+openai
+browser-use
 git+https://github.com/browser-use/browser-use.git
+
+# Others
+tiktoken
+bs4
