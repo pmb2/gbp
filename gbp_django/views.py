@@ -105,8 +105,12 @@ def login(request):
             print(f"[DEBUG] User ID: {user.id}")
             print(f"[DEBUG] Has Google OAuth: {user.socialaccount_set.filter(provider='google').exists()}")
             from .models import Business
+            print("[OAUTH FLOW] Checking the Business table for records associated with userID:", user.id)
             connected_businesses = Business.objects.filter(user=user)
-            print(f"[DEBUG] Connected businesses count: {connected_businesses.count()}")
+            count = connected_businesses.count()
+            print(f"[OAUTH FLOW] Found {count} connected business(es) for userID {user.id}")
+            for biz in connected_businesses:
+                print(f"[OAUTH FLOW] Business details: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
 
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
@@ -876,6 +880,9 @@ def index(request):
     businesses = Business.objects.filter(user=request.user).prefetch_related(
         'post_set', 'qanda_set', 'review_set', 'knowledge_files'
     ).order_by('-is_connected', '-is_verified')
+    print("[OAUTH FLOW] Index view: Retrieved", businesses.count(), "business(es) for user", request.user.id)
+    for biz in businesses:
+        print(f"[OAUTH FLOW] Dashboard Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
 
     print(f"[DEBUG] Found {businesses.count()} businesses for user {request.user.email}")
 
