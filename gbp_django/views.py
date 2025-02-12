@@ -107,6 +107,7 @@ def login(request):
             from .models import Business
             print("[OAUTH FLOW] Checking the Business table for records associated with userID:", user.id)
             connected_businesses = Business.objects.filter(user=user)
+            print("[OAUTH FLOW] SQL Query:", connected_businesses.query)
             count = connected_businesses.count()
             print(f"[OAUTH FLOW] Found {count} connected business(es) for userID {user.id}")
             for biz in connected_businesses:
@@ -889,6 +890,7 @@ def index(request):
         print(f"[OAUTH FLOW] Dashboard Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
 
     print(f"[DEBUG] Found {len(businesses)} businesses for user {request.user.email}")
+    print("[OAUTH FLOW] SQL Query for fetching businesses:", businesses.query)
     print("[OAUTH FLOW] Final list of businesses to display on dashboard and dropdown:")
     for biz in businesses:
         print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.profile_completion}%")
