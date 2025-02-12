@@ -349,6 +349,17 @@ class BusinessProfileManager:
             logging.warning(f"[{business_id}] API account not valid (or not organization): {org_status.get('error')}")
             logging.info(f"[{business_id}] Using fallback automation.")
             await self._run_fallback_flow(business_id, business_url, task_data)
+        
+        logging.info(f"[{business_id}] Sending automation report email.")
+        from gbp_django.utils.email_service import EmailService
+        from datetime import datetime
+        method_used = "API" if api_success else "Fallback"
+        report_data = {
+            "results": results if api_success else "Fallback automation executed",
+            "method": method_used
+        }
+        executed_at = datetime.now().isoformat()
+        EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
             return
 
         api_success = True
