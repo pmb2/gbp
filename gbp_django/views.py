@@ -888,7 +888,10 @@ def index(request):
     for biz in businesses:
         print(f"[OAUTH FLOW] Dashboard Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
 
-    print(f"[DEBUG] Found {businesses.count()} businesses for user {request.user.email}")
+    print(f"[DEBUG] Found {len(businesses)} businesses for user {request.user.email}")
+    print("[OAUTH FLOW] Final list of businesses to display on dashboard and dropdown:")
+    for biz in businesses:
+        print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.profile_completion}%")
 
     processed_businesses = []
     for business in businesses:
