@@ -397,9 +397,9 @@ class BusinessProfileManager:
         }
         executed_at = datetime.now().isoformat()
         EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
-            if not results["update"].get("success"):
-                api_success = False
-                raise Exception("update_business_info failed.")
+        if not results["update"].get("success"):
+            api_success = False
+            raise Exception("update_business_info failed.")
 
             results["respond"] = self.api_handler.respond_to_review(location_name,
                                                                     task_data["review_id"],
