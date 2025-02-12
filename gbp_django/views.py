@@ -114,8 +114,11 @@ def login(request):
                 print(f"[OAUTH FLOW] Business details: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
             if count > 0:
                 print("[OAUTH FLOW] Businesses will be displayed on the dashboard table and dropdown (businessSelect).")
+                business_ids = [biz.business_id for biz in connected_businesses]
+                print(f"[OAUTH FLOW] Business IDs for user {user.id}: {business_ids}")
             else:
                 print("[OAUTH FLOW] No businesses found for user; dashboard and dropdown will be empty.")
+                print(f"[OAUTH FLOW] No business entries found in Business.objects.filter(user={user.id})")
 
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
@@ -894,6 +897,7 @@ def index(request):
     print("[OAUTH FLOW] Final list of businesses to display on dashboard and dropdown:")
     for biz in businesses:
         print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.profile_completion}%")
+    print("[OAUTH FLOW] Dashboard Business IDs:", [b.business_id for b in businesses])
 
     processed_businesses = []
     for business in businesses:
