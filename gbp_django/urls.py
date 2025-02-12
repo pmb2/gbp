@@ -47,6 +47,7 @@ urlpatterns = [
     path('api/business/<str:business_id>/tasks/update/', views.create_task, name='update_task'),
     path('api/generate-content/', views.generate_content, name='generate_content'),
     path('api/business/<str:business_id>/seo-health/', views.get_seo_health, name='get_seo_health'),
+    path('automation_reports/', include('gbp_django.urls_automation_reports')),
 ]
 
 # Serve static files
