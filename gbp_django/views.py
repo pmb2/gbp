@@ -104,6 +104,9 @@ def login(request):
             print(f"[DEBUG] User authenticated successfully: {user.email}")
             print(f"[DEBUG] User ID: {user.id}")
             print(f"[DEBUG] Has Google OAuth: {user.socialaccount_set.filter(provider='google').exists()}")
+            from .models import Business
+            connected_businesses = Business.objects.filter(user=user)
+            print(f"[DEBUG] Connected businesses count: {connected_businesses.count()}")
 
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
@@ -951,6 +954,7 @@ def index(request):
         biz.website_url = biz.website_url or 'No info'
         biz.category = biz.category or 'No info'
         biz.is_verified = 'Verified' if biz.is_verified else 'Not Verified'
+        biz.connection_status = 'Connected' if biz.is_connected else 'Not Connected'
 
     # Gather user info and unread notification count
     users = User.objects.all()
