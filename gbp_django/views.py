@@ -112,6 +112,7 @@ def login(request):
             print(f"[OAUTH FLOW] Found {count} connected business(es) for userID {user.id}")
             for biz in connected_businesses:
                 print(f"[OAUTH FLOW] Business details: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
+            print("[OAUTH FLOW] Completed business table check for userID:", user.id)
             if count > 0:
                 print("[OAUTH FLOW] Businesses will be displayed on the dashboard table and dropdown (businessSelect).")
                 business_ids = [biz.business_id for biz in connected_businesses]
@@ -898,6 +899,7 @@ def index(request):
     for biz in businesses:
         print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.profile_completion}%")
     print("[OAUTH FLOW] Dashboard Business IDs:", [b.business_id for b in businesses])
+    print("[OAUTH FLOW] Final business list ready for dashboard display, total:", len(businesses))
 
     processed_businesses = []
     for business in businesses:
