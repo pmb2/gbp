@@ -111,6 +111,10 @@ def login(request):
             print(f"[OAUTH FLOW] Found {count} connected business(es) for userID {user.id}")
             for biz in connected_businesses:
                 print(f"[OAUTH FLOW] Business details: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Connected={biz.is_connected}")
+            if count > 0:
+                print("[OAUTH FLOW] Businesses will be displayed on the dashboard table and dropdown (businessSelect).")
+            else:
+                print("[OAUTH FLOW] No businesses found for user; dashboard and dropdown will be empty.")
 
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
