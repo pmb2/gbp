@@ -360,7 +360,6 @@ class BusinessProfileManager:
         }
         executed_at = datetime.now().isoformat()
         EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
-            return
 
         api_success = True
         results = {}
