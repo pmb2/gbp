@@ -81,31 +81,43 @@ async def check_post_compliance(business_id: str):
 
 # Monitor compliance for a single business.
 async def monitor_compliance(business_id: str):
-    logging.info(f"[{business_id}] Running compliance checks...")
-    # Determine if criteria are met
+    logging.info(f"[COMPLIANCE] Starting compliance checks for Business ID: {business_id}")
+    
+    # Retrieve latest timestamps
     review_date = await get_latest_review_date(business_id)
+    logging.info(f"[COMPLIANCE] Latest review date for {business_id}: {review_date}")
     question_date = await get_latest_question_date(business_id)
+    logging.info(f"[COMPLIANCE] Latest question date for {business_id}: {question_date}")
     post_date = await get_last_post_date(business_id)
-    now = datetime.now()
-    review_overdue = now - review_date > REVIEW_RESPONSE_THRESHOLD
-    question_overdue = now - question_date > QUESTION_RESPONSE_THRESHOLD
-    post_overdue = now - post_date > POST_FREQUENCY_THRESHOLD
+    logging.info(f"[COMPLIANCE] Latest post date for {business_id}: {post_date}")
 
-    # Run automation triggers as needed based on overdue status
+    let_now = datetime.now()
+    review_overdue = let_now - review_date > REVIEW_RESPONSE_THRESHOLD
+    logging.info(f"[COMPLIANCE] Review overdue for {business_id}: {review_overdue}")
+    question_overdue = let_now - question_date > QUESTION_RESPONSE_THRESHOLD
+    logging.info(f"[COMPLIANCE] Question overdue for {business_id}: {question_overdue}")
+    post_overdue = let_now - post_date > POST_FREQUENCY_THRESHOLD
+    logging.info(f"[COMPLIANCE] Post overdue for {business_id}: {post_overdue}")
+
+    // Run automation triggers as needed based on overdue status
     if review_overdue:
+        logging.info(f"[COMPLIANCE] Triggering review response automation for {business_id}")
         await trigger_review_response_automation(business_id)
     if question_overdue:
+        logging.info(f"[COMPLIANCE] Triggering question response automation for {business_id}")
         await trigger_question_response_automation(business_id)
     if post_overdue:
+        logging.info(f"[COMPLIANCE] Triggering post automation for {business_id}")
         await trigger_post_automation(business_id)
 
-    logging.info(f"[{business_id}] Compliance checks completed.")
+    logging.info(f"[COMPLIANCE] Completed compliance triggers for {business_id}")
 
-    # Compute compliance score: each metric gives 100 if compliant, else 0; average for overall score.
+    # Compute compliance score: each metric gives 100 if compliant, else 0; calculate average
     review_score = 0 if review_overdue else 100
     question_score = 0 if question_overdue else 100
     post_score = 0 if post_overdue else 100
     overall_score = (review_score + question_score + post_score) // 3
+    logging.info(f"[COMPLIANCE] Calculated scores for {business_id} - Review: {review_score}, Question: {question_score}, Post: {post_score}. Overall: {overall_score}%")
 
     # Update the Business record with the calculated compliance score
     try:
@@ -113,9 +125,9 @@ async def monitor_compliance(business_id: str):
         business = Business.objects.get(business_id=business_id)
         business.compliance_score = overall_score
         business.save(update_fields=['compliance_score'])
-        logging.info(f"[{business_id}] Updated compliance score to {overall_score}%")
+        logging.info(f"[COMPLIANCE] Updated compliance score for {business_id} to {overall_score}%")
     except Exception as e:
-        logging.error(f"[{business_id}] Failed to update compliance score: {e}")
+        logging.error(f"[COMPLIANCE] Error updating compliance score for {business_id}: {e}")
 
 # Scheduler function to run the compliance check periodically.
 async def compliance_scheduler(business_id: str, interval_minutes: int = 30):
@@ -133,10 +145,10 @@ async def run_compliance_monitors(business_ids: list):
 
 if __name__ == "__main__":
     from gbp_django.models import Business
-    # Get all active businesses (exclude ones with default 'unverified' business_id)
-    business_ids = list(Business.objects.exclude(business_id='unverified').values_list('business_id', flat=True))
-    logging.info(f"Monitoring compliance for {len(business_ids)} businesses: {business_ids}")
+    # Get only verified businesses using the verification_status column
+    business_ids = list(Business.objects.filter(verification_status='VERIFIED').values_list('business_id', flat=True))
+    logging.info(f"[COMPLIANCE] Monitoring compliance for {len(business_ids)} verified businesses: {business_ids}")
     try:
         asyncio.run(run_compliance_monitors(business_ids))
     except KeyboardInterrupt:
-        logging.info("Compliance monitoring stopped by user.")
+        logging.info("[COMPLIANCE] Compliance monitoring stopped by user.")
