@@ -99,7 +99,7 @@ async def monitor_compliance(business_id: str):
     post_overdue = let_now - post_date > POST_FREQUENCY_THRESHOLD
     logging.info(f"[COMPLIANCE] Post overdue for {business_id}: {post_overdue}")
 
-    // Run automation triggers as needed based on overdue status
+    # Run automation triggers as needed based on overdue status
     if review_overdue:
         logging.info(f"[COMPLIANCE] Triggering review response automation for {business_id}")
         await trigger_review_response_automation(business_id)
