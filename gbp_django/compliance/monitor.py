@@ -132,9 +132,10 @@ async def run_compliance_monitors(business_ids: list):
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
-    # List of business IDs that we monitor.
-    business_ids = ["business1", "business2"]
-    # Start the compliance monitors (each will run every 30 minutes by default).
+    from gbp_django.models import Business
+    # Get all active businesses (exclude ones with default 'unverified' business_id)
+    business_ids = list(Business.objects.exclude(business_id='unverified').values_list('business_id', flat=True))
+    logging.info(f"Monitoring compliance for {len(business_ids)} businesses: {business_ids}")
     try:
         asyncio.run(run_compliance_monitors(business_ids))
     except KeyboardInterrupt:
