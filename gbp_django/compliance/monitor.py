@@ -82,10 +82,40 @@ async def check_post_compliance(business_id: str):
 # Monitor compliance for a single business.
 async def monitor_compliance(business_id: str):
     logging.info(f"[{business_id}] Running compliance checks...")
-    await check_review_compliance(business_id)
-    await check_question_compliance(business_id)
-    await check_post_compliance(business_id)
+    # Determine if criteria are met
+    review_date = await get_latest_review_date(business_id)
+    question_date = await get_latest_question_date(business_id)
+    post_date = await get_last_post_date(business_id)
+    now = datetime.now()
+    review_overdue = now - review_date > REVIEW_RESPONSE_THRESHOLD
+    question_overdue = now - question_date > QUESTION_RESPONSE_THRESHOLD
+    post_overdue = now - post_date > POST_FREQUENCY_THRESHOLD
+
+    # Run automation triggers as needed based on overdue status
+    if review_overdue:
+        await trigger_review_response_automation(business_id)
+    if question_overdue:
+        await trigger_question_response_automation(business_id)
+    if post_overdue:
+        await trigger_post_automation(business_id)
+
     logging.info(f"[{business_id}] Compliance checks completed.")
+
+    # Compute compliance score: each metric gives 100 if compliant, else 0; average for overall score.
+    review_score = 0 if review_overdue else 100
+    question_score = 0 if question_overdue else 100
+    post_score = 0 if post_overdue else 100
+    overall_score = (review_score + question_score + post_score) // 3
+
+    # Update the Business record with the calculated compliance score
+    try:
+        from gbp_django.models import Business
+        business = Business.objects.get(business_id=business_id)
+        business.compliance_score = overall_score
+        business.save(update_fields=['compliance_score'])
+        logging.info(f"[{business_id}] Updated compliance score to {overall_score}%")
+    except Exception as e:
+        logging.error(f"[{business_id}] Failed to update compliance score: {e}")
 
 # Scheduler function to run the compliance check periodically.
 async def compliance_scheduler(business_id: str, interval_minutes: int = 30):
