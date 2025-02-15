@@ -341,8 +341,10 @@ class BusinessProfileManager:
             - post_content, photo_path
         """
         business_url = self.businesses[business_id]
-        location_name = task_data.get("location_name")
-        logging.info(f"[{business_id}] Processing tasks for {business_url}")
+        from gbp_django.models import Business
+        business_obj = Business.objects.get(business_id=business_id)
+        location_name = business_obj.google_location_id if business_obj.google_location_id else task_data.get("location_name")
+        logging.info(f"[{business_id}] Processing tasks for {business_url} with location: {location_name}")
 
         org_status = self.api_handler.check_organization_status()
         if not org_status.get("valid", False):
