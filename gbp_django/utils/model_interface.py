@@ -338,22 +338,9 @@ def get_llm_model() -> LLMInterface:
 
 
 def get_embedding_model() -> LLMInterface:
-    """
-    Factory function to get the configured embedding model:
-      1) Ollama if OLLAMA_ENABLED,
-      2) otherwise OpenAI if OPENAI_API_KEY,
-      3) else raise error.
-    """
-    # 1) Try Ollama for embeddings
-    if getattr(settings, 'OLLAMA_ENABLED', False):
-        try:
-            return OllamaModel()
-        except Exception as e:
-            logger.warning(f"Failed to initialize Ollama for embeddings: {str(e)}")
-
-    # 2) Otherwise, try OpenAI
-    if getattr(settings, 'OPENAI_API_KEY', None):
-        return OpenAIModel()
-
-    raise ValueError("No valid embedding configuration found. Check your settings.")
+    # Always use OllamaModel with llama3.2:1b for embeddings.
+    try:
+        return OllamaModel()
+    except Exception as e:
+        raise ValueError("Failed to initialize Ollama model for embeddings: " + str(e))
 
