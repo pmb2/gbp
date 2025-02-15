@@ -123,7 +123,7 @@ def login(request):
 
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
-
+            ensure_user_businesses(user)
             # Set session expiry based on remember me
             if not remember_me:
                 request.session.set_expiry(0)
