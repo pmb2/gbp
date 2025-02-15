@@ -1436,3 +1436,50 @@ def get_verification_status(request, business_id):
         return JsonResponse({'error': 'Business not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+import secrets
+from django.utils import timezone
+from datetime import timedelta
+
+def ensure_user_businesses(user):
+    """
+    Checks if there are any Business records associated with the given user.
+    If none exist, attempts to fetch business details using the user's OAuth access token
+    and store them via the existing store_business_data API. If that fails, creates a default business record.
+    """
+    from .models import Business
+    if Business.objects.filter(user=user).exists():
+        print("[DEBUG] User already has businesses associated.")
+        return
+
+    print("[DEBUG] No businesses found for user; attempting to fetch business details from OAuth.")
+    # Attempt to fetch business details from OAuth if access token is available
+    if user.google_access_token:
+        try:
+            from .api.business_management import get_user_locations, store_business_data
+            locations_data = get_user_locations(user.google_access_token)
+            if locations_data and locations_data.get('locations'):
+                stored = store_business_data(locations_data, user.id, user.google_access_token)
+                if stored:
+                    print(f"[DEBUG] Created {len(stored)} business(es) from OAuth data for user {user.email}.")
+                    return
+            else:
+                print("[DEBUG] No locations found from OAuth API.")
+        except Exception as e:
+            print(f"[ERROR] Failed to fetch business details from OAuth: {str(e)}")
+
+    # Fallback: create a default Business record with minimal info from the user
+    try:
+        Business.objects.create(
+            user=user,
+            business_name=user.email,
+            business_id=secrets.token_hex(8),
+            is_verified=False,
+            is_connected=False,
+            address="Default address",
+            phone_number="Default phone",
+            website_url="",
+            category="Uncategorized"
+        )
+        print("[DEBUG] Created default business record for user.")
+    except Exception as e:
+        print(f"[ERROR] Failed to create default business record: {str(e)}")
