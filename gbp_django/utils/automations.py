@@ -15,7 +15,6 @@ import json
 import logging
 import asyncio
 from datetime import datetime, timedelta
-import secrets
 
 # Google API libraries for the primary layer
 from googleapiclient.discovery import build
@@ -438,27 +437,21 @@ class BusinessProfileManager:
 ###############################################################################
 def onboard_new_business(cookies_folder: str, chrome_path: str) -> tuple:
     """
-    Onboard a new business using live data automatically.
-    This function now generates business identifiers and URLs instead of using user input.
+    Interactively onboard a new business by gathering its unique ID, URL, and
+    performing an interactive login to collect cookies/session data.
+
     Returns:
         (business_id, business_url)
     """
-    # Replace interactive input with live data generation.
-    business_id = secrets.token_hex(8)
-    business_url = f"https://business.google.com/{business_id}"
-    logging.info(f"[LIVE DATA] Generated business ID: {business_id}")
-    logging.info(f"[LIVE DATA] Generated business URL: {business_url}")
-    
+    business_id = input("Enter the new business ID (unique identifier): ").strip()
+    business_url = input("Enter the business URL (e.g., https://business.google.com/your_business_id): ").strip()
     cookie_file = os.path.join(cookies_folder, f"cookies_{business_id}.json")
-    logging.info(f"[{business_id}] Onboarding new business. Initiating auto-login process using live data.")
-    
     # Instantiate a fallback agent in visible (non-headless) mode to perform login.
     agent = FallbackGBPAgent(business_id, cookie_file, chrome_path, headless=False)
     login_url = "https://accounts.google.com/ServiceLogin?service=businessprofile"
-    logging.info(f"[{business_id}] Navigating to login URL: {login_url}")
+    logging.info(f"[{business_id}] Onboarding new business. Initiating interactive login.")
     agent.collect_cookies_interactively(login_url)
     logging.info(f"[{business_id}] Onboarding complete. Cookies stored in {cookie_file}.")
-    
     return business_id, business_url
 
 
