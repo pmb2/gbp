@@ -28,31 +28,51 @@ POST_FREQUENCY_THRESHOLD = timedelta(days=7)
 # Dummy functions to simulate retrieving the latest timestamps.
 # Replace these with your real functions that query your API or database.
 async def get_latest_review_date(business_id: str) -> datetime:
-    # Example: return the timestamp of the last unanswered review.
-    # For demonstration, we simulate an overdue review.
+    from gbp_django.models import Business, Review
+    try:
+        business = Business.objects.get(business_id=business_id)
+        review = Review.objects.filter(business=business).order_by('-created_at').first()
+        if review:
+            return review.created_at
+    except Exception as e:
+        logging.error(f"[COMPLIANCE] Error fetching latest review date for {business_id}: {e}")
     return datetime.now() - timedelta(hours=25)
 
 async def get_latest_question_date(business_id: str) -> datetime:
-    # Example: return the timestamp of the last unanswered question.
-    # For demonstration, we simulate one that’s within threshold.
+    from gbp_django.models import Business, QandA
+    try:
+        business = Business.objects.get(business_id=business_id)
+        qanda = QandA.objects.filter(business=business).order_by('-created_at').first()
+        if qanda:
+            return qanda.created_at
+    except Exception as e:
+        logging.error(f"[COMPLIANCE] Error fetching latest question date for {business_id}: {e}")
     return datetime.now() - timedelta(hours=10)
 
 async def get_last_post_date(business_id: str) -> datetime:
-    # Example: return the timestamp of the last published/scheduled post.
-    # For demonstration, we simulate an overdue post.
+    from gbp_django.models import Business, Post
+    try:
+        business = Business.objects.get(business_id=business_id)
+        post = Post.objects.filter(business=business).order_by('-created_at').first()
+        if post:
+            return post.created_at
+    except Exception as e:
+        logging.error(f"[COMPLIANCE] Error fetching latest post date for {business_id}: {e}")
     return datetime.now() - timedelta(days=8)
 
 # Dummy automation trigger functions.
 # Replace these with calls to your automation routines.
 async def trigger_review_response_automation(business_id: str):
-    logging.info(f"[{business_id}] Triggering review response automation task.")
-    # Call your API or fallback method here.
+    logging.info(f"[COMPLIANCE] Triggering review response automation for {business_id}")
+    await asyncio.sleep(1)  # Simulate processing delay
     
 async def trigger_question_response_automation(business_id: str):
-    logging.info(f"[{business_id}] Triggering question response automation task.")
+    logging.info(f"[COMPLIANCE] Triggering question response automation for {business_id}")
+    await asyncio.sleep(1)  # Simulate processing delay
     
 async def trigger_post_automation(business_id: str):
-    logging.info(f"[{business_id}] Triggering new post automation task.")
+    logging.info(f"[COMPLIANCE] Triggering post automation for {business_id}")
+    await asyncio.sleep(1)  # Simulate processing delay
 
 # Compliance check functions.
 async def check_review_compliance(business_id: str):
