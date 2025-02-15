@@ -897,7 +897,7 @@ def index(request):
     print("[OAUTH FLOW] SQL Query for fetching businesses:", businesses.query)
     print("[OAUTH FLOW] Final list of businesses to display on dashboard and dropdown:")
     for biz in businesses:
-        print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.profile_completion}%")
+        print(f"[OAUTH FLOW] Display Business: ID={biz.business_id}, Name={biz.business_name}, Verified={biz.is_verified}, Completion: {biz.calculate_profile_completion()}%")
     print("[OAUTH FLOW] Dashboard Business IDs:", [b.business_id for b in businesses])
     print("[OAUTH FLOW] Final business list ready for dashboard display, total:", len(businesses))
 
