@@ -343,7 +343,11 @@ class BusinessProfileManager:
         business_url = self.businesses[business_id]
         from gbp_django.models import Business
         business_obj = Business.objects.get(business_id=business_id)
-        location_name = business_obj.google_location_id if business_obj.google_location_id else task_data.get("location_name")
+        # Use stored google_location_id if available; otherwise fallback to task_data
+        location_name = business_obj.google_location_id or task_data.get("location_name")
+        if not location_name:
+            logging.error(f"[{business_id}] Missing Google location ID for business update.")
+            raise Exception("Missing Google location ID for business update")
         logging.info(f"[{business_id}] Processing tasks for {business_url} with location: {location_name}")
 
         org_status = self.api_handler.check_organization_status()
