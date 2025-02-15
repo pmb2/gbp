@@ -397,31 +397,6 @@ class BusinessProfileManager:
         }
         executed_at = datetime.now().isoformat()
         EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
-        if not results["update"].get("success"):
-            api_success = False
-            raise Exception("update_business_info failed.")
-
-            results["respond"] = self.api_handler.respond_to_review(location_name,
-                                                                    task_data["review_id"],
-                                                                    task_data["review_response"])
-            if not results["respond"].get("success"):
-                api_success = False
-                raise Exception("respond_to_review failed.")
-
-            results["post"] = self.api_handler.schedule_post(location_name,
-                                                             task_data["post_content"],
-                                                             hours_from_now=1)
-            if not results["post"].get("success"):
-                api_success = False
-                raise Exception("schedule_post failed.")
-
-            results["upload"] = self.api_handler.upload_photo(location_name,
-                                                              task_data["photo_path"])
-            if not results["upload"].get("success"):
-                api_success = False
-                raise Exception("upload_photo failed.")
-
-            logging.info(f"[{business_id}] API tasks completed successfully: {results}")
         except Exception as e:
             logging.error(f"[{business_id}] API error: {e}")
             api_success = False
