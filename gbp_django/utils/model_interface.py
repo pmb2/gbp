@@ -133,7 +133,10 @@ class OllamaModel(LLMInterface):
     def __init__(self):
         self.base_url = "http://localhost:11434/api"
         self.embedding_model = "nomic-embed-text"
-        self.llm_model = "phi4"
+        # Using Llama 3.2:1b via Ollama as default LLM model.
+        self.llm_model = "llama3.2:1b"
+        # Uncomment the following lines if you want to use phi4 instead:
+        # self.llm_model = "phi4"
 
     def _prepare_messages(self, query: str, context: str, chat_history: Optional[List[Dict[str, str]]] = None) -> List[
         Dict[str, str]]:
