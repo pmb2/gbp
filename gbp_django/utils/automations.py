@@ -388,8 +388,9 @@ class BusinessProfileManager:
             "results": results,
             "method": method_used
         }
-        executed_at = datetime.now().isoformat()
-        EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
+        try:
+            executed_at = datetime.now().isoformat()
+            EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
         except Exception as e:
             logging.error(f"[{business_id}] API error: {e}")
             api_success = False
