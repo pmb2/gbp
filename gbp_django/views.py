@@ -124,6 +124,7 @@ def login(request):
             auth_login(request, user)
             print("[DEBUG] User logged in successfully")
             ensure_user_businesses(user)
+            gather_gbp_info_during_login(user)
             # Set session expiry based on remember me
             if not remember_me:
                 request.session.set_expiry(0)
@@ -1483,3 +1484,28 @@ def ensure_user_businesses(user):
         print("[DEBUG] Created default business record for user.")
     except Exception as e:
         print(f"[ERROR] Failed to create default business record: {str(e)}")
+def gather_gbp_info_during_login(user):
+    """
+    For each business associated with the user, fetch GBP profile info using the scraper.
+    Extensive [SCRAPER] logs are printed for troubleshooting.
+    """
+    from .models import Business
+    from gbp_django.scraper.gbp_info_scraper import scrape_gbp_profile
+    import json
+    businesses = Business.objects.filter(user=user)
+    print("[SCRAPER] Starting GBP info gathering during login for user:", user.email)
+    for business in businesses:
+        if business.website_url and business.website_url.strip().lower() not in ['no info', 'pending verification']:
+            print(f"[SCRAPER] Gathering GBP info for '{business.business_name}' using URL: {business.website_url}")
+            try:
+                scraped_data = scrape_gbp_profile(business.website_url)
+                print(f"[SCRAPER] Scraped data for '{business.business_name}': {scraped_data}")
+                # Save the scraped data as JSON in the website_summary field
+                business.website_summary = json.dumps(scraped_data)
+                business.save(update_fields=['website_summary'])
+                print(f"[SCRAPER] Updated website_summary for '{business.business_name}'")
+            except Exception as e:
+                print(f"[SCRAPER] Error gathering GBP info for '{business.business_name}': {e}")
+        else:
+            print(f"[SCRAPER] Skipping '{business.business_name}': no valid website URL.")
+    print("[SCRAPER] Completed GBP info gathering during login.")
