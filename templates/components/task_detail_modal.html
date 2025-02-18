@@ -43,16 +43,17 @@
         document.getElementById('taskDetailModal').classList.remove('hidden');
     }
 
+    function openTaskDetailModal() {
+        document.getElementById('taskDetailModal').classList.remove('hidden');
+    }
     function closeTaskDetailModal() {
         document.getElementById('taskDetailModal').classList.add('hidden');
     }
-
     function saveTaskDetails() {
         // Implement the API call to update task details
         console.log("Saving task details...", document.getElementById('taskDetailForm'));
         closeTaskDetailModal();
     }
-
     window.openTaskDetailModal = openTaskDetailModal;
 </script>
 <div id="taskDetailModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
