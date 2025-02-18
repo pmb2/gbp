@@ -1,0 +1,94 @@
+<div class="p-4 w-full">
+  <h3 class="text-xl font-bold mb-4">SEO Audit</h3>
+  <div id="seoAuditContent-{{ business.business_id }}">
+    <div class="p-6 border rounded-md bg-white shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-900">SEO Health Analysis</h3>
+        <button onclick="closeSeoAuditTab('{{ business.business_id }}')" class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="meta-tags-{{ business.business_id }}">
+          <div class="w-6 h-6 flex-shrink-0"></div>
+          <span>Meta Tags Optimization</span>
+        </div>
+        <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="content-quality-{{ business.business_id }}">
+          <div class="w-6 h-6 flex-shrink-0"></div>
+          <span>Content Quality</span>
+        </div>
+        <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="mobile-friendly-{{ business.business_id }}">
+          <div class="w-6 h-6 flex-shrink-0"></div>
+          <span>Mobile Friendliness</span>
+        </div>
+        <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="page-speed-{{ business.business_id }}">
+          <div class="w-6 h-6 flex-shrink-0"></div>
+          <span>Page Speed</span>
+        </div>
+        <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="backlinks-{{ business.business_id }}">
+          <div class="w-6 h-6 flex-shrink-0"></div>
+          <span>Backlink Profile</span>
+        </div>
+      </div>
+      <div class="mt-6">
+        <div class="text-sm text-gray-500">
+          Overall SEO Score: <span id="seo-score-{{ business.business_id }}" class="font-semibold">0</span>%
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div id="seo-progress-{{ business.business_id }}" class="h-2 rounded-full transition-all duration-500" style="width: 0%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function loadSeoAudit(businessId) {
+  fetch(`/api/business/${businessId}/seo-analyze/`)
+    .then(response => response.json())
+    .then(data => {
+      const metrics = {
+        'meta-tags': data.meta_tags_score,
+        'content-quality': data.content_quality_score,
+        'mobile-friendly': data.mobile_friendly_score,
+        'page-speed': data.page_speed_score,
+        'backlinks': data.backlinks_score
+      };
+      Object.entries(metrics).forEach(([key, value]) => {
+        const item = document.getElementById(`${key}-${businessId}`);
+        const iconContainer = item.querySelector('div');
+        item.classList.remove('bg-green-50', 'bg-yellow-50', 'bg-red-50');
+        if (value >= 80) {
+          item.classList.add('bg-green-50');
+          iconContainer.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+        } else if (value >= 50) {
+          item.classList.add('bg-yellow-50');
+          iconContainer.innerHTML = '<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+        } else {
+          item.classList.add('bg-red-50');
+          iconContainer.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+        }
+      });
+      const scoreEl = document.getElementById(`seo-score-${businessId}`);
+      scoreEl.textContent = data.overall_score;
+      const progressEl = document.getElementById(`seo-progress-${businessId}`);
+      progressEl.style.width = data.overall_score + '%';
+      progressEl.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
+      if (data.overall_score >= 80) {
+        progressEl.classList.add('bg-green-500');
+      } else if (data.overall_score >= 50) {
+        progressEl.classList.add('bg-yellow-500');
+      } else {
+        progressEl.classList.add('bg-red-500');
+      }
+    })
+    .catch(error => console.error('Error loading SEO Audit:', error));
+}
+document.addEventListener('DOMContentLoaded', function() {
+  loadSeoAudit('{{ business.business_id }}');
+});
+function closeSeoAuditTab(businessId) {
+  document.getElementById(`seo_audit-content-${businessId}`).classList.add('hidden');
+}
+</script>
