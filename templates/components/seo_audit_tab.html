@@ -84,7 +84,7 @@ function updateSeoChecklist(data, businessId) {
     Object.entries(items).forEach(([key, value]) => {
         const item = document.getElementById(`${key}-${businessId}`);
         const iconContainer = item.querySelector('div');
-        item.classList.remove('bg-green-50','bg-yellow-50','bg-red-50');
+        item.classList.remove('bg-green-50','bg-red-50');
         if (value >= 80) {
             item.classList.add('bg-green-50');
             iconContainer.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
@@ -103,9 +103,18 @@ function updateSeoChecklist(data, businessId) {
     } else {
         progressEl.classList.add('bg-red-500');
     }
-    // Show audit details only after successful API call
-    document.getElementById(`seoAuditContent-${businessId}`).classList.remove('hidden');
+    // Toggle display: hide audit details if overall_score is 0
+    if (data.overall_score > 0) {
+        document.getElementById(`seoAuditPrompt-${businessId}`).classList.add('hidden');
+        document.getElementById(`seoAuditHeader-${businessId}`).classList.remove('hidden');
+        document.getElementById(`seoAuditContent-${businessId}`).classList.remove('hidden');
+    } else {
+        document.getElementById(`seoAuditContent-${businessId}`).classList.add('hidden');
+    }
 }
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById(`seoAuditContent-{{ business.business_id }}`).classList.add('hidden');
+});
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById(`seoAuditContent-{{ business.business_id }}`).classList.add('hidden');
 });
