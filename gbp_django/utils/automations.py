@@ -319,7 +319,7 @@ class FallbackGBPAgent:
     async def handle_2fa(self, page):
         """Handle two-factor authentication if required"""
         print(f"[AUTH][{self.business_id}] 2FA required")
-        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Awaiting 2FA input`);
+        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Awaiting 2FA input")
         two_factor_code = input(f"[{self.business_id}] Enter 2FA code: ").strip()
         if two_factor_code:
             print(f"[AUTH][{self.business_id}] Submitting 2FA code")

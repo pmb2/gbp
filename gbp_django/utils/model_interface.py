@@ -54,8 +54,8 @@ class GroqModel(LLMInterface):
                 response_format={"type": "json_object"}
             )
             print(f"[API RESPONSE] Received status {response.status_code}")
-        
-        try:
+
+            try:
             print(f"[DATA PROCESSING] Parsing JSON response")
             result = json.loads(response.choices[0].message.content)
             print(f"[COMPLIANCE ACTIONS] Generated {len(result.get('actions', []))} actions")
