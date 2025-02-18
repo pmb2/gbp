@@ -144,6 +144,30 @@
         <script>
             console.log('🔍 business_details.html: Loading details for business:', '{{ business.business_id }}');
         </script>
+        <script>
+        function loadComplianceData(businessId) {
+            fetch(`/api/compliance/${businessId}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.actions) {
+                        renderComplianceChart(data.actions);
+                    } else {
+                        console.warn('No compliance data returned, using defaults');
+                        renderComplianceChart([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading compliance data:', error);
+                    showAlertBanner('Failed to load compliance data');
+                    renderComplianceChart([]);
+                });
+        }
+        </script>
     </div>
 
     <!-- SEO Audit Tab -->

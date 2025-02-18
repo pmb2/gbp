@@ -355,7 +355,7 @@ class FallbackGBPAgent:
             except Exception as e:
                 logging.error(f"Action failed: {str(e)}")
 
-    async def compliance_check(self, business_url: str) -> dict:
+    async def compliance_check(self, business_url: str, business_obj=None) -> dict:
         """
         Perform comprehensive compliance check by scraping full business profile details.
         Uses browser automation to collect hours, attributes, services, and verification status.
@@ -405,7 +405,7 @@ class FallbackGBPAgent:
         # Perform AI reasoning
         print(f"\n[REASONING ENGINE] Starting AI analysis for {self.business_id}")
         print(f"[UI UPDATE][{self.business_id}] Compliance stage: AI analysis")
-        llm = get_llm_model()
+        llm = get_llm_model();
         compliance_policy = get_compliance_policy()
         reasoning_prompt = f"Analyze compliance data:\n{json.dumps(compliance_data, indent=2)}"
 
