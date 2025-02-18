@@ -193,6 +193,8 @@ class FallbackGBPAgent:
         """
         Initialize the fallback agent using browser-use (which uses Playwright).
         """
+        self.username = None
+        self.password = None
         self.business_id = business_id
         self.cookies_file = cookies_file
         self.headless = headless
@@ -301,14 +303,31 @@ class FallbackGBPAgent:
         await page.close()
         return result
 
+    async def collect_credentials(self):
+        """Get credentials from env vars or prompt user if needed"""
+        from getpass import getpass
+        
+        # Check environment variables first
+        self.username = os.environ.get("GOOGLE_USER") 
+        self.password = os.environ.get("GOOGLE_PW")
+        
+        if not self.username:
+            self.username = input(f"[{self.business_id}] Enter Google username: ").strip()
+        if not self.password:
+            self.password = getpass(f"[{self.business_id}] Enter Google password: ").strip()
+
+    async def handle_2fa(self, page):
+        """Handle two-factor authentication if required"""
+        two_factor_code = input(f"[{self.business_id}] Enter 2FA code: ").strip()
+        if two_factor_code:
+            await page.fill('input[name="otp"]', two_factor_code)
+            await page.click('button:has-text("Verify")')
+            await page.wait_for_timeout(2000)
+
     async def compliance_check(self, business_url: str) -> dict:
         """
-        Perform a compliance check by scraping key sections of the business profile
-        (posts, reviews, Q&A) to detect new changes (e.g., a new review or question).
-        The scraped data is stored locally and compared to previous data to identify new entries.
-        Then, the new changes are stored in the database by creating new Post, Review, or QandA
-        records for the associated Business. Finally, the business's compliance_score is updated
-        and an AutomationLog entry is created.
+        Perform comprehensive compliance check by scraping full business profile details.
+        Uses browser automation to collect hours, attributes, services, and verification status.
         """
         from playwright.async_api import Page
         import os, json, uuid

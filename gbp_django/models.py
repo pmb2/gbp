@@ -126,6 +126,9 @@ class Business(models.Model):
     website_url = models.TextField(default='Pending verification')
     category = models.CharField(max_length=255, default='Pending verification')
     is_verified = models.BooleanField(default=False)
+    business_hours = models.JSONField(default=dict, blank=True)
+    business_attributes = models.JSONField(default=dict, blank=True)
+    services_offered = models.JSONField(default=list, blank=True)
     is_connected = models.BooleanField(default=False)  # Indicates if connected via Google OAuth
     email_settings = models.JSONField(default=dict, help_text="Email notification preferences", blank=True)
     
