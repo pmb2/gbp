@@ -190,8 +190,10 @@
             
             // Show loading state for all items
             checklist.querySelectorAll('.compliance-item').forEach(item => {
-                item.querySelector('.loading-spinner').classList.remove('hidden');
-                item.querySelector('.checkmark').classList.add('hidden');
+                const spinner = item.querySelector('.loading-spinner');
+                const checkmark = item.querySelector('.checkmark');
+                if (spinner) spinner.classList.remove('hidden');
+                if (checkmark) checkmark.classList.add('hidden');
             });
 
             fetch(`/api/business/${businessId}/compliance/`)
@@ -274,6 +276,11 @@
                 const details = item.querySelector('.task-details');
                 const missingFields = item.querySelector('.missing-fields');
                 const editForm = item.querySelector('.edit-fields');
+                
+                if (!progressCircle || !checkmark || !spinner || !details || !missingFields || !editForm) {
+                    console.warn('Missing elements in compliance item', item);
+                    return;
+                }
 
                 // Animate progress circle
                 const circumference = 2 * Math.PI * 40;
