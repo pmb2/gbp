@@ -5,8 +5,9 @@
 <!-- Modern Browser-like Tabs -->
 <div class="bg-gray-100 rounded-t-lg p-2 flex">
     <button onclick="SwitchTab('{{ business.business_id }}', 'compliance')"
-            class="tab-button flex-1 flex items-center justify-center px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
-            id="compliance-tab-{{ business.business_id }}">
+            class="tab-button flex-1 flex items-center justify-center px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200 {% if not business.website_url %}opacity-50 cursor-not-allowed{% endif %}"
+            id="compliance-tab-{{ business.business_id }}"
+            {% if not business.website_url %}disabled title="Compliance requires website URL"{% endif %}>
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -182,7 +183,11 @@
             if (tabName === 'knowledge') {
                 UpdateBusinessSummary(businessId);
             } else if (tabName === 'compliance') {
-                loadComplianceData(businessId);
+                if (typeof loadComplianceData === 'function') {
+                    loadComplianceData(businessId);
+                } else {
+                    console.warn('loadComplianceData function not found');
+                }
             }
         } catch (error) {
             console.error('Error in SwitchTab:', error);
@@ -196,14 +201,14 @@
             console.error('toggleBusinessDetails: details row not found for businessId ' + businessId);
         }
     };
+    // Initialize first business tab on load
     window.addEventListener('DOMContentLoaded', function () {
-        // For each business row, set default tab to 'knowledge' if available.
-        const businessRows = document.querySelectorAll('[data-business-id]');
-        businessRows.forEach(row => {
-            const businessId = row.dataset.businessId;
+        const firstBusiness = document.querySelector('.business-details-container');
+        if (firstBusiness) {
+            const businessId = '{{ business.business_id }}';
             if (document.getElementById(`knowledge-tab-${businessId}`)) {
                 SwitchTab(businessId, 'knowledge');
             }
-        });
+        }
     });
 </script>
