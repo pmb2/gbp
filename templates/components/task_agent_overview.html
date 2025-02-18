@@ -1,3 +1,16 @@
+<script>
+window.switchTaskTab = function(tabName) {
+    document.querySelectorAll('[id^="tab-content-"]').forEach(function(content) {
+        content.classList.add('hidden');
+    });
+    var active = document.getElementById('tab-content-' + tabName);
+    if (active) {
+        active.classList.remove('hidden');
+    } else {
+        console.error('switchTaskTab: No content found for ' + tabName);
+    }
+};
+</script>
 <div class="p-4 w-full">
   <div class="flex border-b mb-4">
     <button id="compliance-tab" class="flex-1 py-2 text-center font-bold text-gray-600 border-b-2 border-transparent hover:border-blue-500" onclick="switchTaskTab('compliance')">Compliance</button>

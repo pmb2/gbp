@@ -420,6 +420,8 @@ window.openTaskDetailModal = function() {
         document.getElementById(`${tabName}-content-${businessId}`).classList.remove('hidden');
         if (tabName === 'knowledge') {
             UpdateBusinessSummary(businessId);
+        } else if (tabName === 'compliance') {
+            loadComplianceData(businessId);
         }
     };
 
