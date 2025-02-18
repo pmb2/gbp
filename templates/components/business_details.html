@@ -34,11 +34,16 @@
 </div>
 <script>
     function toggleBDContent(businessId) {
-        const viewMode = document.getElementById(`view-mode-${businessId}`);
-        if (viewMode) {
+        const viewMode = document.getElementById('view-mode-' + businessId);
+        const editMode = document.getElementById('edit-mode-' + businessId);
+        const editIcon = document.getElementById('edit-icon-' + businessId);
+
+        if (viewMode && editMode && editIcon) {
             viewMode.classList.toggle('hidden');
+            editMode.classList.toggle('hidden');
+            editIcon.textContent = viewMode.classList.contains('hidden') ? '📁' : '✏️';
         } else {
-            console.error('Business details view not found for business:', businessId);
+            console.error('Business details elements not found for business:', businessId);
         }
     }
 </script>
@@ -148,35 +153,39 @@
 <script>
     window.SwitchTab = function (businessId, tabName) {
         console.log('SwitchTab called with', businessId, tabName);
-        // Reset tab buttons for this business.
-        const tabs = document.querySelectorAll(`[id$="-tab-${businessId}"]`);
-        tabs.forEach(tab => {
-            tab.classList.remove('bg-white', 'text-blue-600');
-            tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
-        });
-        // Activate the selected tab button.
-        const activeTab = document.getElementById(`${tabName}-tab-${businessId}`);
-        if (activeTab) {
-            activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
-            activeTab.classList.add('bg-white', 'text-blue-600');
-        } else {
-            console.error('SwitchTab: active tab not found for tab ' + tabName + ' and businessId ' + businessId);
-        }
-        // Hide all tab contents.
-        const contents = document.querySelectorAll(`[id$="-content-${businessId}"]`);
-        contents.forEach(content => content.classList.add('hidden'));
-        // Show selected tab content.
-        const activeContent = document.getElementById(`${tabName}-content-${businessId}`);
-        if (activeContent) {
-            activeContent.classList.remove('hidden');
-        } else {
-            console.error('SwitchTab: active content not found for tab ' + tabName + ' and businessId ' + businessId);
-        }
-        // Additional functionality for specific tabs.
-        if (tabName === 'knowledge') {
-            UpdateBusinessSummary(businessId);
-        } else if (tabName === 'compliance') {
-            loadComplianceData(businessId);
+        try {
+            // Reset tab buttons for this business.
+            const tabs = document.querySelectorAll('[id$="-tab-' + businessId + '"]');
+            tabs.forEach(tab => {
+                tab.classList.remove('bg-white', 'text-blue-600');
+                tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+            });
+            
+            // Activate the selected tab button.
+            const activeTab = document.getElementById(tabName + '-tab-' + businessId);
+            if (activeTab) {
+                activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+                activeTab.classList.add('bg-white', 'text-blue-600');
+            }
+            
+            // Hide all tab contents.
+            const contents = document.querySelectorAll('[id$="-content-' + businessId + '"]');
+            contents.forEach(content => content.classList.add('hidden'));
+            
+            // Show selected tab content.
+            const activeContent = document.getElementById(tabName + '-content-' + businessId);
+            if (activeContent) {
+                activeContent.classList.remove('hidden');
+            }
+            
+            // Additional functionality for specific tabs.
+            if (tabName === 'knowledge') {
+                UpdateBusinessSummary(businessId);
+            } else if (tabName === 'compliance') {
+                loadComplianceData(businessId);
+            }
+        } catch (error) {
+            console.error('Error in SwitchTab:', error);
         }
     };
     window.toggleBusinessDetails = function (businessId) {
