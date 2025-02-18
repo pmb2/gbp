@@ -46,7 +46,7 @@
 <!-- Tab Contents -->
 <div class="p-4">
     <!-- Business Details Tab -->
-    <div class="business-details-container bg-white rounded-lg shadow p-6"
+    <div class="business-details-container {% if not business.website_url %}bg-red-50 animate-pulse{% else %}bg-white{% endif %} rounded-lg shadow p-6"
          id="business-details-{{ business.business_id }}">
         <div class="grid grid-cols-1 gap-4">
             <!-- Business Details Section -->
