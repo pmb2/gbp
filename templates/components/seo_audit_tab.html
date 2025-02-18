@@ -8,7 +8,7 @@
         {% else %}
           <div class="flex flex-col items-center">
             <h3 class="text-lg font-semibold text-red-600">No valid website provided.</h3>
-            <p class="text-sm text-red-500">Please enter your website URL below and click "Run Audit".</p>
+            <p class="text-sm text-red-500">Please enter your website URL and click "Run Audit" to perform an SEO analysis.</p>
             <div class="mt-2 flex">
               <input type="text" id="seoWebsiteInput-{{ business.business_id }}" placeholder="https://example.com" class="border rounded px-2 py-1 text-sm mr-2">
               <button onclick="runSeoAudit('{{ business.business_id }}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Run Audit</button>
@@ -50,49 +50,64 @@
   </div>
 </div>
 <script>
-function loadSeoAudit(businessId) {
-  fetch(`/api/business/${businessId}/seo-analyze/`)
-    .then(response => response.json())
-    .then(data => {
-      const metrics = {
+function runSeoAudit(businessId) {
+    const websiteInput = document.getElementById(`seoWebsiteInput-${businessId}`);
+    let website = websiteInput ? websiteInput.value.trim() : "";
+    if (!website) {
+         alert('Please enter a valid website URL');
+         return;
+    }
+    fetch(`/api/business/${businessId}/seo-analyze/?website=${encodeURIComponent(website)}`)
+       .then(response => response.json())
+       .then(data => {
+             if (data.overall_score > 0) {
+                  updateSeoChecklist(data, businessId);
+             } else {
+                  alert('SEO audit failed. Please check the website URL and try again.');
+             }
+       })
+       .catch(error => {
+             console.error('SEO audit error:', error);
+             alert('Error performing SEO audit.');
+       });
+}
+
+function updateSeoChecklist(data, businessId) {
+    const items = {
         'meta-tags': data.meta_tags_score,
         'content-quality': data.content_quality_score,
         'mobile-friendly': data.mobile_friendly_score,
         'page-speed': data.page_speed_score,
         'backlinks': data.backlinks_score
-      };
-      Object.entries(metrics).forEach(([key, value]) => {
+    };
+
+    Object.entries(items).forEach(([key, value]) => {
         const item = document.getElementById(`${key}-${businessId}`);
         const iconContainer = item.querySelector('div');
-        item.classList.remove('bg-green-50', 'bg-yellow-50', 'bg-red-50');
+        item.classList.remove('bg-green-50','bg-yellow-50','bg-red-50');
         if (value >= 80) {
-          item.classList.add('bg-green-50');
-          iconContainer.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
-        } else if (value >= 50) {
-          item.classList.add('bg-yellow-50');
-          iconContainer.innerHTML = '<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+            item.classList.add('bg-green-50');
+            iconContainer.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
         } else {
-          item.classList.add('bg-red-50');
-          iconContainer.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
+            item.classList.add('bg-red-50');
+            iconContainer.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>';
         }
-      });
-      const scoreEl = document.getElementById(`seo-score-${businessId}`);
-      scoreEl.textContent = data.overall_score;
-      const progressEl = document.getElementById(`seo-progress-${businessId}`);
-      progressEl.style.width = data.overall_score + '%';
-      progressEl.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
-      if (data.overall_score >= 80) {
+    });
+    const scoreEl = document.getElementById(`seo-score-${businessId}`);
+    scoreEl.textContent = data.overall_score;
+    const progressEl = document.getElementById(`seo-progress-${businessId}`);
+    progressEl.style.width = data.overall_score + '%';
+    progressEl.classList.remove('bg-green-500','bg-red-500');
+    if (data.overall_score >= 80) {
         progressEl.classList.add('bg-green-500');
-      } else if (data.overall_score >= 50) {
-        progressEl.classList.add('bg-yellow-500');
-      } else {
+    } else {
         progressEl.classList.add('bg-red-500');
-      }
-    })
-    .catch(error => console.error('Error loading SEO Audit:', error));
+    }
+    // Show audit details only after successful API call
+    document.getElementById(`seoAuditContent-${businessId}`).classList.remove('hidden');
 }
 document.addEventListener('DOMContentLoaded', function() {
-  loadSeoAudit('{{ business.business_id }}');
+  document.getElementById(`seoAuditContent-{{ business.business_id }}`).classList.add('hidden');
 });
 function closeSeoAuditTab(businessId) {
   document.getElementById(`seo_audit-content-${businessId}`).classList.add('hidden');
