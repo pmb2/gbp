@@ -22,6 +22,8 @@ from django.views.decorators.http import require_http_methods
 
 from allauth.socialaccount import providers
 from allauth.socialaccount.models import SocialApp
+from gbp_django.models import Business
+from gbp_django.utils.automations import FallbackGBPAgent
 
 from .models import (
     User, Post, QandA, Review, FAQ, Business, Notification, Task
@@ -399,6 +401,10 @@ def google_oauth_callback(request):
 
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import os
+import json
+import asyncio
 from django.contrib.auth.decorators import login_required
 import json
 
@@ -446,6 +452,69 @@ def mark_all_notifications_read(request):
     ).update(read=True)
     return JsonResponse({'status': 'success'})
 
+
+@csrf_exempt
+@login_required
+@require_http_methods(["POST"])
+def handle_compliance_update(request):
+    """Handle compliance form submissions using FallbackGBPAgent"""
+    try:
+        data = json.loads(request.body)
+        business_id = data.get('business_id')
+        field = data.get('field')
+        value = data.get('value')
+
+        if not all([business_id, field, value]):
+            return JsonResponse({'status': 'error', 'message': 'Missing required fields'}, status=400)
+
+        business = Business.objects.get(business_id=business_id, user=request.user)
+        
+        # Configure browser automation
+        chrome_path = "/usr/bin/chromium"  # Common chromium path
+        cookies_folder = os.path.join(os.path.dirname(__file__), "browser_cookies")
+        os.makedirs(cookies_folder, exist_ok=True)
+        cookies_file = os.path.join(cookies_folder, f"cookies_{business_id}.json")
+
+        # Create and run fallback agent
+        agent = FallbackGBPAgent(
+            business_id=business_id,
+            cookies_file=cookies_file,
+            chrome_path=chrome_path,
+            headless=True
+        )
+
+        # Update business model and execute browser automation
+        update_mapping = {
+            'website': ('website_url', 'https://business.google.com/'),
+            'hours': ('business_hours', ''),
+            'category': ('category', '')
+        }
+        
+        if field not in update_mapping:
+            return JsonResponse({'status': 'error', 'message': 'Invalid field'}, status=400)
+
+        model_field, default_value = update_mapping[field]
+        setattr(business, model_field, value or default_value)
+        business.save()
+
+        # Execute browser automation
+        result = asyncio.run(agent.update_business_info(
+            business_url=f"https://business.google.com/locations/{business_id}",
+            new_hours=business.business_hours,
+            new_website=business.website_url
+        ))
+
+        return JsonResponse({
+            'status': 'success' if result.get('status') == 'success' else 'error',
+            'message': result.get('message', 'Operation completed')
+        })
+
+    except Business.DoesNotExist:
+        return JsonResponse({'status': 'error', 'message': 'Business not found'}, status=404)
+    except json.JSONDecodeError:
+        return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 def get_time_ago(timestamp):
     """
