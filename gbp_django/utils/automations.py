@@ -360,8 +360,10 @@ class FallbackGBPAgent:
         Perform comprehensive compliance check by scraping full business profile details.
         Uses browser automation to collect hours, attributes, services, and verification status.
         """
-        print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
-        print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
+        print(f"\n[COMPLIANCE CHECK] Initializing check for {self.business_id}")
+        print(f"[AGENT TASKS] Starting browser instance (headless: {self.headless})")
+        print(f"[BROWSER CONFIG] Chrome path: {self.chrome_path}")
+        print(f"[SESSION STATE] Cookies file: {self.cookies_file}")
         print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
         print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
         from playwright.async_api import Page
@@ -381,7 +383,9 @@ class FallbackGBPAgent:
         }
         
         for section, url in sections.items():
-            print(f"[COMPLIANCE CHECK][{self.business_id}] Scanning {section} section at {url}")
+            print(f"\n[COMPLIANCE CHECK][{self.business_id}] Scanning {section.upper()} section")
+            print(f"[BROWSER ACTION] Navigating to {url}")
+            print(f"[DATA COLLECTION] Waiting for selector '.item'")
             console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Analyzing ${section.replace('_', ' ')}`);
             logging.info(f"[{self.business_id} Compliance] Checking {section} at {url}")
             await page.goto(url)

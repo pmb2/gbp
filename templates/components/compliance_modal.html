@@ -209,6 +209,15 @@
                 if (checkmark) checkmark.classList.add('hidden');
             });
 
+            // Update UI with initial status
+            const statusElement = document.getElementById(`compliance-stage-${businessId}`);
+            statusElement.innerHTML = `
+                <div class="flex items-center text-sm text-gray-600">
+                    <div class="animate-spin mr-2">🔄</div>
+                    <span>Initializing compliance engine...</span>
+                </div>
+            `;
+
             fetch(`/api/business/${businessId}/compliance/`)
                 .then(response => {
                     if (!response.ok) {
@@ -234,6 +243,13 @@
                     } else {
                         data.business_id = businessId; // Ensure business_id is set
                     }
+                    // Update status visualization
+                    statusElement.innerHTML = `
+                        <div class="flex items-center text-sm text-green-600">
+                            <div class="mr-2">✅</div>
+                            <span>Completed ${data.actions.length} actions</span>
+                        </div>
+                    `;
                     updateComplianceChecklist(data);
                 })
                 .catch(error => {

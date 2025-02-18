@@ -25,32 +25,45 @@ class LLMInterface(ABC):
 class GroqModel(LLMInterface):
     def structured_reasoning(self, pre_prompt: str, prompt: str, max_tokens: int = 2000) -> dict:
         """Execute structured reasoning with pre-prompt and prompt, returning JSON-formatted actions."""
-        print(f"\n[REASONING ENGINE] Starting structured reasoning")
-        print(f"[REASONING CONTEXT] Business ID: {prompt.split('business_id: ')[1].split('\n')[0] if 'business_id' in prompt else 'Unknown'}")
+        print(f"\n[COMPLIANCE ENGINE] Initializing reasoning pipeline")
+        print(f"[COMPLIANCE CONTEXT] Business ID: {prompt.split('business_id: ')[1].split('\n')[0] if 'business_id' in prompt else 'Unknown'}")
+        print(f"[MODEL SETUP] Using deepseek-r1-distill-llama-70b-specdec")
         system_msg = {
             "role": "system",
-            "content": f"{pre_prompt}\n\nALWAYS RESPOND WITH VALID JSON USING THIS SCHEMA:\n"
-                       "{'reasoning': '...', 'actions': [{'type': 'update|alert|verify', 'target': '...', 'details': '...'}]}"
+            "content": f"{pre_prompt}\n\nOUTPUT MUST BE VALID JSON FOLLOWING THIS SCHEMA:\n"
+                       "{'reasoning': '...', 'actions': [{'type': 'update|verify|quarantine|alert|log', "
+                       "'target': '...', 'details': '...', 'risk_score': 1-10, 'confidence': 0.0-1.0, "
+                       "'eta': 'ISO8601', 'dependencies': [...]}]}"
         }
         print(f"[REASONING SYSTEM PROMPT]\n{system_msg['content'][:500]}...")
         print(f"[REASONING USER PROMPT]\n{prompt[:500]}...")
+        print(f"[API REQUEST] Initializing Groq API connection")
         
         user_msg = {
             "role": "user",
             "content": prompt
         }
 
-        response = self.client.chat.completions.create(
-            model="deepseek-r1-distill-llama-70b-specdec",
-            messages=[system_msg, user_msg],
-            temperature=0.3,
-            max_tokens=max_tokens,
-            response_format={"type": "json_object"}
-        )
+        print(f"[API REQUEST] Sending payload to Groq API")
+        try:
+            response = self.client.chat.completions.create(
+                model="deepseek-r1-distill-llama-70b-specdec",
+                messages=[system_msg, user_msg],
+                temperature=0.3,
+                max_tokens=max_tokens,
+                response_format={"type": "json_object"}
+            )
+            print(f"[API RESPONSE] Received status {response.status_code}")
         
         try:
-            return json.loads(response.choices[0].message.content)
-        except json.JSONDecodeError:
+            print(f"[DATA PROCESSING] Parsing JSON response")
+            result = json.loads(response.choices[0].message.content)
+            print(f"[COMPLIANCE ACTIONS] Generated {len(result.get('actions', []))} actions")
+            print(f"[RISK ASSESSMENT] Highest risk score: {max(a.get('risk_score', 0) for a in result.get('actions', [])})")
+            return result
+        except json.JSONDecodeError as e:
+            print(f"[ERROR] JSON parsing failed: {str(e)}")
+            print(f"[DEBUG] Raw response: {response.choices[0].message.content[:500]}")
             return {"error": "Failed to parse model response", "raw_response": response.choices[0].message.content}
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
