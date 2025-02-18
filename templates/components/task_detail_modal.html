@@ -45,6 +45,7 @@ function saveTaskDetails() {
   console.log("Saving task details...", document.getElementById('taskDetailForm'));
   closeTaskDetailModal();
 }
+window.openTaskDetailModal = openTaskDetailModal;
 </script>
 <div id="taskDetailModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
   <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
