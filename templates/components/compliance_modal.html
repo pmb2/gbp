@@ -1,5 +1,5 @@
-<div id="complianceModal" class="hidden">
-    <div class="bg-white w-full p-6 rounded-md shadow">
+<div class="p-4">
+    <div class="bg-white w-full rounded-lg shadow-sm">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-gray-900">Compliance Checklist</h3>
             <div class="flex space-x-2">
@@ -85,7 +85,7 @@
     }
 
     function loadComplianceData(businessId) {
-        fetch(`/api/business/${businessId}/compliance_status/`)
+        fetch(`/api/business/${businessId}/compliance/`)
             .then(response => {
                 if (!response.ok) {
                     console.error('Error loading compliance data: ', response.statusText);
