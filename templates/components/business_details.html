@@ -123,6 +123,9 @@
         </div>
     </div>
 
+    <div class="tab-content hidden" id="tasks_agents-content-{{ business.business_id }}">
+        {% include 'components/task_agent_overview.html' with business=business %}
+    </div>
     <!-- Knowledge Base Tab -->
     <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}"
          ondrop="handleBusinessRowDrop(event, '{{ business.business_id }}')"
