@@ -397,11 +397,22 @@ class FallbackGBPAgent:
         from gbp_django.utils.model_interface import get_llm_model
         
         # Perform AI reasoning
+        print(f"\n[REASONING ENGINE] Starting AI analysis for {self.business_id}")
+        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: AI analysis`);
         llm = get_llm_model()
+        compliance_policy = get_compliance_policy()
+        reasoning_prompt = f"Analyze compliance data:\n{json.dumps(compliance_data, indent=2)}"
+
+        print(f"[REASONING PROMPT][{self.business_id}] Policy:\n{compliance_policy[:500]}...")
+        print(f"[REASONING PROMPT][{self.business_id}] Data:\n{reasoning_prompt[:500]}...")
+        
         reasoning_result = llm.structured_reasoning(
-            pre_prompt=get_compliance_policy(),
-            prompt=f"Analyze compliance data:\n{json.dumps(compliance_data, indent=2)}"
+            pre_prompt=compliance_policy,
+            prompt=reasoning_prompt
         )
+        
+        print(f"[REASONING RESULT][{self.business_id}] Raw output:\n{json.dumps(reasoning_result, indent=2)}")
+        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Processing ${reasoning_result.actions?.length || 0} actions`);
 
         # Process automated actions
         if 'actions' in reasoning_result:
