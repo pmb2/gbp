@@ -25,10 +25,6 @@
         <label for="lastUpdate" class="text-right col-span-1 text-sm font-medium">Last Update</label>
         <input type="text" id="lastUpdate" name="lastUpdate" value="{{ agent.lastUpdate }}" class="col-span-3 border rounded px-2 py-1 text-sm" disabled>
       </div>
-      <div class="flex items-center space-x-2 py-2">
-        <input type="checkbox" id="activeMode" name="activeMode" class="h-5 w-5" {% if agent.status == "working" %}checked="checked"{% endif %}>
-        <label for="activeMode" class="text-sm">Active Mode</label>
-      </div>
       <div class="grid grid-cols-4 items-center gap-4 py-2">
         <label for="description" class="text-right col-span-1 text-sm font-medium">Description</label>
         <textarea id="description" name="description" class="col-span-3 border rounded px-2 py-1 text-sm">{{ agent.description }}</textarea>
