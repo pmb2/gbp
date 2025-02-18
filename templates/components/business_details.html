@@ -132,3 +132,14 @@
         {% include 'components/seo_health_modal.html' with business=business %}
     </div>
 </div>
+<script>
+window.toggleBusinessDetails = function(businessId) {
+    const detailsRow = document.getElementById(`details-${businessId}`);
+    if (detailsRow) {
+        // Toggle display between "table-row" and "none" since this row is inside a table
+        detailsRow.style.display = (detailsRow.style.display === 'none' || detailsRow.style.display === '') ? 'table-row' : 'none';
+    } else {
+        console.error('No details row found for businessId:', businessId);
+    }
+}
+</script>
