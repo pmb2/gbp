@@ -65,6 +65,10 @@ class GroqModel(LLMInterface):
                 print(f"[ERROR] JSON parsing failed: {str(e)}")
                 print(f"[DEBUG] Raw response: {response.choices[0].message.content[:500]}")
                 return {"error": "Failed to parse model response", "raw_response": response.choices[0].message.content}
+        except Exception as e:
+            print(f"[ERROR] Groq API request failed: {str(e)}")
+            return {"error": "API request failed", "details": str(e)}
+
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
         # Example model names—adjust for your Groq account
