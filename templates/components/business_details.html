@@ -4,14 +4,14 @@
 
 <!-- Modern Browser-like Tabs -->
 <div class="bg-gray-100 rounded-t-lg p-2 flex space-x-1">
-    <button onclick="SwitchTab('{{ business.business_id }}', 'details')"
+    <button onclick="SwitchTab('{{ business.business_id }}', 'tasks_agents')"
             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
-            id="details-tab-{{ business.business_id }}">
+            id="tasks_agents-tab-{{ business.business_id }}">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
-        <span>Business Details</span>
+        <span>Tasks &amp; Agents</span>
     </button>
     <button onclick="SwitchTab('{{ business.business_id }}', 'knowledge')"
             class="tab-button flex items-center space-x-2 px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
@@ -36,7 +36,7 @@
 <!-- Tab Contents -->
 <div class="p-4">
     <!-- Business Details & Settings Tab -->
-    <div class="tab-content active" id="details-content-{{ business.business_id }}">
+    <div class="business-details-container" id="business-details-{{ business.business_id }}">
         <div class="grid grid-cols-2 gap-6">
             <!-- Business Details Section -->
             <div>
