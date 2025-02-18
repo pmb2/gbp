@@ -3,9 +3,8 @@
   <table class="w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
       <tr>
-        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
         <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
@@ -13,11 +12,13 @@
     <tbody class="bg-white divide-y divide-gray-200">
       <!-- Example row (to be dynamically rendered) -->
       <tr>
-        <td class="px-4 py-2">Review Responder</td>
-        <td class="px-4 py-2">Task</td>
         <td class="px-4 py-2">
-          <span class="inline-block px-2 py-1 rounded-full bg-blue-100 text-blue-800">🔵 In-Progress</span>
+          <div class="group inline-block relative">
+            <span class="inline-block w-4 h-4 rounded-full bg-blue-100"></span>
+            <span class="absolute left-full top-0 ml-1 text-xs text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-200">In-Progress</span>
+          </div>
         </td>
+        <td class="px-4 py-2">Review Responder</td>
         <td class="px-4 py-2">Due: 08/15 – Auto-response pending</td>
         <td class="px-4 py-2">
           <button class="text-blue-600 hover:underline">View Details</button>
