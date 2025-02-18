@@ -1,103 +1,113 @@
 <div id="taskDetailModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold">Task Details</h3>
-      <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Task Details</h3>
+            <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <form id="taskDetailForm">
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="taskName" class="text-right col-span-1 text-sm font-medium">Name</label>
+                <input type="text" id="taskName" name="name" value="{{ task.name }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="taskStatus" class="text-right col-span-1 text-sm font-medium">Status</label>
+                <input type="text" id="taskStatus" name="status" value="{{ task.status }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="dueDate" class="text-right col-span-1 text-sm font-medium">Due Date</label>
+                <input type="date" id="dueDate" name="dueDate" value="{{ task.dueDate }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="taskDescription" class="text-right col-span-1 text-sm font-medium">Description</label>
+                <textarea id="taskDescription" name="description"
+                          class="col-span-3 border rounded px-2 py-1 text-sm">{{ task.description }}</textarea>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button type="button" onclick="saveTaskDetails()"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
+                    Save changes
+                </button>
+            </div>
+        </form>
     </div>
-    <form id="taskDetailForm">
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="taskName" class="text-right col-span-1 text-sm font-medium">Name</label>
-        <input type="text" id="taskName" name="name" value="{{ task.name }}" class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="taskStatus" class="text-right col-span-1 text-sm font-medium">Status</label>
-        <input type="text" id="taskStatus" name="status" value="{{ task.status }}" class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="dueDate" class="text-right col-span-1 text-sm font-medium">Due Date</label>
-        <input type="date" id="dueDate" name="dueDate" value="{{ task.dueDate }}" class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="taskDescription" class="text-right col-span-1 text-sm font-medium">Description</label>
-        <textarea id="taskDescription" name="description" class="col-span-3 border rounded px-2 py-1 text-sm">{{ task.description }}</textarea>
-      </div>
-      <div class="flex justify-end mt-4">
-        <button type="button" onclick="saveTaskDetails()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
-            Save changes
-        </button>
-      </div>
-    </form>
-  </div>
 </div>
 <script>
-function openTaskDetailModal() {
-  document.getElementById('taskDetailModal').classList.remove('hidden');
-}
-function closeTaskDetailModal() {
-  document.getElementById('taskDetailModal').classList.add('hidden');
-}
-function saveTaskDetails() {
-  // Implement the API call to update task details
-  console.log("Saving task details...", document.getElementById('taskDetailForm'));
-  closeTaskDetailModal();
-}
-window.openTaskDetailModal = openTaskDetailModal;
+    function openTaskDetailModal() {
+        document.getElementById('taskDetailModal').classList.remove('hidden');
+    }
+
+    function closeTaskDetailModal() {
+        document.getElementById('taskDetailModal').classList.add('hidden');
+    }
+
+    function saveTaskDetails() {
+        // Implement the API call to update task details
+        console.log("Saving task details...", document.getElementById('taskDetailForm'));
+        closeTaskDetailModal();
+    }
+
+    window.openTaskDetailModal = openTaskDetailModal;
 </script>
 <div id="taskDetailModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold">Task Details</h3>
-      <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Task Details</h3>
+            <button onclick="closeTaskDetailModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <form id="taskDetailForm">
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="name" class="text-right col-span-1 text-sm font-medium">Name</label>
+                <input type="text" id="name" name="name" value="{{ task.name }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="status" class="text-right col-span-1 text-sm font-medium">Status</label>
+                <input type="text" id="status" name="status" value="{{ task.status }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="dueDate" class="text-right col-span-1 text-sm font-medium">Due Date</label>
+                <input type="date" id="dueDate" name="dueDate" value="{{ task.dueDate }}"
+                       class="col-span-3 border rounded px-2 py-1 text-sm">
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4 py-2">
+                <label for="description" class="text-right col-span-1 text-sm font-medium">Description</label>
+                <textarea id="description" name="description"
+                          class="col-span-3 border rounded px-2 py-1 text-sm">{{ task.description }}</textarea>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button type="button" onclick="saveTaskDetails()"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
+                    Save changes
+                </button>
+            </div>
+        </form>
     </div>
-    <form id="taskDetailForm">
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="name" class="text-right col-span-1 text-sm font-medium">Name</label>
-        <input type="text" id="name" name="name" value="{{ task.name }}" 
-               class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="status" class="text-right col-span-1 text-sm font-medium">Status</label>
-        <input type="text" id="status" name="status" value="{{ task.status }}" 
-               class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="dueDate" class="text-right col-span-1 text-sm font-medium">Due Date</label>
-        <input type="date" id="dueDate" name="dueDate" value="{{ task.dueDate }}" 
-               class="col-span-3 border rounded px-2 py-1 text-sm">
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4 py-2">
-        <label for="description" class="text-right col-span-1 text-sm font-medium">Description</label>
-        <textarea id="description" name="description" 
-                  class="col-span-3 border rounded px-2 py-1 text-sm">{{ task.description }}</textarea>
-      </div>
-      <div class="flex justify-end mt-4">
-        <button type="button" onclick="saveTaskDetails()" 
-                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
-          Save changes
-        </button>
-      </div>
-    </form>
-  </div>
 </div>
 <script>
-function openTaskDetailModal() {
-  document.getElementById('taskDetailModal').classList.remove('hidden');
-}
-function closeTaskDetailModal() {
-  document.getElementById('taskDetailModal').classList.add('hidden');
-}
-function saveTaskDetails() {
-  // Make your API call here to update the task; for now log the form contents.
-  console.log("Saving task:", document.getElementById('taskDetailForm'));
-  closeTaskDetailModal();
-}
+    function openTaskDetailModal() {
+        document.getElementById('taskDetailModal').classList.remove('hidden');
+    }
+
+    function closeTaskDetailModal() {
+        document.getElementById('taskDetailModal').classList.add('hidden');
+    }
+
+    function saveTaskDetails() {
+        // Make your API call here to update the task; for now log the form contents.
+        console.log("Saving task:", document.getElementById('taskDetailForm'));
+        closeTaskDetailModal();
+    }
 </script>
