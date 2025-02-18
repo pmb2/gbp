@@ -42,15 +42,15 @@
 </div>
 
 <script>
-function showSeoHealthModal(businessId) {
-    const modal = document.getElementById('seoHealthModal');
-    modal.classList.remove('hidden');
-    loadSeoData(businessId);
-}
+function loadSeoData(businessId) {
+    const website = document.querySelector(`[data-business-id="${businessId}"] [data-website]`)?.dataset.website;
+    
+    if (!website) {
+        document.getElementById(`seoAuditPrompt-${businessId}`).classList.remove('hidden');
+        return;
+    }
 
-function closeSeoHealthModal() {
-    document.getElementById('seoHealthModal').classList.add('hidden');
-}
+    fetch(`/api/business/${businessId}/seo-health/`)
 
 function loadSeoData(businessId) {
     fetch(`/api/business/${businessId}/seo-health/`)
