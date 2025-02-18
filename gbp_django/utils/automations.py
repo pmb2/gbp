@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Integrated Google Business Profile Automation with Onboarding
+Integrated Google Business Profile Automation with Onboarding and Compliance Check
 
 This module:
   1. Attempts to perform tasks (e.g. update info, respond to reviews, schedule posts, upload photos)
@@ -8,6 +8,8 @@ This module:
   2. Falls back to browser automation (using browser‑use/Playwright) when API access isn’t available.
   3. Provides an interactive onboarding function so users can add new business accounts
      by collecting cookies/session data (or credentials) required for automation.
+  4. Performs periodic compliance checks by scraping key pages (posts, reviews, Q&A)
+     to detect new changes such as new questions or reviews.
 """
 
 import os
@@ -299,6 +301,120 @@ class FallbackGBPAgent:
         await page.close()
         return result
 
+    async def compliance_check(self, business_url: str) -> dict:
+        """
+        Perform a compliance check by scraping key sections of the business profile
+        (posts, reviews, Q&A) to detect new changes (e.g., a new review or question).
+        The scraped data is stored locally and compared to previous data to identify new entries.
+        Then, the new changes are stored in the database by creating new Post, Review, or QandA
+        records for the associated Business. Finally, the business's compliance_score is updated
+        and an AutomationLog entry is created.
+        """
+        from playwright.async_api import Page
+        import os, json, uuid
+        from datetime import datetime
+        # Import Django models – adjust the import path if necessary.
+        from gbp_django.models import Business, Post, Review, QandA, AutomationLog
+
+        page: Page = await self.context.new_page()
+        compliance_data = {}
+        # Define the sections and their assumed URLs (adjust as needed)
+        sections = {
+            "posts": f"{business_url}/posts",
+            "reviews": f"{business_url}/reviews",
+            "qna": f"{business_url}/qna"  # Assumed URL for Q&A; update if needed.
+        }
+        for section, url in sections.items():
+            logging.info(f"[{self.business_id} Compliance] Checking {section} at {url}")
+            await page.goto(url)
+            await page.wait_for_timeout(2000)  # Wait for data to load; adjust as necessary.
+            # Replace '.item' with the appropriate selector for your page.
+            items = await page.query_selector_all(".item")
+            section_data = []
+            for item in items:
+                text = await item.inner_text()
+                section_data.append(text.strip())
+            compliance_data[section] = section_data
+
+        await page.close()
+
+        # Path for storing the last compliance state locally
+        compliance_file = os.path.join(os.path.dirname(self.cookies_file), f"compliance_{self.business_id}.json")
+        new_changes = {}
+        if os.path.exists(compliance_file):
+            with open(compliance_file, "r") as f:
+                old_data = json.load(f)
+            # Compare each section's data to identify new entries.
+            for section in compliance_data:
+                old_section_data = old_data.get(section, [])
+                new_entries = [entry for entry in compliance_data[section] if entry not in old_section_data]
+                if new_entries:
+                    new_changes[section] = new_entries
+        else:
+            # If no previous compliance file exists, consider all scraped items as new.
+            new_changes = compliance_data
+
+        # Save the latest scraped data.
+        with open(compliance_file, "w") as f:
+            json.dump(compliance_data, f, indent=2)
+        logging.info(f"[{self.business_id} Compliance] Compliance check completed. New changes: {new_changes}")
+
+        # Connect to the DB: Retrieve the associated Business instance.
+        try:
+            business_obj = Business.objects.get(business_id=self.business_id)
+        except Business.DoesNotExist:
+            logging.error(f"[{self.business_id} Compliance] Business not found in DB.")
+            return {"status": "failed", "error": "Business not found"}
+
+        # Process new posts: Create a Post record for each new post if it doesn't already exist.
+        if "posts" in new_changes:
+            for post_content in new_changes["posts"]:
+                if not Post.objects.filter(business=business_obj, content=post_content).exists():
+                    Post.objects.create(
+                        business=business_obj,
+                        post_id=str(uuid.uuid4()),
+                        post_type="compliance",
+                        content=post_content,
+                        status="completed"
+                    )
+        # Process new reviews: Create a Review record for each new review if it doesn't already exist.
+        if "reviews" in new_changes:
+            for review_content in new_changes["reviews"]:
+                if not Review.objects.filter(business=business_obj, content=review_content).exists():
+                    Review.objects.create(
+                        business=business_obj,
+                        review_id=str(uuid.uuid4()),
+                        content=review_content,
+                        rating=5,  # Use a default rating or adjust as needed.
+                        responded=False
+                    )
+        # Process new Q&A items: Create a QandA record for each new question if it doesn't already exist.
+        if "qna" in new_changes:
+            for question_content in new_changes["qna"]:
+                if not QandA.objects.filter(business=business_obj, question=question_content).exists():
+                    QandA.objects.create(
+                        business=business_obj,
+                        question=question_content,
+                        answered=False
+                    )
+
+        # Update the business's compliance score.
+        score = sum(len(new_changes.get(section, [])) for section in new_changes)
+        business_obj.compliance_score = score
+        business_obj.save(update_fields=["compliance_score"])
+
+        # Log the compliance check in the AutomationLog.
+        AutomationLog.objects.create(
+            business_id=self.business_id,
+            action_type="SYSTEM_ALERT",
+            details={"compliance_check": new_changes},
+            status="COMPLETED",
+            user_id="system",  # Alternatively, use a system user identifier.
+            executed_at=datetime.now()
+        )
+
+        return {"status": "success", "new_changes": new_changes, "compliance_data": compliance_data}
+
 
 ###############################################################################
 # BusinessProfileManager: Managing Multiple Business Accounts
@@ -355,7 +471,7 @@ class BusinessProfileManager:
             logging.warning(f"[{business_id}] API account not valid (or not organization): {org_status.get('error')}")
             logging.info(f"[{business_id}] Using fallback automation.")
             await self._run_fallback_flow(business_id, business_url, task_data)
-        
+
         if not org_status.get("valid", False):
             api_success = False
             results = "Fallback automation executed"
@@ -363,15 +479,18 @@ class BusinessProfileManager:
             api_success = True
             results = {}
             try:
-                results["update"] = self.api_handler.update_business_info(location_name, task_data["new_hours"], task_data["new_website"])
+                results["update"] = self.api_handler.update_business_info(location_name, task_data["new_hours"],
+                                                                          task_data["new_website"])
                 if not results["update"].get("success"):
                     api_success = False
                     raise Exception("update_business_info failed.")
-                results["respond"] = self.api_handler.respond_to_review(location_name, task_data["review_id"], task_data["review_response"])
+                results["respond"] = self.api_handler.respond_to_review(location_name, task_data["review_id"],
+                                                                        task_data["review_response"])
                 if not results["respond"].get("success"):
                     api_success = False
                     raise Exception("respond_to_review failed.")
-                results["post"] = self.api_handler.schedule_post(location_name, task_data["post_content"], hours_from_now=1)
+                results["post"] = self.api_handler.schedule_post(location_name, task_data["post_content"],
+                                                                 hours_from_now=1)
                 if not results["post"].get("success"):
                     api_success = False
                     raise Exception("schedule_post failed.")
@@ -436,6 +555,17 @@ class BusinessProfileManager:
         for business_id in tasks_data:
             tasks.append(self.process_business(business_id, tasks_data[business_id]))
         await asyncio.gather(*tasks)
+
+    async def run_compliance_checks(self) -> None:
+        """
+        Run compliance checks for all managed businesses using browser automation.
+        """
+        tasks = []
+        for business_id, business_url in self.businesses.items():
+            tasks.append(self.fallback_agents[business_id].compliance_check(business_url))
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for business_id, result in zip(self.businesses.keys(), results):
+            logging.info(f"[{business_id}] Compliance check result: {result}")
 
 
 ###############################################################################
@@ -509,8 +639,16 @@ if __name__ == "__main__":
     # Create a BusinessProfileManager instance.
     manager = BusinessProfileManager(businesses, cookies_folder, chrome_path, credentials_file, headless=True)
 
-    # Run all tasks concurrently.
+    # Run all automation tasks concurrently.
     try:
         asyncio.run(manager.run_all_businesses(tasks_data))
     except Exception as e:
         logging.error(f"Error running tasks for all businesses: {e}")
+
+    # Ask the user if they want to run a compliance check.
+    run_compliance = input("Would you like to run a compliance check? (y/n): ").strip().lower()
+    if run_compliance == "y":
+        try:
+            asyncio.run(manager.run_compliance_checks())
+        except Exception as e:
+            logging.error(f"Error running compliance checks: {e}")
