@@ -154,18 +154,22 @@
         let complianceInterval = null;
 
         function showComplianceModal(businessId) {
-            currentBusinessId = businessId;
             const modal = document.getElementById('complianceModal');
+            if (!modal) {
+                console.error('Compliance modal element not found');
+                return;
+            }
+            
             modal.classList.remove('hidden');
             loadComplianceData(businessId);
 
             // Clear any previous interval
-            if (complianceInterval !== null) {
-                clearInterval(complianceInterval);
+            if (window.complianceInterval) {
+                clearInterval(window.complianceInterval);
             }
             // Set up a full compliance check to run every 6 hours (21600000 ms)
-            complianceInterval = setInterval(() => {
-                loadComplianceData(currentBusinessId);
+            window.complianceInterval = setInterval(() => {
+                loadComplianceData(businessId);
             }, 21600000);
         }
 
@@ -178,10 +182,17 @@
         }
 
         function loadComplianceData(businessId) {
-            const checklist = document.getElementById(`profile-compliance`);
-            checklist.querySelector('.loading-spinner').classList.remove('hidden');
-            checklist.querySelector('.checkmark').classList.add('hidden');
-            checklist.querySelector('.edit-fields').classList.add('hidden');
+            const checklist = document.querySelector(`.compliance-checklist[data-business-id="${businessId}"]`);
+            if (!checklist) {
+                console.error('Compliance checklist element not found');
+                return;
+            }
+            
+            // Show loading state for all items
+            checklist.querySelectorAll('.compliance-item').forEach(item => {
+                item.querySelector('.loading-spinner').classList.remove('hidden');
+                item.querySelector('.checkmark').classList.add('hidden');
+            });
 
             fetch(`/api/business/${businessId}/compliance/`)
                 .then(response => {
@@ -195,6 +206,7 @@
                     if (!data || Object.keys(data).length === 0) {
                         console.warn('No compliance data returned, using defaults');
                         data = {
+                            business_id: businessId,
                             posts_compliance: 0,
                             reviews_compliance: 0,
                             qa_compliance: 0,
@@ -204,6 +216,8 @@
                             attributes_compliance: 0,
                             overall_compliance: 0
                         };
+                    } else {
+                        data.business_id = businessId; // Ensure business_id is set
                     }
                     updateComplianceChecklist(data);
                 })
