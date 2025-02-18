@@ -94,10 +94,33 @@
                 return response.json();
             })
             .then(data => {
+                if (!data || Object.keys(data).length === 0) {
+                    console.warn('No compliance data returned, using defaults');
+                    data = {
+                        posts_compliance: 0,
+                        reviews_compliance: 0,
+                        qa_compliance: 0,
+                        photos_compliance: 0,
+                        info_compliance: 0,
+                        hours_compliance: 0,
+                        attributes_compliance: 0,
+                        overall_compliance: 0
+                    };
+                }
                 updateComplianceChecklist(data);
             })
             .catch(error => {
                 console.error('Error loading compliance data:', error);
+                updateComplianceChecklist({
+                    posts_compliance: 0,
+                    reviews_compliance: 0,
+                    qa_compliance: 0,
+                    photos_compliance: 0,
+                    info_compliance: 0,
+                    hours_compliance: 0,
+                    attributes_compliance: 0,
+                    overall_compliance: 0
+                });
             });
     }
 
