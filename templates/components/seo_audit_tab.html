@@ -3,18 +3,24 @@
   <div id="seoAuditContent-{{ business.business_id }}">
     <div class="p-6 border rounded-md bg-white shadow">
       <div class="flex justify-center items-center mb-4">
-        {% if business.website_url %}
-          <h3 class="text-lg font-semibold text-gray-900">SEO Health Analysis</h3>
-        {% else %}
-          <div class="flex flex-col items-center">
-            <h3 class="text-lg font-semibold text-red-600">No valid website provided.</h3>
-            <p class="text-sm text-red-500">Please enter your website URL and click "Run Audit" to perform an SEO analysis.</p>
-            <div class="mt-2 flex">
-              <input type="text" id="seoWebsiteInput-{{ business.business_id }}" placeholder="https://example.com" class="border rounded px-2 py-1 text-sm mr-2">
-              <button onclick="runSeoAudit('{{ business.business_id }}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Run Audit</button>
-            </div>
-          </div>
-        {% endif %}
+    {% if business.website_url %}
+      <div id="seoAuditHeader-{{ business.business_id }}" class="hidden">
+        <h3 class="text-lg font-semibold text-gray-900">SEO Health Analysis</h3>
+      </div>
+      <div id="seoAuditPrompt-{{ business.business_id }}">
+        <h3 class="text-lg font-semibold text-red-600">Website URL Needed</h3>
+        <p class="text-sm text-red-500">Please enter your website URL and click "Run Audit" to perform an SEO analysis.</p>
+        <div class="mt-2 flex">
+          <input type="text" id="seoWebsiteInput-{{ business.business_id }}" placeholder="https://example.com" class="border rounded px-2 py-1 text-sm mr-2">
+          <button onclick="runSeoAudit('{{ business.business_id }}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Run Audit</button>
+        </div>
+      </div>
+    {% else %}
+      <div id="seoAuditPrompt-{{ business.business_id }}">
+        <h3 class="text-lg font-semibold text-red-600">No valid website provided.</h3>
+        <p class="text-sm text-red-500">Please update your business profile with a valid website and then run the SEO audit.</p>
+      </div>
+    {% endif %}
       </div>
       <div class="space-y-4">
         <div class="seo-item flex items-center space-x-3 p-2 rounded-lg" id="meta-tags-{{ business.business_id }}">
