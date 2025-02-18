@@ -324,6 +324,33 @@ class FallbackGBPAgent:
             await page.click('button:has-text("Verify")')
             await page.wait_for_timeout(2000)
 
+    def _process_compliance_action(self, action: dict, business_obj) -> None:
+        """Handle compliance actions from reasoning model"""
+        from gbp_django.models import AutomationLog
+        
+        action_type = action.get('type', 'alert')
+        target = action.get('target', 'general')
+        details = action.get('details', '')
+        
+        # Create log entry
+        AutomationLog.objects.create(
+            business_id=self.business_id,
+            action_type=f"COMPLIANCE_{action_type.upper()}",
+            details={'target': target, 'details': details},
+            status="PENDING" if action_type == 'alert' else "PROCESSING"
+        )
+        
+        # Handle automated updates
+        if action_type == 'update':
+            try:
+                if target == 'business_hours':
+                    business_obj.business_hours = details
+                elif target == 'verification_status':
+                    business_obj.is_verified = False
+                business_obj.save()
+            except Exception as e:
+                logging.error(f"Action failed: {str(e)}")
+
     async def compliance_check(self, business_url: str) -> dict:
         """
         Perform comprehensive compliance check by scraping full business profile details.
@@ -355,7 +382,28 @@ class FallbackGBPAgent:
                 section_data.append(text.strip())
             compliance_data[section] = section_data
 
+        from gbp_django.utils.compliance_policy import get_compliance_policy
+        from gbp_django.utils.model_interface import get_llm_model
+        
+        # Perform AI reasoning
+        llm = get_llm_model()
+        reasoning_result = llm.structured_reasoning(
+            pre_prompt=get_compliance_policy(),
+            prompt=f"Analyze compliance data:\n{json.dumps(compliance_data, indent=2)}"
+        )
+
+        # Process automated actions
+        if 'actions' in reasoning_result:
+            for action in reasoning_result.get('actions', []):
+                self._process_compliance_action(action, business_obj)
+
         await page.close()
+
+        # Add reasoning results to compliance data
+        compliance_data.update({
+            'reasoning': reasoning_result.get('reasoning', ''),
+            'actions': reasoning_result.get('actions', [])
+        })
 
         # Path for storing the last compliance state locally
         compliance_file = os.path.join(os.path.dirname(self.cookies_file), f"compliance_{self.business_id}.json")

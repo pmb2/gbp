@@ -3,6 +3,7 @@ import time
 from typing import List, Dict, Optional
 import requests
 import openai
+import json
 from django.conf import settings
 from groq import Groq
 import logging
@@ -22,6 +23,31 @@ class LLMInterface(ABC):
 
 
 class GroqModel(LLMInterface):
+    def structured_reasoning(self, pre_prompt: str, prompt: str, max_tokens: int = 2000) -> dict:
+        """Execute structured reasoning with pre-prompt and prompt, returning JSON-formatted actions."""
+        system_msg = {
+            "role": "system",
+            "content": f"{pre_prompt}\n\nALWAYS RESPOND WITH VALID JSON USING THIS SCHEMA:\n"
+                       "{'reasoning': '...', 'actions': [{'type': 'update|alert|verify', 'target': '...', 'details': '...'}]}"
+        }
+        
+        user_msg = {
+            "role": "user",
+            "content": prompt
+        }
+
+        response = self.client.chat.completions.create(
+            model="deepseek-r1-distill-llama-70b-specdec",
+            messages=[system_msg, user_msg],
+            temperature=0.3,
+            max_tokens=max_tokens,
+            response_format={"type": "json_object"}
+        )
+        
+        try:
+            return json.loads(response.choices[0].message.content)
+        except json.JSONDecodeError:
+            return {"error": "Failed to parse model response", "raw_response": response.choices[0].message.content}
     def __init__(self):
         self.client = Groq(api_key=settings.GROQ_API_KEY)
         # Example model names—adjust for your Groq account
