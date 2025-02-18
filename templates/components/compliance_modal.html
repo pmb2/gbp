@@ -260,13 +260,11 @@
                 .then(data => {
                     if (!data || Object.keys(data).length === 0) {
                         console.warn('No compliance data returned, prompting for required info');
-                        {% raw %}
-                        if (!{{ business.website_url|default:"''" }}) {
+                        if ("{{ business.website_url|default:'' }}" === "") {
                             showComplianceModal('website');
                         } else {
                             showComplianceModal('hours');
                         }
-                        {% endraw %}
                         return;
                     } else {
                         data.business_id = businessId; // Ensure business_id is set
