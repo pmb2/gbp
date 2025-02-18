@@ -43,22 +43,27 @@
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="profile-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
                 <span>Complete Business Profile (Info, Hours &amp; Attributes)</span>
+                <span class="compliance-status ml-auto text-sm"></span>
             </div>
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="posts-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
                 <span>Regular Posts (Weekly)</span>
+                <span class="compliance-status ml-auto text-sm"></span>
             </div>
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="reviews-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
                 <span>Review Responses (Within 48h)</span>
+                <span class="compliance-status ml-auto text-sm"></span>
             </div>
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="qa-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
                 <span>Q&amp;A Responses (Within 24h)</span>
+                <span class="compliance-status ml-auto text-sm"></span>
             </div>
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="photos-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
                 <span>Fresh Photos (Monthly)</span>
+                <span class="compliance-status ml-auto text-sm"></span>
             </div>
         </div>
         <div class="mt-6 flex justify-between items-center">
@@ -173,14 +178,12 @@
     }
 
     function updateComplianceChecklist(data) {
+        // Update individual items (posts, reviews, qa, photos)
         const items = {
             'posts': data.posts_compliance,
             'reviews': data.reviews_compliance,
             'qa': data.qa_compliance,
-            'photos': data.photos_compliance,
-            'info': data.info_compliance,
-            'hours': data.hours_compliance,
-            'attributes': data.attributes_compliance
+            'photos': data.photos_compliance
         };
 
         Object.entries(items).forEach(([key, value]) => {
@@ -206,15 +209,49 @@
                 item.classList.add('bg-red-50');
                 icon.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
             }
+            // Update status for posts, reviews, qa, photos
+            const statusEl = item.querySelector('.compliance-status');
+            if (value > 0) {
+                statusEl.textContent = 'Updated recently';
+                statusEl.classList.remove('animate-pulse','text-red-500');
+            } else {
+                statusEl.textContent = 'Error - may need additional user info, credentials';
+                statusEl.classList.add('animate-pulse','text-red-500');
+            }
         });
 
-        // Update overall compliance score
+        // Update profile compliance (combined info, hours, attributes)
+        const profileItem = document.getElementById('profile-compliance');
+        if (profileItem) {
+            const statusEl = profileItem.querySelector('.compliance-status');
+            const profileScore = ((data.info_compliance || 0) + (data.hours_compliance || 0) + (data.attributes_compliance || 0)) / 3;
+            profileItem.classList.remove('bg-green-50', 'bg-yellow-50', 'bg-red-50');
+            const icon = profileItem.querySelector('div');
+            if (profileScore >= 80) {
+                profileItem.classList.add('bg-green-50');
+                icon.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>';
+            } else if (profileScore >= 50) {
+                profileItem.classList.add('bg-yellow-50');
+                icon.innerHTML = '<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>';
+            } else {
+                profileItem.classList.add('bg-red-50');
+                icon.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+            }
+            if (profileScore < 50) {
+                statusEl.textContent = 'Human intervention required';
+                statusEl.classList.add('animate-pulse','text-red-500');
+            } else {
+                statusEl.textContent = 'Updated';
+                statusEl.classList.remove('animate-pulse','text-red-500');
+            }
+        }
+
+        // Update overall compliance score and progress bar
         const score = data.overall_compliance;
         document.getElementById('compliance-score').textContent = score;
         const progress = document.getElementById('compliance-progress');
         progress.style.width = `${score}%`;
 
-        // Remove previous progress classes before adding new one
         progress.classList.remove('bg-green-500', 'bg-yellow-500', 'bg-red-500');
         if (score >= 80) {
             progress.classList.add('bg-green-500');
