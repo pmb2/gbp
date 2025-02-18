@@ -40,10 +40,28 @@
             </div>
         </div>
         <div class="space-y-4">
-            <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="profile-compliance">
-                <div class="w-6 h-6 flex-shrink-0"></div>
-                <span>Complete Business Profile (Info, Hours &amp; Attributes)</span>
-                <span class="compliance-status ml-auto text-sm"></span>
+            <div class="compliance-item grid grid-cols-[auto_1fr_auto] items-center gap-4 p-3 rounded-lg transition-all duration-300 opacity-0 animate-slide-in"
+                 id="profile-compliance">
+                <div class="status-icon w-6 h-6 flex items-center justify-center">
+                    <div class="loading-spinner hidden w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+                <div class="content">
+                    <h4 class="font-medium">Complete Business Profile</h4>
+                    <div class="missing-fields mt-1 hidden text-sm text-red-600"></div>
+                    <div class="edit-fields mt-2 hidden space-y-2">
+                        <input type="text" class="update-input border rounded px-2 py-1 text-sm w-full" 
+                               placeholder="Enter website URL" data-field="website">
+                        <button class="save-update bg-green-500 text-white px-3 py-1 rounded text-sm mt-2"
+                                onclick="saveBusinessUpdate('{{ business.business_id }}', 'profile')">
+                            Save & Verify
+                        </button>
+                    </div>
+                </div>
+                <div class="status-indicator w-6 h-6 flex items-center justify-center">
+                    <svg class="checkmark w-5 h-5 hidden text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                </div>
             </div>
             <div class="compliance-item flex items-center space-x-3 p-2 rounded-lg" id="posts-compliance">
                 <div class="w-6 h-6 flex-shrink-0"></div>
@@ -138,6 +156,11 @@
     }
 
     function loadComplianceData(businessId) {
+        const checklist = document.getElementById(`profile-compliance`);
+        checklist.querySelector('.loading-spinner').classList.remove('hidden');
+        checklist.querySelector('.checkmark').classList.add('hidden');
+        checklist.querySelector('.edit-fields').classList.add('hidden');
+
         fetch(`/api/business/${businessId}/compliance/`)
             .then(response => {
                 if (!response.ok) {
@@ -177,8 +200,33 @@
             });
     }
 
+    function handleComplianceError(businessId, error) {
+        console.error('Compliance error:', error);
+        const checklist = document.getElementById(`profile-compliance`);
+        checklist.querySelector('.loading-spinner').classList.add('hidden');
+        checklist.querySelector('.missing-fields').textContent = 'Failed to load compliance data. Please try refreshing.';
+        checklist.querySelector('.missing-fields').classList.remove('hidden');
+    }
+
+    function animateProgress(element, targetWidth) {
+        element.style.width = '0%';
+        setTimeout(() => {
+            element.style.width = targetWidth + '%';
+        }, 50);
+    }
+
     function updateComplianceChecklist(data) {
-        // Update individual items (posts, reviews, qa, photos)
+        // Add error checking for DOM elements
+        const getElement = (id) => {
+            const el = document.getElementById(id);
+            if (!el) console.error(`Element not found: ${id}`);
+            return el;
+        };
+
+        // Handle API errors
+        if (data.error) {
+            return handleComplianceError(data.businessId, data.error);
+        }
         const items = {
             'posts': data.posts_compliance,
             'reviews': data.reviews_compliance,
