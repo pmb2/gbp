@@ -374,7 +374,7 @@ class FallbackGBPAgent:
 
         page: Page = await self.context.new_page()
         compliance_data = {}
-        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Browser initialized`);
+        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Browser initialized")
         # Define the sections and their assumed URLs (adjust as needed)
         sections = {
             "posts": f"{business_url}/posts",

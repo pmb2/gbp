@@ -60,7 +60,7 @@ class GroqModel(LLMInterface):
                 result = json.loads(response.choices[0].message.content)
                 print(f"[COMPLIANCE ACTIONS] Generated {len(result.get('actions', []))} actions")
                 print(f"[RISK ASSESSMENT] Highest risk score: {max(a.get('risk_score', 0) for a in result.get('actions', []))}")
-            return result
+                return result
         except json.JSONDecodeError as e:
             print(f"[ERROR] JSON parsing failed: {str(e)}")
             print(f"[DEBUG] Raw response: {response.choices[0].message.content[:500]}")
