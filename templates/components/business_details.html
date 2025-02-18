@@ -32,6 +32,16 @@
         <span>SEO Audit</span>
     </button>
 </div>
+<script>
+function toggleBDContent(businessId) {
+    const viewMode = document.getElementById(`view-mode-${businessId}`);
+    if (viewMode) {
+        viewMode.classList.toggle('hidden');
+    } else {
+        console.error('Business details view not found for business:', businessId);
+    }
+}
+</script>
 
 <!-- Tab Contents -->
 <div class="p-4">
