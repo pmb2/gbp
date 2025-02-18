@@ -362,6 +362,8 @@ class FallbackGBPAgent:
         """
         print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
         print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
+        print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
+        print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
         from playwright.async_api import Page
         import os, json, uuid
         from datetime import datetime
