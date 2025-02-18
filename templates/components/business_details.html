@@ -33,25 +33,27 @@
     </button>
 </div>
 <script>
-function toggleBDContent(businessId) {
-    const viewMode = document.getElementById(`view-mode-${businessId}`);
-    if (viewMode) {
-        viewMode.classList.toggle('hidden');
-    } else {
-        console.error('Business details view not found for business:', businessId);
+    function toggleBDContent(businessId) {
+        const viewMode = document.getElementById(`view-mode-${businessId}`);
+        if (viewMode) {
+            viewMode.classList.toggle('hidden');
+        } else {
+            console.error('Business details view not found for business:', businessId);
+        }
     }
-}
 </script>
 
 <!-- Tab Contents -->
 <div class="p-4">
     <!-- Business Details Tab -->
-    <div class="business-details-container bg-white rounded-lg shadow p-6" id="business-details-{{ business.business_id }}">
+    <div class="business-details-container bg-white rounded-lg shadow p-6"
+         id="business-details-{{ business.business_id }}">
         <div class="grid grid-cols-1 gap-4">
             <!-- Business Details Section -->
             <div>
                 <div class="space-y-3" id="business-details-{{ business.business_id }}">
-                    <div class="flex justify-between items-center mb-4 cursor-pointer hover:bg-gray-100" onclick="toggleBDContent('{{ business.business_id }}')">
+                    <div class="flex justify-between items-center mb-4 cursor-pointer hover:bg-gray-100"
+                         onclick="toggleBDContent('{{ business.business_id }}')">
                         <h3 class="text-lg font-medium text-gray-900">Business Details</h3>
                         <button onclick="toggleEditMode('{{ business.business_id }}'); event.stopPropagation();"
                                 class="text-gray-600 hover:text-gray-900">
@@ -143,13 +145,13 @@ function toggleBDContent(businessId) {
     </div>
 </div>
 <script>
-window.toggleBusinessDetails = function(businessId) {
-    const detailsRow = document.getElementById(`details-${businessId}`);
-    if (detailsRow) {
-        // Toggle display between "table-row" and "none" since this row is inside a table
-        detailsRow.style.display = (detailsRow.style.display === 'none' || detailsRow.style.display === '') ? 'table-row' : 'none';
-    } else {
-        console.error('No details row found for businessId:', businessId);
+    window.toggleBusinessDetails = function (businessId) {
+        const detailsRow = document.getElementById(`details-${businessId}`);
+        if (detailsRow) {
+            // Toggle display between "table-row" and "none" since this row is inside a table
+            detailsRow.style.display = (detailsRow.style.display === 'none' || detailsRow.style.display === '') ? 'table-row' : 'none';
+        } else {
+            console.error('No details row found for businessId:', businessId);
+        }
     }
-}
 </script>
