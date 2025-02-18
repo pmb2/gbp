@@ -185,8 +185,15 @@
 
         Object.entries(items).forEach(([key, value]) => {
             const item = document.getElementById(`${key}-compliance`);
+            if (!item) {
+                console.warn(`No element found for ${key}-compliance`);
+                return;
+            }
             const icon = item.querySelector('div');
-            // Remove any previous background color classes first
+            if (!icon) {
+                console.warn(`No icon element found in ${key}-compliance`);
+                return;
+            }
             item.classList.remove('bg-green-50', 'bg-yellow-50', 'bg-red-50');
 
             if (value >= 80) {
