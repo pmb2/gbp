@@ -404,7 +404,7 @@ class FallbackGBPAgent:
         
         # Perform AI reasoning
         print(f"\n[REASONING ENGINE] Starting AI analysis for {self.business_id}")
-        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: AI analysis`);
+        print(f"[UI UPDATE][{self.business_id}] Compliance stage: AI analysis")
         llm = get_llm_model()
         compliance_policy = get_compliance_policy()
         reasoning_prompt = f"Analyze compliance data:\n{json.dumps(compliance_data, indent=2)}"
