@@ -360,11 +360,11 @@ class FallbackGBPAgent:
         Perform comprehensive compliance check by scraping full business profile details.
         Uses browser automation to collect hours, attributes, services, and verification status.
         """
-        print(f"\n[COMPLIANCE CHECK] Initializing check for {self.business_id}")
-        print(f"[AGENT TASKS] Starting browser instance (headless: {self.headless})")
-        print(f"[BROWSER CONFIG] Chrome path: {self.chrome_path}")
-        print(f"[SESSION STATE] Cookies file: {self.cookies_file}")
-        print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
+        print(f"\n[COMPLIANCE] Initializing check for {self.business_id}")
+        print(f"[COMPLIANCE] AGENT TASKS: Starting browser instance (headless: {self.headless})")
+        print(f"[COMPLIANCE] BROWSER CONFIG: Chrome path: {self.chrome_path}")
+        print(f"[COMPLIANCE] SESSION STATE: Cookies file: {self.cookies_file}")
+        print(f"\n[COMPLIANCE] Starting compliance check for {self.business_id}")
         print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
         from playwright.async_api import Page
         import os, json, uuid
@@ -400,11 +400,11 @@ class FallbackGBPAgent:
             compliance_data[section] = section_data
 
         from gbp_django.utils.llm_reasoning import generate_compliance_reasoning
-        print(f"\n[REASONING ENGINE] Starting AI analysis for {self.business_id} using the new reasoning model")
-        print(f"[UI UPDATE][{self.business_id}] Compliance stage: AI analysis in progress...")
+        print(f"\n[COMPLIANCE] REASONING ENGINE: Starting AI analysis for {self.business_id} using the new reasoning model")
+        print(f"[COMPLIANCE] UI UPDATE: Compliance stage: AI analysis in progress...")
         reasoning_result = generate_compliance_reasoning(compliance_data)
-        print(f"[REASONING RESULT][{self.business_id}] Raw output:\n{json.dumps(reasoning_result, indent=2)}")
-        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Processing {len(reasoning_result.get('actions', []))} actions")
+        print(f"[COMPLIANCE] REASONING RESULT: Raw output:\n{json.dumps(reasoning_result, indent=2)}")
+        print(f"[COMPLIANCE] UI UPDATE: Compliance stage: Processing {len(reasoning_result.get('actions', []))} actions")
 
         # Process automated actions
         if 'actions' in reasoning_result:
