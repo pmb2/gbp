@@ -114,7 +114,12 @@
 </div>
 <script>
     function openTaskDetailModal() {
-        document.getElementById('taskDetailModal').classList.remove('hidden');
+        const modal = document.getElementById('taskDetailModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        } else {
+            console.error("openTaskDetailModal: taskDetailModal element is null");
+        }
     }
 
     function closeTaskDetailModal() {
