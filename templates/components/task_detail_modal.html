@@ -115,3 +115,10 @@
 window.openTaskDetailModal = function() {
     document.getElementById('taskDetailModal').classList.remove('hidden');
 };
+<script>
+if (typeof window.openTaskDetailModal === "undefined") {
+  window.openTaskDetailModal = function() {
+    document.getElementById('taskDetailModal').classList.remove('hidden');
+  };
+}
+</script>
