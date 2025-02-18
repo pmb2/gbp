@@ -1,0 +1,56 @@
+<div id="agentDetailModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+  <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold">Agent Details</h3>
+      <button onclick="closeAgentDetailModal()" class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <form id="agentDetailForm">
+      <div class="grid grid-cols-4 items-center gap-4 py-2">
+        <label for="agentName" class="text-right col-span-1 text-sm font-medium">Name</label>
+        <input type="text" id="agentName" name="agentName" value="{{ agent.agentName }}" class="col-span-3 border rounded px-2 py-1 text-sm">
+      </div>
+      <div class="grid grid-cols-4 items-center gap-4 py-2">
+        <label for="status" class="text-right col-span-1 text-sm font-medium">Status</label>
+        <input type="text" id="status" name="status" value="{{ agent.status }}" class="col-span-3 border rounded px-2 py-1 text-sm" disabled>
+      </div>
+      <div class="grid grid-cols-4 items-center gap-4 py-2">
+        <label for="currentTask" class="text-right col-span-1 text-sm font-medium">Current Task</label>
+        <input type="text" id="currentTask" name="currentTask" value="{{ agent.currentTask }}" class="col-span-3 border rounded px-2 py-1 text-sm">
+      </div>
+      <div class="grid grid-cols-4 items-center gap-4 py-2">
+        <label for="lastUpdate" class="text-right col-span-1 text-sm font-medium">Last Update</label>
+        <input type="text" id="lastUpdate" name="lastUpdate" value="{{ agent.lastUpdate }}" class="col-span-3 border rounded px-2 py-1 text-sm" disabled>
+      </div>
+      <div class="flex items-center space-x-2 py-2">
+        <input type="checkbox" id="activeMode" name="activeMode" class="h-5 w-5" {% if agent.status == "working" %}checked{% endif %}>
+        <label for="activeMode" class="text-sm">Active Mode</label>
+      </div>
+      <div class="grid grid-cols-4 items-center gap-4 py-2">
+        <label for="description" class="text-right col-span-1 text-sm font-medium">Description</label>
+        <textarea id="description" name="description" class="col-span-3 border rounded px-2 py-1 text-sm">{{ agent.description }}</textarea>
+      </div>
+      <div class="flex justify-end mt-4">
+        <button type="button" onclick="saveAgentDetails()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 text-sm">
+            Save changes
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function openAgentDetailModal() {
+  document.getElementById('agentDetailModal').classList.remove('hidden');
+}
+function closeAgentDetailModal() {
+  document.getElementById('agentDetailModal').classList.add('hidden');
+}
+function saveAgentDetails() {
+  // Implement the API call to update agent details
+  console.log("Saving agent details...", document.getElementById('agentDetailForm'));
+  closeAgentDetailModal();
+}
+</script>
