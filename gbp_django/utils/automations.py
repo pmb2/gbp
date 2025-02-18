@@ -318,11 +318,15 @@ class FallbackGBPAgent:
 
     async def handle_2fa(self, page):
         """Handle two-factor authentication if required"""
+        print(f"[AUTH][{self.business_id}] 2FA required")
+        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Awaiting 2FA input`);
         two_factor_code = input(f"[{self.business_id}] Enter 2FA code: ").strip()
         if two_factor_code:
+            print(f"[AUTH][{self.business_id}] Submitting 2FA code")
             await page.fill('input[name="otp"]', two_factor_code)
             await page.click('button:has-text("Verify")')
             await page.wait_for_timeout(2000)
+            console.log(`[UI UPDATE][${self.business_id}] 2FA verification submitted`);
 
     def _process_compliance_action(self, action: dict, business_obj) -> None:
         """Handle compliance actions from reasoning model"""
@@ -356,6 +360,8 @@ class FallbackGBPAgent:
         Perform comprehensive compliance check by scraping full business profile details.
         Uses browser automation to collect hours, attributes, services, and verification status.
         """
+        print(f"\n[COMPLIANCE CHECK] Starting compliance check for {self.business_id}")
+        print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
         from playwright.async_api import Page
         import os, json, uuid
         from datetime import datetime
@@ -364,18 +370,23 @@ class FallbackGBPAgent:
 
         page: Page = await self.context.new_page()
         compliance_data = {}
+        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Browser initialized`);
         # Define the sections and their assumed URLs (adjust as needed)
         sections = {
             "posts": f"{business_url}/posts",
             "reviews": f"{business_url}/reviews",
-            "qna": f"{business_url}/qna"  # Assumed URL for Q&A; update if needed.
+            "qna": f"{business_url}/qna"
         }
+        
         for section, url in sections.items():
+            print(f"[COMPLIANCE CHECK][{self.business_id}] Scanning {section} section at {url}")
+            console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Analyzing ${section.replace('_', ' ')}`);
             logging.info(f"[{self.business_id} Compliance] Checking {section} at {url}")
             await page.goto(url)
-            await page.wait_for_timeout(2000)  # Wait for data to load; adjust as necessary.
-            # Replace '.item' with the appropriate selector for your page.
+            await page.wait_for_timeout(2000)
+            print(f"[AGENT TASKS][{self.business_id}] Waiting for {section} content to load")
             items = await page.query_selector_all(".item")
+            print(f"[DATA COLLECTION][{self.business_id}] Found {len(items)} items in {section} section")
             section_data = []
             for item in items:
                 text = await item.inner_text()

@@ -25,11 +25,15 @@ class LLMInterface(ABC):
 class GroqModel(LLMInterface):
     def structured_reasoning(self, pre_prompt: str, prompt: str, max_tokens: int = 2000) -> dict:
         """Execute structured reasoning with pre-prompt and prompt, returning JSON-formatted actions."""
+        print(f"\n[REASONING ENGINE] Starting structured reasoning")
+        print(f"[REASONING CONTEXT] Business ID: {prompt.split('business_id: ')[1].split('\n')[0] if 'business_id' in prompt else 'Unknown'}")
         system_msg = {
             "role": "system",
             "content": f"{pre_prompt}\n\nALWAYS RESPOND WITH VALID JSON USING THIS SCHEMA:\n"
                        "{'reasoning': '...', 'actions': [{'type': 'update|alert|verify', 'target': '...', 'details': '...'}]}"
         }
+        print(f"[REASONING SYSTEM PROMPT]\n{system_msg['content'][:500]}...")
+        print(f"[REASONING USER PROMPT]\n{prompt[:500]}...")
         
         user_msg = {
             "role": "user",
