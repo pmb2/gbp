@@ -49,10 +49,20 @@
     }
 
     function openTaskDetailModal() {
-        document.getElementById('taskDetailModal').classList.remove('hidden');
+        const modal = document.getElementById('taskDetailModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        } else {
+            console.error("openTaskDetailModal: taskDetailModal element is null");
+        }
     }
     function closeTaskDetailModal() {
-        document.getElementById('taskDetailModal').classList.add('hidden');
+        const modal = document.getElementById('taskDetailModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        } else {
+            console.error("closeTaskDetailModal: taskDetailModal element is null");
+        }
     }
     function saveTaskDetails() {
         // Implement the API call to update task details
