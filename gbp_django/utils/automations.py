@@ -326,7 +326,7 @@ class FallbackGBPAgent:
             await page.fill('input[name="otp"]', two_factor_code)
             await page.click('button:has-text("Verify")')
             await page.wait_for_timeout(2000)
-            console.log(`[UI UPDATE][${self.business_id}] 2FA verification submitted`);
+            print(f"[UI UPDATE][{self.business_id}] 2FA verification submitted")
 
     def _process_compliance_action(self, action: dict, business_obj) -> None:
         """Handle compliance actions from reasoning model"""

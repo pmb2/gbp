@@ -56,10 +56,10 @@ class GroqModel(LLMInterface):
             print(f"[API RESPONSE] Received status {response.status_code}")
 
             try:
-            print(f"[DATA PROCESSING] Parsing JSON response")
-            result = json.loads(response.choices[0].message.content)
-            print(f"[COMPLIANCE ACTIONS] Generated {len(result.get('actions', []))} actions")
-            print(f"[RISK ASSESSMENT] Highest risk score: {max(a.get('risk_score', 0) for a in result.get('actions', [])})")
+                print(f"[DATA PROCESSING] Parsing JSON response")
+                result = json.loads(response.choices[0].message.content)
+                print(f"[COMPLIANCE ACTIONS] Generated {len(result.get('actions', []))} actions")
+                print(f"[RISK ASSESSMENT] Highest risk score: {max(a.get('risk_score', 0) for a in result.get('actions', []))}")
             return result
         except json.JSONDecodeError as e:
             print(f"[ERROR] JSON parsing failed: {str(e)}")
