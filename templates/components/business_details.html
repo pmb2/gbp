@@ -145,13 +145,44 @@
     </div>
 </div>
 <script>
+    window.SwitchTab = function (businessId, tabName) {
+        // Reset tab buttons for this business.
+        const tabs = document.querySelectorAll(`[id$="-tab-${businessId}"]`);
+        tabs.forEach(tab => {
+            tab.classList.remove('bg-white', 'text-blue-600');
+            tab.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+        });
+        // Activate the selected tab button.
+        const activeTab = document.getElementById(`${tabName}-tab-${businessId}`);
+        if (activeTab) {
+            activeTab.classList.remove('text-gray-500', 'hover:text-gray-700', 'hover:bg-gray-50');
+            activeTab.classList.add('bg-white', 'text-blue-600');
+        } else {
+            console.error('SwitchTab: active tab not found for tab ' + tabName + ' and businessId ' + businessId);
+        }
+        // Hide all tab contents.
+        const contents = document.querySelectorAll(`[id$="-content-${businessId}"]`);
+        contents.forEach(content => content.classList.add('hidden'));
+        // Show selected tab content.
+        const activeContent = document.getElementById(`${tabName}-content-${businessId}`);
+        if (activeContent) {
+            activeContent.classList.remove('hidden');
+        } else {
+            console.error('SwitchTab: active content not found for tab ' + tabName + ' and businessId ' + businessId);
+        }
+        // Additional functionality for specific tabs.
+        if (tabName === 'knowledge') {
+            UpdateBusinessSummary(businessId);
+        } else if (tabName === 'compliance') {
+            loadComplianceData(businessId);
+        }
+    };
     window.toggleBusinessDetails = function (businessId) {
         const detailsRow = document.getElementById(`details-${businessId}`);
         if (detailsRow) {
-            // Toggle display between "table-row" and "none" since this row is inside a table
             detailsRow.style.display = (detailsRow.style.display === 'none' || detailsRow.style.display === '') ? 'table-row' : 'none';
         } else {
-            console.error('No details row found for businessId:', businessId);
+            console.error('toggleBusinessDetails: details row not found for businessId ' + businessId);
         }
-    }
+    };
 </script>
