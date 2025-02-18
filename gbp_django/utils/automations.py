@@ -386,7 +386,7 @@ class FallbackGBPAgent:
             print(f"\n[COMPLIANCE CHECK][{self.business_id}] Scanning {section.upper()} section")
             print(f"[BROWSER ACTION] Navigating to {url}")
             print(f"[DATA COLLECTION] Waiting for selector '.item'")
-            console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Analyzing ${section.replace('_', ' ')}`);
+            print(f"[UI UPDATE][{self.business_id}] Compliance stage: Analyzing {section.replace('_', ' ')}")
             logging.info(f"[{self.business_id} Compliance] Checking {section} at {url}")
             await page.goto(url)
             await page.wait_for_timeout(2000)
@@ -418,7 +418,7 @@ class FallbackGBPAgent:
         )
         
         print(f"[REASONING RESULT][{self.business_id}] Raw output:\n{json.dumps(reasoning_result, indent=2)}")
-        console.log(`[UI UPDATE][${self.business_id}] Compliance stage: Processing ${reasoning_result.actions?.length || 0} actions`);
+        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Processing {len(reasoning_result.get('actions', []))} actions")
 
         # Process automated actions
         if 'actions' in reasoning_result:
