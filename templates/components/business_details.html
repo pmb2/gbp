@@ -4,14 +4,14 @@
 
 <!-- Modern Browser-like Tabs -->
 <div class="bg-gray-100 rounded-t-lg p-2 flex">
-    <button onclick="SwitchTab('{{ business.business_id }}', 'tasks_agents')"
+    <button onclick="SwitchTab('{{ business.business_id }}', 'compliance')"
             class="tab-button flex-1 flex items-center justify-center px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
-            id="tasks_agents-tab-{{ business.business_id }}">
+            id="compliance-tab-{{ business.business_id }}">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"/>
+                  d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
-        <span>Tasks</span>
+        <span>Compliance</span>
     </button>
     <button onclick="SwitchTab('{{ business.business_id }}', 'knowledge')"
             class="tab-button flex-1 flex items-center justify-center px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
@@ -22,12 +22,12 @@
         </svg>
         <span>Brand Alignment</span>
     </button>
-    <button onclick="SwitchTab('{{ business.business_id }}', 'seo_audit')"
+    <button onclick="SwitchTab('{{ business.business_id }}', 'seo_health')"
             class="tab-button flex-1 flex items-center justify-center px-4 py-2 rounded-t-lg text-sm font-medium transition-all duration-200"
-            id="seo_audit-tab-{{ business.business_id }}">
+            id="seo_health-tab-{{ business.business_id }}">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>
         <span>SEO Audit</span>
     </button>
@@ -124,10 +124,11 @@
         </div>
     </div>
 
-    <div class="tab-content hidden" id="tasks_agents-content-{{ business.business_id }}">
-        {% include 'components/task_agent_overview.html' with business=business %}
+    <!-- Compliance Tab -->
+    <div class="tab-content hidden" id="compliance-content-{{ business.business_id }}">
+        {% include 'components/compliance_modal.html' with business=business %}
     </div>
-    <!-- Knowledge Base Tab -->
+    <!-- Brand Alignment Tab -->
     <div class="tab-content hidden" id="knowledge-content-{{ business.business_id }}"
          ondrop="handleBusinessRowDrop(event, '{{ business.business_id }}')"
          ondragover="handleDragOver(event)"
@@ -140,7 +141,7 @@
     </div>
 
     <!-- SEO Audit Tab -->
-    <div class="tab-content hidden" id="seo_audit-content-{{ business.business_id }}">
+    <div class="tab-content hidden" id="seo_health-content-{{ business.business_id }}">
         {% include 'components/seo_health_modal.html' with business=business %}
     </div>
 </div>
