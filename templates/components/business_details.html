@@ -146,6 +146,7 @@
 </div>
 <script>
     window.SwitchTab = function (businessId, tabName) {
+        console.log('SwitchTab called with', businessId, tabName);
         // Reset tab buttons for this business.
         const tabs = document.querySelectorAll(`[id$="-tab-${businessId}"]`);
         tabs.forEach(tab => {
@@ -185,4 +186,14 @@
             console.error('toggleBusinessDetails: details row not found for businessId ' + businessId);
         }
     };
+    window.addEventListener('DOMContentLoaded', function() {
+        // For each business row, set default tab to 'knowledge' if available.
+        const businessRows = document.querySelectorAll('[data-business-id]');
+        businessRows.forEach(row => {
+            const businessId = row.dataset.businessId;
+            if (document.getElementById(`knowledge-tab-${businessId}`)) {
+                SwitchTab(businessId, 'knowledge');
+            }
+        });
+    });
 </script>
