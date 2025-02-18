@@ -85,8 +85,14 @@
     }
 
     function loadComplianceData(businessId) {
-        fetch(`/api/business/${businessId}/compliance/`)
-            .then(response => response.json())
+        fetch(`/api/business/${businessId}/compliance_status/`)
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error loading compliance data: ', response.statusText);
+                    return {};
+                }
+                return response.json();
+            })
             .then(data => {
                 updateComplianceChecklist(data);
             })
