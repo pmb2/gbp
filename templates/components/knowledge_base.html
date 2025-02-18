@@ -1,5 +1,4 @@
 <div class="p-4 h-[612px]" onload="console.log('📚 knowledge_base.html: Initializing knowledge base component')">
-    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Knowledge Base</h3>
     <script>
     console.log('📚 knowledge_base.html: Loading knowledge base for business:', '{{ business.business_id }}');
  
@@ -143,21 +142,6 @@
             <div id="chat-messages-{{ business.business_id }}"
                  class="flex-1 p-4 space-y-4 overflow-y-auto max-h-[440px]">
                 <!-- Initial welcome message -->
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <div class="ml-3 bg-gray-100 rounded-lg py-2 px-3">
-                        <p class="text-sm text-gray-800">
-                            Welcome! I'm your AI assistant. Let me summarize what I know about your business so far:
-                        </p>
-                    </div>
-                </div>
                 <!-- Business Summary -->
                 <div class="flex items-start mt-4">
                     <div class="flex-shrink-0">
