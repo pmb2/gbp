@@ -3,186 +3,213 @@
         <div class="grid grid-cols-1 gap-4 mb-4 animate-fade-in">
             <div class="flex justify-between items-center">
                 <div class="flex-1 flex items-center gap-3">
-                    <button onclick="loadComplianceData('{{ business.business_id }}')" 
+                    <button onclick="loadComplianceData('{{ business.business_id }}')"
                             class="text-gray-400 hover:text-green-500 transition-colors duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                         </svg>
                     </button>
                     <div class="flex-1">
                         <h3 class="text-lg font-semibold text-gray-900">Compliance Checklist</h3>
                         {% if not business.website_url %}
-                        <div class="ml-2 bg-red-50 p-2 rounded animate-pulse">
-                        <p class="text-sm text-red-600">
-                            <i class="fas fa-exclamation-circle mr-1"></i>
-                            Website required for compliance checks. 
-                            <a href="#business-details-{{ business.business_id }}" 
-                               class="underline hover:text-red-700">Update business details</a>
-                        </p>
+                            <div class="ml-2 bg-red-50 p-2 rounded animate-pulse">
+                                <p class="text-sm text-red-600">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>
+                                    Website required for compliance checks.
+                                    <a href="#business-details-{{ business.business_id }}"
+                                       class="underline hover:text-red-700">Update business details</a>
+                                </p>
+                            </div>
+                        {% endif %}
                     </div>
+                    {% if not business.website_url %}
+                        <div class="flex items-center space-x-2">
+                            <input type="text" id="websiteInput-{{ business.business_id }}"
+                                   placeholder="Enter business website URL"
+                                   class="border rounded px-2 py-1 text-sm w-64"
+                                   value="{{ business.website_url|default:'' }}">
+                            <button onclick="updateBusinessWebsite('{{ business.business_id }}')"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                                Save URL
+                            </button>
+                        </div>
                     {% endif %}
-                </div>
-                {% if not business.website_url %}
-                <div class="flex items-center space-x-2">
-                    <input type="text" id="websiteInput-{{ business.business_id }}" 
-                           placeholder="Enter business website URL"
-                           class="border rounded px-2 py-1 text-sm w-64"
-                           value="{{ business.website_url|default:'' }}">
-                    <button onclick="updateBusinessWebsite('{{ business.business_id }}')"
-                            class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                        Save URL
+                    <button onclick="closeComplianceModal()" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
                     </button>
                 </div>
-                {% endif %}
-                <button onclick="closeComplianceModal()" class="text-gray-500 hover:text-gray-700">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
             </div>
-        </div>
-        <div class="space-y-4 compliance-checklist" data-business-id="{{ business.business_id }}">
-            <!-- Animated Compliance Items -->
-            <div class="compliance-item animate-fade-in-up opacity-0 translate-y-4" data-task="profile">
-                <div class="flex items-center gap-4 p-4 rounded-lg transition-all duration-300 hover:bg-gray-50">
-                    <div class="status-indicator relative w-8 h-8 flex-shrink-0">
-                        <svg class="progress-circle w-full h-full" viewBox="0 0 100 100">
-                            <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"/>
-                            <circle class="text-blue-500" stroke-width="8" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" 
-                                  stroke="currentColor" fill="transparent" r="40" cx="50" cy="50" transform="rotate(-90 50 50)"/>
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="loading-spinner hidden w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                            <svg class="checkmark hidden w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <div class="space-y-4 compliance-checklist" data-business-id="{{ business.business_id }}">
+                <!-- Animated Compliance Items -->
+                <div class="compliance-item animate-fade-in-up opacity-0 translate-y-4" data-task="profile">
+                    <div class="flex items-center gap-4 p-4 rounded-lg transition-all duration-300 hover:bg-gray-50">
+                        <div class="status-indicator relative w-8 h-8 flex-shrink-0">
+                            <svg class="progress-circle w-full h-full" viewBox="0 0 100 100">
+                                <circle class="text-gray-200" stroke-width="8" stroke="currentColor" fill="transparent"
+                                        r="40" cx="50" cy="50"/>
+                                <circle class="text-blue-500" stroke-width="8" stroke-dasharray="251.2"
+                                        stroke-dashoffset="251.2" stroke-linecap="round"
+                                        stroke="currentColor" fill="transparent" r="40" cx="50" cy="50"
+                                        transform="rotate(-90 50 50)"/>
                             </svg>
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="loading-spinner hidden w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                <svg class="checkmark hidden w-6 h-6 text-green-500" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-medium mb-1">Business Profile Completeness</h4>
-                        <div class="task-details text-sm text-gray-600 transition-all duration-300 overflow-hidden max-h-0">
-                            <div class="missing-fields space-y-2"></div>
-                            <form class="edit-fields mt-3 space-y-2 hidden" onsubmit="handleQuickUpdate(event, '{{ business.business_id }}')">
-                                <input type="text" name="website" class="update-input border rounded px-2 py-1 text-sm w-full" 
-                                       placeholder="Website URL" required>
-                                <input type="text" name="hours" class="update-input border rounded px-2 py-1 text-sm w-full" 
-                                       placeholder="Business Hours (e.g., Mon-Fri 9-5)" required>
-                                <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded text-sm w-full hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
-                                    <span class="button-text flex items-center"><i class="fas fa-check-circle mr-2"></i>Update & Verify</span>
-                                    <div class="loading-spinner hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                </button>
-                            </form>
+                        <div class="flex-1">
+                            <h4 class="font-medium mb-1">Business Profile Completeness</h4>
+                            <div class="task-details text-sm text-gray-600 transition-all duration-300 overflow-hidden max-h-0">
+                                <div class="missing-fields space-y-2"></div>
+                                <form class="edit-fields mt-3 space-y-2 hidden"
+                                      onsubmit="handleQuickUpdate(event, '{{ business.business_id }}')">
+                                    <input type="text" name="website"
+                                           class="update-input border rounded px-2 py-1 text-sm w-full"
+                                           placeholder="Website URL" required>
+                                    <input type="text" name="hours"
+                                           class="update-input border rounded px-2 py-1 text-sm w-full"
+                                           placeholder="Business Hours (e.g., Mon-Fri 9-5)" required>
+                                    <button type="submit"
+                                            class="bg-blue-500 text-white px-3 py-1 rounded text-sm w-full hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+                                        <span class="button-text flex items-center"><i
+                                                class="fas fa-check-circle mr-2"></i>Update & Verify</span>
+                                        <div class="loading-spinner hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Other compliance items with similar structure -->
-            <div class="compliance-item animate-fade-in-up opacity-0 translate-y-4" data-task="posts">
-                <div class="flex items-center gap-4 p-4 rounded-lg transition-all duration-300 hover:bg-gray-50">
-                    <div class="status-indicator relative w-8 h-8 flex-shrink-0">
-                        <!-- Progress circle and status icons same as above -->
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="font-medium mb-1">Regular Content Posts</h4>
-                        <div class="task-details text-sm text-gray-600 transition-all duration-300 overflow-hidden max-h-0">
-                            <!-- Task-specific content -->
+                <!-- Other compliance items with similar structure -->
+                <div class="compliance-item animate-fade-in-up opacity-0 translate-y-4" data-task="posts">
+                    <div class="flex items-center gap-4 p-4 rounded-lg transition-all duration-300 hover:bg-gray-50">
+                        <div class="status-indicator relative w-8 h-8 flex-shrink-0">
+                            <!-- Progress circle and status icons same as above -->
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium mb-1">Regular Content Posts</h4>
+                            <div class="task-details text-sm text-gray-600 transition-all duration-300 overflow-hidden max-h-0">
+                                <!-- Task-specific content -->
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Similar structure for reviews, qa, photos compliance items -->
-        </div>
-        <div class="mt-6 flex justify-between items-center">
-            
-            <div class="text-sm text-gray-500">
-                Overall Compliance Score: <span id="compliance-score" class="font-semibold">0</span>%
+                <!-- Similar structure for reviews, qa, photos compliance items -->
             </div>
-            <div class="w-1/3 bg-gray-200 rounded-full h-2">
-                <div id="compliance-progress" class="h-2 rounded-full transition-all duration-500"></div>
+            <div class="mt-6 flex justify-between items-center">
+
+                <div class="text-sm text-gray-500">
+                    Overall Compliance Score: <span id="compliance-score" class="font-semibold">0</span>%
+                </div>
+                <div class="w-1/3 bg-gray-200 rounded-full h-2">
+                    <div id="compliance-progress" class="h-2 rounded-full transition-all duration-500"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    function updateBusinessWebsite(businessId) {
-        const websiteInput = document.getElementById(`websiteInput-${businessId}`);
-        const website = websiteInput.value.trim();
-        
-        if (!website) {
-            alert('Please enter a valid website URL');
-            return;
-        }
+    <script>
+        function updateBusinessWebsite(businessId) {
+            const websiteInput = document.getElementById(`websiteInput-${businessId}`);
+            const website = websiteInput.value.trim();
 
-        fetch(`/api/business/${businessId}/update/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            },
-            body: JSON.stringify({ website })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                loadComplianceData(businessId);
-            } else {
-                alert('Failed to update website: ' + (data.message || 'Unknown error'));
+            if (!website) {
+                alert('Please enter a valid website URL');
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error updating website:', error);
-            alert('Error updating website');
-        });
-    }
 
-    // Global variable to hold the current businessId and interval reference
-    let complianceInterval = null;
-
-    function showComplianceModal(businessId) {
-        currentBusinessId = businessId;
-        const modal = document.getElementById('complianceModal');
-        modal.classList.remove('hidden');
-        loadComplianceData(businessId);
-
-        // Clear any previous interval
-        if (complianceInterval !== null) {
-            clearInterval(complianceInterval);
-        }
-        // Set up a full compliance check to run every 6 hours (21600000 ms)
-        complianceInterval = setInterval(() => {
-            loadComplianceData(currentBusinessId);
-        }, 21600000);
-    }
-
-    function closeComplianceModal() {
-        document.getElementById('complianceModal').classList.add('hidden');
-        if (complianceInterval !== null) {
-            clearInterval(complianceInterval);
-            complianceInterval = null;
-        }
-    }
-
-    function loadComplianceData(businessId) {
-        const checklist = document.getElementById(`profile-compliance`);
-        checklist.querySelector('.loading-spinner').classList.remove('hidden');
-        checklist.querySelector('.checkmark').classList.add('hidden');
-        checklist.querySelector('.edit-fields').classList.add('hidden');
-
-        fetch(`/api/business/${businessId}/compliance/`)
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error loading compliance data: ', response.statusText);
-                    return {};
-                }
-                return response.json();
+            fetch(`/api/business/${businessId}/update/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({website})
             })
-            .then(data => {
-                if (!data || Object.keys(data).length === 0) {
-                    console.warn('No compliance data returned, using defaults');
-                    data = {
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        loadComplianceData(businessId);
+                    } else {
+                        alert('Failed to update website: ' + (data.message || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating website:', error);
+                    alert('Error updating website');
+                });
+        }
+
+        // Global variable to hold the current businessId and interval reference
+        let complianceInterval = null;
+
+        function showComplianceModal(businessId) {
+            currentBusinessId = businessId;
+            const modal = document.getElementById('complianceModal');
+            modal.classList.remove('hidden');
+            loadComplianceData(businessId);
+
+            // Clear any previous interval
+            if (complianceInterval !== null) {
+                clearInterval(complianceInterval);
+            }
+            // Set up a full compliance check to run every 6 hours (21600000 ms)
+            complianceInterval = setInterval(() => {
+                loadComplianceData(currentBusinessId);
+            }, 21600000);
+        }
+
+        function closeComplianceModal() {
+            document.getElementById('complianceModal').classList.add('hidden');
+            if (complianceInterval !== null) {
+                clearInterval(complianceInterval);
+                complianceInterval = null;
+            }
+        }
+
+        function loadComplianceData(businessId) {
+            const checklist = document.getElementById(`profile-compliance`);
+            checklist.querySelector('.loading-spinner').classList.remove('hidden');
+            checklist.querySelector('.checkmark').classList.add('hidden');
+            checklist.querySelector('.edit-fields').classList.add('hidden');
+
+            fetch(`/api/business/${businessId}/compliance/`)
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Error loading compliance data: ', response.statusText);
+                        return {};
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || Object.keys(data).length === 0) {
+                        console.warn('No compliance data returned, using defaults');
+                        data = {
+                            posts_compliance: 0,
+                            reviews_compliance: 0,
+                            qa_compliance: 0,
+                            photos_compliance: 0,
+                            info_compliance: 0,
+                            hours_compliance: 0,
+                            attributes_compliance: 0,
+                            overall_compliance: 0
+                        };
+                    }
+                    updateComplianceChecklist(data);
+                })
+                .catch(error => {
+                    console.error('Error loading compliance data:', error);
+                    updateComplianceChecklist({
                         posts_compliance: 0,
                         reviews_compliance: 0,
                         qa_compliance: 0,
@@ -191,137 +218,123 @@
                         hours_compliance: 0,
                         attributes_compliance: 0,
                         overall_compliance: 0
-                    };
-                }
-                updateComplianceChecklist(data);
-            })
-            .catch(error => {
-                console.error('Error loading compliance data:', error);
-                updateComplianceChecklist({
-                    posts_compliance: 0,
-                    reviews_compliance: 0,
-                    qa_compliance: 0,
-                    photos_compliance: 0,
-                    info_compliance: 0,
-                    hours_compliance: 0,
-                    attributes_compliance: 0,
-                    overall_compliance: 0
+                    });
                 });
-            });
-    }
+        }
 
-    function handleComplianceError(businessId, error) {
-        console.error('Compliance error:', error);
-        const checklist = document.getElementById(`profile-compliance`);
-        checklist.querySelector('.loading-spinner').classList.add('hidden');
-        checklist.querySelector('.missing-fields').textContent = 'Failed to load compliance data. Please try refreshing.';
-        checklist.querySelector('.missing-fields').classList.remove('hidden');
-    }
+        function handleComplianceError(businessId, error) {
+            console.error('Compliance error:', error);
+            const checklist = document.getElementById(`profile-compliance`);
+            checklist.querySelector('.loading-spinner').classList.add('hidden');
+            checklist.querySelector('.missing-fields').textContent = 'Failed to load compliance data. Please try refreshing.';
+            checklist.querySelector('.missing-fields').classList.remove('hidden');
+        }
 
-    function animateProgress(element, targetWidth) {
-        element.style.width = '0%';
-        setTimeout(() => {
-            element.style.width = targetWidth + '%';
-        }, 50);
-    }
-
-    function updateComplianceChecklist(data) {
-        const checklist = document.querySelector(`.compliance-checklist[data-business-id="${data.business_id}"]`);
-        if (!checklist) return;
-
-        // Animate in checklist items
-        const items = checklist.querySelectorAll('.compliance-item');
-        items.forEach((item, index) => {
+        function animateProgress(element, targetWidth) {
+            element.style.width = '0%';
             setTimeout(() => {
-                item.style.opacity = '1';
-                item.style.transform = 'translateY(0)';
-            }, index * 150);
-        });
+                element.style.width = targetWidth + '%';
+            }, 50);
+        }
 
-        // Update each compliance task
-        items.forEach(item => {
-            const taskType = item.dataset.task;
-            const progress = data[`${taskType}_compliance`] || 0;
-            const progressCircle = item.querySelector('.progress-circle circle:last-child');
-            const checkmark = item.querySelector('.checkmark');
-            const spinner = item.querySelector('.loading-spinner');
-            const details = item.querySelector('.task-details');
-            const missingFields = item.querySelector('.missing-fields');
-            const editForm = item.querySelector('.edit-fields');
+        function updateComplianceChecklist(data) {
+            const checklist = document.querySelector(`.compliance-checklist[data-business-id="${data.business_id}"]`);
+            if (!checklist) return;
 
-            // Animate progress circle
-            const circumference = 2 * Math.PI * 40;
-            const offset = circumference - (progress / 100) * circumference;
-            progressCircle.style.strokeDashoffset = offset;
-            progressCircle.style.transition = 'stroke-dashoffset 1s ease-in-out';
+            // Animate in checklist items
+            const items = checklist.querySelectorAll('.compliance-item');
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
 
-            // Update status visuals
-            if (progress >= 80) {
-                checkmark.classList.remove('hidden');
-                details.style.maxHeight = '0';
-                editForm.classList.add('hidden');
-            } else {
-                checkmark.classList.add('hidden');
-                details.style.maxHeight = details.scrollHeight + 'px';
-                
-                // Show missing fields if under 80%
-                if (taskType === 'profile' && progress < 80) {
-                    missingFields.innerHTML = Object.entries(data.missing_fields || {})
-                        .map(([field, msg]) => `<div class="text-red-500">⚠️ ${field}: ${msg}</div>`)
-                        .join('');
-                    editForm.classList.toggle('hidden', !data.requires_update);
+            // Update each compliance task
+            items.forEach(item => {
+                const taskType = item.dataset.task;
+                const progress = data[`${taskType}_compliance`] || 0;
+                const progressCircle = item.querySelector('.progress-circle circle:last-child');
+                const checkmark = item.querySelector('.checkmark');
+                const spinner = item.querySelector('.loading-spinner');
+                const details = item.querySelector('.task-details');
+                const missingFields = item.querySelector('.missing-fields');
+                const editForm = item.querySelector('.edit-fields');
+
+                // Animate progress circle
+                const circumference = 2 * Math.PI * 40;
+                const offset = circumference - (progress / 100) * circumference;
+                progressCircle.style.strokeDashoffset = offset;
+                progressCircle.style.transition = 'stroke-dashoffset 1s ease-in-out';
+
+                // Update status visuals
+                if (progress >= 80) {
+                    checkmark.classList.remove('hidden');
+                    details.style.maxHeight = '0';
+                    editForm.classList.add('hidden');
+                } else {
+                    checkmark.classList.add('hidden');
+                    details.style.maxHeight = details.scrollHeight + 'px';
+
+                    // Show missing fields if under 80%
+                    if (taskType === 'profile' && progress < 80) {
+                        missingFields.innerHTML = Object.entries(data.missing_fields || {})
+                            .map(([field, msg]) => `<div class="text-red-500">⚠️ ${field}: ${msg}</div>`)
+                            .join('');
+                        editForm.classList.toggle('hidden', !data.requires_update);
+                    }
                 }
+            });
+
+            // Update overall progress
+            const overallProgress = document.getElementById('compliance-progress');
+            const score = data.overall_compliance;
+            overallProgress.style.width = `${score}%`;
+            overallProgress.classList.toggle('bg-green-500', score >= 80);
+            overallProgress.classList.toggle('bg-yellow-500', score >= 50 && score < 80);
+            overallProgress.classList.toggle('bg-red-500', score < 50);
+        }
+
+        async function handleQuickUpdate(event, businessId) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const complianceItem = form.closest('.compliance-item');
+            const spinner = complianceItem.querySelector('.loading-spinner');
+            const checkmark = complianceItem.querySelector('.checkmark');
+
+            try {
+                complianceItem.querySelector('.checkmark').classList.add('hidden');
+                spinner.classList.remove('hidden');
+
+                const response = await fetch(`/api/business/${businessId}/update/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                if (!response.ok) throw new Error('Update failed');
+
+                spinner.classList.add('hidden');
+                checkmark.classList.remove('hidden');
+
+                // Re-check compliance after update
+                setTimeout(() => loadComplianceData(businessId), 1500);
+            } catch (error) {
+                console.error('Update error:', error);
+                spinner.classList.add('hidden');
+                showAlertBanner('Failed to update business details. Please try again.');
+            }
+        }
+
+        // Close modal when clicking outside of the content area
+        document.getElementById('complianceModal').addEventListener('click', function (event) {
+            if (event.target === this) {
+                closeComplianceModal();
             }
         });
-
-        // Update overall progress
-        const overallProgress = document.getElementById('compliance-progress');
-        const score = data.overall_compliance;
-        overallProgress.style.width = `${score}%`;
-        overallProgress.classList.toggle('bg-green-500', score >= 80);
-        overallProgress.classList.toggle('bg-yellow-500', score >= 50 && score < 80);
-        overallProgress.classList.toggle('bg-red-500', score < 50);
-    }
-
-    async function handleQuickUpdate(event, businessId) {
-        event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        const complianceItem = form.closest('.compliance-item');
-        const spinner = complianceItem.querySelector('.loading-spinner');
-        const checkmark = complianceItem.querySelector('.checkmark');
-
-        try {
-            complianceItem.querySelector('.checkmark').classList.add('hidden');
-            spinner.classList.remove('hidden');
-            
-            const response = await fetch(`/api/business/${businessId}/update/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify(Object.fromEntries(formData))
-            });
-
-            if (!response.ok) throw new Error('Update failed');
-            
-            spinner.classList.add('hidden');
-            checkmark.classList.remove('hidden');
-            
-            // Re-check compliance after update
-            setTimeout(() => loadComplianceData(businessId), 1500);
-        } catch (error) {
-            console.error('Update error:', error);
-            spinner.classList.add('hidden');
-            showAlertBanner('Failed to update business details. Please try again.');
-        }
-    }
-
-    // Close modal when clicking outside of the content area
-    document.getElementById('complianceModal').addEventListener('click', function (event) {
-        if (event.target === this) {
-            closeComplianceModal();
-        }
-    });
-</script>
+    </script>
+</div>
