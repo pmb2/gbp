@@ -41,15 +41,15 @@
             <!-- Business Details Section -->
             <div>
                 <div class="space-y-3" id="business-details-{{ business.business_id }}">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex justify-between items-center mb-4 cursor-pointer hover:bg-gray-100" onclick="toggleBusinessDetails('{{ business.business_id }}')">
                         <h3 class="text-lg font-medium text-gray-900">Business Details</h3>
-                        <button onclick="toggleEditMode('{{ business.business_id }}')"
+                        <button onclick="toggleEditMode('{{ business.business_id }}'); event.stopPropagation();"
                                 class="text-gray-600 hover:text-gray-900">
                             <span id="edit-icon-{{ business.business_id }}">✏️</span>
                         </button>
                     </div>
                     <!-- View Mode -->
-                    <div class="view-mode" id="view-mode-{{ business.business_id }}">
+                    <div class="view-mode hidden" id="view-mode-{{ business.business_id }}">
                         <div class="flex justify-between">
                             <span class="text-gray-500">Business Name:</span>
                             <span class="text-gray-900">{{ business.business_name }}</span>
