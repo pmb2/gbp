@@ -4,10 +4,10 @@
     <script>
         console.log('📊 Stats:', {
             total: '{{ dashboard_data.stats.total_businesses }}',
-            notVerified: '{{ dashboard_data.stats.step1_count }}',
-            gettingStarted: '{{ dashboard_data.stats.step2_count }}',
-            inProgress: '{{ dashboard_data.stats.step3_count }}',
-            complete: '{{ dashboard_data.stats.step4_count }}'
+            intervention: '{{ dashboard_data.stats.intervention_count }}',
+            scheduled: '{{ dashboard_data.stats.scheduled_count }}',
+            active: '{{ dashboard_data.stats.active_count }}',
+            normal: '{{ dashboard_data.stats.normal_count }}'
         });
     </script>
     <div class="flex items-center justify-center space-x-8">
