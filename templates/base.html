@@ -49,6 +49,11 @@
 </div>
 
 {% block extra_body %}{% endblock %}
+<script>
+window.openTaskDetailModal = function() {
+    document.getElementById('taskDetailModal').classList.remove('hidden');
+};
+</script>
 
 <script>
     // --- Feedback Function ---
