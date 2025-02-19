@@ -565,34 +565,45 @@ class BusinessProfileManager:
             logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
 
             actions = reasoning_result.get("actions", [])
-            for action in actions:
-                logging.debug(f"Structured compliance action: {action}")
-                action_type = action.get("type")
-                target = action.get("target")
-                details = action.get("details")
-                logging.info(f"[{business.business_id} Compliance Action] {action_type} on {target}: {details}")
-                logging.info(f"[{business.business_id} Compliance] Calling fallback agent with action: {action_type} on {target}");
-                agent = self.fallback_agents.get(business.business_id)
-                if not agent:
-                    logging.error(f"No fallback agent found for business {business.business_id}")
-                    continue
-                try:
-                    if target == "website" and (action_type == "update" or action_type == "fallback_update"):
-                        new_website = details  # Parse details as needed
-                        logging.info(f"[{business.business_id}][AGENT] Initiating fallback update for website: {new_website}")
-                        result = await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"), new_website)
-                        logging.info(f"[{business.business_id}][AGENT] Fallback update result: {result}")
-                    elif target in ["reviews", "qna", "posts", "photos"] and (action_type == "verify" or action_type == "fallback_verify"):
-                        logging.info(f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
-                        result = await agent.compliance_check(business_url)
-                        logging.info(f"[{business.business_id}][AGENT] Fallback compliance check result: {result}")
-                    elif action_type == "alert":
-                        input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
-                    elif action_type == "log":
-                        logging.info(f"[{business.business_id} LOG] {details}")
-                except Exception as e:
-                    logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
-                logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}");
+            while actions:
+                for action in actions:
+                    logging.debug(f"Structured compliance action: {action}")
+                    action_type = action.get("type")
+                    target = action.get("target")
+                    details = action.get("details")
+                    logging.info(f"[{business.business_id} Compliance Action] {action_type} on {target}: {details}")
+                    agent = self.fallback_agents.get(business.business_id)
+                    if not agent:
+                        logging.error(f"No fallback agent found for business {business.business_id}")
+                        continue
+                    try:
+                        if target == "website" and action_type in ("update", "fallback_update"):
+                            new_website = details  # Parse details as needed
+                            logging.info(f"[{business.business_id}][AGENT] Initiating fallback update for website: {new_website}")
+                            result = await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"), new_website)
+                            logging.info(f"[{business.business_id}][AGENT] Fallback update result: {result}")
+                        elif target in ["reviews", "qna", "posts", "photos"] and action_type in ("verify", "fallback_verify"):
+                            logging.info(f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
+                            result = await agent.compliance_check(business_url)
+                            logging.info(f"[{business.business_id}][AGENT] Fallback compliance check result: {result}")
+                        elif action_type == "alert":
+                            input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
+                        elif action_type == "log":
+                            logging.info(f"[{business.business_id} LOG] {details}")
+                    except Exception as e:
+                        logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
+                    logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}")
+                # Feed back the executed actions to the reasoning model to get next instructions.
+                feedback_data = {
+                    "business_id": business.business_id,
+                    "executed_actions": actions
+                }
+                logging.info(f"[{business.business_id} Feedback] Sending executed actions to reasoning model: {feedback_data}")
+                new_reasoning = generate_compliance_reasoning(feedback_data)
+                actions = new_reasoning.get("actions", [])
+                if not actions:
+                    logging.info(f"[{business.business_id} Feedback] No further actions received from reasoning model. Exiting feedback loop.")
+                    break
         logging.info("[COMPLIANCE] Structured compliance flow completed.");
  
     async def run_compliance_checks(self) -> None:
