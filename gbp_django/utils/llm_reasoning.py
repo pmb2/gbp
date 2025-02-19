@@ -88,6 +88,8 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
             response = llm.structured_reasoning(pre_prompt, full_prompt)
         else:
             response_text = llm.generate_response(full_prompt, "")
+            if not response_text.strip():
+                raise ValueError("Empty response from LLM")
             response = json.loads(response_text)
     except Exception as e:
         response = {
