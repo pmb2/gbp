@@ -259,7 +259,7 @@
                 .catch(error => {
                     console.error('Error loading compliance data:', error);
                     if (error.message.indexOf("404") !== -1) {
-                        showComplianceModal('missing');
+                        showComplianceModal('website');
                     } else {
                         statusElement.innerHTML = `<div class="text-red-500">Failed to load compliance data. Please try again later.</div>`;
                     }
