@@ -189,7 +189,12 @@
                  },
                  body: JSON.stringify({ trigger: true })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => console.log('[COMPLIANCE] Automation fallback triggered:', data))
             .catch(err => console.error('[COMPLIANCE] Automation fallback error:', err));
         }
