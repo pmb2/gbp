@@ -563,9 +563,35 @@ class BusinessProfileManager:
             })
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
             logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
-
-            actions = reasoning_result.get("actions", [])
-            while actions:
+            
+            // Pass the first instruction to the fallback agent and log the result.
+            let agent = self.fallback_agents.get(business.business_id)
+            if (agent) {
+                let firstInst = null;
+                for (const item of reasoning_result.get("actions", [])) {
+                    if (item.get("type") === "instruction") {
+                        firstInst = item;
+                        break;
+                    }
+                }
+                if (firstInst) {
+                    logging.info(f"[{business.business_id} Instruction] Passing first instruction to agent: " + firstInst.get("details"));
+                    try {
+                        const instruction_result = await agent.execute_instruction(firstInst.get("details"));
+                        logging.info(f"[{business.business_id} Instruction] Execution result: " + instruction_result);
+                        reasoning_result.get("actions", []).remove(firstInst);
+                    } catch (ex) {
+                        logging.error(f"[{business.business_id} Instruction] Error executing instruction: " + ex);
+                    }
+                } else {
+                    logging.info(f"[{business.business_id} Instruction] No instruction action found.");
+                }
+            } else {
+                logging.error(f"No fallback agent found for business {business.business_id}");
+            }
+            
+            let actions = reasoning_result.get("actions", []);
+            while (actions) {
                 for action in actions:
                     logging.debug(f"Structured compliance action: {action}")
                     action_type = action.get("type")
