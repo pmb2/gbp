@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import login_required
 from . import views
+from gbp_django.api import automation
 from django.conf import settings
 from django.conf.urls.static import static
 from allauth.account.views import LoginView
@@ -47,6 +48,7 @@ urlpatterns = [
     path('api/business/<str:business_id>/tasks/update/', views.create_task, name='update_task'),
     path('api/generate-content/', views.generate_content, name='generate_content'),
     path('api/business/<str:business_id>/seo-health/', views.get_seo_health, name='get_seo_health'),
+    path('api/automation/fallback/<str:business_id>/', automation.automation_fallback, name='automation_fallback'),
 ]
 
 # Serve static files
