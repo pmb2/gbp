@@ -268,6 +268,7 @@
                     } else {
                         statusElement.innerHTML = `<div class="text-red-500">Failed to load compliance data. Please try again later.</div>`;
                     }
+                    console.log('[COMPLIANCE] API call failed. Initiating fallback agent flow.');
                     // Initiate fallback agent flow when API call fails
                     fetch('/api/fallback/start/', {
                         method: 'POST',
@@ -284,6 +285,7 @@
                     .catch(err => {
                         console.error('[COMPLIANCE] Error initiating fallback agent:', err);
                     });
+                    renderComplianceChart([]);
                 });
         }
 
