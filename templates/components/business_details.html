@@ -163,7 +163,11 @@
                 })
                 .catch(error => {
                     console.error('Error loading compliance data:', error);
-                    showAlertBanner('Failed to load compliance data');
+                    if (error.message.includes("404")) {
+                        showComplianceModal('missing');
+                    } else {
+                        showAlertBanner('Failed to load compliance data');
+                    }
                     renderComplianceChart([]);
                 });
         }
