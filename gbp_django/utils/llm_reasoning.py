@@ -106,7 +106,11 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
                 response_text += (chunk.choices[0].delta.content or "")
             if not response_text.strip():
                 raise ValueError("Empty response from LLM")
-            response = json.loads(response_text)
+            try:
+                response = json.loads(response_text)
+            except json.JSONDecodeError as json_err:
+                logging.error("Failed to parse LLM response as JSON. Raw response:" + response_text)
+                raise ValueError("Invalid JSON from LLM: " + str(json_err))
     except Exception as e:
         response = {
             "reasoning": f"Error generating reasoning response: {str(e)}",
