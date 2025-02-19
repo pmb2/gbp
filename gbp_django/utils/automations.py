@@ -506,10 +506,12 @@ class BusinessProfileManager:
         agent = self.fallback_agents[business_id]
         try:
             logging.info(f"[{business_id}][AGENT] Initiating update_business_info via fallback agent");
-            update_res = await agent.update_business_info(business_url, task_data["new_hours"], task_data["new_website"])
+            update_res = await agent.update_business_info(business_url, task_data["new_hours"],
+                                                          task_data["new_website"])
             logging.info(f"[{business_id}][AGENT] Update result: {update_res}");
             logging.info(f"[{business_id}][AGENT] Initiating respond_review via fallback agent");
-            respond_res = await agent.respond_review(business_url, task_data["review_text"], task_data["review_response"])
+            respond_res = await agent.respond_review(business_url, task_data["review_text"],
+                                                     task_data["review_response"])
             logging.info(f"[{business_id}][AGENT] Respond result: {respond_res}");
             logging.info(f"[{business_id}][AGENT] Initiating schedule_post via fallback agent");
             post_res = await agent.schedule_post(business_url, task_data["post_content"], hours_from_now=1)
@@ -562,36 +564,35 @@ class BusinessProfileManager:
                 "compliance_score": business.compliance_score
             })
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
-            logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
-            
-            // Pass the first instruction to the fallback agent and log the result.
-            let agent = self.fallback_agents.get(business.business_id)
-            if (agent) {
-                let firstInst = null;
-                for (const item of reasoning_result.get("actions", [])) {
-                    if (item.get("type") === "instruction") {
-                        firstInst = item;
-                        break;
-                    }
-                }
-                if (firstInst) {
-                    logging.info(f"[{business.business_id} Instruction] Passing first instruction to agent: " + firstInst.get("details"));
-                    try {
-                        const instruction_result = await agent.execute_instruction(firstInst.get("details"));
-                        logging.info(f"[{business.business_id} Instruction] Execution result: " + instruction_result);
-                        reasoning_result.get("actions", []).remove(firstInst);
-                    } catch (ex) {
-                        logging.error(f"[{business.business_id} Instruction] Error executing instruction: " + ex);
-                    }
-                } else {
-                    logging.info(f"[{business.business_id} Instruction] No instruction action found.");
-                }
-            } else {
-                logging.error(f"No fallback agent found for business {business.business_id}");
-            }
-            
-            let actions = reasoning_result.get("actions", []);
-            while (actions) {
+            logging.info(
+                f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
+
+            # Pass the first instruction to the fallback agent and log the result.
+            agent = self.fallback_agents.get(business.business_id)
+            if agent:
+                firstInst = None
+                for item in reasoning_result.get("actions", []):
+                    if item.get("type") == "instruction":
+                        firstInst = item
+                        break
+                if firstInst:
+                    logging.info(
+                        f"[{business.business_id} Instruction] Passing first instruction to agent: " + firstInst.get(
+                            "details"))
+                    try:
+                        instruction_result = await agent.execute_instruction(firstInst.get("details"))
+                        logging.info(
+                            f"[{business.business_id} Instruction] Execution result: " + str(instruction_result))
+                        reasoning_result.get("actions", []).remove(firstInst)
+                    except Exception as ex:
+                        logging.error(f"[{business.business_id} Instruction] Error executing instruction: " + str(ex))
+                else:
+                    logging.info(f"[{business.business_id} Instruction] No instruction action found.")
+            else:
+                logging.error(f"No fallback agent found for business {business.business_id}")
+
+            actions = reasoning_result.get("actions", [])
+            while actions:
                 for action in actions:
                     logging.debug(f"Structured compliance action: {action}")
                     action_type = action.get("type")
@@ -605,15 +606,21 @@ class BusinessProfileManager:
                     try:
                         if target == "website" and action_type in ("update", "fallback_update"):
                             new_website = details  # Parse details as needed
-                            logging.info(f"[{business.business_id}][AGENT] Initiating fallback update for website: {new_website}")
-                            result = await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"), new_website)
+                            logging.info(
+                                f"[{business.business_id}][AGENT] Initiating fallback update for website: {new_website}")
+                            result = await agent.update_business_info(business_url,
+                                                                      getattr(business, "hours", "Mon-Fri 09:00-17:00"),
+                                                                      new_website)
                             logging.info(f"[{business.business_id}][AGENT] Fallback update result: {result}")
-                        elif target in ["reviews", "qna", "posts", "photos"] and action_type in ("verify", "fallback_verify"):
-                            logging.info(f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
+                        elif target in ["reviews", "qna", "posts", "photos"] and action_type in (
+                        "verify", "fallback_verify"):
+                            logging.info(
+                                f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
                             result = await agent.compliance_check(business_url)
                             logging.info(f"[{business.business_id}][AGENT] Fallback compliance check result: {result}")
                         elif action_type == "alert":
-                            input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
+                            input(
+                                f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
                         elif action_type == "log":
                             logging.info(f"[{business.business_id} LOG] {details}")
                         elif action_type == "instruction":
@@ -622,23 +629,27 @@ class BusinessProfileManager:
                                 result = await agent.execute_instruction(details)
                                 logging.info(f"[{business.business_id}][AGENT] Instruction result: {result}")
                             else:
-                                logging.info(f"[{business.business_id}][AGENT] No execute_instruction method available; skipping instruction.")
+                                logging.info(
+                                    f"[{business.business_id}][AGENT] No execute_instruction method available; skipping instruction.")
                     except Exception as e:
-                        logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
+                        logging.error(
+                            f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
                     logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}")
                 # Feed back the executed actions to the reasoning model to get next instructions.
                 feedback_data = {
                     "business_id": business.business_id,
                     "executed_actions": actions
                 }
-                logging.info(f"[{business.business_id} Feedback] Sending executed actions to reasoning model: {feedback_data}")
+                logging.info(
+                    f"[{business.business_id} Feedback] Sending executed actions to reasoning model: {feedback_data}")
                 new_reasoning = generate_compliance_reasoning(feedback_data)
                 actions = new_reasoning.get("actions", [])
                 if not actions:
-                    logging.info(f"[{business.business_id} Feedback] No further actions received from reasoning model. Exiting feedback loop.")
+                    logging.info(
+                        f"[{business.business_id} Feedback] No further actions received from reasoning model. Exiting feedback loop.")
                     break
-        logging.info("[COMPLIANCE] Structured compliance flow completed.");
- 
+            logging.info("[COMPLIANCE] Structured compliance flow completed.")
+
     async def run_compliance_checks(self) -> None:
         tasks = [self.fallback_agents[biz_id].compliance_check(self.businesses[biz_id]) for biz_id in self.businesses]
         results = await asyncio.gather(*tasks, return_exceptions=True)
