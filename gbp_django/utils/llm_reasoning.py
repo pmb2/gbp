@@ -34,19 +34,16 @@ COMPLIANCE_REASONING_PROMPT = """**Compliance Orchestration Protocol v3.0**
 
 Your objective is to guide the browser-use agent through the complete compliance process for a Google Business Profile. Follow these priorities:
 
-1. **Agent Initialization & Login:**  
-   Instruct the agent to launch the browser-use process and log into the Google Business Profile using the provided environment credentials (DO NOT expose credentials externally).
-
-2. **Data Collection:**  
+1. **Data Collection:**  
    Command the agent to scrape and gather all available business data including website URL, business name, address, business hours (with special hours), category, locations, photos, latest posts, Q&A, reviews, and responses.
 
-3. **Data Verification & Storage:**  
+2. **Data Verification & Storage:**  
    Ensure that the agent stores all gathered data and verifies that all required fields are complete and valid.
 
-4. **User Prompt for Missing Data:**  
+3. **User Prompt for Missing Data:**  
    If any required data is missing or invalid, instruct the agent to prompt the user via a popup modal for that missing piece—one item at a time—with clear instructions.
 
-5. **Feedback Loop:**  
+4. **Feedback Loop:**  
    If the agent has any questions or uncertainties during any step, ask for clarification. Include these as follow-up questions in your output.
 
 Output a valid JSON object with the following keys:
