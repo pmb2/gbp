@@ -527,6 +527,7 @@ class BusinessProfileManager:
         """
         Execute the compliance flow step-by-step using the reasoning model.
         """
+        logging.info("[COMPLIANCE] Running structured compliance flow for all businesses.");
         from model_interface import get_llm_model
         from compliance_policy import get_compliance_policy
 
@@ -580,7 +581,8 @@ class BusinessProfileManager:
                 except Exception as e:
                     logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
                 logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}");
-
+        logging.info("[COMPLIANCE] Structured compliance flow completed.");
+ 
     async def run_compliance_checks(self) -> None:
         tasks = [self.fallback_agents[biz_id].compliance_check(self.businesses[biz_id]) for biz_id in self.businesses]
         results = await asyncio.gather(*tasks, return_exceptions=True)
