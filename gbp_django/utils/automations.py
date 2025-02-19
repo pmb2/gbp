@@ -565,22 +565,20 @@ class BusinessProfileManager:
                 if not agent:
                     logging.error(f"No fallback agent found for business {business.business_id}")
                     continue
-                try {
+                try:
                     if target == "website" and (action_type == "update" or action_type == "fallback_update"):
                         new_website = details  # Parse details as needed
-                        logging.info(f"[{business.business_id}] Executing fallback update for website: {new_website}");
+                        logging.info(f"[{business.business_id}] Executing fallback update for website: {new_website}")
                         await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"), new_website)
-                    } else if (target in ["reviews", "qna", "posts", "photos"] and (action_type == "verify" or action_type == "fallback_verify")) {
-                        logging.info(f"[{business.business_id}] Executing fallback compliance check for target: {target}");
+                    elif target in ["reviews", "qna", "posts", "photos"] and (action_type == "verify" or action_type == "fallback_verify"):
+                        logging.info(f"[{business.business_id}] Executing fallback compliance check for target: {target}")
                         await agent.compliance_check(business_url)
-                    } else if (action_type === "alert") {
-                        input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.");
-                    } else if (action_type === "log") {
-                        logging.info(f"[{business.business_id} LOG] {details}");
-                    }
-                } catch (Exception e) {
-                    logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}");
-                }
+                    elif action_type == "alert":
+                        input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
+                    elif action_type == "log":
+                        logging.info(f"[{business.business_id} LOG] {details}")
+                except Exception as e:
+                    logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
                 logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}");
 
     async def run_compliance_checks(self) -> None:
