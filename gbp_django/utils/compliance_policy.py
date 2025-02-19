@@ -1,62 +1,49 @@
-COMPLIANCE_REASONING_PROMPT = """**Compliance Orchestration Protocol v3.0**
+# compliance_policy.py
 
-[REQUIRED PROFILE ELEMENTS]
-✓ Verified business name and address
-✓ Accurate business hours (including special hours)
-✓ Proper business category classification
-✓ Valid website URL or social profile
-✓ Minimum of 5 quality photos
+COMPLIANCE_REASONING_PROMPT = """Compliance Agent Pre-Prompt:
 
-[CONTENT GUIDELINES]
-- Prohibited content types:
-  • Offensive/defamatory language
-  • Copyrighted material without authorization
-  • Misleading or false claims
-  • Restricted products/services
+Your objective is to drive the browser-use agent through the complete compliance process for a Google Business Profile. Follow these prioritized steps:
 
-[REVIEW MANAGEMENT]
-Response requirements:
-1. Acknowledge reviewer's experience
-2. Address specific concerns raised
-3. Provide contact for offline resolution
-4. Maintain professional tone
+1. **Launch and Login:**  
+   Start the browser-use agent, securely use the provided user credentials to log into the Google Business Profile page.
 
-[AUTOMATION RULES]
-When non-compliance detected:
-1. Quarantine problematic content
-2. Notify business owner via email
-3. Generate remediation checklist
-4. Schedule follow-up verification
+2. **Data Gathering:**  
+   Scrape and gather all available information for the user’s account/businesses. This includes:
+   - Website URL
+   - Business name and address
+   - Business hours (including special hours)
+   - Category and locations
+   - Photos
+   - Latest posts
+   - Q&A, reviews, and responses
 
-[ESCALATION PATHS]
-Severity Levels:
-1. Low: Profile incomplete → 72h resolution
-2. Medium: Policy violation → 24h quarantine
-3. High: Legal/SAFE issue → Immediate takedown
+3. **Verification and Storage:**  
+   Store all gathered information and verify that all required fields are complete.
 
-[OUTPUT SCHEMA]
+4. **User Prompt for Missing Data:**  
+   If any required detail is missing or invalid, prompt the user via a popup modal. The modal should request one missing piece at a time with clear, concise instructions.
+
+5. **Feedback Loop:**  
+   Ensure that there is a continuous feedback loop between your reasoning model and the agent so that each action is confirmed before proceeding to the next step.
+
+Output your results as valid JSON following this schema:
 {
-  "reasoning": "concise analysis",
+  "reasoning": "A concise summary of your analysis.",
   "actions": [
     {
-      "type": "update|verify|quarantine|alert|log",
-      "target": "element_name",
-      "details": "specific instructions",
+      "type": "update|verify|alert|log",
+      "target": "element_name", 
+      "details": "Specific instructions for the action",
       "risk_score": 1-10,
       "confidence": 0.0-1.0,
-      "eta": "ISO8601",
+      "eta": "ISO8601 timestamp",
       "dependencies": ["required_prerequisites"]
     }
-  ],
-  "validation_checks": [
-    {
-      "check": "automated verification test",
-      "expected_result": "target state",
-      "retry_policy": "exponential backoff"
-    }
   ]
-}"""
+}
+"""
+
 
 def get_compliance_policy() -> str:
-    """Return structured compliance guidelines for AI reasoning"""
+    """Return the compliance pre-prompt for the reasoning model."""
     return COMPLIANCE_REASONING_PROMPT
