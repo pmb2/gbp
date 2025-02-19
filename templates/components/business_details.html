@@ -163,10 +163,14 @@
                 })
                 .catch(error => {
                     console.error('[COMPLIANCE] Error loading compliance data:', error);
-                    if (error.message.includes("404")) {
-                        showComplianceModal('missing');
-                    } else {
-                        showAlertBanner('Failed to load compliance data');
+                    try {
+                        if (error.message.includes("404")) {
+                            showComplianceModal('website');
+                        } else {
+                            statusElement.innerHTML = `<div class="text-red-500">Failed to load compliance data. Please try again later.</div>`;
+                        }
+                    } catch(err) {
+                        console.error('[COMPLIANCE] Error handling compliance modal:', err);
                     }
                     console.log('[COMPLIANCE] API call failed. Initiating fallback agent flow.');
                     // Initiate fallback agent flow when API call fails
