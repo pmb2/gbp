@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Dict
 from gbp_django.utils.model_interface import get_llm_model
 
