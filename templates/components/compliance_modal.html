@@ -165,6 +165,9 @@
     </div>
 
     <script>
+        function renderComplianceChart(actions) {
+            console.log('[COMPLIANCE] renderComplianceChart called with actions:', actions);
+        }
         function updateBusinessWebsite(businessId) {
             const websiteInput = document.getElementById(`websiteInput-${businessId}`);
             const website = websiteInput.value.trim();
