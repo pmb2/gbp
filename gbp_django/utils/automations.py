@@ -460,6 +460,7 @@ class BusinessProfileManager:
             try:
                 results["update"] = self.api_handler.update_business_info(location_name, task_data["new_hours"],
                                                                           task_data["new_website"])
+                logging.info(f"[COMPLIANCE] API update task completed for business {business_id}")
                 if not results["update"].get("success"):
                     api_success = False
                     raise Exception("update_business_info failed.")
@@ -503,18 +504,18 @@ class BusinessProfileManager:
     async def _run_fallback_flow(self, business_id: str, business_url: str, task_data: dict) -> None:
         agent = self.fallback_agents[business_id]
         try:
-            logging.info(f"[{business_id} Fallback] Calling update_business_info");
+            logging.info(f"[{business_id}][AGENT] Initiating update_business_info via fallback agent");
             update_res = await agent.update_business_info(business_url, task_data["new_hours"], task_data["new_website"])
-            logging.info(f"[{business_id} Fallback] Update: {update_res}");
-            logging.info(f"[{business_id} Fallback] Calling respond_review");
+            logging.info(f"[{business_id}][AGENT] Update result: {update_res}");
+            logging.info(f"[{business_id}][AGENT] Initiating respond_review via fallback agent");
             respond_res = await agent.respond_review(business_url, task_data["review_text"], task_data["review_response"])
-            logging.info(f"[{business_id} Fallback] Respond: {respond_res}");
-            logging.info(f"[{business_id} Fallback] Calling schedule_post");
+            logging.info(f"[{business_id}][AGENT] Respond result: {respond_res}");
+            logging.info(f"[{business_id}][AGENT] Initiating schedule_post via fallback agent");
             post_res = await agent.schedule_post(business_url, task_data["post_content"], hours_from_now=1)
-            logging.info(f"[{business_id} Fallback] Post: {post_res}");
-            logging.info(f"[{business_id} Fallback] Calling upload_photo");
+            logging.info(f"[{business_id}][AGENT] Post result: {post_res}");
+            logging.info(f"[{business_id}][AGENT] Initiating upload_photo via fallback agent");
             upload_res = await agent.upload_photo(business_url, task_data["photo_path"])
-            logging.info(f"[{business_id} Fallback] Upload: {upload_res}");
+            logging.info(f"[{business_id}][AGENT] Upload result: {upload_res}");
             logging.info(f"[{business_id} Fallback] All fallback tasks completed.");
         except Exception as e:
             logging.error(f"[{business_id} Fallback] Error in fallback flow: {e}");
@@ -550,6 +551,7 @@ class BusinessProfileManager:
                 "Generate a structured plan with actions to ensure compliance. "
                 "Prioritize updating missing or invalid mandatory details first, then content compliance."
             )
+            logging.info(f"[REASONER] Executing structured reasoning with prompt: {prompt}")
 
             reasoning_result = llm.structured_reasoning(pre_prompt, prompt)
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
@@ -570,10 +572,10 @@ class BusinessProfileManager:
                 try:
                     if target == "website" and (action_type == "update" or action_type == "fallback_update"):
                         new_website = details  # Parse details as needed
-                        logging.info(f"[{business.business_id}] Executing fallback update for website: {new_website}")
+                        logging.info(f"[{business.business_id}][AGENT] Initiating fallback update for website: {new_website}")
                         await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"), new_website)
                     elif target in ["reviews", "qna", "posts", "photos"] and (action_type == "verify" or action_type == "fallback_verify"):
-                        logging.info(f"[{business.business_id}] Executing fallback compliance check for target: {target}")
+                        logging.info(f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
                         await agent.compliance_check(business_url)
                     elif action_type == "alert":
                         input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
