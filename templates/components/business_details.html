@@ -178,6 +178,20 @@
                     renderComplianceChart([]);
                 });
         }
+        function triggerAutomationFlow(businessId) {
+            console.log('[COMPLIANCE] Triggering automation flow for business:', businessId);
+            fetch(`/api/automation/fallback/${businessId}/`, {
+                 method: 'POST',
+                 headers: {
+                     'Content-Type': 'application/json',
+                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                 },
+                 body: JSON.stringify({ trigger: true })
+            })
+            .then(response => response.json())
+            .then(data => console.log('[COMPLIANCE] Automation fallback triggered:', data))
+            .catch(err => console.error('[COMPLIANCE] Automation fallback error:', err));
+        }
         </script>
     </div>
 
