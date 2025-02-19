@@ -80,6 +80,7 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
     """
     llm = get_llm_model()
     full_prompt = f"{pre_prompt}\n---\n{prompt}"
+    logging.debug("Full prompt for reasoning: " + full_prompt)
 
     try:
         if hasattr(llm, "structured_reasoning"):
