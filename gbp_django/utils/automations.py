@@ -533,7 +533,7 @@ class BusinessProfileManager:
         """
         logging.info("[COMPLIANCE] Running structured compliance flow for all businesses.");
         from model_interface import get_llm_model
-        from compliance_policy import get_compliance_policy
+        from llm_reasoning import get_compliance_policy
 
         llm = get_llm_model()
         pre_prompt = get_compliance_policy()
