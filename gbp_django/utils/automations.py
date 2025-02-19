@@ -430,6 +430,7 @@ class BusinessProfileManager:
             cookie_file = os.path.join(cookies_folder, f"cookies_{business_id}.json")
             self.fallback_agents[business_id] = FallbackGBPAgent(business_id, cookie_file, chrome_path,
                                                                  headless=headless)
+            logging.info(f"[{business_id}] Fallback agent connected.");
 
     async def process_business(self, business_id: str, task_data: dict) -> None:
         """
