@@ -296,13 +296,15 @@
                 const offset = circumference - (progress / 100) * circumference;
                 progressCircle.style.strokeDashoffset = offset;
                 progressCircle.style.transition = 'stroke-dashoffset 1s ease-in-out';
+                // Update the task progress text to show current task and progress.
+                details.style.maxHeight = details.scrollHeight + 'px';
+                details.textContent = `Working on ${taskType} compliance. ${progress}% complete.`;
                 if (progress >= 80) {
                     checkmark.classList.remove('hidden');
                     details.style.maxHeight = '0';
                     editForm.classList.add('hidden');
                 } else {
                     checkmark.classList.add('hidden');
-                    details.style.maxHeight = details.scrollHeight + 'px';
                     if (taskType === 'profile' && progress < 80) {
                         missingFields.innerHTML = Object.entries(data.missing_fields || {})
                             .map(([field, msg]) => `<div class="text-red-500">⚠️ ${field}: ${msg}</div>`)
