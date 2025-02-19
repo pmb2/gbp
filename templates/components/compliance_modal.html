@@ -168,12 +168,10 @@
         function updateBusinessWebsite(businessId) {
             const websiteInput = document.getElementById(`websiteInput-${businessId}`);
             const website = websiteInput.value.trim();
-
             if (!website) {
                 alert('Please enter a valid website URL');
                 return;
             }
-
             fetch(`/api/business/${businessId}/update/`, {
                 method: 'POST',
                 headers: {
@@ -228,14 +226,12 @@
                 console.error('Compliance checklist element not found');
                 return;
             }
-
             checklist.querySelectorAll('.compliance-item').forEach(item => {
                 const spinner = item.querySelector('.loading-spinner');
                 const checkmark = item.querySelector('.checkmark');
                 if (spinner) spinner.classList.remove('hidden');
                 if (checkmark) checkmark.classList.add('hidden');
             });
-
             const statusElement = document.getElementById(`compliance-stage-${businessId}`);
             statusElement.innerHTML = `
                 <div class="flex items-center text-sm text-gray-600">
@@ -243,7 +239,6 @@
                     <span>Initializing compliance engine...</span>
                 </div>
             `;
-
             fetch(`/api/business/${businessId}/compliance/`)
                 .then(response => {
                     if (!response.ok) {
@@ -268,31 +263,12 @@
                     } else {
                         statusElement.innerHTML = `<div class="text-red-500">Failed to load compliance data. Please try again later.</div>`;
                     }
-                    console.log('[COMPLIANCE] API call failed. Initiating fallback agent flow.');
-                    // Initiate fallback agent flow when API call fails
-                    fetch('/api/fallback/start/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                        },
-                        body: JSON.stringify({businessId: businessId})
-                    })
-                    .then(resp => resp.json())
-                    .then(data => {
-                        console.log('[COMPLIANCE] Fallback agent initiated:', data);
-                    })
-                    .catch(err => {
-                        console.error('[COMPLIANCE] Error initiating fallback agent:', err);
-                    });
-                    renderComplianceChart([]);
                 });
         }
 
         function updateComplianceChecklist(data) {
             const checklist = document.querySelector(`.compliance-checklist[data-business-id="${data.business_id}"]`);
             if (!checklist) return;
-
             const items = checklist.querySelectorAll('.compliance-item');
             items.forEach((item, index) => {
                 setTimeout(() => {
@@ -300,7 +276,6 @@
                     item.style.transform = 'translateY(0)';
                 }, index * 150);
             });
-
             items.forEach(item => {
                 const taskType = item.dataset.task;
                 const progress = data[`${taskType}_compliance`] || 0;
@@ -310,17 +285,14 @@
                 const details = item.querySelector('.task-details');
                 const missingFields = item.querySelector('.missing-fields');
                 const editForm = item.querySelector('.edit-fields');
-
                 if (!progressCircle || !checkmark || !spinner || !details || !missingFields || !editForm) {
                     console.warn('Missing elements in compliance item', item);
                     return;
                 }
-
                 const circumference = 2 * Math.PI * 40;
                 const offset = circumference - (progress / 100) * circumference;
                 progressCircle.style.strokeDashoffset = offset;
                 progressCircle.style.transition = 'stroke-dashoffset 1s ease-in-out';
-
                 if (progress >= 80) {
                     checkmark.classList.remove('hidden');
                     details.style.maxHeight = '0';
@@ -336,7 +308,6 @@
                     }
                 }
             });
-
             const overallProgress = document.getElementById('compliance-progress');
             const score = data.overall_compliance || 0;
             overallProgress.style.width = `${score}%`;
@@ -352,11 +323,9 @@
             const complianceItem = form.closest('.compliance-item');
             const spinner = complianceItem.querySelector('.loading-spinner');
             const checkmark = complianceItem.querySelector('.checkmark');
-
             try {
                 checkmark.classList.add('hidden');
                 spinner.classList.remove('hidden');
-
                 const response = await fetch(`/api/business/${businessId}/update/`, {
                     method: 'POST',
                     headers: {
@@ -365,12 +334,9 @@
                     },
                     body: JSON.stringify(Object.fromEntries(formData))
                 });
-
                 if (!response.ok) throw new Error('Update failed');
-
                 spinner.classList.add('hidden');
                 checkmark.classList.remove('hidden');
-
                 setTimeout(() => loadComplianceData(businessId), 1500);
             } catch (error) {
                 console.error('Update error:', error);
@@ -392,7 +358,6 @@
             const fieldInput = document.getElementById('missingFieldInput');
             const instructions = document.getElementById('fieldInstructions');
             const examples = document.getElementById('fieldExamples');
-
             const fieldsConfig = {
                 'website': {
                     instruction: 'We need your business website URL to verify your online presence:',
@@ -413,23 +378,19 @@
                     type: 'text'
                 }
             };
-
             const config = fieldsConfig[missingField];
             instructions.innerHTML = `<strong>Action Required:</strong> ${config.instruction}`;
             fieldInput.placeholder = config.placeholder;
             fieldInput.type = config.type;
             fieldInput.name = missingField;
             examples.textContent = config.examples;
-
             modal.classList.remove('hidden');
-
             document.getElementById('complianceForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const formData = new FormData();
                 formData.append('business_id', '{{ business.business_id }}');
                 formData.append('field', missingField);
                 formData.append('value', fieldInput.value);
-
                 try {
                     const response = await fetch('/compliance/update_missing_data/', {
                         method: 'POST',
@@ -450,12 +411,6 @@
                     alert('Error submitting information. Please try again.');
                 }
             });
-        }
-    </script>
-    <script>
-        function renderComplianceChart(actions) {
-            console.log("[COMPLIANCE] renderComplianceChart called with actions:", actions);
-            // TODO: Implement chart rendering logic as needed.
         }
     </script>
 </div>

@@ -524,7 +524,7 @@ class BusinessProfileManager:
         """
         Execute the compliance flow step-by-step using the reasoning model.
         """
-        from utils.model_interface import get_llm_model
+        from model_interface import get_llm_model
         from compliance_policy import get_compliance_policy
 
         llm = get_llm_model()
