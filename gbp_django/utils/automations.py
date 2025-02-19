@@ -238,6 +238,7 @@ class FallbackGBPAgent:
             logging.warning(f"[{self.business_id}] Auto‑login error: {e}. Falling back to manual login.")
             input(f"[{self.business_id}] Complete the login manually, then press Enter...")
 
+        logging.info(f"[{self.business_id}] Checking for 2FA requirements.")
         try:
             otp_field = driver.find_element_by_name("otp")
             otp_code = input(f"[{self.business_id}] 2FA detected. Enter OTP code: ")
@@ -546,6 +547,7 @@ class BusinessProfileManager:
 
             reasoning_result = llm.structured_reasoning(pre_prompt, prompt)
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
+            logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
 
             actions = reasoning_result.get("actions", [])
             for action in actions:
