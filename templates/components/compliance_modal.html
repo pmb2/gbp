@@ -92,36 +92,40 @@
                                            placeholder="Business Hours (e.g., Mon-Fri 9-5)" required>
                                     <button type="submit"
                                             class="bg-blue-500 text-white px-3 py-1 rounded text-sm w-full hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
-                                        <span class="button-text flex items-center gap-2"><i
-                                                class="fas fa-check-circle mr-2"></i> Update &amp; Verify</span>
+                                        <span class="button-text flex items-center gap-2">
+                                            <i class="fas fa-check-circle mr-2"></i> Update &amp; Verify
+                                        </span>
                                         <div class="loading-spinner hidden w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                     </button>
                                 </form>
                             </div>
                         </div>
 
-                        <div id="complianceModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+                        <div id="complianceModal"
+                             class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
                             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                                 <div class="mt-3 text-center">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Additional Information Required</h3>
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Additional Information
+                                        Required</h3>
                                     <form id="complianceForm" class="space-y-4">
                                         <div class="text-left" id="missingFieldContainer">
                                             <div class="mb-4 p-3 bg-blue-50 rounded-lg">
                                                 <p class="text-sm text-blue-800" id="fieldInstructions"></p>
                                             </div>
                                             <div class="dynamic-field-container">
-                                                <input type="text" id="missingFieldInput" 
+                                                <input type="text" id="missingFieldInput"
                                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                                        autocomplete="off">
                                             </div>
                                             <p class="mt-2 text-sm text-gray-500" id="fieldExamples"></p>
                                         </div>
                                         <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                                                 Submit Information
                                             </button>
-                                            <button type="button" onclick="document.getElementById('complianceModal').classList.add('hidden')"
+                                            <button type="button"
+                                                    onclick="document.getElementById('complianceModal').classList.add('hidden')"
                                                     class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                                                 Cancel
                                             </button>
@@ -147,11 +151,9 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Similar structure for reviews, qa, photos compliance items -->
+                <!-- Similar structure for reviews, Q&A, photos compliance items -->
             </div>
             <div class="mt-6 flex justify-between items-center">
-
                 <div class="text-sm text-gray-500">
                     Overall Compliance Score: <span id="compliance-score" class="font-semibold">0</span>%
                 </div>
@@ -194,7 +196,6 @@
                 });
         }
 
-        // Global variable to hold the current businessId and interval reference
         let complianceInterval = null;
 
         function showComplianceModal(businessId) {
@@ -203,15 +204,11 @@
                 console.error('Compliance modal element not found');
                 return;
             }
-            
             modal.classList.remove('hidden');
             loadComplianceData(businessId);
-
-            // Clear any previous interval
             if (window.complianceInterval) {
                 clearInterval(window.complianceInterval);
             }
-            // Set up a full compliance check to run every 6 hours (21600000 ms)
             window.complianceInterval = setInterval(() => {
                 loadComplianceData(businessId);
             }, 21600000);
@@ -231,8 +228,7 @@
                 console.error('Compliance checklist element not found');
                 return;
             }
-            
-            // Show loading state for all items
+
             checklist.querySelectorAll('.compliance-item').forEach(item => {
                 const spinner = item.querySelector('.loading-spinner');
                 const checkmark = item.querySelector('.checkmark');
@@ -240,7 +236,6 @@
                 if (checkmark) checkmark.classList.add('hidden');
             });
 
-            // Update UI with initial status
             const statusElement = document.getElementById(`compliance-stage-${businessId}`);
             statusElement.innerHTML = `
                 <div class="flex items-center text-sm text-gray-600">
@@ -252,67 +247,34 @@
             fetch(`/api/business/${businessId}/compliance/`)
                 .then(response => {
                     if (!response.ok) {
-                        console.error('Error loading compliance data: ', response.statusText);
-                        return {};
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
-                    if (!data || Object.keys(data).length === 0) {
-                        console.warn('No compliance data returned, prompting for required info');
-                        if ("{{ business.website_url|default:'' }}" === "") {
-                            showComplianceModal('website');
-                        } else {
-                            showComplianceModal('hours');
-                        }
-                        return;
-                    } else {
-                        data.business_id = businessId; // Ensure business_id is set
-                    }
-                    // Update status visualization
+                    data.business_id = businessId;
                     statusElement.innerHTML = `
                         <div class="flex items-center text-sm text-green-600">
                             <div class="mr-2">✅</div>
-                            <span>Completed ${data.actions.length} actions</span>
+                            <span>Completed ${data.actions ? data.actions.length : 0} actions</span>
                         </div>
                     `;
                     updateComplianceChecklist(data);
                 })
                 .catch(error => {
                     console.error('Error loading compliance data:', error);
-                    updateComplianceChecklist({
-                        posts_compliance: 0,
-                        reviews_compliance: 0,
-                        qa_compliance: 0,
-                        photos_compliance: 0,
-                        info_compliance: 0,
-                        hours_compliance: 0,
-                        attributes_compliance: 0,
-                        overall_compliance: 0
-                    });
+                    if (error.message.indexOf("404") !== -1) {
+                        showComplianceModal('missing');
+                    } else {
+                        statusElement.innerHTML = `<div class="text-red-500">Failed to load compliance data. Please try again later.</div>`;
+                    }
                 });
-        }
-
-        function handleComplianceError(businessId, error) {
-            console.error('Compliance error:', error);
-            const checklist = document.getElementById(`profile-compliance`);
-            checklist.querySelector('.loading-spinner').classList.add('hidden');
-            checklist.querySelector('.missing-fields').textContent = 'Failed to load compliance data. Please try refreshing.';
-            checklist.querySelector('.missing-fields').classList.remove('hidden');
-        }
-
-        function animateProgress(element, targetWidth) {
-            element.style.width = '0%';
-            setTimeout(() => {
-                element.style.width = targetWidth + '%';
-            }, 50);
         }
 
         function updateComplianceChecklist(data) {
             const checklist = document.querySelector(`.compliance-checklist[data-business-id="${data.business_id}"]`);
             if (!checklist) return;
 
-            // Animate in checklist items
             const items = checklist.querySelectorAll('.compliance-item');
             items.forEach((item, index) => {
                 setTimeout(() => {
@@ -321,7 +283,6 @@
                 }, index * 150);
             });
 
-            // Update each compliance task
             items.forEach(item => {
                 const taskType = item.dataset.task;
                 const progress = data[`${taskType}_compliance`] || 0;
@@ -331,19 +292,17 @@
                 const details = item.querySelector('.task-details');
                 const missingFields = item.querySelector('.missing-fields');
                 const editForm = item.querySelector('.edit-fields');
-                
+
                 if (!progressCircle || !checkmark || !spinner || !details || !missingFields || !editForm) {
                     console.warn('Missing elements in compliance item', item);
                     return;
                 }
 
-                // Animate progress circle
                 const circumference = 2 * Math.PI * 40;
                 const offset = circumference - (progress / 100) * circumference;
                 progressCircle.style.strokeDashoffset = offset;
                 progressCircle.style.transition = 'stroke-dashoffset 1s ease-in-out';
 
-                // Update status visuals
                 if (progress >= 80) {
                     checkmark.classList.remove('hidden');
                     details.style.maxHeight = '0';
@@ -351,8 +310,6 @@
                 } else {
                     checkmark.classList.add('hidden');
                     details.style.maxHeight = details.scrollHeight + 'px';
-
-                    // Show missing fields if under 80%
                     if (taskType === 'profile' && progress < 80) {
                         missingFields.innerHTML = Object.entries(data.missing_fields || {})
                             .map(([field, msg]) => `<div class="text-red-500">⚠️ ${field}: ${msg}</div>`)
@@ -362,9 +319,8 @@
                 }
             });
 
-            // Update overall progress
             const overallProgress = document.getElementById('compliance-progress');
-            const score = data.overall_compliance;
+            const score = data.overall_compliance || 0;
             overallProgress.style.width = `${score}%`;
             overallProgress.classList.toggle('bg-green-500', score >= 80);
             overallProgress.classList.toggle('bg-yellow-500', score >= 50 && score < 80);
@@ -380,7 +336,7 @@
             const checkmark = complianceItem.querySelector('.checkmark');
 
             try {
-                complianceItem.querySelector('.checkmark').classList.add('hidden');
+                checkmark.classList.add('hidden');
                 spinner.classList.remove('hidden');
 
                 const response = await fetch(`/api/business/${businessId}/update/`, {
@@ -397,16 +353,14 @@
                 spinner.classList.add('hidden');
                 checkmark.classList.remove('hidden');
 
-                // Re-check compliance after update
                 setTimeout(() => loadComplianceData(businessId), 1500);
             } catch (error) {
                 console.error('Update error:', error);
                 spinner.classList.add('hidden');
-                showAlertBanner('Failed to update business details. Please try again.');
+                alert('Failed to update business details. Please try again.');
             }
         }
 
-        // Close modal when clicking outside of the content area
         document.getElementById('complianceModal').addEventListener('click', function (event) {
             if (event.target === this) {
                 closeComplianceModal();
@@ -414,73 +368,70 @@
         });
     </script>
     <script>
-    function showComplianceModal(missingField) {
-        const modal = document.getElementById('complianceModal');
-        const fieldContainer = document.getElementById('missingFieldContainer');
-        const fieldInput = document.getElementById('missingFieldInput');
-        const instructions = document.getElementById('fieldInstructions');
-        const examples = document.getElementById('fieldExamples');
-        
-        // Configure based on missing field
-        const fieldsConfig = {
-            'website': {
-                instruction: 'We need your business website URL to verify your online presence:',
-                placeholder: 'https://yourbusiness.com',
-                examples: 'Example: https://mybusiness.com or https://www.myshop.net',
-                type: 'url'
-            },
-            'hours': {
-                instruction: 'Please provide your current business hours:',
-                placeholder: 'Mon-Fri 9am-5pm, Sat 10am-2pm',
-                examples: 'Format: Day Range StartTime-EndTime separated by commas',
-                type: 'text'
-            },
-            'category': {
-                instruction: 'What primary category describes your business?',
-                placeholder: 'e.g. Hair Salon, Restaurant, Auto Repair',
-                examples: 'Be specific - "Pizza Restaurant" instead of just "Restaurant"',
-                type: 'text'
-            }
-        };
+        function showComplianceModal(missingField) {
+            const modal = document.getElementById('complianceModal');
+            const fieldContainer = document.getElementById('missingFieldContainer');
+            const fieldInput = document.getElementById('missingFieldInput');
+            const instructions = document.getElementById('fieldInstructions');
+            const examples = document.getElementById('fieldExamples');
 
-        const config = fieldsConfig[missingField];
-        instructions.innerHTML = `<strong>Action Required:</strong> ${config.instruction}`;
-        fieldInput.placeholder = config.placeholder;
-        fieldInput.type = config.type;
-        fieldInput.name = missingField;
-        examples.textContent = config.examples;
-
-        modal.classList.remove('hidden');
-        
-        document.getElementById('complianceForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const formData = new FormData();
-            formData.append('business_id', '{{ business.business_id }}');
-            formData.append('field', missingField);
-            formData.append('value', fieldInput.value);
-
-            try {
-                const response = await fetch('/compliance/update_missing_data/', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    },
-                    body: formData
-                });
-
-                if (response.ok) {
-                    modal.classList.add('hidden');
-                    loadComplianceData('{{ business.business_id }}');
-                    showAlertBanner('Information submitted successfully!');
-                } else {
-                    throw new Error('Failed to submit data');
+            const fieldsConfig = {
+                'website': {
+                    instruction: 'We need your business website URL to verify your online presence:',
+                    placeholder: 'https://yourbusiness.com',
+                    examples: 'Example: https://mybusiness.com or https://www.myshop.net',
+                    type: 'url'
+                },
+                'hours': {
+                    instruction: 'Please provide your current business hours:',
+                    placeholder: 'Mon-Fri 9am-5pm, Sat 10am-2pm',
+                    examples: 'Format: Day Range StartTime-EndTime separated by commas',
+                    type: 'text'
+                },
+                'category': {
+                    instruction: 'What primary category describes your business?',
+                    placeholder: 'e.g. Hair Salon, Restaurant, Auto Repair',
+                    examples: 'Be specific - "Pizza Restaurant" instead of just "Restaurant"',
+                    type: 'text'
                 }
-            } catch (error) {
-                console.error('Error submitting compliance data:', error);
-                showAlertBanner('Error submitting information. Please try again.');
-            }
-        });
-    }
+            };
+
+            const config = fieldsConfig[missingField];
+            instructions.innerHTML = `<strong>Action Required:</strong> ${config.instruction}`;
+            fieldInput.placeholder = config.placeholder;
+            fieldInput.type = config.type;
+            fieldInput.name = missingField;
+            examples.textContent = config.examples;
+
+            modal.classList.remove('hidden');
+
+            document.getElementById('complianceForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData();
+                formData.append('business_id', '{{ business.business_id }}');
+                formData.append('field', missingField);
+                formData.append('value', fieldInput.value);
+
+                try {
+                    const response = await fetch('/compliance/update_missing_data/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: formData
+                    });
+                    if (response.ok) {
+                        modal.classList.add('hidden');
+                        loadComplianceData('{{ business.business_id }}');
+                        alert('Information submitted successfully!');
+                    } else {
+                        throw new Error('Failed to submit data');
+                    }
+                } catch (error) {
+                    console.error('Error submitting compliance data:', error);
+                    alert('Error submitting information. Please try again.');
+                }
+            });
+        }
     </script>
 </div>
