@@ -175,6 +175,7 @@
                     console.log('[COMPLIANCE] API call failed. Initiating fallback agent flow.');
                     // Initiate fallback agent flow when API call fails
                     console.log('[COMPLIANCE] Fallback agent flow will be handled via backend.');
+                    triggerAutomationFlow(businessId);
                     renderComplianceChart([]);
                 });
         }
