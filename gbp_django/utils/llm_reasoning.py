@@ -110,7 +110,9 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
             if json_start != -1:
                 response_text = response_text[json_start:]
             try:
-                response = json.loads(response_text)
+                decoder = json.JSONDecoder()
+                response_obj, idx = decoder.raw_decode(response_text)
+                response = response_obj
             except json.JSONDecodeError as json_err:
                 logging.error("Failed to parse LLM response as JSON. Raw response:" + response_text)
                 raise ValueError("Invalid JSON from LLM: " + str(json_err))
