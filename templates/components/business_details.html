@@ -182,7 +182,7 @@
                         },
                         body: JSON.stringify({businessId: businessId})
                     })
-                    .then(resp => resp.json())
+                    .then(resp => { if(resp.ok){ return resp.json(); } else { throw new Error('Fallback API error: ' + resp.status); } })
                     .then(data => {
                         console.log('[COMPLIANCE] Fallback agent initiated:', data);
                     })
