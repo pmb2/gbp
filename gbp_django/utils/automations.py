@@ -553,7 +553,8 @@ class BusinessProfileManager:
                 "Prioritize updating missing or invalid mandatory details first, then content compliance."
             )
             logging.info(f"[REASONER] Executing structured reasoning with prompt: {prompt}")
-
+            logging.info("[REASONER] Prompting reasoning model now...")
+            
             reasoning_result = llm.structured_reasoning(pre_prompt, prompt)
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
             logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
