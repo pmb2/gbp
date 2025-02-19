@@ -502,19 +502,21 @@ class BusinessProfileManager:
     async def _run_fallback_flow(self, business_id: str, business_url: str, task_data: dict) -> None:
         agent = self.fallback_agents[business_id]
         try:
-            update_res = await agent.update_business_info(business_url, task_data["new_hours"],
-                                                          task_data["new_website"])
-            logging.info(f"[{business_id} Fallback] Update: {update_res}")
-            respond_res = await agent.respond_review(business_url, task_data["review_text"],
-                                                     task_data["review_response"])
-            logging.info(f"[{business_id} Fallback] Respond: {respond_res}")
+            logging.info(f"[{business_id} Fallback] Calling update_business_info");
+            update_res = await agent.update_business_info(business_url, task_data["new_hours"], task_data["new_website"])
+            logging.info(f"[{business_id} Fallback] Update: {update_res}");
+            logging.info(f"[{business_id} Fallback] Calling respond_review");
+            respond_res = await agent.respond_review(business_url, task_data["review_text"], task_data["review_response"])
+            logging.info(f"[{business_id} Fallback] Respond: {respond_res}");
+            logging.info(f"[{business_id} Fallback] Calling schedule_post");
             post_res = await agent.schedule_post(business_url, task_data["post_content"], hours_from_now=1)
-            logging.info(f"[{business_id} Fallback] Post: {post_res}")
+            logging.info(f"[{business_id} Fallback] Post: {post_res}");
+            logging.info(f"[{business_id} Fallback] Calling upload_photo");
             upload_res = await agent.upload_photo(business_url, task_data["photo_path"])
-            logging.info(f"[{business_id} Fallback] Upload: {upload_res}")
-            logging.info(f"[{business_id} Fallback] All fallback tasks completed.")
+            logging.info(f"[{business_id} Fallback] Upload: {upload_res}");
+            logging.info(f"[{business_id} Fallback] All fallback tasks completed.");
         except Exception as e:
-            logging.error(f"[{business_id} Fallback] Error in fallback flow: {e}")
+            logging.error(f"[{business_id} Fallback] Error in fallback flow: {e}");
 
     async def run_all_businesses(self, tasks_data: dict) -> None:
         tasks = [self.process_business(biz_id, tasks_data[biz_id]) for biz_id in tasks_data]
