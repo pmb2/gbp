@@ -191,7 +191,12 @@
             })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    if (response.status === 404) {
+                        console.warn('[COMPLIANCE] Automation fallback endpoint not found (404), skipping fallback.');
+                        return {};
+                    } else {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                 }
                 return response.json();
             })
