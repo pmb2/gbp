@@ -95,6 +95,7 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
             "steps": [],
             "questions": []
         }
+    logging.debug("Reasoning model raw output: " + str(response))
     return response
 
 

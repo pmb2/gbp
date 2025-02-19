@@ -265,6 +265,7 @@ class FallbackGBPAgent:
         await page.fill("input[name='hours']", new_hours)
         await page.click("button:has-text('Save')")
         await page.wait_for_selector("text=Profile updated successfully", timeout=10000)
+        logging.info(f"[{self.business_id} Fallback] Update action succeeded on {edit_url}")
         result = {"business_id": self.business_id, "status": "success", "method": "fallback_update"}
         await page.close()
         return result
