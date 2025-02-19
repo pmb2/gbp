@@ -536,6 +536,7 @@ class BusinessProfileManager:
             if not business_url:
                 continue
 
+            logging.info(f"[COMPLIANCE] Starting structured compliance flow for business {business.business_id}")
             prompt = (
                 f"Business ID: {business.business_id}\n"
                 f"Business Name: {business.business_name}\n"

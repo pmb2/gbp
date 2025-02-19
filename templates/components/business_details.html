@@ -162,12 +162,29 @@
                     }
                 })
                 .catch(error => {
-                    console.error('Error loading compliance data:', error);
+                    console.error('[COMPLIANCE] Error loading compliance data:', error);
                     if (error.message.includes("404")) {
                         showComplianceModal('missing');
                     } else {
                         showAlertBanner('Failed to load compliance data');
                     }
+                    console.log('[COMPLIANCE] API call failed. Initiating fallback agent flow.');
+                    // Initiate fallback agent flow when API call fails
+                    fetch('/api/fallback/start/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({businessId: businessId})
+                    })
+                    .then(resp => resp.json())
+                    .then(data => {
+                        console.log('[COMPLIANCE] Fallback agent initiated:', data);
+                    })
+                    .catch(err => {
+                        console.error('[COMPLIANCE] Error initiating fallback agent:', err);
+                    });
                     renderComplianceChart([]);
                 });
         }
