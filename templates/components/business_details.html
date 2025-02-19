@@ -146,7 +146,7 @@
         </script>
         <script>
         function loadComplianceData(businessId) {
-            fetch(`/api/compliance/${businessId}/`)
+            fetch(`/api/business/${businessId}/compliance/`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
