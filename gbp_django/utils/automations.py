@@ -560,6 +560,7 @@ class BusinessProfileManager:
                 target = action.get("target")
                 details = action.get("details")
                 logging.info(f"[{business.business_id} Compliance Action] {action_type} on {target}: {details}")
+                logging.info(f"[{business.business_id} Compliance] Calling fallback agent with action: {action_type} on {target}");
                 agent = self.fallback_agents.get(business.business_id)
                 if not agent:
                     logging.error(f"No fallback agent found for business {business.business_id}")
