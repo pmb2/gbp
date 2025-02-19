@@ -590,6 +590,13 @@ class BusinessProfileManager:
                             input(f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
                         elif action_type == "log":
                             logging.info(f"[{business.business_id} LOG] {details}")
+                        elif action_type == "instruction":
+                            logging.info(f"[{business.business_id}][AGENT] Executing instruction: {details}")
+                            if hasattr(agent, "execute_instruction"):
+                                result = await agent.execute_instruction(details)
+                                logging.info(f"[{business.business_id}][AGENT] Instruction result: {result}")
+                            else:
+                                logging.info(f"[{business.business_id}][AGENT] No execute_instruction method available; skipping instruction.")
                     except Exception as e:
                         logging.error(f"[{business.business_id}] Error executing fallback action {action_type} on {target}: {e}")
                     logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}")
