@@ -554,8 +554,13 @@ class BusinessProfileManager:
             )
             logging.info(f"[REASONER] Executing structured reasoning with prompt: {prompt}")
             logging.info("[REASONER] Prompting reasoning model now...")
-            
-            reasoning_result = llm.structured_reasoning(pre_prompt, prompt)
+            from gbp_django.utils.llm_reasoning import generate_compliance_reasoning
+            reasoning_result = generate_compliance_reasoning({
+                "business_id": business.business_id,
+                "business_name": business.business_name,
+                "website": business.website_url,
+                "compliance_score": business.compliance_score
+            })
             logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
             logging.info(f"[COMPLIANCE] Structured compliance actions generated for business {business.business_id}: {len(reasoning_result.get('actions', []))} actions")
 
