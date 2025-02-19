@@ -613,7 +613,7 @@ class BusinessProfileManager:
                                                                       new_website)
                             logging.info(f"[{business.business_id}][AGENT] Fallback update result: {result}")
                         elif target in ["reviews", "qna", "posts", "photos"] and action_type in (
-                        "verify", "fallback_verify"):
+                                "verify", "fallback_verify"):
                             logging.info(
                                 f"[{business.business_id}][AGENT] Initiating fallback compliance check for target: {target}")
                             result = await agent.compliance_check(business_url)
