@@ -87,7 +87,23 @@ def generate_reasoning_response(pre_prompt: str, prompt: str) -> Dict:
         if hasattr(llm, "structured_reasoning"):
             response = llm.structured_reasoning(pre_prompt, full_prompt)
         else:
-            response_text = llm.generate_response(full_prompt, "")
+            from groq import Groq
+            client = Groq()
+            completion = client.chat.completions.create(
+                model="deepseek-r1-distill-llama-70b",
+                messages=[{
+                    "role": "user",
+                    "content": full_prompt
+                }],
+                temperature=0.6,
+                max_completion_tokens=1024,
+                top_p=0.95,
+                stream=True,
+                reasoning_format="raw"
+            )
+            response_text = ""
+            for chunk in completion:
+                response_text += (chunk.choices[0].delta.content or "")
             if not response_text.strip():
                 raise ValueError("Empty response from LLM")
             response = json.loads(response_text)
