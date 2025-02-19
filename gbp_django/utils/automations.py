@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Integrated Google Business Profile Automation with Onboarding and Compliance Check
+Integrated Google Business Profile Automation with Onboarding, Structured Compliance Flow, and Compliance Check
 
 This module:
   1. Attempts to perform tasks (e.g. update info, respond to reviews, schedule posts, upload photos)
@@ -8,8 +8,12 @@ This module:
   2. Falls back to browser automation (using browser‑use/Playwright) when API access isn’t available.
   3. Provides an interactive onboarding function so users can add new business accounts
      by collecting cookies/session data (or credentials) required for automation.
-  4. Performs periodic compliance checks by scraping key pages (posts, reviews, Q&A)
-     to detect new changes such as new questions or reviews.
+  4. Implements a reasoning model to drive a structured compliance flow. This flow ensures that:
+       - Mandatory details (e.g. business website) are verified and updated first.
+       - Then content compliance (reviews, Q&A, posts, photos) is checked.
+     The reasoning model outputs structured JSON that calls on the FallbackAgent’s browser‑use actions.
+  5. Uses an auto‑login workaround: when logging in, the agent injects GOOGLE_USER and GOOGLE_PW (from env)
+     into the login fields. If 2FA is encountered, the user is prompted for the code.
 """
 
 import os
@@ -36,9 +40,7 @@ logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 ###############################################################################
 class GoogleBusinessAPIHandler:
     def __init__(self, credentials_file: str):
-        """
-        Initialize the API handler with OAuth2 credentials.
-        """
+        """Initialize the API handler with OAuth2 credentials."""
         self.credentials_file = credentials_file
         self.service = None
         self.account_info = None
@@ -47,7 +49,6 @@ class GoogleBusinessAPIHandler:
     def _build_service(self):
         try:
             creds = Credentials.from_authorized_user_file(self.credentials_file)
-            # Build the API service (adjust API name and version per current docs)
             self.service = build('mybusiness', 'v4', credentials=creds)
             logging.info("Google Business Profile API service built successfully.")
         except Exception as e:
@@ -55,10 +56,7 @@ class GoogleBusinessAPIHandler:
             self.service = None
 
     def check_organization_status(self) -> dict:
-        """
-        Check whether the API account is an Organization account.
-        Returns a dict with a 'valid' flag and details.
-        """
+        """Check whether the API account is an Organization account."""
         if not self.service:
             return {"valid": False, "error": "API service not built"}
         try:
@@ -66,7 +64,6 @@ class GoogleBusinessAPIHandler:
             accounts = result.get("accounts", [])
             if not accounts:
                 return {"valid": False, "error": "No accounts found."}
-            # For demonstration, use the first account
             self.account_info = accounts[0]
             account_name = self.account_info.get("name", "").lower()
             if "organization" in account_name or "agency" in account_name:
@@ -83,15 +80,11 @@ class GoogleBusinessAPIHandler:
             return {"valid": False, "error": str(e)}
 
     def update_business_info(self, location_name: str, new_hours: str, new_website: str) -> dict:
-        """
-        Update business info via the API.
-        location_name: resource name (e.g. "accounts/123/locations/456").
-        """
+        """Update business info via the API."""
         if not self.service:
             return {"success": False, "error": "No API service"}
         try:
             location = self.service.accounts().locations().get(name=location_name).execute()
-            # Update fields (this is a simplified example)
             if "regularHours" in location:
                 try:
                     open_time, close_time = [t.strip() for t in new_hours.split("-")]
@@ -100,7 +93,6 @@ class GoogleBusinessAPIHandler:
                 except Exception as parse_err:
                     logging.warning("Failed to parse hours, skipping regularHours update.")
             location["websiteUrl"] = new_website
-
             updated_location = self.service.accounts().locations().patch(
                 name=location_name,
                 body=location,
@@ -116,9 +108,7 @@ class GoogleBusinessAPIHandler:
             return {"success": False, "error": str(e)}
 
     def respond_to_review(self, location_name: str, review_id: str, response_text: str) -> dict:
-        """
-        Respond to a review via the API.
-        """
+        """Respond to a review via the API."""
         if not self.service:
             return {"success": False, "error": "No API service"}
         try:
@@ -136,9 +126,7 @@ class GoogleBusinessAPIHandler:
             return {"success": False, "error": str(e)}
 
     def schedule_post(self, location_name: str, post_content: str, hours_from_now: int = 1) -> dict:
-        """
-        Create a new post via the API.
-        """
+        """Create a new post via the API."""
         if not self.service:
             return {"success": False, "error": "No API service"}
         try:
@@ -163,14 +151,10 @@ class GoogleBusinessAPIHandler:
             return {"success": False, "error": str(e)}
 
     def upload_photo(self, location_name: str, photo_file_path: str) -> dict:
-        """
-        Upload a photo via the API.
-        Note: Actual photo upload might require multipart upload via MediaFileUpload.
-        """
+        """Upload a photo via the API."""
         if not self.service:
             return {"success": False, "error": "No API service"}
         try:
-            # Placeholder: In production, use googleapiclient.http.MediaFileUpload, etc.
             response = self.service.accounts().locations().media().upload(
                 parent=location_name,
                 media_body=photo_file_path
@@ -190,11 +174,7 @@ class GoogleBusinessAPIHandler:
 ###############################################################################
 class FallbackGBPAgent:
     def __init__(self, business_id: str, cookies_file: str, chrome_path: str, headless: bool = True):
-        """
-        Initialize the fallback agent using browser-use (which uses Playwright).
-        """
-        self.username = None
-        self.password = None
+        """Initialize the fallback agent using browser-use (which uses Playwright)."""
         self.business_id = business_id
         self.cookies_file = cookies_file
         self.headless = headless
@@ -219,8 +199,8 @@ class FallbackGBPAgent:
 
     def collect_cookies_interactively(self, login_url: str):
         """
-        Launch a visible login flow using Selenium (if available) to collect cookies.
-        This should be run when onboarding a new business.
+        Launch a visible login flow using Selenium to collect cookies.
+        Auto‑fill login credentials from environment variables.
         """
         try:
             if hasattr(self.context, "driver"):
@@ -235,7 +215,39 @@ class FallbackGBPAgent:
 
         driver.get(login_url)
         logging.info(f"[{self.business_id}] Navigated to login URL: {login_url}")
-        input(f"[{self.business_id}] Complete the login in the opened browser window, then press Enter...")
+        driver.implicitly_wait(5)
+        try:
+            username_field = driver.find_element_by_name("identifier")
+            password_field = driver.find_element_by_name("password")
+            username = os.getenv("GOOGLE_USER")
+            password = os.getenv("GOOGLE_PW")
+            if username and password:
+                username_field.clear()
+                username_field.send_keys(username)
+                driver.find_element_by_id("identifierNext").click()
+                driver.implicitly_wait(5)
+                password_field = driver.find_element_by_name("password")
+                password_field.clear()
+                password_field.send_keys(password)
+                driver.find_element_by_id("passwordNext").click()
+                logging.info(f"[{self.business_id}] Auto‑login attempted with environment credentials.")
+            else:
+                logging.warning("GOOGLE_USER or GOOGLE_PW not set; falling back to manual login.")
+                input(f"[{self.business_id}] Complete the login manually, then press Enter...")
+        except Exception as e:
+            logging.warning(f"[{self.business_id}] Auto‑login error: {e}. Falling back to manual login.")
+            input(f"[{self.business_id}] Complete the login manually, then press Enter...")
+
+        try:
+            otp_field = driver.find_element_by_name("otp")
+            otp_code = input(f"[{self.business_id}] 2FA detected. Enter OTP code: ")
+            otp_field.clear()
+            otp_field.send_keys(otp_code)
+            driver.find_element_by_id("verifyOtp").click()
+            logging.info(f"[{self.business_id}] 2FA code submitted.")
+        except Exception:
+            pass
+
         cookies = driver.get_cookies()
         with open(self.cookies_file, "w") as f:
             json.dump(cookies, f)
@@ -303,151 +315,55 @@ class FallbackGBPAgent:
         await page.close()
         return result
 
-    async def collect_credentials(self):
-        """Get credentials from env vars or prompt user if needed"""
-        from getpass import getpass
-        
-        # Check environment variables first
-        self.username = os.environ.get("GOOGLE_USER") 
-        self.password = os.environ.get("GOOGLE_PW")
-        
-        if not self.username:
-            self.username = input(f"[{self.business_id}] Enter Google username: ").strip()
-        if not self.password:
-            self.password = getpass(f"[{self.business_id}] Enter Google password: ").strip()
-
-    async def handle_2fa(self, page):
-        """Handle two-factor authentication if required"""
-        print(f"[AUTH][{self.business_id}] 2FA required")
-        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Awaiting 2FA input")
-        two_factor_code = input(f"[{self.business_id}] Enter 2FA code: ").strip()
-        if two_factor_code:
-            print(f"[AUTH][{self.business_id}] Submitting 2FA code")
-            await page.fill('input[name="otp"]', two_factor_code)
-            await page.click('button:has-text("Verify")')
-            await page.wait_for_timeout(2000)
-            print(f"[UI UPDATE][{self.business_id}] 2FA verification submitted")
-
-    def _process_compliance_action(self, action: dict, business_obj) -> None:
-        """Handle compliance actions from reasoning model"""
-        from gbp_django.models import AutomationLog
-        
-        action_type = action.get('type', 'alert')
-        target = action.get('target', 'general')
-        details = action.get('details', '')
-        
-        # Create log entry
-        AutomationLog.objects.create(
-            business_id=self.business_id,
-            action_type=f"COMPLIANCE_{action_type.upper()}",
-            details={'target': target, 'details': details},
-            status="PENDING" if action_type == 'alert' else "PROCESSING"
-        )
-        
-        # Handle automated updates
-        if action_type == 'update':
-            try:
-                if target == 'business_hours':
-                    business_obj.business_hours = details
-                elif target == 'verification_status':
-                    business_obj.is_verified = False
-                business_obj.save()
-            except Exception as e:
-                logging.error(f"Action failed: {str(e)}")
-
-    async def compliance_check(self, business_url: str, business_obj=None) -> dict:
+    async def compliance_check(self, business_url: str) -> dict:
         """
-        Perform comprehensive compliance check by scraping full business profile details.
-        Uses browser automation to collect hours, attributes, services, and verification status.
+        Perform a compliance check by scraping key sections (posts, reviews, Q&A) and updating the database.
         """
-        print(f"\n[COMPLIANCE] Initializing check for {self.business_id}")
-        print(f"[COMPLIANCE] AGENT TASKS: Starting browser instance (headless: {self.headless})")
-        print(f"[COMPLIANCE] BROWSER CONFIG: Chrome path: {self.chrome_path}")
-        print(f"[COMPLIANCE] SESSION STATE: Cookies file: {self.cookies_file}")
-        print(f"\n[COMPLIANCE] Starting compliance check for {self.business_id}")
-        print(f"[AGENT TASKS] Initializing browser instance for {self.business_id}")
         from playwright.async_api import Page
         import os, json, uuid
         from datetime import datetime
-        # Import Django models – adjust the import path if necessary.
         from gbp_django.models import Business, Post, Review, QandA, AutomationLog
 
         page: Page = await self.context.new_page()
         compliance_data = {}
-        print(f"[UI UPDATE][{self.business_id}] Compliance stage: Browser initialized")
-        # Define the sections and their assumed URLs (adjust as needed)
         sections = {
             "posts": f"{business_url}/posts",
             "reviews": f"{business_url}/reviews",
             "qna": f"{business_url}/qna"
         }
-        
         for section, url in sections.items():
-            print(f"\n[COMPLIANCE CHECK][{self.business_id}] Scanning {section.upper()} section")
-            print(f"[BROWSER ACTION] Navigating to {url}")
-            print(f"[DATA COLLECTION] Waiting for selector '.item'")
-            print(f"[UI UPDATE][{self.business_id}] Compliance stage: Analyzing {section.replace('_', ' ')}")
             logging.info(f"[{self.business_id} Compliance] Checking {section} at {url}")
             await page.goto(url)
             await page.wait_for_timeout(2000)
-            print(f"[AGENT TASKS][{self.business_id}] Waiting for {section} content to load")
             items = await page.query_selector_all(".item")
-            print(f"[DATA COLLECTION][{self.business_id}] Found {len(items)} items in {section} section")
-            section_data = []
-            for item in items:
-                text = await item.inner_text()
-                section_data.append(text.strip())
+            section_data = [(await item.inner_text()).strip() for item in items]
             compliance_data[section] = section_data
-
-        from gbp_django.utils.llm_reasoning import generate_compliance_reasoning
-        print(f"\n[COMPLIANCE] REASONING ENGINE: Starting AI analysis for {self.business_id} using the new reasoning model")
-        print(f"[COMPLIANCE] UI UPDATE: Compliance stage: AI analysis in progress...")
-        reasoning_result = generate_compliance_reasoning(compliance_data)
-        print(f"[COMPLIANCE] REASONING RESULT: Raw output:\n{json.dumps(reasoning_result, indent=2)}")
-        print(f"[COMPLIANCE] UI UPDATE: Compliance stage: Processing {len(reasoning_result.get('actions', []))} actions")
-
-        # Process automated actions
-        if 'actions' in reasoning_result:
-            for action in reasoning_result.get('actions', []):
-                self._process_compliance_action(action, business_obj)
 
         await page.close()
 
-        # Add reasoning results to compliance data
-        compliance_data.update({
-            'reasoning': reasoning_result.get('reasoning', ''),
-            'actions': reasoning_result.get('actions', [])
-        })
-
-        # Path for storing the last compliance state locally
         compliance_file = os.path.join(os.path.dirname(self.cookies_file), f"compliance_{self.business_id}.json")
         new_changes = {}
         if os.path.exists(compliance_file):
             with open(compliance_file, "r") as f:
                 old_data = json.load(f)
-            # Compare each section's data to identify new entries.
             for section in compliance_data:
                 old_section_data = old_data.get(section, [])
                 new_entries = [entry for entry in compliance_data[section] if entry not in old_section_data]
                 if new_entries:
                     new_changes[section] = new_entries
         else:
-            # If no previous compliance file exists, consider all scraped items as new.
             new_changes = compliance_data
 
-        # Save the latest scraped data.
         with open(compliance_file, "w") as f:
             json.dump(compliance_data, f, indent=2)
-        logging.info(f"[{self.business_id} Compliance] Compliance check completed. New changes: {new_changes}")
+        logging.info(f"[{self.business_id} Compliance] New changes: {new_changes}")
 
-        # Connect to the DB: Retrieve the associated Business instance.
         try:
             business_obj = Business.objects.get(business_id=self.business_id)
         except Business.DoesNotExist:
             logging.error(f"[{self.business_id} Compliance] Business not found in DB.")
             return {"status": "failed", "error": "Business not found"}
 
-        # Process new posts: Create a Post record for each new post if it doesn't already exist.
         if "posts" in new_changes:
             for post_content in new_changes["posts"]:
                 if not Post.objects.filter(business=business_obj, content=post_content).exists():
@@ -458,7 +374,6 @@ class FallbackGBPAgent:
                         content=post_content,
                         status="completed"
                     )
-        # Process new reviews: Create a Review record for each new review if it doesn't already exist.
         if "reviews" in new_changes:
             for review_content in new_changes["reviews"]:
                 if not Review.objects.filter(business=business_obj, content=review_content).exists():
@@ -466,10 +381,9 @@ class FallbackGBPAgent:
                         business=business_obj,
                         review_id=str(uuid.uuid4()),
                         content=review_content,
-                        rating=5,  # Use a default rating or adjust as needed.
+                        rating=5,
                         responded=False
                     )
-        # Process new Q&A items: Create a QandA record for each new question if it doesn't already exist.
         if "qna" in new_changes:
             for question_content in new_changes["qna"]:
                 if not QandA.objects.filter(business=business_obj, question=question_content).exists():
@@ -479,18 +393,16 @@ class FallbackGBPAgent:
                         answered=False
                     )
 
-        # Update the business's compliance score.
         score = sum(len(new_changes.get(section, [])) for section in new_changes)
         business_obj.compliance_score = score
         business_obj.save(update_fields=["compliance_score"])
 
-        # Log the compliance check in the AutomationLog.
         AutomationLog.objects.create(
             business_id=self.business_id,
             action_type="SYSTEM_ALERT",
             details={"compliance_check": new_changes},
             status="COMPLETED",
-            user_id="system",  # Alternatively, use a system user identifier.
+            user_id="system",
             executed_at=datetime.now()
         )
 
@@ -505,13 +417,6 @@ class BusinessProfileManager:
                  credentials_file: str, headless: bool = True):
         """
         Initialize agents for multiple businesses.
-
-        Args:
-            businesses (dict): Mapping of business_id to business_url.
-            cookies_folder (str): Folder for storing cookie files.
-            chrome_path (str): Path to Chrome/Chromium.
-            credentials_file (str): Path to Google API OAuth credentials.
-            headless (bool): Run in headless mode by default.
         """
         self.businesses = businesses
         self.cookies_folder = cookies_folder
@@ -519,7 +424,6 @@ class BusinessProfileManager:
         self.credentials_file = credentials_file
         self.headless = headless
         self.api_handler = GoogleBusinessAPIHandler(credentials_file)
-        # Initialize fallback agents for each business.
         self.fallback_agents = {}
         for business_id in businesses:
             cookie_file = os.path.join(cookies_folder, f"cookies_{business_id}.json")
@@ -528,28 +432,20 @@ class BusinessProfileManager:
 
     async def process_business(self, business_id: str, task_data: dict) -> None:
         """
-        For a given business, attempt API-based automation first;
-        if API calls fail or the account is not properly set up, fall back to browser automation.
-
-        task_data must include:
-            - location_name (e.g. "accounts/123/locations/456")
-            - new_hours, new_website
-            - review_id, review_text, review_response
-            - post_content, photo_path
+        Process automation tasks for a business.
         """
         business_url = self.businesses[business_id]
         from gbp_django.models import Business
         business_obj = Business.objects.get(business_id=business_id)
-        # Use stored google_location_id if available; otherwise fallback to task_data
         location_name = business_obj.google_location_id or task_data.get("location_name")
         if not location_name:
-            logging.error(f"[{business_id}] Missing Google location ID for business update.")
+            logging.error(f"[{business_id}] Missing Google location ID.")
             raise Exception("Missing Google location ID for business update")
         logging.info(f"[{business_id}] Processing tasks for {business_url} with location: {location_name}")
 
         org_status = self.api_handler.check_organization_status()
         if not org_status.get("valid", False):
-            logging.warning(f"[{business_id}] API account not valid (or not organization): {org_status.get('error')}")
+            logging.warning(f"[{business_id}] API account invalid: {org_status.get('error')}")
             logging.info(f"[{business_id}] Using fallback automation.")
             await self._run_fallback_flow(business_id, business_url, task_data)
 
@@ -579,7 +475,7 @@ class BusinessProfileManager:
                 if not results["upload"].get("success"):
                     api_success = False
                     raise Exception("upload_photo failed.")
-                logging.info(f"[{business_id}] API tasks completed successfully: {results}")
+                logging.info(f"[{business_id}] API tasks completed: {results}")
             except Exception as e:
                 logging.error(f"[{business_id}] API error: {e}")
                 api_success = False
@@ -590,15 +486,12 @@ class BusinessProfileManager:
         from gbp_django.utils.email_service import EmailService
         from datetime import datetime
         method_used = "API" if api_success else "Fallback"
-        report_data = {
-            "results": results,
-            "method": method_used
-        }
+        report_data = {"results": results, "method": method_used}
         try:
             executed_at = datetime.now().isoformat()
             EmailService.send_automation_report(business_id, "Automation", report_data, executed_at)
         except Exception as e:
-            logging.error(f"[{business_id}] API error: {e}")
+            logging.error(f"[{business_id}] Email report error: {e}")
             api_success = False
 
         if not api_success:
@@ -608,62 +501,91 @@ class BusinessProfileManager:
     async def _run_fallback_flow(self, business_id: str, business_url: str, task_data: dict) -> None:
         agent = self.fallback_agents[business_id]
         try:
-            update_res = await agent.update_business_info(business_url,
-                                                          task_data["new_hours"],
+            update_res = await agent.update_business_info(business_url, task_data["new_hours"],
                                                           task_data["new_website"])
             logging.info(f"[{business_id} Fallback] Update: {update_res}")
-
-            respond_res = await agent.respond_review(business_url,
-                                                     task_data["review_text"],
+            respond_res = await agent.respond_review(business_url, task_data["review_text"],
                                                      task_data["review_response"])
             logging.info(f"[{business_id} Fallback] Respond: {respond_res}")
-
-            post_res = await agent.schedule_post(business_url,
-                                                 task_data["post_content"],
-                                                 hours_from_now=1)
+            post_res = await agent.schedule_post(business_url, task_data["post_content"], hours_from_now=1)
             logging.info(f"[{business_id} Fallback] Post: {post_res}")
-
-            upload_res = await agent.upload_photo(business_url,
-                                                  task_data["photo_path"])
+            upload_res = await agent.upload_photo(business_url, task_data["photo_path"])
             logging.info(f"[{business_id} Fallback] Upload: {upload_res}")
-
             logging.info(f"[{business_id} Fallback] All fallback tasks completed.")
         except Exception as e:
             logging.error(f"[{business_id} Fallback] Error in fallback flow: {e}")
 
     async def run_all_businesses(self, tasks_data: dict) -> None:
-        tasks = []
-        for business_id in tasks_data:
-            tasks.append(self.process_business(business_id, tasks_data[business_id]))
+        tasks = [self.process_business(biz_id, tasks_data[biz_id]) for biz_id in tasks_data]
         await asyncio.gather(*tasks)
 
+    async def run_structured_compliance_flow(self) -> None:
+        """
+        Execute the compliance flow step-by-step using the reasoning model.
+        """
+        from utils.model_interface import get_llm_model
+        from compliance_policy import get_compliance_policy
+
+        llm = get_llm_model()
+        pre_prompt = get_compliance_policy()
+
+        from gbp_django.models import Business
+        for business in Business.objects.all():
+            business_url = self.businesses.get(business.business_id)
+            if not business_url:
+                continue
+
+            prompt = (
+                f"Business ID: {business.business_id}\n"
+                f"Business Name: {business.business_name}\n"
+                f"Website: {business.website_url}\n"
+                f"Compliance Score: {business.compliance_score}\n"
+                "Generate a structured plan with actions to ensure compliance. "
+                "Prioritize updating missing or invalid mandatory details first, then content compliance."
+            )
+
+            reasoning_result = llm.structured_reasoning(pre_prompt, prompt)
+            logging.info(f"[{business.business_id} Structured Compliance] Reasoning output: {reasoning_result}")
+
+            actions = reasoning_result.get("actions", [])
+            for action in actions:
+                action_type = action.get("type")
+                target = action.get("target")
+                details = action.get("details")
+                logging.info(f"[{business.business_id} Compliance Action] {action_type} on {target}: {details}")
+                agent = self.fallback_agents.get(business.business_id)
+                if not agent:
+                    logging.error(f"No fallback agent found for business {business.business_id}")
+                    continue
+
+                if target == "website" and action_type == "update":
+                    new_website = details  # Parse details as needed
+                    await agent.update_business_info(business_url, getattr(business, "hours", "Mon-Fri 09:00-17:00"),
+                                                     new_website)
+                elif target in ["reviews", "qna", "posts", "photos"] and action_type == "verify":
+                    await agent.compliance_check(business_url)
+                elif action_type == "alert":
+                    input(
+                        f"[{business.business_id}] Intervention required for {target}: {details}. Press Enter after action.")
+                elif action_type == "log":
+                    logging.info(f"[{business.business_id} LOG] {details}")
+                logging.info(f"[{business.business_id} Compliance] Completed action: {action_type} on {target}")
+
     async def run_compliance_checks(self) -> None:
-        """
-        Run compliance checks for all managed businesses using browser automation.
-        """
-        tasks = []
-        for business_id, business_url in self.businesses.items():
-            tasks.append(self.fallback_agents[business_id].compliance_check(business_url))
+        tasks = [self.fallback_agents[biz_id].compliance_check(self.businesses[biz_id]) for biz_id in self.businesses]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        for business_id, result in zip(self.businesses.keys(), results):
-            logging.info(f"[{business_id}] Compliance check result: {result}")
+        for biz_id, result in zip(self.businesses.keys(), results):
+            logging.info(f"[{biz_id}] Compliance check result: {result}")
 
 
 ###############################################################################
 # Onboarding Function: Add a New Business Account
 ###############################################################################
 def onboard_new_business(cookies_folder: str, chrome_path: str) -> tuple:
-    """
-    Interactively onboard a new business by gathering its unique ID, URL, and
-    performing an interactive login to collect cookies/session data.
-
-    Returns:
-        (business_id, business_url)
-    """
+    """Interactively onboard a new business and collect cookies."""
     business_id = input("Enter the new business ID (unique identifier): ").strip()
     business_url = input("Enter the business URL (e.g., https://business.google.com/your_business_id): ").strip()
     cookie_file = os.path.join(cookies_folder, f"cookies_{business_id}.json")
-    # Instantiate a fallback agent in visible (non-headless) mode to perform login.
     agent = FallbackGBPAgent(business_id, cookie_file, chrome_path, headless=False)
     login_url = "https://accounts.google.com/ServiceLogin?service=businessprofile"
     logging.info(f"[{business_id}] Onboarding new business. Initiating interactive login.")
@@ -680,56 +602,51 @@ if __name__ == "__main__":
     cookies_folder = os.path.join(base_dir, "browser_cookies")
     os.makedirs(cookies_folder, exist_ok=True)
 
-    # Path to Chrome/Chromium executable (adjust for your OS/environment)
     chrome_path = r"/usr/bin/chromium-browser"
-    # Path to the Google API credentials JSON file (for OAuth2)
     credentials_file = os.path.join(base_dir, "credentials.json")
 
-    # Load existing businesses (in a production system, this would come from persistent storage)
-    # For demonstration, we start with an empty dictionary.
     businesses = {}
-
-    # Ask the user if they want to onboard a new business.
     add_new = input("Would you like to add a new business? (y/n): ").strip().lower()
     if add_new == "y":
         new_id, new_url = onboard_new_business(cookies_folder, chrome_path)
         businesses[new_id] = new_url
     else:
-        # Otherwise, define pre-existing businesses here.
         businesses = {
             "business1": "https://business.google.com/your_business_id1",
             "business2": "https://business.google.com/your_business_id2"
         }
 
-    # Define task-specific data for each business.
-    # For API calls, 'location_name' should be the resource name (e.g. "accounts/123/locations/456")
     tasks_data = {
         biz_id: {
-            "location_name": "accounts/EXAMPLE/locations/EXAMPLE",  # Replace with actual resource names.
+            "location_name": "accounts/EXAMPLE/locations/EXAMPLE",
             "new_hours": "Mon-Fri 09:00-17:00",
             "new_website": f"https://new-website-for-{biz_id}.example.com",
-            "review_id": "reviewEXAMPLE",  # Replace with actual review ID.
+            "review_id": "reviewEXAMPLE",
             "review_text": "The service was excellent!",
             "review_response": "Thank you for your kind feedback! We are thrilled to serve you.",
             "post_content": "We're excited to announce a new promotion this week!",
-            "photo_path": r"/path/to/photo.jpg"  # Adjust the file path accordingly.
+            "photo_path": r"/path/to/photo.jpg"
         }
         for biz_id in businesses
     }
 
-    # Create a BusinessProfileManager instance.
     manager = BusinessProfileManager(businesses, cookies_folder, chrome_path, credentials_file, headless=True)
 
-    # Run all automation tasks concurrently.
     try:
         asyncio.run(manager.run_all_businesses(tasks_data))
     except Exception as e:
         logging.error(f"Error running tasks for all businesses: {e}")
 
-    # Ask the user if they want to run a compliance check.
     run_compliance = input("Would you like to run a compliance check? (y/n): ").strip().lower()
     if run_compliance == "y":
         try:
             asyncio.run(manager.run_compliance_checks())
         except Exception as e:
             logging.error(f"Error running compliance checks: {e}")
+
+    run_structured = input("Run structured compliance flow (prioritized, step-by-step)? (y/n): ").strip().lower()
+    if run_structured == "y":
+        try:
+            asyncio.run(manager.run_structured_compliance_flow())
+        except Exception as e:
+            logging.error(f"Error running structured compliance flow: {e}")
