@@ -557,6 +557,7 @@ class BusinessProfileManager:
 
             actions = reasoning_result.get("actions", [])
             for action in actions:
+                logging.debug(f"Structured compliance action: {action}")
                 action_type = action.get("type")
                 target = action.get("target")
                 details = action.get("details")
